@@ -1,0 +1,85 @@
+/* Sidebar Styling */
+.app-sidebar {
+    background: linear-gradient(135deg, #1e293b, #0f172a);
+    color: #f1f5f9;
+    border-right: 1px solid rgba(255,255,255,0.08);
+}
+
+.app-sidebar .nav-link {
+    color: #cbd5e1;
+    transition: background 0.3s, color 0.3s;
+    border-radius: 6px;
+    padding: 0.65rem 1rem;
+}
+
+.app-sidebar .nav-link:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: #fff;
+}
+
+.app-sidebar .nav-link.active {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
+
+.app-sidebar .nav-item.menu-open > .nav-link {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.app-sidebar .nav-treeview {
+    margin-left: 1.25rem;
+    transition: all 0.3s ease-in-out;
+    display: none;
+}
+
+.app-sidebar .nav-treeview.show {
+    display: block;
+    animation: fadeInDown 0.3s ease-in-out;
+}
+
+@keyframes fadeInDown {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.app-sidebar .nav-treeview .nav-link {
+    padding-left: 2rem;
+    font-size: 0.92rem;
+}
+
+.sidebar-brand {
+    background: rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    margin-bottom: 0.5rem;
+}
+
+.sidebar-brand .brand-text {
+    font-weight: 500;
+    color: #f8fafc;
+}
+
+/* Sidebar Collapsed State */
+.app-sidebar.collapsed {
+    width: 60px;
+    overflow-x: hidden;
+}
+
+.app-sidebar.collapsed .nav-link p,
+.app-sidebar.collapsed .brand-text,
+.app-sidebar.collapsed .nav-treeview {
+    display: none;
+}
+
+/* OverlayScrollbars theme override */
+.os-theme-light > .os-scrollbar {
+    background: transparent;
+}
+
+.os-theme-light > .os-scrollbar > .os-scrollbar-track {
+    background: rgba(255,255,255,0.05);
+}
+
+.os-theme-light > .os-scrollbar > .os-scrollbar-handle {
+    background: rgba(255,255,255,0.25);
+    border-radius: 5px;
+}
