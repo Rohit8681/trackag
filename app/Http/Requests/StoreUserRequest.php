@@ -45,6 +45,28 @@ class StoreUserRequest extends FormRequest
             'image' => 'nullable|image|max:5120',
             'roles' => 'nullable|array',
             'company_id' => 'nullable|exists:companies,id',
+
+            // 🆕 Newly Added Fields
+            'company_mobile' => 'nullable|string|max:20',
+            'village' => 'nullable|string|max:100',
+            'depo_id' => 'nullable|exists:depos,id',
+            'is_web_login_access' => 'nullable|boolean',
+
+            'account_no' => 'nullable|string|max:30',
+            'branch_name' => 'nullable|string|max:100',
+            'ifsc_code' => 'nullable|string|max:20',
+
+            'pan_card_no' => 'nullable|string|max:20',
+            'aadhar_no' => 'nullable|string|max:20',
+
+            'driving_lic_no' => 'nullable|string|max:50',
+            'driving_expiry' => 'nullable|date',
+
+            'passport_no' => 'nullable|string|max:50',
+            'passport_expiry' => 'nullable|date',
+
+            'cancel_cheque_photos'   => 'nullable|array|max:3',
+            'cancel_cheque_photos.*' => 'image|max:5120', 
         ];
     }
 }

@@ -75,12 +75,12 @@
                                         
                                         <div class="col-md-4">
                                             <label class="form-label">Mobile</label>
-                                            <input type="text" name="mobile" class="form-control"
+                                            <input type="text" name="mobile" class="form-control mobile_no"
                                                 value="{{ old('mobile') }}">
                                         </div>
                                         <div class="col-md-4">
                                             <label class="form-label">Company Mobile</label>
-                                            <input type="text" name="company_mobile" class="form-control"
+                                            <input type="text" name="company_mobile" class="form-control mobile_no"
                                                 value="{{ old('company_mobile') }}">
                                         </div>
 
@@ -141,13 +141,6 @@
                                             </select>
                                         </div>
 
-                                        {{-- <div class="col-md-3">
-                                            <label class="form-label">City</label>
-                                            <select name="city_id" id="city" class="form-select">
-                                                <option value="">Select City</option>
-                                            </select>
-                                        </div> --}}
-
                                         <div class="col-md-3">
                                             <label class="form-label">Taluka</label>
                                             <select name="tehsil_id" id="tehsil" class="form-select">
@@ -167,14 +160,6 @@
                                                 <option value="">Select Pincode</option>
                                             </select>
                                         </div>
-
-                                        {{-- Pincode, Postal, Lat/Lng --}}
-                                        {{-- <div class="col-md-4">
-                                            <label class="form-label">Pincode</label>
-                                            <input type="text" name="pincode" class="form-control" value="{{ old('pincode') }}">
-                                        </div> --}}
-
-
 
                                         <div class="col-md-4">
                                             <label class="form-label">Postal Address</label>
@@ -335,8 +320,8 @@
                                                 value="{{ old('driving_lic_no') }}">
                                         </div>
                                         <div class="col-md-4">
-                                            <label class="form-label">Driving Expiry </label>
-                                            <input type="text" name="driving_expiry" class="form-control"
+                                            <label class="form-label">Driving Expiry</label>
+                                            <input type="date" name="driving_expiry" class="form-control"
                                                 value="{{ old('driving_expiry') }}">
                                         </div>
                                         <div class="col-md-4">
@@ -345,9 +330,20 @@
                                                 value="{{ old('passport_no') }}">
                                         </div>
                                         <div class="col-md-4">
-                                            <label class="form-label">Passport Expiry </label>
-                                            <input type="text" name="passport_expiry" class="form-control"
+                                            <label class="form-label">Passport Expiry</label>
+                                            <input type="date" name="passport_expiry" class="form-control"
                                                 value="{{ old('passport_expiry') }}">
+                                        </div>
+                                    </div>
+
+                                    {{-- Cancel Cheque Photos --}}
+                                    <h5 class="mb-3">Cancel Cheque Photos (Max 3)</h5>
+                                    <div class="row g-3 mb-4">
+                                        <div class="col-md-12">
+                                            <label class="form-label">Upload Cancel Cheque Photos</label>
+                                            <input type="file" name="cancel_cheque_photos[]" class="form-control" accept="image/*"
+                                                   multiple onchange="validateChequePhotos(this)">
+                                            <small class="text-muted">You can upload up to 3 images.</small>
                                         </div>
                                     </div>
 
@@ -406,3 +402,23 @@
         </div>
     </main>
 @endsection
+
+
+@push('scripts')
+<script>
+    function validateChequePhotos(input) {
+        if (input.files.length > 3) {
+            alert("You can upload only up to 3 Cancel Cheque Photos.");
+            input.value = ""; // reset selection
+        }
+    }
+    $('.mobile_no').on('input', function() {
+        this.value = this.value.replace(/\D/g, '');
+        
+        // Limit to 10 digits
+        if (this.value.length > 10) {
+            this.value = this.value.slice(0, 10);
+        }
+    });
+</script>
+@endpush
