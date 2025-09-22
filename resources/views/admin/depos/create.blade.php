@@ -23,14 +23,15 @@
             <div class="card-header">
                 <h3 class="card-title">Create Depo</h3>
             </div>
-            <div class="card-body">
+            <div class="card-body row g-3">
                 @include('admin.depos.form', [
                     'action' => route('depos.store'),
                     'method' => 'POST',
                     'depo' => null,
                     'states' => $states,
                     'districts' => collect(),
-                    'tehsils' => collect()
+                    'tehsils' => collect(),
+                    'designation' => $designation,
                 ])
             </div>
         </div>

@@ -16,7 +16,8 @@ class Company extends Model
         'tenant_id','name','code','owner_name','gst_number','contact_no',
         'contact_no2','telephone_no','email','logo','website','state',
         'product_name','subscription_type','tally_configuration','address',
-        'subdomain','is_active','status'
+        'subdomain','is_active','status','start_date','validity_upto','user_assigned',
+        'created_at','updated_at'
     ];
 
     public function users()

@@ -6,65 +6,46 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class StoreCompanyRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
-        // You can add condition if only admins can create company
         return true;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     */
     public function rules(): array
     {
-        return [
-            // Company Fields
+        $companyId = $this->route('company')?->id; 
+
+        $rules = [
             'name' => 'required|string|max:255',
-            'code' => 'nullable|string|unique:companies,code',
-            'email' => 'nullable|email',
-            'address' => 'nullable|string',
             'owner_name' => 'nullable|string|max:255',
+            'code' => 'required|string|unique:companies,code' . ($companyId ? ',' . $companyId : ''),
             'gst_number' => 'nullable|string|max:50',
-            'contact_no' => 'nullable|string|max:20',
+            'address' => 'nullable|string',
+            'contact_no' => 'required|string|max:20',
             'contact_no2' => 'nullable|string|max:20',
             'telephone_no' => 'nullable|string|max:20',
+            'email' => 'required|email',
             'website' => 'nullable|url',
-            'state' => 'nullable|string|max:100',
+            'state' => 'nullable|array',
+            'state.*' => 'exists:states,id',
             'product_name' => 'nullable|string|max:255',
             'subscription_type' => 'nullable|string|max:100',
             'tally_configuration' => 'nullable|boolean',
             'logo' => 'nullable|image|mimes:png|max:2048',
-            'subdomain' => 'nullable|string|alpha_dash|unique:companies,subdomain',
-
-            // Admin User Fields
-            'user_name' => 'required|string|max:255',
-            'user_email' => 'required|email|unique:users,email',
-            'user_password' => 'required|string|min:6|confirmed',
-            'user_mobile' => 'nullable|string|max:20',
-            'user_dob' => 'nullable|date',
-            'user_gender' => 'nullable|string',
-            'user_marital_status' => 'nullable|string',
-            'user_address' => 'nullable|string',
-            'state_id' => 'nullable|exists:states,id',
-            'district_id' => 'nullable|exists:districts,id',
-            'city_id' => 'nullable|exists:cities,id',
-            'tehsil_id' => 'nullable|exists:tehsils,id',
-            'pincode_id' => 'nullable|exists:pincodes,id',
-            'postal_address' => 'nullable|string',
-            'latitude' => 'nullable|string',
-            'longitude' => 'nullable|string',
-            'user_type' => 'nullable|string',
-            'user_code' => 'nullable|string|unique:users,user_code',
-            'designation_id' => 'nullable|exists:designations,id',
-            'reporting_to' => 'nullable|exists:users,id',
-            'headquarter' => 'nullable|string',
-            'is_self_sale' => 'nullable|boolean',
-            'is_multi_day_start_end_allowed' => 'nullable|boolean',
-            'is_allow_tracking' => 'nullable|boolean',
+            'start_date' => 'required|date',
+            'validity_upto' => 'required|date|after_or_equal:start_date',
+            'user_assigned' => 'required|integer',
         ];
+
+        if ($this->isMethod('post')) {
+            // Create (store)
+            $rules['user_password'] = 'required|string|min:6|confirmed';
+        } else {
+            // Update
+            $rules['user_password'] = 'nullable|string|min:6|confirmed';
+        }
+
+        return $rules;
     }
 
     /**
@@ -74,9 +55,17 @@ class StoreCompanyRequest extends FormRequest
     {
         return [
             'name.required' => 'Company name is required.',
-            'user_name.required' => 'Admin user name is required.',
-            'user_email.unique' => 'This email is already taken for another user.',
-            'subdomain.unique' => 'This subdomain is already taken.',
+            'code.unique' => 'This company code is already taken.',
+            'user_password.required' => 'Password is required.',
+            'user_password.min' => 'Password must be at least 6 characters.',
+            'user_password.confirmed' => 'Password and Confirm Password do not match.',
+            'start_date.required' => 'Start date is required.',
+            'start_date.date' => 'Start date must be a valid date.',
+            'validity_upto.required' => 'Validity date is required.',
+            'validity_upto.date' => 'Validity date must be a valid date.',
+            'validity_upto.after_or_equal' => 'Validity date must be after or equal to start date.',
+            'user_assigned.required' => 'User assigned  is required.',
+            'user_assigned.integer' => 'User assigned must be a valid user ID.',
         ];
     }
 }

@@ -31,4 +31,9 @@ class Depo extends Model
     {
         return $this->belongsTo(Tehsil::class);
     }
+
+    public function designation()
+    {
+        return $this->belongsTo(Designation::class, 'manage_by', 'id');
+    }
 }

@@ -30,6 +30,7 @@
 
 <!-- SweetAlert2 -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 <!-- Google Maps API -->
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB_-uOyQimLqBkDW_Vr8d88GX6Qk0lyksI&libraries=places">
@@ -41,7 +42,7 @@
 <!-- Initialize DataTables -->
 <script>
     $(document).ready(function() {
-        $("#roles-table, #users-table, #companies-table, #permissions-table, #customers-table, #designation-table, #trips-table,#states-table,#tehsils-table,#districts-table")
+        $("#roles-table, #users-table, #permissions-table, #customers-table, #designation-table, #trips-table,#states-table,#tehsils-table,#districts-table")
             .DataTable();
     });
 </script>

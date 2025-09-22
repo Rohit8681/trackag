@@ -17,63 +17,52 @@ class DesignationController extends Controller
         Session::put('page', 'designations');
 
         $authUser = auth()->user();
-
-        // $designations = $authUser->user_level === 'master_admin'
-        //     ? Designation::with('company')->latest()->get()
-        //     : Designation::with('company')->where('company_id', $authUser->company_id)->latest()->get();
+        
         $designations = Designation::with('company')->latest()->get();
 
         return view('admin.hr.index', compact('designations'));
     }
 
-    /**
-     * Show the form for creating a new designation.
-     */
+    public function toggleStatus(Request $request)
+    {
+        $designation = Designation::findOrFail($request->id);
+        $designation->status = $request->status;
+        $designation->save();
+
+        return response()->json(['success' => true, 'message' => 'Status updated successfully.']);
+    }
+
     public function create()
     {
         $authUser = auth()->user();
 
-        $companies = $authUser->user_level === 'master_admin'
-            ? Company::all()
-            : collect();
-
-        return view('admin.hr.create', compact('companies', 'authUser'));
+        return view('admin.hr.create', compact( 'authUser'));
     }
 
     /**
      * Store a newly created designation.
      */
     public function store(Request $request)
-{
-    $request->validate([
-        'name' => 'required|string|max:255',
-        'description' => 'nullable|string'
-    ]);
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+        ]);
 
-    $authUser = auth()->user();
-    $companyId = $authUser->user_level === 'master_admin'
-        ? $request->company_id
-        : $authUser->company_id;
+        // ✅ Duplicate designation check added here
+        $existing = Designation::where('name', $request->name)->first();
 
-    // ✅ Duplicate designation check added here
-    $existing = Designation::where('company_id', $companyId)
-        ->where('name', $request->name)
-        ->first();
+        if ($existing) {
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['A designation with this name already exists ']);
+        }
 
-    if ($existing) {
-        // Redirect back with error if duplicate found
-        return redirect()->back()
-            ->withInput()
-            ->withErrors(['A designation with this name already exists for the selected company.']);
+        $data = $request->only(['name']);
+
+        Designation::create($data);
+
+        return redirect()->route('designations.index')->with('success', 'Designation created successfully.');
     }
-
-    $data = $request->only(['name', 'description']);
-    $data['company_id'] = $companyId;
-
-    Designation::create($data);
-
-    return redirect()->route('designations.index')->with('success', 'Designation created successfully.');
-}
 
 
     /**
@@ -95,49 +84,19 @@ class DesignationController extends Controller
      */
     public function edit(Designation $designation)
     {
-        $authUser = auth()->user();
-
-        if ($authUser->user_level !== 'master_admin' && $designation->company_id !== $authUser->company_id) {
-            abort(403, 'Unauthorized edit attempt.');
-        }
-
-        $companies = $authUser->user_level === 'master_admin'
-            ? Company::all()
-            : collect();
-
-        return view('admin.hr.edit', compact('designation', 'companies', 'authUser'));
+        return view('admin.hr.edit', compact('designation'));
     }
 
-    /**
-     * Update a specific designation.
-     */
     public function update(Request $request, Designation $designation)
     {
-        $authUser = auth()->user();
+        $request->validate(['name' => 'required|string|max:255']);
 
-        if ($authUser->user_level !== 'master_admin' && $designation->company_id !== $authUser->company_id) {
-            abort(403, 'Unauthorized update attempt.');
-        }
-
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string'
-        ]);
-
-        $designation->update([
-            'name'        => $request->name,
-            'description' => $request->description,
-            'company_id'  => $authUser->user_level === 'master_admin'
-                ? $request->company_id
-                : $authUser->company_id
-        ]);
+        $designation->update(['name' => $request->name]);
 
         return redirect()->route('designations.index')->with('success', 'Designation updated successfully.');
     }
 
-    /**
-     * Delete a specific designation.
-     */
+    
     public function destroy(Designation $designation)
     {
         $authUser = auth()->user();

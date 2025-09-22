@@ -4,33 +4,185 @@
 <main class="app-main">
     <div class="container-fluid py-4">
         <h3>Edit Company</h3>
-        <form action="{{ route('companies.update', $company) }}" method="POST">
+
+        @if ($errors->any())
+            <div class="alert alert-danger">
+                <ul class="mb-0">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
+        <form action="{{ route('companies.update', $company->id) }}" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
 
-            <div class="mb-3">
-                <label for="name" class="form-label">Company Name</label>
-                <input type="text" name="name" id="name" class="form-control" value="{{ $company->name }}" required>
+            <div class="card mb-4">
+                <div class="card-header"><h5>Company Information</h5></div>
+                <div class="card-body row g-3">
+
+                    <div class="col-md-6">
+                        <label class="form-label">Company Name <span class="text-danger">*</span></label>
+                        <input type="text" name="name" class="form-control"
+                               value="{{ old('name', $company->name) }}" required>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Owner Name</label>
+                        <input type="text" name="owner_name" class="form-control"
+                               value="{{ old('owner_name', $company->owner_name) }}">
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Company Code <span class="text-danger">*</span></label>
+                        <input type="text" readonly name="code" class="form-control"
+                               value="{{ old('code', $company->code) }}">
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">GST Number</label>
+                        <input type="text" name="gst_number" class="form-control"
+                               value="{{ old('gst_number', $company->gst_number) }}">
+                    </div>
+
+                    <div class="col-md-12">
+                        <label class="form-label">Address</label>
+                        <textarea name="address" class="form-control">{{ old('address', $company->address) }}</textarea>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Contact No</label>
+                        <input type="text" name="contact_no" class="form-control"
+                               value="{{ old('contact_no', $company->contact_no) }}">
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Contact No 2</label>
+                        <input type="text" name="contact_no2" class="form-control mobile_no"
+                               value="{{ old('contact_no2', $company->contact_no2) }}">
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Telephone No</label>
+                        <input type="text" name="telephone_no" class="form-control mobile_no"
+                               value="{{ old('telephone_no', $company->telephone_no) }}">
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Email</label>
+                        <input type="email" name="email" class="form-control"
+                               value="{{ old('email', $company->email) }}">
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Logo (PNG)</label><br>
+                        @if($company->logo)
+                            <img src="{{ asset('storage/'.$company->logo) }}" height="50" class="mb-2">
+                        @endif
+                        <input type="file" name="logo" class="form-control" accept="image/png">
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Website</label>
+                        <input type="url" name="website" class="form-control"
+                               value="{{ old('website', $company->website) }}">
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">State Working</label>
+                        <select name="state[]" class="form-control" multiple>
+                            @foreach($state as $s)
+                                <option value="{{ $s->id }}"
+                                    {{ in_array($s->id, explode(',', old('state', $company->state ?? ''))) ? 'selected' : '' }}>
+                                    {{ $s->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Product Name</label>
+                        <input type="text" name="product_name" class="form-control"
+                               value="{{ old('product_name', $company->product_name) }}">
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Subscription Type</label>
+                        <input type="text" name="subscription_type" class="form-control"
+                               value="{{ old('subscription_type', $company->subscription_type) }}">
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Tally Configuration</label>
+                        <select name="tally_configuration" class="form-select">
+                            <option value="0" {{ old('tally_configuration', $company->tally_configuration) == 0 ? 'selected' : '' }}>No</option>
+                            <option value="1" {{ old('tally_configuration', $company->tally_configuration) == 1 ? 'selected' : '' }}>Yes</option>
+                        </select>
+                    </div>
+
+                     <div class="col-md-4">
+                        <label class="form-label">Start Date</label>
+                        <input type="date" name="start_date" class="form-control"
+                            value="{{ old('start_date', $company->start_date ? \Carbon\Carbon::parse($company->start_date)->format('Y-m-d') : '') }}">
+                    </div>
+
+
+                    <div class="col-md-4">
+                        <label class="form-label">Validity Upto</label>
+                        <input type="date" name="validity_upto" class="form-control"
+                            value="{{ old('validity_upto', $company->validity_upto ? \Carbon\Carbon::parse($company->validity_upto)->format('Y-m-d') : '') }}">
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">User Assigned</label>
+                        <input type="text" name="user_assigned" class="form-control"
+                            value="{{ old('user_assigned', $company->user_assigned) }}">
+                    </div>
+                </div>
             </div>
 
-            <div class="mb-3">
-                <label for="code" class="form-label">Company Code</label>
-                <input type="text" name="code" id="code" class="form-control" value="{{ $company->code }}">
+            <div class="card mb-4">
+                <div class="card-header"><h5>Admin User Information</h5></div>
+                <div class="card-body row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Password <span class="text-danger">*</span></label>
+                        <input type="password" name="user_password" class="form-control @error('user_password') is-invalid @enderror">
+                        @error('user_password')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Confirm Password <span class="text-danger">*</span></label>
+                        <input type="password" name="user_password_confirmation" class="form-control">
+                    </div>
+                </div>
             </div>
 
-            <div class="mb-3">
-                <label for="email" class="form-label">Company Email</label>
-                <input type="email" name="email" id="email" class="form-control" value="{{ $company->email }}">
+            <div class="text-end">
+                <button type="submit" class="btn btn-primary">Update Company</button>
+                <a href="{{ route('companies.index') }}" class="btn btn-secondary">Cancel</a>
             </div>
-
-            <div class="mb-3">
-                <label for="address" class="form-label">Company Address</label>
-                <textarea name="address" id="address" class="form-control" rows="3">{{ $company->address }}</textarea>
-            </div>
-
-            <button type="submit" class="btn btn-primary">Update Company</button>
-            <a href="{{ route('companies.index') }}" class="btn btn-secondary">Cancel</a>
         </form>
     </div>
 </main>
 @endsection
+@push('scripts')
+<script>
+$('.mobile_no').on('input', function() {
+    // Remove non-digit characters
+    this.value = this.value.replace(/\D/g, '');
+    
+    // Limit to 10 digits
+    if (this.value.length > 10) {
+        this.value = this.value.slice(0, 10);
+    }
+});
+$(document).ready(function() {
+    $('select[name="state[]"]').select2({
+        placeholder: "Select State(s)"
+    });
+});
+</script>
+@endpush

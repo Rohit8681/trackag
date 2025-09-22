@@ -35,8 +35,6 @@ class User extends Authenticatable
         'password',
         'mobile',
         'image',
-
-        // Added fields from the extended schema
         'user_type',
         'user_code',
         'headquarter',
@@ -62,10 +60,24 @@ class User extends Authenticatable
         'depo',
         'postal_address',
         'status',
-
-        // ✨ Added for Multi-Tenant Support
         'company_id',
         'user_level',
+        'company_id',
+        'user_level',
+        'company_mobile',
+        'village',
+        'depo_id',
+        'is_web_login_access',
+        'account_no',
+        'branch_name',
+        'ifsc_code',
+        'pan_card_no',
+        'aadhar_no',
+        'driving_lic_no',
+        'driving_expiry',
+        'passport_no',
+        'passport_expiry',
+        'cancel_cheque_photos',
     ];
 
     /**
@@ -107,13 +119,11 @@ class User extends Authenticatable
     public function tehsil() { return $this->belongsTo(Tehsil::class); }
     public function pincode() { return $this->belongsTo(Pincode::class);}
 
-    // ✨ Company relationship (multi-tenant)
     public function company()
     {
         return $this->belongsTo(Company::class);
     }
 
-    // ✨ Check if user is master admin
     public function isMasterAdmin()
     {
         return $this->user_level === 'master_admin';
@@ -125,29 +135,22 @@ class User extends Authenticatable
     }
 
     public function reportingManager()
-{
-    return $this->belongsTo(User::class, 'reporting_to');
-}
+    {
+        return $this->belongsTo(User::class, 'reporting_to');
+    }
 
-public function designation()
-{
-    return $this->belongsTo(Designation::class);
-}
+    public function designation()
+    {
+        return $this->belongsTo(Designation::class);
+    }
 
-// In App\Models\User.php
+    public function sessions()
+    {
+        return $this->hasMany(UserSession::class);
+    }
 
-public function sessions()
-{
-    return $this->hasMany(UserSession::class);
-}
-
-public function activeSessions()
-{
-    return $this->hasMany(\App\Models\UserSession::class)->whereNull('logout_at');
-}
-
-
-
-
-
+    public function activeSessions()
+    {
+        return $this->hasMany(\App\Models\UserSession::class)->whereNull('logout_at');
+    }
 }

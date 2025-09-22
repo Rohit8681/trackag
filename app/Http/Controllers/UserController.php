@@ -13,6 +13,7 @@ use Spatie\Permission\Models\Permission;
 use App\Models\State;
 use App\Models\District;
 use App\Models\City;
+use App\Models\Company;
 use App\Models\Tehsil;
 use App\Models\Pincode;
 use App\Models\Designation;
@@ -45,26 +46,14 @@ class UserController extends Controller
     public function create()
     {
         $authUser = auth()->user();
-
-        $roles = $authUser->user_level === 'master_admin'
-            ? Role::all()
-            : Role::where('company_id', $authUser->company_id)->get();
-
-        $companies = $authUser->user_level === 'master_admin'
-            ? \App\Models\Company::all()
-            : collect(); // empty for non-master
-
-        // ✅ Added: get users of same company for 'Reporting To' dropdown
+        $roles = Role::all();
+        $companies = Company::all();
         $users = User::when($authUser->user_level !== 'master_admin', function ($query) use ($authUser) {
                 $query->where('company_id', $authUser->company_id);
             })->get();
 
-        $designations = $authUser->user_level === 'master_admin'
-        ? Designation::all()
-        : Designation::where('company_id', $authUser->company_id)->get();
-
+        $designations = Designation::all();
         $depos = Depo::where('status',1)->get();
-
         
         return view('admin.users.create', [
             'roles' => $roles,
@@ -77,10 +66,32 @@ class UserController extends Controller
             'depos' => $depos
         ]);
     }
+   
+    // public function store(StoreUserRequest $request)
+    // {
+    //     $data = $request->validated();
 
-    /**
-     * Store a newly created user in the database.
-     */
+    //     if (!empty($data['password'])) {
+    //         $data['password'] = bcrypt($data['password']);
+    //     }
+
+    //     if (auth()->user()->user_level !== 'master_admin') {
+    //         $data['company_id'] = auth()->user()->company_id;
+    //     }
+
+    //     if ($request->hasFile('image')) {
+    //         $data['image'] = $request->file('image')->store('users', 'public');
+    //     }
+
+    //     $user = User::create($data);
+
+    //     if ($request->filled('roles')) {
+    //         $user->syncRoles($request->input('roles'));
+    //     }
+
+    //     return redirect()->route('users.index')->with('success', 'User created successfully.');
+    // }
+
     public function store(StoreUserRequest $request)
     {
         $data = $request->validated();
@@ -89,12 +100,17 @@ class UserController extends Controller
             $data['password'] = bcrypt($data['password']);
         }
 
-        if (auth()->user()->user_level !== 'master_admin') {
-            $data['company_id'] = auth()->user()->company_id;
-        }
-
         if ($request->hasFile('image')) {
             $data['image'] = $request->file('image')->store('users', 'public');
+        }
+
+        if ($request->hasFile('cancel_cheque_photos')) {
+            $photos = [];
+            foreach ($request->file('cancel_cheque_photos') as $index => $photo) {
+                if ($index >= 3) break; 
+                $photos[] = $photo->store('cancel_cheques', 'public');
+            }
+            $data['cancel_cheque_photos'] = json_encode($photos);
         }
 
         $user = User::create($data);
@@ -106,9 +122,7 @@ class UserController extends Controller
         return redirect()->route('users.index')->with('success', 'User created successfully.');
     }
 
-    /**
-     * Display a specific user's details.
-     */
+
     public function show(User $user)
     {
         if (auth()->user()->user_level !== 'master_admin' && $user->company_id !== auth()->user()->company_id) {
@@ -148,6 +162,8 @@ public function edit(User $user)
     ? Designation::all()
     : Designation::where('company_id', $authUser->company_id)->get();
 
+    $depos = Depo::where('status',1)->get();
+
     return view('admin.users.edit', [
         'user' => $user,
         'roles' => $roles,
@@ -160,38 +176,75 @@ public function edit(User $user)
         'companies' => $companies,
         'authUser' => $authUser,
         'users' => $users, // ✅ passed this for Reporting To dropdown
-        'designations' => $designations // ✅ passed to edit view
+        'designations' => $designations, // ✅ passed to edit view,
+        'depos' => $depos
+
     ]);
 }
 
     /**
      * Update a specific user in the database.
      */
+    // public function update(UpdateUserRequest $request, User $user)
+    // {
+    //     if (auth()->user()->user_level !== 'master_admin' && $user->company_id !== auth()->user()->company_id) {
+    //         abort(403, 'Unauthorized update attempt.');
+    //     }
+
+    //     $data = $request->validated();
+
+    //     if (!empty($data['password'])) {
+    //         $data['password'] = bcrypt($data['password']);
+    //     } else {
+    //         unset($data['password']);
+    //     }
+
+    //     if ($request->hasFile('image')) {
+    //         $data['image'] = $request->file('image')->store('users', 'public');
+    //     }
+
+    //     $user->update($data);
+
+    //     $user->syncRoles($request->input('roles', []));
+    //     $user->syncPermissions($request->input('permissions', []));
+
+    //     return redirect()->route('users.index')->with('success', 'User updated successfully.');
+    // }
+
     public function update(UpdateUserRequest $request, User $user)
     {
-        if (auth()->user()->user_level !== 'master_admin' && $user->company_id !== auth()->user()->company_id) {
-            abort(403, 'Unauthorized update attempt.');
-        }
-
         $data = $request->validated();
 
+        // Handle password
         if (!empty($data['password'])) {
             $data['password'] = bcrypt($data['password']);
         } else {
             unset($data['password']);
         }
 
+        // Handle Profile Image
         if ($request->hasFile('image')) {
             $data['image'] = $request->file('image')->store('users', 'public');
         }
 
+        // Handle Cancel Cheque Photos
+        if ($request->hasFile('cancel_cheque_photos')) {
+            $cheque_photos = [];
+            foreach ($request->file('cancel_cheque_photos') as $photo) {
+                $cheque_photos[] = $photo->store('cheque_photos', 'public');
+            }
+            $data['cancel_cheque_photos'] = json_encode($cheque_photos);
+        }
+
         $user->update($data);
 
+        // Sync Roles & Permissions
         $user->syncRoles($request->input('roles', []));
         $user->syncPermissions($request->input('permissions', []));
 
         return redirect()->route('users.index')->with('success', 'User updated successfully.');
     }
+
 
     /**
      * Delete a specific user.

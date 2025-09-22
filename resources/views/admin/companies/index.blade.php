@@ -40,11 +40,6 @@
                                             aria-label="Close"></button>
                                     </div>
                                 @endif
-                                
-                                                                
-                                {{-- @dd('test'); --}}
-                                {{-- @can('view_companies') --}}
-                                
                                 <div class="table-responsive">
                                     <table id="companies-table" class="table table-bordered table-striped align-middle">
                                         <thead class="table-light">
@@ -52,11 +47,10 @@
                                                 <th>#</th>
                                                 <th>Name</th>
                                                 <th>Code</th>
-                                                <th>Email</th>
-                                                <th>Address</th>
-                                                @can('toggle_companies')
-                                                    <th>Status</th>
-                                                @endcan
+                                                <th>Start Date</th>
+                                                <th>End Date</th>
+                                                <th>Assign User</th>
+                                                <th>Status</th>
                                                 <th>Created At</th>
                                                 <th>Updated At</th>
                                                 <th>Actions</th>
@@ -68,22 +62,25 @@
                                                     <td>{{ $loop->iteration }}</td>
                                                     <td>{{ $company->name }}</td>
                                                     <td>{{ $company->code ?? '-' }}</td>
-                                                    <td>{{ $company->email ?? '-' }}</td>
-                                                    <td>{{ $company->address ?? '-' }}</td>
+                                                    <td>{{ $company->start_date ? \Carbon\Carbon::parse($company->start_date)->format('m/d/Y') : '-' }}</td>
+                                                    <td>{{ $company->validity_upto ? \Carbon\Carbon::parse($company->validity_upto)->format('m/d/Y') : '-' }}</td>
 
-                                                    @can('toggle_companies')
-                                                        <td>
-                                                            <form action="{{ route('companies.toggle', $company->id) }}" method="POST">
-                                                                @csrf
-                                                                @method('PATCH')
-                                                                <button type="submit"
-                                                                    class="badge {{ $company->is_active ? 'bg-success' : 'bg-danger' }}"
-                                                                    onclick="return confirm('Are you sure you want to {{ $company->is_active ? 'deactivate' : 'activate' }} this company?')">
-                                                                    {{ $company->is_active ? 'Active' : 'Inactive' }}
-                                                                </button>
-                                                            </form>
-                                                        </td>
-                                                    @endcan
+                                                    <td>{{ $company->user_assigned ?? '-' }}</td>
+                                                    <td>
+                                                         @can('toggle_companies')
+                                                        <form action="{{ route('companies.toggle', $company->id) }}" method="POST">
+                                                            @csrf
+                                                            @method('PATCH')
+                                                            <button type="submit"
+                                                                class="badge {{ $company->is_active ? 'bg-success' : 'bg-danger' }}"
+                                                                onclick="return confirm('Are you sure you want to {{ $company->is_active ? 'deactivate' : 'activate' }} this company?')">
+                                                                {{ $company->is_active ? 'Active' : 'Inactive' }}
+                                                            </button>
+                                                        </form>
+                                                         @else
+                                                            {{ $company->is_active ? 'Active' : 'Inactive' }}
+                                                        @endcan
+                                                    </td>
 
                                                     <td>{{ $company->created_at->format('Y-m-d H:i') }}</td>
                                                     <td>{{ $company->updated_at->format('Y-m-d H:i') }}</td>
@@ -126,3 +123,21 @@
         </div>
     </main>
 @endsection
+@push('scripts')
+<script>
+$(document).ready(function() {
+    var companiesCount = @json($companies->count());
+    if (companiesCount > 0) {
+        $('#companies-table').DataTable({
+            responsive: true,
+            autoWidth: false,
+            pageLength: 10,
+            lengthMenu: [5, 10, 25, 50],
+            columnDefs: [
+                { orderable: false, targets: -1 } // Actions column not orderable
+            ]
+        });
+    }
+});
+</script>
+@endpush
