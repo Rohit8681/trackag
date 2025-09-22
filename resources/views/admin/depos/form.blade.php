@@ -3,7 +3,7 @@
     @if($method === 'PUT') @method('PUT') @endif
 
     {{-- Depo Code --}}
-    <div class="mb-3">
+    <div class="mb-3 " >
         <label for="depo_code" class="form-label">Depo Code <span class="text-danger">*</span></label>
         <input type="text" name="depo_code" id="depo_code"
                class="form-control @error('depo_code') is-invalid @enderror"
@@ -23,9 +23,15 @@
     {{-- Manage By --}}
     <div class="mb-3">
         <label for="manage_by" class="form-label">Manage By</label>
-        <input type="text" name="manage_by" id="manage_by"
-               class="form-control"
-               value="{{ old('manage_by', $depo->manage_by ?? '') }}">
+        <select name="manage_by" id="manage_by" class="form-select">
+            <option value="">-- Select Manage By --</option>
+            @foreach($designation as $desig)
+                <option value="{{ $desig->id }}"
+                    {{ old('manage_by', $depo->manage_by ?? '') == $desig->id ? 'selected' : '' }}>
+                    {{ $desig->name }}
+                </option>
+            @endforeach
+        </select>
     </div>
 
     {{-- State --}}
@@ -81,12 +87,7 @@
                value="{{ old('city', $depo->city ?? '') }}">
     </div>
 
-    {{-- Status --}}
-    <div class="form-check mb-3">
-        <input type="checkbox" name="status" value="1" class="form-check-input"
-               {{ old('status', $depo->status ?? 1) ? 'checked' : '' }}>
-        <label for="status" class="form-check-label">Active</label>
-    </div>
+    
 
     {{-- Buttons --}}
     <button type="submit" class="btn btn-primary">{{ $method === 'PUT' ? 'Update' : 'Save' }}</button>

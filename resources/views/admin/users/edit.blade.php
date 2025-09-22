@@ -272,26 +272,6 @@
                                         </div>
                                     </div>
 
-                                    {{-- Company Information --}}
-                                    @if ($authUser->user_level === 'master_admin')
-                                        <h5 class="mb-3">Company Information</h5>
-                                        <div class="row g-3 mb-4">
-                                            <div class="col-md-6">
-                                                <label class="form-label">Company</label>
-                                                <select name="company_id" class="form-select">
-                                                    <option value="">Select Company</option>
-                                                    @foreach ($companies as $company)
-                                                        <option value="{{ $company->id }}"
-                                                            {{ old('company_id', $user->company_id) == $company->id ? 'selected' : '' }}>
-                                                            {{ $company->name }}
-                                                        </option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-                                        </div>
-                                    @endif
-
-
                                     {{-- Authentication --}}
                                     <h5 class="mb-3">Authentication</h5>
                                     <div class="row g-3 mb-4">

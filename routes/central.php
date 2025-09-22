@@ -275,6 +275,8 @@ Route::middleware(['web'])->group(function () {
 
         // Protected routes
         Route::middleware(['admin', 'last_seen'])->group(function () {
+            Route::resource('users', UserController::class);
+            Route::post('/users/{user}/toggle', [UserController::class, 'toggle'])->name('users.toggle');
             Route::get('dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
             Route::resource('companies', CompanyController::class);
             Route::patch('companies/{id}/toggle', [CompanyController::class, 'toggle'])->name('companies.toggle');
@@ -285,8 +287,10 @@ Route::middleware(['web'])->group(function () {
             Route::resource('tehsils', TehsilController::class);
             Route::resource('roles', RoleController::class);
             Route::resource('/hr/designations', DesignationController::class);
+            Route::post('/hr/designations/toggle-status', [DesignationController::class, 'toggleStatus'])->name('designations.toggle-status');
 
             Route::resource('depos', DepoController::class);
+            Route::post('/depos/toggle-status', [App\Http\Controllers\DepoController::class, 'toggleStatus'])->name('depos.toggle-status');
             Route::get('ajax/get-districts', [DepoController::class, 'getDistricts'])->name('depos.get-districts');
             Route::get('ajax/get-tehsils', [DepoController::class, 'getTehsils'])->name('depos.get-tehsils');
 

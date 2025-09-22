@@ -67,6 +67,7 @@ Route::prefix('admin')->group(function () {
 
     // Protected Tenant Routes
     Route::middleware(['admin', 'last_seen'])->group(function () {
+
         Route::get('dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
         Route::get('users/{userId}/sessions', [AdminController::class, 'getUserSessionHistory'])->name('admin.users.sessions');
         Route::delete('/customers/bulk-delete', [CustomerController::class, 'bulkDelete'])->name('customers.bulk-delete');

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Depo;
+use App\Models\Designation;
 use App\Models\State;
 use App\Models\District;
 use App\Models\Tehsil;
@@ -15,15 +16,26 @@ class DepoController extends Controller
     public function index()
     {
         
-        $depos = Depo::with(['state','district','tehsil'])->orderBy('id','desc')->paginate(20);
+        $depos = Depo::with(['state','district','tehsil','designation'])->orderBy('id','desc')->get();
         return view('admin.depos.index', compact('depos'));
+    }
+
+    public function toggleStatus(Request $request)
+    {
+        $depo = Depo::findOrFail($request->id);
+        $depo->status = $request->status;
+        $depo->save();
+
+        return response()->json(['success' => true, 'message' => 'Status updated successfully.']);
     }
 
     public function create()
     {
         // active states
         $states = State::where('status', 1)->orderBy('name')->get();
-        return view('admin.depos.create', compact('states'));
+        $designation = Designation::where('status', 1)->orderBy('name')->get();
+        
+        return view('admin.depos.create', compact('states','designation'));
     }
 
     public function store(Request $request)
@@ -51,8 +63,9 @@ class DepoController extends Controller
         // For edit, load districts & tehsils relevant to selected values
         $districts = $depo->state_id ? District::where('state_id', $depo->state_id)->where('status',1)->orderBy('name')->get() : collect();
         $tehsils = $depo->district_id ? Tehsil::where('district_id', $depo->district_id)->where('status',1)->orderBy('name')->get() : collect();
+        $designation = Designation::where('status', 1)->orderBy('name')->get();
 
-        return view('admin.depos.edit', compact('depo','states','districts','tehsils'));
+        return view('admin.depos.edit', compact('depo','states','districts','tehsils','designation'));
     }
 
     public function update(Request $request, Depo $depo)

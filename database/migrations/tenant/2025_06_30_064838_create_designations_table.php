@@ -9,7 +9,7 @@ return new class extends Migration {
     {
         Schema::create('designations', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('company_id'); // 🔸 Add company_id for multi-tenant association
+            $table->unsignedBigInteger('company_id')->nullable();
             $table->string('name');
             $table->text('description')->nullable();
             $table->timestamps();

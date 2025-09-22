@@ -13,6 +13,7 @@ use Spatie\Permission\Models\Permission;
 use App\Models\State;
 use App\Models\District;
 use App\Models\City;
+use App\Models\Company;
 use App\Models\Tehsil;
 use App\Models\Pincode;
 use App\Models\Designation;
@@ -45,26 +46,14 @@ class UserController extends Controller
     public function create()
     {
         $authUser = auth()->user();
-
-        $roles = $authUser->user_level === 'master_admin'
-            ? Role::all()
-            : Role::where('company_id', $authUser->company_id)->get();
-
-        $companies = $authUser->user_level === 'master_admin'
-            ? \App\Models\Company::all()
-            : collect(); // empty for non-master
-
-        // ✅ Added: get users of same company for 'Reporting To' dropdown
+        $roles = Role::all();
+        $companies = Company::all();
         $users = User::when($authUser->user_level !== 'master_admin', function ($query) use ($authUser) {
                 $query->where('company_id', $authUser->company_id);
             })->get();
 
-        $designations = $authUser->user_level === 'master_admin'
-        ? Designation::all()
-        : Designation::where('company_id', $authUser->company_id)->get();
-
+        $designations = Designation::all();
         $depos = Depo::where('status',1)->get();
-
         
         return view('admin.users.create', [
             'roles' => $roles,

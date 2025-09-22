@@ -28,10 +28,7 @@
                                 <tr>
                                     <th>#</th>
                                     <th>Name</th>
-                                    <th>Description</th>
-                                    @if (auth()->user()->user_level === 'master_admin')
-                                        <th>Company</th>
-                                    @endif
+                                    <th>Status</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -40,10 +37,16 @@
                                     <tr>
                                         <td>{{ $key + 1 }}</td>
                                         <td>{{ $designation->name }}</td>
-                                        <td>{{ $designation->description }}</td>
-                                        @if (auth()->user()->user_level === 'master_admin')
-                                            <td>{{ $designation->company->name ?? '-' }}</td>
-                                        @endif
+                                        <td>
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input toggle-status" type="checkbox"
+                                                    data-id="{{ $designation->id }}"
+                                                    {{ $designation->status ? 'checked' : '' }}>
+                                                <label class="form-check-label">
+                                                    {{ $designation->status ? 'Active' : 'Inactive' }}
+                                                </label>
+                                            </div>
+                                        </td>
                                         <td>
                                             <a href="{{ route('designations.edit', $designation->id) }}" class="btn btn-sm btn-primary">Edit</a>
                                             <form action="{{ route('designations.destroy', $designation->id) }}" method="POST" class="d-inline">
@@ -66,3 +69,29 @@
         </div>
     </main>
 @endsection
+@push('scripts')
+<script>
+$(document).ready(function () {
+    $('.toggle-status').change(function () {
+        let status = $(this).prop('checked') ? 1 : 0;
+        let designation_id = $(this).data('id');
+
+        $.ajax({
+            url: "{{ route('designations.toggle-status') }}",
+            type: "POST",
+            data: {
+                _token: "{{ csrf_token() }}",
+                id: designation_id,
+                status: status
+            },
+            success: function (response) {
+                // alert(response.message);
+            },
+            error: function () {
+                alert('Something went wrong!');
+            }
+        });
+    });
+});
+</script>
+@endpush

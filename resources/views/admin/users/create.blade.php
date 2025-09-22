@@ -351,31 +351,6 @@
                                         </div>
                                     </div>
 
-                                    {{-- Company Mapping --}}
-                                    <h5 class="mb-3">Company Information</h5>
-                                    <div class="row g-3 mb-4">
-                                        <div class="col-md-6">
-                                            <label class="form-label">Company <span class="text-danger">*</span></label>
-                                            @if ($authUser->hasRole('master_admin'))
-                                                <select name="company_id" class="form-select" required>
-                                                    <option value="">Select Company</option>
-                                                    @foreach ($companies as $company)
-                                                        <option value="{{ $company->id }}"
-                                                            {{ old('company_id') == $company->id ? 'selected' : '' }}>
-                                                            {{ $company->name }}
-                                                        </option>
-                                                    @endforeach
-                                                </select>
-                                            @else
-                                                <input type="hidden" name="company_id"
-                                                    value="{{ $authUser->company_id }}">
-                                                <input type="text" class="form-control"
-                                                    value="{{ $authUser->company->name }}" disabled>
-                                            @endif
-                                        </div>
-                                    </div>
-
-
                                     {{-- Authentication --}}
                                     <h5 class="mb-3">Authentication</h5>
                                     <div class="row g-3 mb-4">

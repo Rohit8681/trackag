@@ -86,7 +86,7 @@
 
                             {{-- 📋 Depo Table --}}
                             <div class="table-responsive" style="max-height: 600px;">
-                                <table class="table table-bordered table-hover table-striped align-middle table-sm">
+                                <table id="depos-table" class="table table-bordered table-hover table-striped align-middle table-sm">
                                     <thead class="table-light sticky-top">
                                         <tr>
                                             <th style="width: 40px;">No</th>
@@ -104,20 +104,21 @@
                                     <tbody>
                                         @forelse ($depos as $index => $depo)
                                             <tr>
-                                                <td>{{ $depos->firstItem() + $index }}</td>
+                                                <td>{{  $index }}</td>
                                                 <td>{{ $depo->depo_code }}</td>
                                                 <td>{{ $depo->depo_name }}</td>
-                                                <td>{{ $depo->manage_by }}</td>
+                                                <td>{{ $depo->designation->name ?? '-' }}</td>
                                                 <td>{{ $depo->state?->name ?? '-' }}</td>
                                                 <td>{{ $depo->district?->name ?? '-' }}</td>
                                                 <td>{{ $depo->tehsil?->name ?? '-' }}</td>
                                                 <td>{{ $depo->city ?? '-' }}</td>
                                                 <td>
-                                                    @if($depo->status)
-                                                        <span class="badge bg-success">Active</span>
-                                                    @else
-                                                        <span class="badge bg-secondary">Inactive</span>
-                                                    @endif
+                                                    <div class="form-check form-switch">
+                                                        <input class="form-check-input toggle-status" type="checkbox"
+                                                            data-id="{{ $depo->id }}"
+                                                            {{ $depo->status ? 'checked' : '' }}>
+                                                        
+                                                    </div>
                                                 </td>
                                                 <td>
                                                     <a href="{{ route('depos.edit', $depo->id) }}"
@@ -147,10 +148,6 @@
 
                         </div>
 
-                        {{-- Pagination --}}
-                        <div class="card-footer clearfix">
-                            {{ $depos->links() }}
-                        </div>
                     </div>
 
                 </div>
@@ -159,3 +156,42 @@
     </div>
 </main>
 @endsection
+@push('scripts')
+<script>
+$(document).ready(function() {
+    var depos = @json($depos->count());
+    if (depos > 0) {
+        $('#depos-table').DataTable({
+            responsive: true,
+            autoWidth: false,
+            pageLength: 10,
+            lengthMenu: [5, 10, 25, 50],
+            columnDefs: [
+                { orderable: false, targets: -1 } // Actions column not orderable
+            ]
+        });
+    }
+});
+$('.toggle-status').change(function () {
+    let status = $(this).prop('checked') ? 1 : 0;
+    let depo_id = $(this).data('id');
+    let label = $(this).closest('.form-switch').find('.form-check-label');
+
+    $.ajax({
+        url: "{{ route('depos.toggle-status') }}",
+        type: "POST",
+        data: {
+            _token: "{{ csrf_token() }}",
+            id: depo_id,
+            status: status
+        },
+        success: function (response) {
+            label.text(status ? 'Active' : 'Inactive');
+        },
+        error: function () {
+            alert('Something went wrong!');
+        }
+    });
+});
+</script>
+@endpush
