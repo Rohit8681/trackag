@@ -14,12 +14,12 @@ class DistrictSeeder extends Seeder
         // Example: ['Maharashtra' => 5, 'Karnataka' => 6, ...]
 
         $districts = [
-            ['name' => 'Pune', 'state' => 'Maharashtra'],
-            ['name' => 'Mumbai', 'state' => 'Maharashtra'],
-            ['name' => 'Bangalore', 'state' => 'Karnataka'],
-            ['name' => 'Ahmedabad', 'state' => 'Gujarat'],
-            ['name' => 'Chennai', 'state' => 'Tamil Nadu'],
-            ['name' => 'Nagpur', 'state' => 'Maharashtra'],
+            ['country_id' => 1, 'name' => 'Pune', 'state' => 'Maharashtra'],
+            ['country_id' => 1,'name' => 'Mumbai', 'state' => 'Maharashtra'],
+            ['country_id' => 1,'name' => 'Bangalore', 'state' => 'Karnataka'],
+            ['country_id' => 1,'name' => 'Ahmedabad', 'state' => 'Gujarat'],
+            ['country_id' => 1,'name' => 'Chennai', 'state' => 'Tamil Nadu'],
+            ['country_id' => 1,'name' => 'Nagpur', 'state' => 'Maharashtra'],
         ];
 
         foreach ($districts as $district) {

@@ -221,7 +221,8 @@ class CompanyController extends Controller
                 foreach ($finalSeederList as $seederClass) {
                     if (in_array($seederClass, [
                         'Database\\Seeders\\DatabaseSeeder',
-                        'Database\\Seeders\\MultiCompanySeeder'
+                        'Database\\Seeders\\MultiCompanySeeder',
+                        'Database\\Seeders\\TripSeeder',
                     ])) {
                         continue;
                     }

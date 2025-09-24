@@ -63,7 +63,6 @@ class EnsureTenantDatabase
                 'domain' => $domain,
             ], 404);
         }
-
         return $next($request);
     }
 }
