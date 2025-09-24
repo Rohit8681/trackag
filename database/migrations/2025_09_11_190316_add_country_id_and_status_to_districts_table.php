@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('districts', function (Blueprint $table) {
-            $table->unsignedBigInteger('country_id')->after('id'); // Adjust position as needed
+            $table->unsignedBigInteger('country_id')->nullable()->after('id'); 
             $table->tinyInteger('status')->default(1)->after('country_id'); // 1=Active, 0=Inactive
         });
     }

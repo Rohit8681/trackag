@@ -17,7 +17,7 @@ class EnsureTenantDatabase
     {
         // Get current domain
         $domain = $request->getHost();
-
+        
         // Central domains (skip tenancy)
         $centralDomains = ['127.0.0.1', 'localhost'];
         if (in_array($domain, $centralDomains)) {
@@ -63,7 +63,6 @@ class EnsureTenantDatabase
                 'domain' => $domain,
             ], 404);
         }
-
         return $next($request);
     }
 }
