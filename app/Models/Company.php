@@ -10,7 +10,7 @@ class Company extends Model
      * The connection name for the model.
      * This model uses the central database connection.
      */
-    protected $connection = 'mysql';
+
     
     protected $fillable = [
         'tenant_id','name','code','owner_name','gst_number','contact_no',

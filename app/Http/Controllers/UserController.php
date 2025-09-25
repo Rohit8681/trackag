@@ -31,13 +31,20 @@ class UserController extends Controller
         $query = User::with(['roles', 'permissions', 'state', 'district', 'tehsil', 'city', 'reportingManager', 'activeSessions'])->latest();
 
         // 🔐 Restrict users to current user's company unless master_admin
+        $maxUsers = 0;
         if (auth()->user()->user_level !== 'master_admin') {
-            $query->where('company_id', auth()->user()->company_id);
+            $getcompany = Company::find(1);
+            if(isset($getcompany->id)) {
+                $maxUsers = $getcompany->user_assigned;
+                
+            }
         }
 
         $users = $query->get();
+        $currentUsers = $query->count();
+        
 
-        return view('admin.users.index', compact('users'));
+        return view('admin.users.index', compact('users','userAssign','currentUsers'));
     }
 
     /**
@@ -67,30 +74,7 @@ class UserController extends Controller
         ]);
     }
    
-    // public function store(StoreUserRequest $request)
-    // {
-    //     $data = $request->validated();
-
-    //     if (!empty($data['password'])) {
-    //         $data['password'] = bcrypt($data['password']);
-    //     }
-
-    //     if (auth()->user()->user_level !== 'master_admin') {
-    //         $data['company_id'] = auth()->user()->company_id;
-    //     }
-
-    //     if ($request->hasFile('image')) {
-    //         $data['image'] = $request->file('image')->store('users', 'public');
-    //     }
-
-    //     $user = User::create($data);
-
-    //     if ($request->filled('roles')) {
-    //         $user->syncRoles($request->input('roles'));
-    //     }
-
-    //     return redirect()->route('users.index')->with('success', 'User created successfully.');
-    // }
+    
 
     public function store(StoreUserRequest $request)
     {
@@ -182,34 +166,7 @@ public function edit(User $user)
     ]);
 }
 
-    /**
-     * Update a specific user in the database.
-     */
-    // public function update(UpdateUserRequest $request, User $user)
-    // {
-    //     if (auth()->user()->user_level !== 'master_admin' && $user->company_id !== auth()->user()->company_id) {
-    //         abort(403, 'Unauthorized update attempt.');
-    //     }
-
-    //     $data = $request->validated();
-
-    //     if (!empty($data['password'])) {
-    //         $data['password'] = bcrypt($data['password']);
-    //     } else {
-    //         unset($data['password']);
-    //     }
-
-    //     if ($request->hasFile('image')) {
-    //         $data['image'] = $request->file('image')->store('users', 'public');
-    //     }
-
-    //     $user->update($data);
-
-    //     $user->syncRoles($request->input('roles', []));
-    //     $user->syncPermissions($request->input('permissions', []));
-
-    //     return redirect()->route('users.index')->with('success', 'User updated successfully.');
-    // }
+    
 
     public function update(UpdateUserRequest $request, User $user)
     {

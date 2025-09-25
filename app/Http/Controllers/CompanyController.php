@@ -26,10 +26,9 @@ class CompanyController extends Controller
     public function index()
     {
         $user = Auth::user();
-        $companies = $user->hasRole('master_admin')
-            ? Company::all()
-            : Company::where('id', $user->company_id)->get();
+        $companies = Company::get();
 
+        
         return view('admin.companies.index', compact('companies'));
     }
 

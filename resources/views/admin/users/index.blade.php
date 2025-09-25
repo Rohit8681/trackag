@@ -26,9 +26,11 @@
                             <div class="card-header d-flex justify-content-between align-items-center">
                                 <h3 class="card-title">User Control Panel</h3>
                                 {{-- @can('create_users') --}}
+                                    @if($currentUsers < $maxUsers || auth()->user()->user_level === 'master_admin')
                                     <a href="{{ route('users.create') }}" style="float: right;" class="btn btn-sm btn-primary">
                                         <i class="fas fa-user-plus me-1"></i> Add New User
                                     </a>
+                                    @endif
                                 {{-- @endcan --}}
                             </div>
 
