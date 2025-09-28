@@ -218,9 +218,9 @@
 
                 <!-- Trip Management -->
                 <li
-                    class="nav-item {{ request()->is('admin/trips*') || request()->is('admin/trip-types*') || request()->is('admin/travel-modes*') || request()->is('admin/purposes*') ? 'menu-open' : '' }}">
+                    class="nav-item {{ request()->is('admin/trip-types*') || request()->is('admin/travel-modes*') || request()->is('admin/purposes*') ? 'menu-open' : '' }}">
                     <a href="#"
-                        class="nav-link {{ request()->is('admin/trips*') || request()->is('admin/trip-types*') || request()->is('admin/travel-modes*') || request()->is('admin/purposes*') ? 'active' : '' }}">
+                        class="nav-link {{ request()->is('admin/trip-types*') || request()->is('admin/travel-modes*') || request()->is('admin/purposes*') ? 'active' : '' }}">
                         <i class="bi bi-truck-front me-2"></i>
                         <p>Trip Management <i class="bi bi-chevron-right ms-auto"></i></p>
                     </a>
@@ -233,22 +233,22 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ url('admin/trips/tourtype') }}"
-                                class="nav-link {{ request()->is('admin/trips/tourtype*') ? 'active' : '' }}">
+                            <a href="{{ url('admin/tourtype') }}"
+                                class="nav-link {{ request()->is('admin/tourtype*') ? 'active' : '' }}">
                                 <i class="bi bi-tag me-2"></i>
                                 <p>Trip Types</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ url('admin/trips/travelmode') }}"
-                                class="nav-link {{ request()->is('admin/trips/travelmode*') ? 'active' : '' }}">
+                            <a href="{{ url('admin/travelmode') }}"
+                                class="nav-link {{ request()->is('admin/travelmode*') ? 'active' : '' }}">
                                 <i class="bi bi-signpost me-2"></i>
                                 <p>Travel Modes</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ url('admin/trips/purpose') }}"
-                                class="nav-link {{ request()->is('admin/trips/purpose*') ? 'active' : '' }}">
+                            <a href="{{ url('admin/purpose') }}"
+                                class="nav-link {{ request()->is('admin/purpose*') ? 'active' : '' }}">
                                 <i class="bi bi-bullseye me-2"></i>
                                 <p>Trip Purposes</p>
                             </a>
@@ -311,9 +311,9 @@
 
                 <!-- Master Management -->
                 <li
-                    class="nav-item {{ request()->is('admin/states*') || request()->is('admin/districts*') || request()->is('admin/tehsils*') ? 'menu-open' : '' }}">
+                    class="nav-item {{ request()->is('admin/states*') || request()->is('admin/districts*') || request()->is('admin/tehsils*') || request()->is('admin/vehicle-types*') ? 'menu-open' : '' }}">
                     <a href="#"
-                        class="nav-link {{ request()->is('admin/states*') || request()->is('admin/districts*') || request()->is('admin/tehsils*') ? 'active' : '' }}">
+                        class="nav-link {{ request()->is('admin/states*') || request()->is('admin/districts*') || request()->is('admin/tehsils*') || request()->is('admin/vehicle-types*') ? 'active' : '' }}">
                         <i class="bi bi-geo-alt-fill me-2"></i>
                         <p>
                             Master
@@ -321,13 +321,15 @@
                         </p>
                     </a>
                     <ul class="nav nav-treeview">
+
+                        {{-- State Menu --}}
                         <li
                             class="nav-item {{ request()->is('admin/states*') || request()->is('admin/districts*') || request()->is('admin/tehsils*') ? 'menu-open' : '' }}">
                             <a href="#"
                                 class="nav-link {{ request()->is('admin/states*') || request()->is('admin/districts*') || request()->is('admin/tehsils*') ? 'active' : '' }}">
                                 <i class="bi bi-flag me-2"></i>
                                 <p>
-                                    States
+                                    State
                                     <i class="bi bi-chevron-right ms-auto"></i>
                                 </p>
                             </a>
@@ -355,6 +357,28 @@
                                 </li>
                             </ul>
                         </li>
+
+                        {{-- Vehicle Type Menu --}}
+                        <li class="nav-item {{ request()->is('admin/vehicle-types*') ? 'menu-open' : '' }}">
+                            <a href="#"
+                                class="nav-link {{ request()->is('admin/vehicle-types*') ? 'active' : '' }}">
+                                <i class="bi bi-truck-front me-2"></i>
+                                <p>
+                                    Vehicle Type
+                                    <i class="bi bi-chevron-right ms-auto"></i>
+                                </p>
+                            </a>
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a href="{{ url('admin/vehicle-types') }}"
+                                        class="nav-link {{ request()->is('admin/vehicle-types*') ? 'active' : '' }}">
+                                        <i class="bi bi-circle me-2"></i>
+                                        <p>Vehicle Types</p>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+
                     </ul>
                 </li>
 

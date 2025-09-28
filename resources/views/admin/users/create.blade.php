@@ -124,7 +124,7 @@
                                         {{-- Location Dropdowns --}}
                                         <div class="col-md-3">
                                             <label class="form-label">State</label>
-                                            <select name="state_id" id="state" class="form-select">
+                                            <select name="state_id" id="state_id" class="form-select">
                                                 <option value="">Select State</option>
                                                 @foreach ($states as $state)
                                                     <option value="{{ $state->id }}"
@@ -136,14 +136,14 @@
 
                                         <div class="col-md-3">
                                             <label class="form-label">District</label>
-                                            <select name="district_id" id="district" class="form-select">
+                                            <select name="district_id" id="district_id" class="form-select">
                                                 <option value="">Select District</option>
                                             </select>
                                         </div>
 
                                         <div class="col-md-3">
                                             <label class="form-label">Taluka</label>
-                                            <select name="tehsil_id" id="tehsil" class="form-select">
+                                            <select name="tehsil_id" id="tehsil_id" class="form-select">
                                                 <option value="">Select Taluka</option>
                                             </select>
                                         </div>
@@ -264,11 +264,11 @@
 
                                         <div class="col-md-4">
                                             <label class="form-label">Depo Assign</label>
-                                            <select name="depo_id" class="form-select">
+                                            <select name="depo" class="form-select">
                                                 <option value="">Select Depo</option>
                                                 @foreach ($depos as $depo)
                                                         <option value="{{ $depo->id }}"
-                                                            {{ old('depo_id') == $depo->id ? 'selected' : '' }}>
+                                                            {{ old('depo') == $depo->id ? 'selected' : '' }}>
                                                             {{ $depo->depo_name }}
                                                         </option>
                                                     @endforeach
@@ -421,4 +421,45 @@
         }
     });
 </script>
+<script>
+$(document).ready(function() {
+    $('#state_id').on('change', function() {
+        var stateId = $(this).val();
+        $('#district_id').html('<option value="">Loading...</option>');
+        $('#tehsil_id').html('<option value="">-- Select Tehsil --</option>');
+
+        if(!stateId) {
+            $('#district_id').html('<option value="">-- Select District --</option>');
+            return;
+        }
+
+        $.get("{{ route('depos.get-districts') }}", { state_id: stateId }, function(data){
+            var html = '<option value="">-- Select District --</option>';
+            $.each(data, function(i, d){
+                html += '<option value="'+ d.id +'">'+ d.name +'</option>';
+            });
+            $('#district_id').html(html);
+        });
+    });
+
+    $('#district_id').on('change', function() {
+        var districtId = $(this).val();
+        $('#tehsil_id').html('<option value="">Loading...</option>');
+
+        if(!districtId) {
+            $('#tehsil_id').html('<option value="">-- Select Tehsil --</option>');
+            return;
+        }
+
+        $.get("{{ route('depos.get-tehsils') }}", { district_id: districtId }, function(data){
+            var html = '<option value="">-- Select Tehsil --</option>';
+            $.each(data, function(i, t){
+                html += '<option value="'+ t.id +'">'+ t.name +'</option>';
+            });
+            $('#tehsil_id').html(html);
+        });
+    });
+});
+</script>
 @endpush
+

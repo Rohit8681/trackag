@@ -153,4 +153,10 @@ class User extends Authenticatable
     {
         return $this->hasMany(\App\Models\UserSession::class)->whereNull('logout_at');
     }
+
+    public function depos()
+    {
+        return $this->belongsTo(Depo::class, 'depo', 'id');
+    }
+
 }

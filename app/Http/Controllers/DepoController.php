@@ -48,7 +48,7 @@ class DepoController extends Controller
             'tehsil_id' => 'nullable|exists:tehsils,id',
             'manage_by' => 'nullable|string|max:191',
             'city' => 'nullable|string|max:191',
-            'status' => ['required', Rule::in(['0','1',0,1,true,false])],
+            // 'status' => ['required', Rule::in(['0','1',0,1,true,false])],
         ]);
 
         Depo::create($data);
