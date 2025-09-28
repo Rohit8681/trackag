@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\DepoController;
+use App\Http\Controllers\VehicleTypeController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\CustomerController;
@@ -46,6 +47,8 @@ Route::middleware(['web'])->group(function () {
         Route::middleware(['admin', 'last_seen'])->group(function () {
             Route::resource('users', UserController::class);
             Route::post('/users/{user}/toggle', [UserController::class, 'toggle'])->name('users.toggle');
+            Route::post('/users/reset-password', [UserController::class, 'resetPassword'])->name('users.reset-password');
+
             Route::get('dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
             Route::resource('companies', CompanyController::class);
             Route::patch('companies/{id}/toggle', [CompanyController::class, 'toggle'])->name('companies.toggle');
@@ -67,6 +70,19 @@ Route::middleware(['web'])->group(function () {
             Route::get('/get-cities/{district_id}', [UserController::class, 'getCities'])->name('get.cities');
             Route::get('/get-tehsils/{city_id}', [UserController::class, 'getTehsils'])->name('get.tehsils');
             Route::get('/get-pincodes/{city_id}', [UserController::class, 'getPincodes'])->name('get.pincodes');
+
+            Route::resource('vehicle-types', VehicleTypeController::class);
+
+
+            // Route::prefix('trips')->group(function () {
+            Route::resource('travelmode', TravelModeController::class)->names('travelmode');
+            Route::resource('tourtype', TourTypeController::class)->names('tourtype');
+            Route::resource('purpose', PurposeController::class)->names('purpose');
+            Route::resource('trips', TripController::class)->names('trips');
+            Route::post('/trips/{trip}/approve', [TripController::class, 'approve'])->name('trips.approve');
+            Route::post('/admin/trips/{id}/complete', [TripController::class, 'completeTrip'])->name('trips.complete');
+            Route::post('/trips/{trip}/toggle-status', [TripController::class, 'toggleStatus'])->name('trips.status.toggle');
+            // });
         });
     });
 });

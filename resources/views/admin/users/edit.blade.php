@@ -86,8 +86,9 @@
                                     <div class="col-md-4">
                                         <label class="form-label">Date of Birth</label>
                                         <input type="date" name="date_of_birth" class="form-control"
-                                               value="{{ old('date_of_birth', $user->date_of_birth) }}">
+                                            value="{{ old('date_of_birth', optional($user->date_of_birth)->format('Y-m-d')) }}">
                                     </div>
+
                                     <div class="col-md-4">
                                         <label class="form-label">Gender</label>
                                         <select name="gender" class="form-select">
@@ -113,7 +114,7 @@
                                     {{-- Location Dropdowns --}}
                                     <div class="col-md-3">
                                         <label class="form-label">State</label>
-                                        <select name="state_id" id="state" class="form-select">
+                                        <select name="state_id" id="state_id" class="form-select">
                                             <option value="">Select State</option>
                                             @foreach ($states as $state)
                                                 <option value="{{ $state->id }}" {{ old('state_id', $user->state_id) == $state->id ? 'selected' : '' }}>
@@ -124,13 +125,13 @@
                                     </div>
                                     <div class="col-md-3">
                                         <label class="form-label">District</label>
-                                        <select name="district_id" id="district" class="form-select">
+                                        <select name="district_id" id="district_id" class="form-select">
                                             <option value="">Select District</option>
                                         </select>
                                     </div>
                                     <div class="col-md-3">
                                         <label class="form-label">Taluka</label>
-                                        <select name="tehsil_id" id="tehsil" class="form-select">
+                                        <select name="tehsil_id" id="tehsil_id" class="form-select">
                                             <option value="">Select Taluka</option>
                                         </select>
                                     </div>
@@ -201,7 +202,7 @@
                                     </div>
                                     <div class="col-md-4">
                                         <label class="form-label">Joining Date</label>
-                                        <input type="date" name="joining_date" class="form-control" value="{{ old('joining_date', $user->joining_date) }}">
+                                        <input type="date" name="joining_date" class="form-control" value="{{ old('joining_date', optional($user->joining_date)->format('Y-m-d')) }}">
                                     </div>
                                     <div class="col-md-4">
                                         <label class="form-label">Emergency Contact</label>
@@ -381,5 +382,63 @@
         this.value = this.value.replace(/\D/g, '');
         if (this.value.length > 10) this.value = this.value.slice(0, 10);
     });
+</script>
+<script>
+$(document).ready(function() {
+    function loadDistricts(stateId, selectedDistrict = null) {
+        if(!stateId) {
+            $('#district_id').html('<option value="">-- Select District --</option>');
+            $('#tehsil_id').html('<option value="">-- Select Tehsil --</option>');
+            return;
+        }
+        $.get("{{ route('depos.get-districts') }}", { state_id: stateId }, function(data){
+            let html = '<option value="">-- Select District --</option>';
+            $.each(data, function(i, d){
+                html += `<option value="${d.id}" ${selectedDistrict == d.id ? 'selected' : ''}>${d.name}</option>`;
+            });
+            $('#district_id').html(html);
+
+            // If editing, trigger tehsil load
+            let selectedTehsil = "{{ old('tehsil_id', $user->tehsil_id) }}";
+            if(selectedTehsil) {
+                loadTehsils($('#district_id').val(), selectedTehsil);
+            }
+        });
+    }
+
+    function loadTehsils(districtId, selectedTehsil = null) {
+        if(!districtId) {
+            $('#tehsil_id').html('<option value="">-- Select Tehsil --</option>');
+            return;
+        }
+        $.get("{{ route('depos.get-tehsils') }}", { district_id: districtId }, function(data){
+            let html = '<option value="">-- Select Tehsil --</option>';
+            $.each(data, function(i, t){
+                html += `<option value="${t.id}" ${selectedTehsil == t.id ? 'selected' : ''}>${t.name}</option>`;
+            });
+            $('#tehsil_id').html(html);
+        });
+    }
+
+    // On state change
+    $('#state_id').on('change', function() {
+        let stateId = $(this).val();
+        loadDistricts(stateId);
+    });
+
+    // On district change
+    $('#district_id').on('change', function() {
+        let districtId = $(this).val();
+        loadTehsils(districtId);
+    });
+
+    // On page load: pre-select districts & tehsils if editing
+    let initialState = $('#state_id').val();
+    let selectedDistrict = "{{ old('district_id', $user->district_id) }}";
+    if(initialState) {
+        loadDistricts(initialState, selectedDistrict);
+    }
+});
+
 </script>
 @endpush

@@ -17,6 +17,8 @@ use App\Models\Company;
 use App\Models\Tehsil;
 use App\Models\Pincode;
 use App\Models\Designation;
+use Illuminate\Support\Facades\Hash;
+
 
 
 class UserController extends Controller
@@ -28,7 +30,7 @@ class UserController extends Controller
     {
         Session::put('page', 'dashboard');
 
-        $query = User::with(['roles', 'permissions', 'state', 'district', 'tehsil', 'city', 'reportingManager', 'activeSessions'])->latest();
+        $query = User::with(['roles', 'permissions', 'state', 'district', 'tehsil', 'city', 'reportingManager', 'activeSessions','depos'])->latest();
 
         // 🔐 Restrict users to current user's company unless master_admin
         $maxUsers = 0;
@@ -44,7 +46,7 @@ class UserController extends Controller
         $currentUsers = $query->count();
         
 
-        return view('admin.users.index', compact('users','userAssign','currentUsers'));
+        return view('admin.users.index', compact('users','maxUsers','currentUsers'));
     }
 
     /**
@@ -232,36 +234,38 @@ public function edit(User $user)
         return redirect()->route('users.index')->with('success', 'User status updated.');
     }
 
-    /**
-     * AJAX: Get districts for selected state.
-     */
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'password' => 'required|min:6',
+        ]);
+
+        $user = User::findOrFail($request->user_id);
+        $user->password = Hash::make($request->password);
+        $user->save();
+
+        return response()->json(['message' => 'Password reset successfully']);
+    }
+
     public function getDistricts($state_id)
     {
         $districts = District::where('state_id', $state_id)->get();
         return response()->json($districts);
     }
 
-    /**
-     * AJAX: Get cities for selected district.
-     */
     public function getCities($district_id)
     {
         $cities = City::where('district_id', $district_id)->get();
         return response()->json($cities);
     }
 
-    /**
-     * AJAX: Get tehsils for selected city.
-     */
     public function getTehsils($city_id)
     {
         $tehsils = Tehsil::where('city_id', $city_id)->get();
         return response()->json($tehsils);
     }
 
-    /**
-     * AJAX: Get pincodes for selected city.
-     */
     public function getPincodes($city_id)
     {
         $pincodes = Pincode::where('city_id', $city_id)->get();
