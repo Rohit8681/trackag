@@ -5,6 +5,7 @@ use App\Http\Controllers\HolidayController;
 use App\Http\Controllers\LeaveController;
 use App\Http\Controllers\TaDaBillMasterController;
 use App\Http\Controllers\TaDaSlabController;
+use App\Http\Controllers\VehicleController;
 use App\Http\Controllers\VehicleTypeController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\AdminController;
@@ -82,7 +83,10 @@ Route::middleware(['web'])->group(function () {
             Route::post('/holidays/toggle-status', [HolidayController::class, 'toggleStatus'])->name('holidays.toggle-status');
 
             Route::resource('leaves', LeaveController::class);
-            Route::post('/leaves/toggle-status', [LeaveController::class, 'toggleStatus'])->name('leaves.toggle-status');
+            //Route::post('/leaves/toggle-status', [LeaveController::class, 'toggleStatus'])->name('leaves.toggle-status');
+
+            Route::resource('vehicle', VehicleController::class);
+            Route::post('/vehicle/toggle-status', [VehicleController::class, 'toggleStatus'])->name('vehicle.toggle-status');
 
             Route::get('ta-da-bill-master', [TaDaBillMasterController::class, 'index'])->name('ta-da-bill-master.index');
             Route::post('ta-da-bill-master', [TaDaBillMasterController::class, 'update'])->name('ta-da-bill-master.update');
