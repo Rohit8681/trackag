@@ -3,6 +3,7 @@
 use App\Http\Controllers\DepoController;
 use App\Http\Controllers\HolidayController;
 use App\Http\Controllers\LeaveController;
+use App\Http\Controllers\TaDaBillMasterController;
 use App\Http\Controllers\TaDaSlabController;
 use App\Http\Controllers\VehicleTypeController;
 use Illuminate\Support\Facades\Route;
@@ -82,6 +83,11 @@ Route::middleware(['web'])->group(function () {
 
             Route::resource('leaves', LeaveController::class);
             Route::post('/leaves/toggle-status', [LeaveController::class, 'toggleStatus'])->name('leaves.toggle-status');
+
+            Route::get('ta-da-bill-master', [TaDaBillMasterController::class, 'index'])->name('ta-da-bill-master.index');
+            Route::post('ta-da-bill-master', [TaDaBillMasterController::class, 'update'])->name('ta-da-bill-master.update');
+            Route::post('/ta-da-bill-master/toggle-status', [TaDaBillMasterController::class, 'toggleStatus'])->name('ta-da-bill-master.toggle-status');
+
 
             Route::get('/get-districts/{state_id}', [UserController::class, 'getDistricts'])->name('get.districts');
             Route::get('/get-cities/{district_id}', [UserController::class, 'getCities'])->name('get.cities');

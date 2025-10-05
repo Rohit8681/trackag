@@ -425,6 +425,14 @@
                     </a>
                 </li>
 
+                <li class="nav-item">
+                    <a href="{{ url('admin/ta-da-bill-master') }}"
+                        class="nav-link {{ request()->is('admin/ta-da-bill-master*') ? 'active' : '' }}">
+                        <i class="bi bi-file-earmark-text me-2"></i>
+                        <p>TA-DA Bill Master</p>
+                    </a>
+                </li>
+
 
                 <!-- Party Management -->
                 <li class="nav-item">
