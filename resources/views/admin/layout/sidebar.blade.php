@@ -397,7 +397,7 @@
                                 </li>
                             </ul>
                         </li>
-
+                        
                     </ul>
                 </li>
 
@@ -406,6 +406,22 @@
                         class="nav-link {{ request()->is('admin/depos*') ? 'active' : '' }}">
                         <i class="bi bi-person-lines-fill me-2"></i>
                         <p>Depo Master</p>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="{{ url('admin/holidays') }}"
+                        class="nav-link {{ request()->is('admin/holidays*') ? 'active' : '' }}">
+                        <i class="bi bi-calendar-check me-2"></i>
+                        <p>Holiday Master</p>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="{{ url('admin/leaves') }}"
+                        class="nav-link {{ request()->is('admin/leaves*') ? 'active' : '' }}">
+                        <i class="bi bi-calendar-check me-2"></i>
+                        <p>Leave Master</p>
                     </a>
                 </li>
 

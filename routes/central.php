@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\DepoController;
+use App\Http\Controllers\HolidayController;
+use App\Http\Controllers\LeaveController;
 use App\Http\Controllers\TaDaSlabController;
 use App\Http\Controllers\VehicleTypeController;
 use Illuminate\Support\Facades\Route;
@@ -71,9 +73,15 @@ Route::middleware(['web'])->group(function () {
             Route::post('/hr/designations/toggle-status', [DesignationController::class, 'toggleStatus'])->name('designations.toggle-status');
 
             Route::resource('depos', DepoController::class);
-            Route::post('/depos/toggle-status', [App\Http\Controllers\DepoController::class, 'toggleStatus'])->name('depos.toggle-status');
+            Route::post('/depos/toggle-status', [DepoController::class, 'toggleStatus'])->name('depos.toggle-status');
             Route::get('ajax/get-districts', [DepoController::class, 'getDistricts'])->name('depos.get-districts');
             Route::get('ajax/get-tehsils', [DepoController::class, 'getTehsils'])->name('depos.get-tehsils');
+
+            Route::resource('holidays', HolidayController::class);
+            Route::post('/holidays/toggle-status', [HolidayController::class, 'toggleStatus'])->name('holidays.toggle-status');
+
+            Route::resource('leaves', LeaveController::class);
+            Route::post('/leaves/toggle-status', [LeaveController::class, 'toggleStatus'])->name('leaves.toggle-status');
 
             Route::get('/get-districts/{state_id}', [UserController::class, 'getDistricts'])->name('get.districts');
             Route::get('/get-cities/{district_id}', [UserController::class, 'getCities'])->name('get.cities');
