@@ -9,12 +9,14 @@ class StateSeeder extends Seeder
 {
     public function run()
     {
-        $states = ['Maharashtra', 'Karnataka', 'Gujarat', 'Tamil Nadu'];
+        $states = ['AndhraPradesh', 'Assam', 'Bihar', 'Chattisgarh', 'Goa','Gujarat','Haryana','HimachalPradesh','Jharkhand','Karnataka
+    ','Kerala','MadhyaPradesh','Maharashtra','Manipur','Meghalaya','Mizoram','Nagaland','Puducherry','Punjab','Rajasthan
+    ','TamilNadu','Telangana','Tripura','Uttarakhand','UttarPradesh','WestBengal'];
 
         foreach ($states as $state) {
             DB::table('states')->updateOrInsert(
-                ['name' => $state], // unique condition
-                ['name' => $state]  // update values if already exist
+                ['name' => $state],              // condition (check if state exists)
+                ['country_id' => 1, 'name' => $state] // values to insert/update
             );
         }
     }

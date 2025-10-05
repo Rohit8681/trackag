@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\DepoController;
+use App\Http\Controllers\TaDaSlabController;
 use App\Http\Controllers\VehicleTypeController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\AdminController;
@@ -48,6 +49,14 @@ Route::middleware(['web'])->group(function () {
             Route::resource('users', UserController::class);
             Route::post('/users/{user}/toggle', [UserController::class, 'toggle'])->name('users.toggle');
             Route::post('/users/reset-password', [UserController::class, 'resetPassword'])->name('users.reset-password');
+            Route::get('get-depos', [UserController::class,'getDepos'])->name('admin.get.depos');
+            Route::get('get-user-depo-access', [UserController::class, 'getUserDepoAccess']);
+            Route::get('get-user-state-access', [UserController::class, 'getUserStateAccess'])->name('admin.get.user-state-access');
+            Route::post('save-user-state-access', [UserController::class, 'saveUserStateAccess'])->name('admin.save.user-state-access');
+
+            Route::post('save-depo-access', [UserController::class, 'saveDepoAccess'])->name('admin.save.depo.access');
+            Route::post('save-user-slab', [UserController::class, 'saveSlab'])->name('admin.save.user.slab');
+
 
             Route::get('dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
             Route::resource('companies', CompanyController::class);
@@ -72,6 +81,9 @@ Route::middleware(['web'])->group(function () {
             Route::get('/get-pincodes/{city_id}', [UserController::class, 'getPincodes'])->name('get.pincodes');
 
             Route::resource('vehicle-types', VehicleTypeController::class);
+            Route::get('ta-da-slab', [TaDaSlabController::class, 'form'])->name('ta-da-slab.form');
+            Route::post('ta-da-slab', [TaDaSlabController::class, 'save'])->name('ta-da-slab.save');
+
 
 
             // Route::prefix('trips')->group(function () {

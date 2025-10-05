@@ -11,9 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('districts', function (Blueprint $table) {
-            $table->unsignedBigInteger('country_id')->nullable()->after('id'); 
-            $table->tinyInteger('status')->default(1)->after('country_id'); // 1=Active, 0=Inactive
+        Schema::table('designations', function (Blueprint $table) {
+            $table->boolean('status')->default(1)->after('name'); 
+            // 👆 or use ->tinyInteger('status')->default(1) if you prefer
+            // 1 = Active, 0 = Inactive
         });
     }
 
@@ -22,8 +23,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('districts', function (Blueprint $table) {
-            $table->dropColumn(['country_id', 'status']);
+        Schema::table('designations', function (Blueprint $table) {
+            $table->dropColumn('status');
         });
     }
 };

@@ -25,9 +25,9 @@
                 <div class="card mb-4">
                     <div class="card-header d-flex align-items-center justify-content-between">
                         <h5 class="card-title mb-0">Trip List</h5>
-                        @can('create_trips')
+                        {{-- @can('create_trips')
                             <a href="{{ route('trips.create') }}" class="btn btn-primary">Add Trip</a>
-                        @endcan
+                        @endcan --}}
                     </div>
 
                     <div class="card-body table-responsive">

@@ -23,6 +23,7 @@ return new class extends Migration
             $table->string('product_name')->nullable();
             $table->string('subscription_type')->nullable();
             $table->boolean('tally_configuration')->default(false);
+            $table->tinyInteger('main_company_id')->nullable();
         });
     }
 

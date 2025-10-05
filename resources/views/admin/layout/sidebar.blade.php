@@ -378,6 +378,25 @@
                                 </li>
                             </ul>
                         </li>
+                        <li class="nav-item {{ request()->is('admin/ta-da-slab*') ? 'menu-open' : '' }}">
+                            <a href="#"
+                                class="nav-link {{ request()->is('admin/ta-da-slab*') ? 'active' : '' }}">
+                                <i class="bi bi-truck-front me-2"></i>
+                                <p>
+                                    TA-DA Master
+                                    <i class="bi bi-chevron-right ms-auto"></i>
+                                </p>
+                            </a>
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a href="{{ url('admin/ta-da-slab') }}"
+                                        class="nav-link {{ request()->is('admin/ta-da-slab*') ? 'active' : '' }}">
+                                        <i class="bi bi-circle me-2"></i>
+                                        <p>TA-DA</p>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
 
                     </ul>
                 </li>
