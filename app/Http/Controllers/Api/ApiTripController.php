@@ -141,8 +141,8 @@ class ApiTripController extends BaseController
             'location.*.trip_id' => 'required|exists:trips,id',
             'location.*.latitude' => 'required|numeric',
             'location.*.longitude' => 'required|numeric',
-            'location.*.gps_status' => 'nullable|string|numeric',
-            'location.*.battery_percentage' => 'nullable|string|numeric',
+            'location.*.gps_status' => 'nullable',
+            'location.*.battery_percentage' => 'nullable',
             'location.*.recorded_at' => 'nullable|date',
         ]);
 
