@@ -23,4 +23,9 @@ class Designation extends Model
     {
         return $this->belongsTo(Company::class);
     }
+
+    public function taDaBillMaster()
+    {
+        return $this->hasOne(TaDaBillMaster::class);
+    }
 }

@@ -6,6 +6,8 @@ use App\Models\Depo;
 use App\Models\User;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
+use App\Models\UserDepoAccess;
+use App\Models\UserStateAccess;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use Spatie\Permission\Models\Role;
@@ -44,9 +46,75 @@ class UserController extends Controller
 
         $users = $query->get();
         $currentUsers = $query->count();
-        
+        $states = State::where('status',1)->get();
 
-        return view('admin.users.index', compact('users','maxUsers','currentUsers'));
+        ;
+
+        return view('admin.users.index', compact('users','maxUsers','currentUsers','states'));
+    }
+
+    public function getDepos(Request $request){
+        $depos = Depo::where('state_id',$request->state_id)->get(['id','depo_name']);
+        return response()->json($depos);
+    }
+
+    public function getUserDepoAccess(Request $request)
+    {
+        $userAccess = UserDepoAccess::where('user_id', $request->user_id)->first();
+        return response()->json(['userAccess' => $userAccess]);
+    }
+
+    public function saveDepoAccess(Request $request)
+    {
+        $data = $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'state_id' => 'required|exists:states,id',
+            'depo_id' => 'required|array|min:1',
+            'depo_id.*' => 'exists:depos,id',
+        ]);
+
+        // Save or update
+        $access = UserDepoAccess::updateOrCreate(
+            ['user_id' => $data['user_id'], 'state_id' => $data['state_id']],
+            ['depo_ids' => $data['depo_id']]
+        );
+
+        return response()->json(['message' => 'Depo access saved successfully']);
+    }
+
+    public function getUserStateAccess(Request $request){
+        $access = UserStateAccess::where('user_id', $request->user_id)->first();
+        return response()->json([
+            'state_ids' => $access ? $access->state_ids : []
+        ]);
+    }
+
+    public function saveUserStateAccess(Request $request){
+        $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'state_ids' => 'required|array'
+        ]);
+
+        UserStateAccess::updateOrCreate(
+            ['user_id' => $request->user_id],
+            ['state_ids' => $request->state_ids]
+        );
+
+        return response()->json(['success'=>true]);
+    }
+
+    public function saveSlab(Request $request)
+    {
+        $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'slab' => 'required|string',
+        ]);
+
+        $user = User::findOrFail($request->user_id);
+        $user->slab = $request->slab;
+        $user->save();
+
+        return response()->json(['message' => 'Slab updated successfully']);
     }
 
     /**

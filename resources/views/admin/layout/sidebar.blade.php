@@ -378,7 +378,26 @@
                                 </li>
                             </ul>
                         </li>
-
+                        <li class="nav-item {{ request()->is('admin/ta-da-slab*') ? 'menu-open' : '' }}">
+                            <a href="#"
+                                class="nav-link {{ request()->is('admin/ta-da-slab*') ? 'active' : '' }}">
+                                <i class="bi bi-truck-front me-2"></i>
+                                <p>
+                                    TA-DA Master
+                                    <i class="bi bi-chevron-right ms-auto"></i>
+                                </p>
+                            </a>
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a href="{{ url('admin/ta-da-slab') }}"
+                                        class="nav-link {{ request()->is('admin/ta-da-slab*') ? 'active' : '' }}">
+                                        <i class="bi bi-circle me-2"></i>
+                                        <p>TA-DA</p>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        
                     </ul>
                 </li>
 
@@ -387,6 +406,37 @@
                         class="nav-link {{ request()->is('admin/depos*') ? 'active' : '' }}">
                         <i class="bi bi-person-lines-fill me-2"></i>
                         <p>Depo Master</p>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="{{ url('admin/holidays') }}"
+                        class="nav-link {{ request()->is('admin/holidays*') ? 'active' : '' }}">
+                        <i class="bi bi-calendar-check me-2"></i>
+                        <p>Holiday Master</p>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="{{ url('admin/leaves') }}"
+                        class="nav-link {{ request()->is('admin/leaves*') ? 'active' : '' }}">
+                        <i class="bi bi-calendar-check me-2"></i>
+                        <p>Leave Master</p>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="{{ url('admin/ta-da-bill-master') }}"
+                        class="nav-link {{ request()->is('admin/ta-da-bill-master*') ? 'active' : '' }}">
+                        <i class="bi bi-file-earmark-text me-2"></i>
+                        <p>TA-DA Bill Master</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url('admin/vehicle') }}"
+                        class="nav-link {{ request()->is('admin/vehicle*') ? 'active' : '' }}">
+                        <i class="bi bi-file-earmark-text me-2"></i>
+                        <p>Vehicle Master</p>
                     </a>
                 </li>
 

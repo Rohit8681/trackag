@@ -21,7 +21,7 @@ return new class extends Migration {
                   ->onDelete('cascade');
 
             // 🔸 Unique constraint: designation name should be unique per company
-            $table->unique([ 'name']);
+            $table->unique(['name']);
         });
     }
 

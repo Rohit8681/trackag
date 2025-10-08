@@ -109,9 +109,13 @@
                                                     </span>
                                                 </td>
                                                 <td class="text-center"><i class="fas fa-cog text-muted"></i></td>
-                                                <td class="text-center"><i class="fas fa-cog text-muted"></i></td>
-                                                <td class="text-center"><i class="fas fa-cog text-muted"></i></td>
-                                                <td class="text-center"><i class="fas fa-cog text-muted"></i></td>
+                                               <td class="text-center">
+                                                <i class="fas fa-cog text-muted slab_access" style="cursor:pointer;" data-user-id="{{ $user->id }}" data-user-slab="{{ $user->slab }}"></i>
+                                                </td>
+                                                <td class="text-center"><i class="fas fa-cog text-muted depo_access" style="cursor:pointer;" data-user-id="{{ $user->id }}"></i></td>
+                                                <td class="text-center"><i class="fas fa-cog text-muted state_access" style="cursor:pointer;" data-user-id="{{ $user->id }}"></i></td>
+
+                                                
                                                 <td class="text-center">
                                                     @if ($user->is_active)
                                                         <span class="badge bg-success">
@@ -189,6 +193,113 @@
       </div>
     </div>
 
+    
+
+{{-- Depo Access Modal --}}
+<div class="modal fade" id="depoAccessModal" tabindex="-1" aria-labelledby="depoAccessModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="depoAccessModalLabel">Depo Access</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="depoAccessForm">
+          @csrf
+          <input type="hidden" name="user_id" id="depoModalUserId">
+
+          {{-- State Dropdown --}}
+          <div class="mb-3">
+            <label for="stateId" class="form-label">State Name</label>
+            <select class="form-select" name="state_id" id="stateId" required>
+                <option value="">-- Select State --</option>
+                @foreach($states as $state)
+                    <option value="{{ $state->id }}">{{ $state->name }}</option>
+                @endforeach
+            </select>
+          </div>
+
+          {{-- Depo Multiple Select --}}
+          <div class="mb-3">
+            <label for="depoId" class="form-label">Depo Name</label>
+            <select class="form-select" name="depo_id[]" id="depoId" multiple="multiple" required></select>
+          </div>
+
+        </form>
+        <div id="depoAccessMessage"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="saveDepoAccessBtn">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="stateAccessModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Assign States</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form id="stateAccessForm">
+          @csrf
+          <input type="hidden" name="user_id" id="stateModalUserId">
+
+          <div class="mb-3">
+            <label class="form-label">Select States</label>
+            <select name="state_ids[]" id="stateIds" class="form-select" multiple required>
+              @foreach($states as $state)
+                <option value="{{ $state->id }}">{{ $state->name }}</option>
+              @endforeach
+            </select>
+          </div>
+        </form>
+        <div id="stateAccessMessage"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button class="btn btn-primary" id="saveStateBtn">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+{{-- TA/DA Slab Modal --}}
+<div class="modal fade" id="slabAccessModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Assign TA/DA Slab</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form id="slabAccessForm">
+          @csrf
+          <input type="hidden" name="user_id" id="slabModalUserId">
+
+          <div class="mb-3">
+            <label class="form-label">Select Slab</label>
+            <select name="slab" id="slabSelect" class="form-select" required>
+              <option value="">-- Select Slab --</option>
+              <option value="Individual">TA/DA Slab - Individual</option>
+              <option value="Slab Wise">TA/DA - Slab Wise</option>
+            </select>
+          </div>
+        </form>
+        <div id="slabAccessMessage"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button class="btn btn-primary" id="saveSlabBtn">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
 </main>
 @endsection
 
@@ -196,6 +307,49 @@
 
 <script>
 $(document).ready(function() {
+    $('#depoAccessModal').on('shown.bs.modal', function () {
+        $('#depoId').select2({
+            placeholder: "Select Depos",
+            width: '100%',
+            dropdownParent: $('#depoAccessModal') // VERY IMPORTANT for Bootstrap modal
+        });
+    });
+    $('#stateAccessModal').on('shown.bs.modal', function () {
+        $('#stateIds').select2({
+            placeholder: "Select State",
+            width: '100%',
+            dropdownParent: $('#stateAccessModal') 
+        });
+    });
+    $('.slab_access').click(function() {
+        let userId = $(this).data('user-id');
+        let userSlab = $(this).data('user-slab');
+
+        $('#slabModalUserId').val(userId);
+        $('#slabSelect').val(userSlab).trigger('change');
+        $('#slabAccessMessage').html('');
+        $('#slabAccessModal').modal('show');
+    });
+
+    $('#saveSlabBtn').click(function(){
+        let formData = $('#slabAccessForm').serialize();
+
+        $.ajax({
+            url: '/admin/save-user-slab',
+            type: 'POST',
+            data: formData,
+            success: function(res){
+                $('#slabAccessMessage').html('<div class="alert alert-success">Slab saved successfully!</div>');
+                setTimeout(() => { $('#slabAccessModal').modal('hide'); }, 1500);
+            },
+            error: function(xhr){
+                let errors = xhr.responseJSON.errors;
+                let msg = '';
+                $.each(errors, function(k,v){ msg += v[0]+'<br>'; });
+                $('#slabAccessMessage').html('<div class="alert alert-danger">'+msg+'</div>');
+            }
+        });
+    });
     // Open modal and set user id
     $('.reset-password').click(function() {
         let userId = $(this).data('user-id');
@@ -204,6 +358,134 @@ $(document).ready(function() {
         $('#resetPasswordMessage').html('');
         $('#resetPasswordModal').modal('show');
     });
+
+    $('.state_access').click(function() {
+        let userId = $(this).data('user-id');
+        $('#stateModalUserId').val(userId);
+
+        // reset select
+        $('#stateIds').val(null).trigger('change');
+        $('#stateAccessMessage').html('');
+
+        $('#stateAccessModal').modal('show');
+
+        // load existing user state access
+        $.ajax({
+            url: '/admin/get-user-state-access',
+            type: 'GET',
+            data: { user_id: userId },
+            success: function(res){
+                if(res.state_ids){
+                    $('#stateIds').val(res.state_ids).trigger('change');
+                }
+            }
+        });
+    });
+
+    $('#saveStateBtn').click(function(){
+        let formData = $('#stateAccessForm').serialize();
+        $.ajax({
+            url: '/admin/save-user-state-access',
+            type: 'POST',
+            data: formData,
+            success: function(res){
+                $('#stateAccessMessage').html('<div class="alert alert-success">States saved successfully!</div>');
+                setTimeout(() => { $('#stateAccessModal').modal('hide'); }, 1500);
+            },
+            error: function(){
+                $('#stateAccessMessage').html('<div class="alert alert-danger">Error saving states.</div>');
+            }
+        });
+    });
+
+    $('.depo_access').click(function() {
+        $('#depoAccessMessage').html('');
+        let userId = $(this).data('user-id');
+        $('#depoModalUserId').val(userId);
+
+        // Reset form & depo dropdown
+        $('#depoAccessForm')[0].reset();
+        $('#depoId').empty().trigger('change');
+
+        // Show modal
+        $('#depoAccessModal').modal('show');
+
+        // Optional: if you want to preselect state + depos
+        $.ajax({
+            url: 'get-user-depo-access', // New route
+            type: 'GET',
+            data: { user_id: userId },
+            success: function(res) {
+                if(res.userAccess) {
+                    // Set state
+                    $('#stateId').val(res.userAccess.state_id).trigger('change');
+
+                    // Wait a bit for depos to load dynamically after state change
+                    setTimeout(function() {
+                        let selectedDepos = res.userAccess.depo_ids; // array
+                        $('#depoId').val(selectedDepos).trigger('change');
+                    }, 300); // 300ms delay for AJAX depos load
+                }
+            }
+        });
+    });
+
+
+    $('#stateId').change(function() {
+        let stateId = $(this).val();
+        if(stateId){
+            $.ajax({
+                url: '{{ route("admin.get.depos") }}',
+                type: 'GET',
+                data: { state_id: stateId },
+                success: function(data){
+                    console.log(data); // check data is coming
+                    // Clear old options
+                    $('#depoId').empty();
+
+                    // Add default placeholder
+                    $('#depoId').append(new Option('-- Select Depos --', '', false, false));
+
+                    // Append new options
+                    data.forEach(function(depo){
+                        let option = new Option(depo.depo_name, depo.id, false, false);
+                        $('#depoId').append(option);
+                    });
+
+                    // Update Select2
+                    $('#depoId').val(null).trigger('change');
+                },
+                error: function(err){
+                    console.log(err);
+                }
+            });
+        } else {
+            $('#depoId').empty().val(null).trigger('change');
+        }
+    });
+
+    $('#saveDepoAccessBtn').click(function() {
+        let formData = $('#depoAccessForm').serialize();
+        $.ajax({
+            url: '{{ route("admin.save.depo.access") }}',
+            type: 'POST',
+            data: formData,
+            success: function(res){
+                $('#depoAccessMessage').html('<div class="alert alert-success">'+res.message+'</div>');
+                setTimeout(function(){
+                    $('#depoAccessModal').modal('hide');
+                    $('#depoAccessMessage').html('');
+                }, 1500);
+            },
+            error: function(xhr){
+                let errors = xhr.responseJSON.errors;
+                let msg = '';
+                $.each(errors, function(k,v){ msg += v[0]+'<br>'; });
+                $('#depoAccessMessage').html('<div class="alert alert-danger">'+msg+'</div>');
+            }
+        });
+    });
+
 
     // Handle reset password AJAX
     $('#resetPasswordBtn').click(function() {
@@ -231,6 +513,7 @@ $(document).ready(function() {
         });
     });
 });
+
 </script>
 @endpush
 

@@ -293,6 +293,187 @@ class CompanyController extends Controller
         }
     }
 
+    
+    // public function store(StoreCompanyRequest $request)
+    // {
+    //     $validated = $request->validated();
+
+    //     if ($request->hasFile('logo')) {
+    //         $validated['logo'] = $request->file('logo')->store('logos', 'public');
+    //     }
+
+    //     $subdomain = Str::slug($validated['code'], '-');
+    //     $centralDomain = env('CENTRAL_DOMAIN', 'test'); 
+    //     $fullDomain = $subdomain . '.' . $centralDomain;
+    //     $tenancyDbName = 'tenant_' . Str::slug($subdomain, '_');
+
+    //     $company = null;
+    //     $tenant = null;
+
+    //     try {
+    //         // Create tenant database
+    //         DB::statement("CREATE DATABASE IF NOT EXISTS `$tenancyDbName` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+
+    //         // Central DB transaction
+    //         DB::beginTransaction();
+    //         try {
+    //             $company = Company::create([
+    //                 'name' => $validated['name'],
+    //                 'code' => $validated['code'] ?? null,
+    //                 'owner_name' => $validated['owner_name'] ?? null,
+    //                 'email' => $validated['email'] ?? null,
+    //                 'gst_number' => $validated['gst_number'] ?? null,
+    //                 'address' => $validated['address'] ?? null,
+    //                 'contact_no' => $validated['contact_no'] ?? null,
+    //                 'contact_no2' => $validated['contact_no2'] ?? null,
+    //                 'telephone_no' => $validated['telephone_no'] ?? null,
+    //                 'website' => $validated['website'] ?? null,
+    //                 'state' => !empty($validated['state']) ? implode(',', $validated['state']) : null,
+    //                 'product_name' => $validated['product_name'] ?? null,
+    //                 'subscription_type' => $validated['subscription_type'] ?? null,
+    //                 'tally_configuration' => $validated['tally_configuration'] ?? 0,
+    //                 'logo' => $validated['logo'] ?? null,
+    //                 'subdomain' => $fullDomain,
+    //                 'start_date' => $validated['start_date'] ?? null,
+    //                 'validity_upto' => $validated['validity_upto'] ?? null,
+    //                 'user_assigned' => $validated['user_assigned'] ?? null,
+    //                 'created_at' => now(),
+    //                 'updated_at' => now()
+    //             ]);
+
+    //             $tenant = Tenant::create([
+    //                 'id' => (string) Str::uuid(),
+    //                 'data' => ['company_id' => $company->id, 'database' => $tenancyDbName],
+    //                 'tenancy_db_name' => $tenancyDbName,
+    //             ]);
+
+    //             $tenant->domains()->create(['domain' => $fullDomain]);
+    //             $company->update(['tenant_id' => $tenant->id]);
+
+    //             DB::commit();
+    //         } catch (\Exception $e) {
+    //             DB::rollBack();
+    //             throw $e;
+    //         }
+
+    //         // Initialize tenant connection
+    //         tenancy()->initialize($tenant);
+    //         $tenantConnection = config('database.connections.tenant');
+    //         $tenantConnection['database'] = $tenancyDbName;
+    //         config(['database.connections.tenant' => $tenantConnection]);
+    //         DB::purge('tenant');
+    //         DB::reconnect('tenant');
+
+    //         // Run tenant migrations
+    //         $exitCode = Artisan::call('migrate', [
+    //             '--database' => 'tenant',
+    //             '--path' => 'database/migrations/tenant',
+    //             '--force' => true,
+    //         ]);
+
+    //         if ($exitCode !== 0) {
+    //             throw new \Exception('Tenant migrations failed: ' . Artisan::output());
+    //         }
+
+    //         // Insert tenant and company in tenant DB
+    //         DB::connection('tenant')->table('tenants')->updateOrInsert(
+    //             ['id' => $tenant->id],
+    //             [
+    //                 'id' => $tenant->id,
+    //                 'data' => json_encode($tenant->data),
+    //                 'created_at' => now(),
+    //                 'updated_at' => now(),
+    //             ]
+    //         );
+
+    //         $tenantCompanyData = [
+    //             'name' => $company->name,
+    //             'code' => $company->code,
+    //             'owner_name' => $company->owner_name,
+    //             'email' => $company->email,
+    //             'gst_number' => $company->gst_number,
+    //             'address' => $company->address,
+    //             'contact_no' => $company->contact_no,
+    //             'contact_no2' => $company->contact_no2,
+    //             'telephone_no' => $company->telephone_no,
+    //             'website' => $company->website,
+    //             'state' => $company->state,
+    //             'product_name' => $company->product_name,
+    //             'subscription_type' => $company->subscription_type,
+    //             'tally_configuration' => $company->tally_configuration,
+    //             'logo' => $company->logo,
+    //             'subdomain' => $fullDomain,
+    //             'start_date' => $validated['start_date'] ?? null,
+    //             'validity_upto' => $validated['validity_upto'] ?? null,
+    //             'user_assigned' => $validated['user_assigned'] ?? null,
+    //             'tenant_id' => $tenant->id,
+    //             'created_at' => now(),
+    //             'updated_at' => now(),
+    //         ];
+    //         DB::connection('tenant')->table('companies')->updateOrInsert(
+    //             ['code' => $company->code],
+    //             $tenantCompanyData
+    //         );
+
+    //         // Run only these 5 seeders in order
+    //         $seeders = [
+    //             'Database\\Seeders\\StateSeeder',
+    //             'Database\\Seeders\\DistrictSeeder',
+    //             'Database\\Seeders\\CitySeeder',
+    //             'Database\\Seeders\\TehsilSeeder',
+    //             'Database\\Seeders\\RoleSeeder', // must create 'sub_admin' role
+    //         ];
+
+    //         DB::connection('tenant')->statement('SET FOREIGN_KEY_CHECKS=0;');
+    //         foreach ($seeders as $seederClass) {
+    //             if (class_exists($seederClass)) {
+    //                 Artisan::call('db:seed', [
+    //                     '--class' => $seederClass,
+    //                     '--database' => 'tenant',
+    //                     '--force' => true,
+    //                 ]);
+    //             } else {
+    //                 Log::warning("Seeder not found: {$seederClass}");
+    //             }
+    //         }
+    //         DB::connection('tenant')->statement('SET FOREIGN_KEY_CHECKS=1;');
+
+    //         // Create admin user after roles exist
+    //         $userData = [
+    //             'name' => $validated['name'],
+    //             'email' => $validated['email'],
+    //             'password' => Hash::make($validated['user_password']),
+    //             'mobile' => $validated['contact_no'] ?? null,
+    //             'address' => $validated['address'] ?? null,
+    //             'user_level' => 'company_admin',
+    //             'is_active' => true,
+    //             'created_at' => now(),
+    //             'updated_at' => now(),
+    //         ];
+
+    //         $userId = DB::connection('tenant')->table('users')->insertGetId($userData);
+    //         $tenantUser = (new \App\Models\User())->setConnection('tenant')->find($userId);
+
+    //         if ($tenantUser) {
+    //             $tenantUser->assignRole('admin'); // ensure RoleSeeder created this role
+    //         }
+
+    //         return redirect()->route('companies.index')
+    //             ->with('success', "Company & Admin created successfully. Domain: {$fullDomain}");
+
+    //     } catch (\Exception $e) {
+    //         Log::error('Onboarding failed: ' . $e->getMessage());
+
+    //         if ($tenant) { try { $tenant->delete(); } catch (\Throwable $ex) { Log::warning($ex->getMessage()); } }
+    //         if ($company) { try { $company->delete(); } catch (\Throwable $ex) { Log::warning($ex->getMessage()); } }
+    //         try { DB::statement("DROP DATABASE IF EXISTS `$tenancyDbName`"); } catch (\Throwable $ex) { Log::warning($ex->getMessage()); }
+
+    //         return back()->withInput()->withErrors(['error' => 'Onboarding failed: ' . $e->getMessage()]);
+    //     }
+    // }
+
+
+
     public function show(Company $company)
     {
         $this->authorizeCompanyAccess($company);
