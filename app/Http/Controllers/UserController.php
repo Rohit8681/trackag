@@ -28,30 +28,71 @@ class UserController extends Controller
     /**
      * Display a paginated list of users.
      */
-    public function index()
+    // public function index()
+    // {
+    //     Session::put('page', 'dashboard');
+
+    //     $query = User::with(['roles', 'permissions', 'state', 'district', 'tehsil', 'city', 'reportingManager', 'activeSessions','depos'])->latest();
+
+    //     // 🔐 Restrict users to current user's company unless master_admin
+    //     $maxUsers = 0;
+    //     if (auth()->user()->user_level !== 'master_admin') {
+    //         $getcompany = Company::find(1);
+    //         if(isset($getcompany->id)) {
+    //             $maxUsers = $getcompany->user_assigned;
+                
+    //         }
+    //     }
+
+    //     $users = $query->get();
+    //     $currentUsers = $query->count();
+    //     $states = State::where('status',1)->get();
+
+    //     ;
+
+    //     return view('admin.users.index', compact('users','maxUsers','currentUsers','states'));
+    // }
+    public function index(Request $request)
     {
         Session::put('page', 'dashboard');
 
-        $query = User::with(['roles', 'permissions', 'state', 'district', 'tehsil', 'city', 'reportingManager', 'activeSessions','depos'])->latest();
+        $query = User::with(['roles', 'permissions', 'state', 'district', 'tehsil', 'city', 'reportingManager', 'activeSessions', 'depos', 'designation'])->latest();
 
-        // 🔐 Restrict users to current user's company unless master_admin
+        // Filters
+        if ($request->filled('state_id')) {
+            $query->where('state_id', $request->state_id);
+        }
+        if ($request->filled('name')) {
+            $query->where('name', 'like', '%' . $request->name . '%');
+        }
+        if ($request->filled('designation_id')) {
+            $query->where('designation_id', $request->designation_id);
+        }
+        if ($request->filled('mobile')) {
+            $query->where('mobile', 'like', '%' . $request->mobile . '%');
+        }
+        if ($request->filled('status')) {
+            $query->where('is_active', $request->status);
+        }
+
+        // Company restriction
         $maxUsers = 0;
         if (auth()->user()->user_level !== 'master_admin') {
             $getcompany = Company::find(1);
             if(isset($getcompany->id)) {
                 $maxUsers = $getcompany->user_assigned;
-                
             }
         }
 
         $users = $query->get();
         $currentUsers = $query->count();
-        $states = State::where('status',1)->get();
 
-        ;
+        $states = State::where('status', 1)->get();
+        $designations = Designation::where('status', 1)->get();
 
-        return view('admin.users.index', compact('users','maxUsers','currentUsers','states'));
+        return view('admin.users.index', compact('users', 'maxUsers', 'currentUsers', 'states', 'designations'));
     }
+
 
     public function getDepos(Request $request){
         $depos = Depo::where('state_id',$request->state_id)->get(['id','depo_name']);

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Designation;
 use App\Models\TaDaSlab;
 use App\Models\TourType;
 use App\Models\VehicleType;
@@ -14,8 +15,8 @@ class TaDaSlabController extends Controller
         $slab = TaDaSlab::with(['vehicleSlabs', 'tourSlabs'])->first();
         $vehicleTypes = VehicleType::where('is_deleted', 0)->get();
         $tourTypes = TourType::all();
-
-        return view('admin.ta_da_slab.form', compact('slab','vehicleTypes','tourTypes'));
+        $designations = Designation::all();
+        return view('admin.ta_da_slab.form', compact('slab','vehicleTypes','tourTypes','designations'));
     }
 
     public function save(Request $request)
@@ -31,7 +32,7 @@ class TaDaSlabController extends Controller
             'tour_type_id.*' => 'required|exists:tour_types,id',
             'da_amount.*' => 'nullable|numeric',
         ]);
-
+        dd($request->all());
         // Determine type automatically
         $type = $request->designation ? 'slab_wise' : 'individual';
 

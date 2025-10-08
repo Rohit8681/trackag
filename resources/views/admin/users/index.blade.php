@@ -1,6 +1,19 @@
 @extends('admin.layout.layout')
 
 @section('content')
+<style>
+    td small strong {
+        color: #444;
+        min-width: 80px;
+        display: inline-block;
+    }
+    td small {
+        color: #555;
+    }
+    .table td {
+        vertical-align: middle;
+    }
+</style>
 <main class="app-main">
     <div class="app-content-header">
         <div class="container-fluid">
@@ -33,12 +46,79 @@
                         </div>
 
                         <div class="card-body">
+
                             @if (session('success'))
                                 <div class="alert alert-success alert-dismissible fade show" role="alert">
                                     <strong>Success:</strong> {{ session('success') }}
                                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                                 </div>
                             @endif
+                            <div class="mb-3">
+                            <form method="GET" action="{{ route('users.index') }}" id="filterForm">
+                                <div class="row g-2 align-items-end">
+
+                                    <!-- State -->
+                                    <div class="col-md-2">
+                                        <label class="form-label">State</label>
+                                        <select name="state_id" class="form-select">
+                                            <option value="">All</option>
+                                            @foreach($states as $state)
+                                                <option value="{{ $state->id }}" {{ request('state_id') == $state->id ? 'selected' : '' }}>
+                                                    {{ $state->name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+
+                                    <!-- Employee Name -->
+                                    <div class="col-md-2">
+                                        <label class="form-label">Employee Name</label>
+                                        <input type="text" name="name" value="{{ request('name') }}" class="form-control" placeholder="Enter name">
+                                    </div>
+
+                                    <!-- Designation -->
+                                    <div class="col-md-2">
+                                        <label class="form-label">Designation</label>
+                                        <select name="designation_id" class="form-select">
+                                            <option value="">All</option>
+                                            @foreach($designations as $desig)
+                                                <option value="{{ $desig->id }}" {{ request('designation_id') == $desig->id ? 'selected' : '' }}>
+                                                    {{ $desig->name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+
+                                    <!-- Mobile No -->
+                                    <div class="col-md-2">
+                                        <label class="form-label">Mobile No</label>
+                                        <input type="text" name="mobile" value="{{ request('mobile') }}" class="form-control" placeholder="Enter mobile">
+                                    </div>
+
+                                    <!-- Status -->
+                                    <div class="col-md-2">
+                                        <label class="form-label">Status</label>
+                                        <select name="status" class="form-select">
+                                            <option value="">All</option>
+                                            <option value="1" {{ request('status') == '1' ? 'selected' : '' }}>Active</option>
+                                            <option value="0" {{ request('status') == '0' ? 'selected' : '' }}>Inactive</option>
+                                        </select>
+                                    </div>
+
+                                    <!-- Buttons -->
+                                    <div class="col-md-2 d-flex align-items-end">
+                                        <button type="submit" class="btn btn-primary me-2 px-3">
+                                            <i class="fas fa-search"></i>
+                                        </button>
+                                        <a href="{{ route('users.index') }}" class="btn btn-secondary px-3">
+                                            <i class="fas fa-undo"></i>
+                                        </a>
+                                    </div>
+
+                                </div>
+                            </form>
+                        </div>
+
 
                             <div class="table-responsive" style="max-height: 600px;">
                                 <table id="users-table" class="table table-hover align-middle mb-0">
@@ -72,36 +152,41 @@
                                                 <td class="text-center">{{ $loop->iteration }}</td>
                                                 <td>
                                                     <div class="d-flex align-items-center">
-                                                        <img src="{{ $userImage }}" alt="avatar" class="rounded-circle me-2" width="40" height="40">
-                                                        <div>
+                                                        <img src="{{ $userImage }}" alt="avatar" class="rounded-circle me-2" width="45" height="45">
+                                                        <div style="line-height: 1.3;">
                                                             <strong>{{ $user->name }}</strong><br>
-                                                            <small class="text-muted">{{ $user->mobile ?? '-' }}</small><br>
-                                                            <span class="badge bg-secondary">{{ $user->designation->name ?? '-' }}</span>
+                                                            <small><strong>Mobile:</strong> {{ $user->mobile ?? '-' }}</small><br>
+                                                            <small><strong>Designation:</strong> {{ $user->designation->name ?? '-' }}</small>
                                                             @if ($user->id === $loggedInUserId)
-                                                                <span class="badge bg-success ms-1">You</span><br>
+                                                                <span class="badge bg-success ms-1">You</span>
                                                             @endif
-                                                            <small class="text-muted">{{ $user->reportingManager->name ?? '-' }}</small><br>
+                                                            <br>
+                                                            <small><strong>Reporting To:</strong> {{ $user->reportingManager->name ?? '-' }}</small>
                                                         </div>
                                                     </div>
                                                 </td>
-                                                <td>
-                                                    <small>{{ $user->state->name ?? '-' }}</small><br>
-                                                    <small>{{ $user->district->name ?? '-' }}</small><br>
-                                                    <small>{{ $user->tehsil->name ?? '-' }}</small><br>
-                                                    <small>{{ $user->village ?? '-' }}</small>
+                                                <td style="line-height: 1.3;">
+                                                    <small><strong>State:</strong> {{ $user->state->name ?? '-' }}</small><br>
+                                                    <small><strong>District:</strong> {{ $user->district->name ?? '-' }}</small><br>
+                                                    <small><strong>Tehsil:</strong> {{ $user->tehsil->name ?? '-' }}</small><br>
+                                                    <small><strong>Village:</strong> {{ $user->village ?? '-' }}</small>
                                                 </td>
-                                                <td>
-                                                    <small>{{ $user->joining_date ? \Carbon\Carbon::parse($user->joining_date)->format('d-m-Y') : '-' }}</small><br>
-                                                    <small>{{ $user->headquarter ?? '-' }}</small><br>
-                                                    @if ($user->roles && count($user->roles))
-                                                        @foreach ($user->getRoleNames() as $role)
-                                                            <span class="badge bg-info text-dark">{{ $role }}</span>
-                                                        @endforeach
-                                                    @else
-                                                        <span class="text-muted">No Role</span>
-                                                    @endif
-                                                    <br>
-                                                    <small>{{ $user->depos?->depo_name ?? '-' }}</small>
+
+                                                <td style="line-height: 1.3;">
+                                                    <small><strong>Joining Date:</strong> {{ $user->joining_date ? \Carbon\Carbon::parse($user->joining_date)->format('d-m-Y') : '-' }}</small><br>
+                                                    <small><strong>Headquarter:</strong> {{ $user->headquarter ?? '-' }}</small><br>
+                                                    
+                                                    <small><strong>Roles:</strong>
+                                                        @if ($user->roles && count($user->roles))
+                                                            @foreach ($user->getRoleNames() as $role)
+                                                                <span class="badge bg-info text-dark">{{ $role }}</span>
+                                                            @endforeach
+                                                        @else
+                                                            <span class="text-muted">No Role</span>
+                                                        @endif
+                                                    </small><br>
+                                                    
+                                                    <small><strong>Depo:</strong> {{ $user->depos?->depo_name ?? '-' }}</small>
                                                 </td>
                                                 <td class="text-center">
                                                     <span class="badge {{ $user->is_self_sale ? 'bg-success' : 'bg-danger' }}">
@@ -268,7 +353,7 @@
 </div>
 {{-- TA/DA Slab Modal --}}
 <div class="modal fade" id="slabAccessModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog">
+  <div class="modal-dialog modal-lg ">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">Assign TA/DA Slab</h5>

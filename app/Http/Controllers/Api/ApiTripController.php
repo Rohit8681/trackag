@@ -13,6 +13,7 @@ use App\Models\TripLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class ApiTripController extends BaseController
@@ -102,35 +103,72 @@ class ApiTripController extends BaseController
     }
 
     // Store a new trip log point
+    // public function logPoint(Request $request)
+    // {
+    //     $validated = $request->validate([
+    //         'trip_id'     => 'required|exists:trips,id',
+    //         'latitude'    => 'required|numeric',
+    //         'longitude'   => 'required|numeric',
+    //         'battery_percentage' => 'nullable|string|numeric',
+    //         'gps_status' => 'nullable|string|numeric',
+    //         'recorded_at' => 'nullable|date',
+    //     ]);
+
+    //     // Check if the trip is completed
+    //     $trip = Trip::find($validated['trip_id']);
+
+    //     if ($trip->status === 'completed') {
+    //         return $this->sendError("Cannot log points for a completed trip", [], 403);
+    //     }
+
+    //     $log = TripLog::create([
+    //         'trip_id'     => $validated['trip_id'],
+    //         'latitude'    => $validated['latitude'],
+    //         'longitude'   => $validated['longitude'],
+    //         'battery_percentage'   => $validated['battery_percentage'] ?? null,
+    //         'gps_status'   => $validated['gps_status'] ?? null,
+    //         'recorded_at' => $validated['recorded_at'] ?? now(),
+    //     ]);
+
+    //     return $this->sendResponse($log, "Trip log recorded successfully");
+    // }
+
     public function logPoint(Request $request)
     {
         $validated = $request->validate([
-            'trip_id'     => 'required|exists:trips,id',
-            'latitude'    => 'required|numeric',
-            'longitude'   => 'required|numeric',
-            'battery_percentage' => 'nullable|string|numeric',
-            'gps_status' => 'nullable|string|numeric',
-            'recorded_at' => 'nullable|date',
+            'location' => 'required|array|min:1', 
+            'location.*.trip_id' => 'required|exists:trips,id', 
+            'location.*.latitude' => 'required|numeric|between:-90,90', 
+            'location.*.longitude' => 'required|numeric|between:-180,180', 
+            'location.*.battery_percentage' => 'nullable|numeric|between:0,100', 
+            'location.*.gps_status' => 'nullable|numeric|in:0,1', 
+            'location.*.recorded_at' => 'nullable|date', 
         ]);
 
-        // Check if the trip is completed
-        $trip = Trip::find($validated['trip_id']);
-
+        $trip = Trip::find($validated['location'][0]['trip_id']);
         if ($trip->status === 'completed') {
-            return $this->sendError("Cannot log points for a completed trip", [], 403);
+            return $this->sendError("Cannot log points for a completed trip (ID: {$trip->id})", [], 403);
         }
 
-        $log = TripLog::create([
-            'trip_id'     => $validated['trip_id'],
-            'latitude'    => $validated['latitude'],
-            'longitude'   => $validated['longitude'],
-            'battery_percentage'   => $validated['battery_percentage'] ?? null,
-            'gps_status'   => $validated['gps_status'] ?? null,
-            'recorded_at' => $validated['recorded_at'] ?? now(),
-        ]);
+        $logs = DB::transaction(function () use ($validated) {
+            $logs = [];
+            foreach ($validated['location'] as $location) {
+                $log = TripLog::create([
+                    'trip_id' => $location['trip_id'],
+                    'latitude' => $location['latitude'],
+                    'longitude' => $location['longitude'],
+                    'battery_percentage' => $location['battery_percentage'] ?? null,
+                    'gps_status' => $location['gps_status'] ?? null,
+                    'recorded_at' => $location['recorded_at'] ?? now(),
+                ]);
+                $logs[] = $log;
+            }
+            return $logs;
+        });
 
-        return $this->sendResponse($log, "Trip log recorded successfully");
+        return $this->sendResponse($logs, "Trip logs recorded successfully");
     }
+    
 
     // Get all logs for a trip
     public function logs($tripId)
