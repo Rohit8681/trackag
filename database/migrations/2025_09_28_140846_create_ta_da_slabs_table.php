@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('ta_da_slabs', function (Blueprint $table) {
             $table->id();
             $table->enum('type', ['individual', 'slab_wise'])->default('individual');
-            $table->string('designation')->nullable(); // Only for slab_wise type
+            $table->integer('designation')->nullable(); // Only for slab_wise type
             $table->enum('max_monthly_travel', ['yes', 'no'])->nullable();
             $table->integer('km')->nullable();
             $table->json('approved_bills_in_da')->nullable();
@@ -26,6 +26,8 @@ return new class extends Migration
             $table->foreignId('ta_da_slab_id')->constrained()->onDelete('cascade');
             $table->foreignId('vehicle_type_id')->constrained('vehicle_types')->onDelete('cascade');
             $table->decimal('travelling_allow_per_km', 8, 2)->nullable();
+            $table->string('type')->nullable(); // New field
+            $table->unsignedBigInteger('user_id')->nullable(); // New field
             $table->timestamps();
         });
 
@@ -34,6 +36,8 @@ return new class extends Migration
             $table->foreignId('ta_da_slab_id')->constrained()->onDelete('cascade');
             $table->foreignId('tour_type_id')->constrained('tour_types')->onDelete('cascade');
             $table->decimal('da_amount', 8, 2)->nullable();
+            $table->string('type')->nullable(); // New field
+            $table->unsignedBigInteger('user_id')->nullable(); // New field
             $table->timestamps();
         });
     }

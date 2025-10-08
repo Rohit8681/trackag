@@ -2,14 +2,14 @@
 
 @section('content')
 <main class="app-main">
-    <div class="app-content-header">
+    <div class="app-content-header mb-4">
         <div class="container-fluid">
-            <div class="row">
+            <div class="row align-items-center">
                 <div class="col-sm-6">
                     <h3 class="mb-0">Add TA-DA Slab</h3>
                 </div>
                 <div class="col-sm-6">
-                    <ol class="breadcrumb float-sm-end">
+                    <ol class="breadcrumb float-sm-end mb-0">
                         <li class="breadcrumb-item"><a href="{{ route('ta-da-slab.form') }}">TA-DA Slab</a></li>
                         <li class="breadcrumb-item active">Add</li>
                     </ol>
@@ -22,7 +22,7 @@
         <div class="container-fluid">
             <div class="card shadow-sm border-0">
                 <div class="card-header bg-primary text-white">
-                    <h3 class="card-title mb-0">New TA-DA Slab</h3>
+                    <h4 class="mb-0">New TA-DA Slab</h4>
                 </div>
 
                 <form action="{{ route('ta-da-slab.save') }}" method="POST">
@@ -67,18 +67,18 @@
                             </div>
                         </div>
 
-                        {{-- Two Column Layout --}}
-                        <div class="row">
+                        {{-- Vehicle & Tour Slabs --}}
+                        <div class="row g-4">
                             {{-- Vehicle Types --}}
-                            <div class="col-md-6 mb-4">
-                                <div class="card border h-100">
+                            <div class="col-md-6">
+                                <div class="card border shadow-sm h-100">
                                     <div class="card-header bg-light fw-bold">Vehicle Type Slab Details</div>
                                     <div class="card-body p-0">
-                                        <table class="table table-bordered mb-0">
+                                        <table class="table table-bordered mb-0 text-center">
                                             <thead class="table-secondary">
                                                 <tr>
-                                                    <th style="width:50%">Vehicle Type</th>
-                                                    <th style="width:50%">Travelling Allow per KM</th>
+                                                    <th>Vehicle Type</th>
+                                                    <th>Travelling Allow per KM</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -106,15 +106,15 @@
                             </div>
 
                             {{-- Tour Types --}}
-                            <div class="col-md-6 mb-4">
-                                <div class="card border h-100">
+                            <div class="col-md-6">
+                                <div class="card border shadow-sm h-100">
                                     <div class="card-header bg-light fw-bold">Tour Type Slab Details</div>
                                     <div class="card-body p-0">
-                                        <table class="table table-bordered mb-0">
+                                        <table class="table table-bordered mb-0 text-center">
                                             <thead class="table-secondary">
                                                 <tr>
-                                                    <th style="width:50%">Tour Type</th>
-                                                    <th style="width:50%">D.A. Amount</th>
+                                                    <th>Tour Type</th>
+                                                    <th>D.A. Amount</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -126,6 +126,91 @@
                                                     </td>
                                                     <td>
                                                         <input type="number" step="0.01" name="da_amount[]" 
+                                                            class="form-control @error('da_amount.'.$loop->index) is-invalid @enderror"
+                                                            value="{{ old('da_amount')[$loop->index] ?? $slab->tourSlabs[$loop->index]->da_amount ?? '' }}"
+                                                            placeholder="Enter amount">
+                                                        @error('da_amount.'.$loop->index)
+                                                            <div class="invalid-feedback">{{ $message }}</div>
+                                                        @enderror
+                                                    </td>
+                                                </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- Second Vehicle & Tour Section (Duplicate as per your code) --}}
+                        <div class="row g-4 mt-4">
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">Designation</label>
+                                <select name="designation_id" class="form-select">
+                                    <option value="">-- Select --</option>
+                                    @foreach($designations as $d)
+                                        <option value="{{ $d->id }}" {{ old('designation_id', $slab->designation_id ?? '') == $d->id ? 'selected' : '' }}>{{ $d->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            {{-- Vehicle Types --}}
+                            <div class="col-md-4">
+                                <div class="card border shadow-sm h-100">
+                                    <div class="card-header bg-light fw-bold">Vehicle Type Slab Details</div>
+                                    <div class="card-body p-0">
+                                        <table class="table table-bordered mb-0 text-center">
+                                            <thead class="table-secondary">
+                                                <tr>
+                                                    <th>Vehicle Type</th>
+                                                    <th>Travelling Allow per KM</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach($vehicleTypes as $vt)
+                                                <tr>
+                                                    <td class="align-middle">
+                                                        <input type="hidden" name="slab_wise_vehicle_type_id[]" value="{{ $vt->id }}">
+                                                        <strong>{{ $vt->vehicle_type }}</strong>
+                                                    </td>
+                                                    <td>
+                                                        <input type="number" step="0.01" name="slab_wise_travelling_allow_per_km[]" 
+                                                            class="form-control @error('travelling_allow_per_km.'.$loop->index) is-invalid @enderror"
+                                                            value="{{ old('travelling_allow_per_km')[$loop->index] ?? $slab->vehicleSlabs[$loop->index]->travelling_allow_per_km ?? '' }}"
+                                                            placeholder="Enter amount">
+                                                        @error('travelling_allow_per_km.'.$loop->index)
+                                                            <div class="invalid-feedback">{{ $message }}</div>
+                                                        @enderror
+                                                    </td>
+                                                </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {{-- Tour Types --}}
+                            <div class="col-md-4">
+                                <div class="card border shadow-sm h-100">
+                                    <div class="card-header bg-light fw-bold">Tour Type Slab Details</div>
+                                    <div class="card-body p-0">
+                                        <table class="table table-bordered mb-0 text-center">
+                                            <thead class="table-secondary">
+                                                <tr>
+                                                    <th>Tour Type</th>
+                                                    <th>D.A. Amount</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach($tourTypes as $tt)
+                                                <tr>
+                                                    <td class="align-middle">
+                                                        <input type="hidden" name="slab_wise_tour_type_id[]" value="{{ $tt->id }}">
+                                                        <strong>{{ $tt->name }}</strong>
+                                                    </td>
+                                                    <td>
+                                                        <input type="number" step="0.01" name="slab_wise_da_amount[]" 
                                                             class="form-control @error('da_amount.'.$loop->index) is-invalid @enderror"
                                                             value="{{ old('da_amount')[$loop->index] ?? $slab->tourSlabs[$loop->index]->da_amount ?? '' }}"
                                                             placeholder="Enter amount">
