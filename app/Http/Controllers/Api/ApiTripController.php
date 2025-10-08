@@ -133,42 +133,98 @@ class ApiTripController extends BaseController
     //     return $this->sendResponse($log, "Trip log recorded successfully");
     // }
 
+    // public function logPoint(Request $request)
+    // {
+    //     $validated = $request->validate([
+    //         'location' => 'required|array|min:1', 
+    //         'location.*.trip_id' => 'required|exists:trips,id', 
+    //         'location.*.latitude' => 'required|numeric|between:-90,90', 
+    //         'location.*.longitude' => 'required|numeric|between:-180,180', 
+    //         'location.*.battery_percentage' => 'nullable|numeric|between:0,100', 
+    //         'location.*.gps_status' => 'nullable|numeric|in:0,1', 
+    //         'location.*.recorded_at' => 'nullable|date', 
+    //     ]);
+
+    //     $trip = Trip::find($validated['location'][0]['trip_id']);
+    //     if ($trip->status === 'completed') {
+    //         return $this->sendError("Cannot log points for a completed trip (ID: {$trip->id})", [], 403);
+    //     }
+
+    //     $logs = DB::transaction(function () use ($validated) {
+    //         $logs = [];
+    //         foreach ($validated['location'] as $location) {
+    //             $log = TripLog::create([
+    //                 'trip_id' => $location['trip_id'],
+    //                 'latitude' => $location['latitude'],
+    //                 'longitude' => $location['longitude'],
+    //                 'battery_percentage' => $location['battery_percentage'] ?? null,
+    //                 'gps_status' => $location['gps_status'] ?? null,
+    //                 'recorded_at' => $location['recorded_at'] ?? now(),
+    //             ]);
+    //             $logs[] = $log;
+    //         }
+    //         return $logs;
+    //     });
+
+    //     return $this->sendResponse($logs, "Trip logs recorded successfully");
+    // }
+
     public function logPoint(Request $request)
-    {
-        $validated = $request->validate([
-            'location' => 'required|array|min:1', 
-            'location.*.trip_id' => 'required|exists:trips,id', 
-            'location.*.latitude' => 'required|numeric|between:-90,90', 
-            'location.*.longitude' => 'required|numeric|between:-180,180', 
-            'location.*.battery_percentage' => 'nullable|numeric|between:0,100', 
-            'location.*.gps_status' => 'nullable|numeric|in:0,1', 
-            'location.*.recorded_at' => 'nullable|date', 
-        ]);
-
-        $trip = Trip::find($validated['location'][0]['trip_id']);
-        if ($trip->status === 'completed') {
-            return $this->sendError("Cannot log points for a completed trip (ID: {$trip->id})", [], 403);
-        }
-
-        $logs = DB::transaction(function () use ($validated) {
-            $logs = [];
-            foreach ($validated['location'] as $location) {
-                $log = TripLog::create([
-                    'trip_id' => $location['trip_id'],
-                    'latitude' => $location['latitude'],
-                    'longitude' => $location['longitude'],
-                    'battery_percentage' => $location['battery_percentage'] ?? null,
-                    'gps_status' => $location['gps_status'] ?? null,
-                    'recorded_at' => $location['recorded_at'] ?? now(),
-                ]);
-                $logs[] = $log;
-            }
-            return $logs;
-        });
-
-        return $this->sendResponse($logs, "Trip logs recorded successfully");
+{
+    // Normalize single object to array if needed
+    if (!is_array($request->input('location', [])) || !isset($request->input('location')[0])) {
+        $request->merge(['location' => [$request->input('location')]]);
     }
-    
+
+    // Validate incoming request
+    $validated = $request->validate([
+        'location' => 'required|array|min:1',
+        'location.*.trip_id' => 'required|exists:trips,id',
+        'location.*.latitude' => 'required|numeric|between:-90,90',
+        'location.*.longitude' => 'required|numeric|between:-180,180',
+        'location.*.battery_percentage' => 'nullable|numeric|between:0,100',
+        'location.*.gps_status' => 'nullable|numeric|in:0,1',
+        'location.*.recorded_at' => 'nullable|date',
+    ], [
+        'location.*.trip_id.exists' => 'Trip ID :input does not exist.',
+        'location.*.latitude.between' => 'Latitude must be between -90 and 90.',
+        'location.*.longitude.between' => 'Longitude must be between -180 and 180.',
+        'location.*.battery_percentage.between' => 'Battery percentage must be between 0 and 100.',
+        'location.*.gps_status.in' => 'GPS status must be 0 or 1.',
+    ]);
+
+    // Check for completed trips
+    $tripIds = collect($validated['location'])->pluck('trip_id');
+    $completedTrips = Trip::whereIn('id', $tripIds)
+        ->where('status', 'completed')
+        ->pluck('id')
+        ->toArray();
+
+    if (!empty($completedTrips)) {
+        return $this->sendError(
+            "Cannot log points for completed trips: " . implode(', ', $completedTrips),
+            [],
+            403
+        );
+    }
+
+    // Insert logs inside a transaction
+    $logs = DB::transaction(function () use ($validated) {
+        return collect($validated['location'])->map(function ($location) {
+            return TripLog::create([
+                'trip_id' => $location['trip_id'],
+                'latitude' => $location['latitude'],
+                'longitude' => $location['longitude'],
+                'battery_percentage' => $location['battery_percentage'] ?? null,
+                'gps_status' => $location['gps_status'] ?? null,
+                'recorded_at' => $location['recorded_at'] ?? now(),
+            ]);
+        });
+    });
+
+    return $this->sendResponse($logs, "Trip logs recorded successfully");
+}
+
 
     // Get all logs for a trip
     public function logs($tripId)
