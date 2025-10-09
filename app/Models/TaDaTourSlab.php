@@ -13,6 +13,7 @@ class TaDaTourSlab extends Model
         'ta_da_slab_id',
         'tour_type_id',
         'da_amount',
+        'type'
     ];
 
     // Relation to main slab

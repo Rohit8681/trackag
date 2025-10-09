@@ -67,12 +67,29 @@
                             </div>
                         </div>
 
-                        {{-- Vehicle & Tour Slabs --}}
-                        <div class="row g-4">
-                            {{-- Vehicle Types --}}
+                        {{-- Designation --}}
+                        <div class="row mb-4">
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">Designation</label>
+                                <select name="designation_id" class="form-select">
+                                    <option value="">-- Select --</option>
+                                    @foreach($designations as $d)
+                                        <option value="{{ $d->id }}" {{ old('designation_id', $slab->designation ?? '') == $d->id ? 'selected' : '' }}>
+                                            {{ $d->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+
+                        {{-- INDIVIDUAL SECTION --}}
+                        <div class="row g-4 mb-4">
+                            <h5 class="text-primary fw-bold">Individual Slab</h5>
+
+                            {{-- Vehicle Types (Individual) --}}
                             <div class="col-md-6">
                                 <div class="card border shadow-sm h-100">
-                                    <div class="card-header bg-light fw-bold">Vehicle Type Slab Details</div>
+                                    <div class="card-header bg-light fw-bold">Vehicle Type (Individual)</div>
                                     <div class="card-body p-0">
                                         <table class="table table-bordered mb-0 text-center">
                                             <thead class="table-secondary">
@@ -82,22 +99,18 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                @foreach($vehicleTypes as $vt)
-                                                <tr>
-                                                    <td class="align-middle">
-                                                        <input type="hidden" name="vehicle_type_id[]" value="{{ $vt->id }}">
-                                                        <strong>{{ $vt->vehicle_type }}</strong>
-                                                    </td>
-                                                    <td>
-                                                        <input type="number" step="0.01" name="travelling_allow_per_km[]" 
-                                                            class="form-control @error('travelling_allow_per_km.'.$loop->index) is-invalid @enderror"
-                                                            value="{{ old('travelling_allow_per_km')[$loop->index] ?? $slab->vehicleSlabs[$loop->index]->travelling_allow_per_km ?? '' }}"
-                                                            placeholder="Enter amount">
-                                                        @error('travelling_allow_per_km.'.$loop->index)
-                                                            <div class="invalid-feedback">{{ $message }}</div>
-                                                        @enderror
-                                                    </td>
-                                                </tr>
+                                                @foreach($vehicleTypes as $index => $vt)
+                                                    @php
+                                                        $value = $individualVehicleSlabs->where('vehicle_type_id', $vt->id)->first()->travelling_allow_per_km ?? '';
+                                                    @endphp
+                                                    <tr>
+                                                        <td>{{ $vt->vehicle_type }}</td>
+                                                        <td>
+                                                            <input type="hidden" name="vehicle_type_id[]" value="{{ $vt->id }}">
+                                                            <input type="number" step="0.01" name="travelling_allow_per_km[]" class="form-control"
+                                                                value="{{ old('travelling_allow_per_km')[$index] ?? $value }}">
+                                                        </td>
+                                                    </tr>
                                                 @endforeach
                                             </tbody>
                                         </table>
@@ -105,10 +118,10 @@
                                 </div>
                             </div>
 
-                            {{-- Tour Types --}}
+                            {{-- Tour Types (Individual) --}}
                             <div class="col-md-6">
                                 <div class="card border shadow-sm h-100">
-                                    <div class="card-header bg-light fw-bold">Tour Type Slab Details</div>
+                                    <div class="card-header bg-light fw-bold">Tour Type (Individual)</div>
                                     <div class="card-body p-0">
                                         <table class="table table-bordered mb-0 text-center">
                                             <thead class="table-secondary">
@@ -118,22 +131,18 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                @foreach($tourTypes as $tt)
-                                                <tr>
-                                                    <td class="align-middle">
-                                                        <input type="hidden" name="tour_type_id[]" value="{{ $tt->id }}">
-                                                        <strong>{{ $tt->name }}</strong>
-                                                    </td>
-                                                    <td>
-                                                        <input type="number" step="0.01" name="da_amount[]" 
-                                                            class="form-control @error('da_amount.'.$loop->index) is-invalid @enderror"
-                                                            value="{{ old('da_amount')[$loop->index] ?? $slab->tourSlabs[$loop->index]->da_amount ?? '' }}"
-                                                            placeholder="Enter amount">
-                                                        @error('da_amount.'.$loop->index)
-                                                            <div class="invalid-feedback">{{ $message }}</div>
-                                                        @enderror
-                                                    </td>
-                                                </tr>
+                                                @foreach($tourTypes as $index => $tt)
+                                                    @php
+                                                        $value = $individualTourSlabs->where('tour_type_id', $tt->id)->first()->da_amount ?? '';
+                                                    @endphp
+                                                    <tr>
+                                                        <td>{{ $tt->name }}</td>
+                                                        <td>
+                                                            <input type="hidden" name="tour_type_id[]" value="{{ $tt->id }}">
+                                                            <input type="number" step="0.01" name="da_amount[]" class="form-control"
+                                                                value="{{ old('da_amount')[$index] ?? $value }}">
+                                                        </td>
+                                                    </tr>
                                                 @endforeach
                                             </tbody>
                                         </table>
@@ -142,22 +151,14 @@
                             </div>
                         </div>
 
-                        {{-- Second Vehicle & Tour Section (Duplicate as per your code) --}}
+                        {{-- SLAB-WISE SECTION --}}
                         <div class="row g-4 mt-4">
-                            <div class="col-md-4">
-                                <label class="form-label fw-bold">Designation</label>
-                                <select name="designation_id" class="form-select">
-                                    <option value="">-- Select --</option>
-                                    @foreach($designations as $d)
-                                        <option value="{{ $d->id }}" {{ old('designation_id', $slab->designation_id ?? '') == $d->id ? 'selected' : '' }}>{{ $d->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
+                            <h5 class="text-primary fw-bold">Slab-wise</h5>
 
-                            {{-- Vehicle Types --}}
-                            <div class="col-md-4">
+                            {{-- Vehicle Types (Slab-wise) --}}
+                            <div class="col-md-6">
                                 <div class="card border shadow-sm h-100">
-                                    <div class="card-header bg-light fw-bold">Vehicle Type Slab Details</div>
+                                    <div class="card-header bg-light fw-bold">Vehicle Type (Slab-wise)</div>
                                     <div class="card-body p-0">
                                         <table class="table table-bordered mb-0 text-center">
                                             <thead class="table-secondary">
@@ -167,22 +168,18 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                @foreach($vehicleTypes as $vt)
-                                                <tr>
-                                                    <td class="align-middle">
-                                                        <input type="hidden" name="slab_wise_vehicle_type_id[]" value="{{ $vt->id }}">
-                                                        <strong>{{ $vt->vehicle_type }}</strong>
-                                                    </td>
-                                                    <td>
-                                                        <input type="number" step="0.01" name="slab_wise_travelling_allow_per_km[]" 
-                                                            class="form-control @error('travelling_allow_per_km.'.$loop->index) is-invalid @enderror"
-                                                            value="{{ old('travelling_allow_per_km')[$loop->index] ?? $slab->vehicleSlabs[$loop->index]->travelling_allow_per_km ?? '' }}"
-                                                            placeholder="Enter amount">
-                                                        @error('travelling_allow_per_km.'.$loop->index)
-                                                            <div class="invalid-feedback">{{ $message }}</div>
-                                                        @enderror
-                                                    </td>
-                                                </tr>
+                                                @foreach($vehicleTypes as $index => $vt)
+                                                    @php
+                                                        $value = $slabWiseVehicleSlabs->where('vehicle_type_id', $vt->id)->first()->travelling_allow_per_km ?? '';
+                                                    @endphp
+                                                    <tr>
+                                                        <td>{{ $vt->vehicle_type }}</td>
+                                                        <td>
+                                                            <input type="hidden" name="slab_wise_vehicle_type_id[]" value="{{ $vt->id }}">
+                                                            <input type="number" step="0.01" name="slab_wise_travelling_allow_per_km[]" class="form-control"
+                                                                value="{{ old('slab_wise_travelling_allow_per_km')[$index] ?? $value }}">
+                                                        </td>
+                                                    </tr>
                                                 @endforeach
                                             </tbody>
                                         </table>
@@ -190,10 +187,10 @@
                                 </div>
                             </div>
 
-                            {{-- Tour Types --}}
-                            <div class="col-md-4">
+                            {{-- Tour Types (Slab-wise) --}}
+                            <div class="col-md-6">
                                 <div class="card border shadow-sm h-100">
-                                    <div class="card-header bg-light fw-bold">Tour Type Slab Details</div>
+                                    <div class="card-header bg-light fw-bold">Tour Type (Slab-wise)</div>
                                     <div class="card-body p-0">
                                         <table class="table table-bordered mb-0 text-center">
                                             <thead class="table-secondary">
@@ -203,22 +200,18 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                @foreach($tourTypes as $tt)
-                                                <tr>
-                                                    <td class="align-middle">
-                                                        <input type="hidden" name="slab_wise_tour_type_id[]" value="{{ $tt->id }}">
-                                                        <strong>{{ $tt->name }}</strong>
-                                                    </td>
-                                                    <td>
-                                                        <input type="number" step="0.01" name="slab_wise_da_amount[]" 
-                                                            class="form-control @error('da_amount.'.$loop->index) is-invalid @enderror"
-                                                            value="{{ old('da_amount')[$loop->index] ?? $slab->tourSlabs[$loop->index]->da_amount ?? '' }}"
-                                                            placeholder="Enter amount">
-                                                        @error('da_amount.'.$loop->index)
-                                                            <div class="invalid-feedback">{{ $message }}</div>
-                                                        @enderror
-                                                    </td>
-                                                </tr>
+                                                @foreach($tourTypes as $index => $tt)
+                                                    @php
+                                                        $value = $slabWiseTourSlabs->where('tour_type_id', $tt->id)->first()->da_amount ?? '';
+                                                    @endphp
+                                                    <tr>
+                                                        <td>{{ $tt->name }}</td>
+                                                        <td>
+                                                            <input type="hidden" name="slab_wise_tour_type_id[]" value="{{ $tt->id }}">
+                                                            <input type="number" step="0.01" name="slab_wise_da_amount[]" class="form-control"
+                                                                value="{{ old('slab_wise_da_amount')[$index] ?? $value }}">
+                                                        </td>
+                                                    </tr>
                                                 @endforeach
                                             </tbody>
                                         </table>
