@@ -13,6 +13,7 @@ class TaDaVehicleSlab extends Model
         'ta_da_slab_id',
         'vehicle_type_id',
         'travelling_allow_per_km',
+        'type'
     ];
 
     // Relation to main slab
