@@ -138,7 +138,7 @@ class ApiTripController extends BaseController
         // Validate incoming request
         $validated = $request->validate([
             'location' => 'required|array|min:1',
-            'location.*.trip_id' => 'required|exists:trips,id',
+            'location.*.tripId' => 'required|exists:trips,id',
             'location.*.latitude' => 'required|numeric',
             'location.*.longitude' => 'required|numeric',
             'location.*.gps_status' => 'nullable',
@@ -166,7 +166,7 @@ class ApiTripController extends BaseController
         $logs = DB::transaction(function () use ($locations) {
             return collect($locations)->map(function ($loc) {
                 return TripLog::create([
-                    'trip_id' => $loc['trip_id'],
+                    'trip_id' => $loc['tripId'],
                     'latitude' => $loc['latitude'],
                     'longitude' => $loc['longitude'],
                     'gps_status' => $loc['gps_status'] ?? null,

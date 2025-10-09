@@ -19,6 +19,11 @@ use App\Models\Company;
 use App\Models\Tehsil;
 use App\Models\Pincode;
 use App\Models\Designation;
+use App\Models\TaDaSlab;
+use App\Models\TaDaTourSlab;
+use App\Models\TaDaVehicleSlab;
+use App\Models\TourType;
+use App\Models\VehicleType;
 use Illuminate\Support\Facades\Hash;
 
 
@@ -156,6 +161,37 @@ class UserController extends Controller
         $user->save();
 
         return response()->json(['message' => 'Slab updated successfully']);
+    }
+
+    public function getUserSlab(Request $request)
+    {
+        $userId = $request->user_id;
+        $slabType = $request->slab;
+
+        $vehicleTypes = VehicleType::where('is_deleted', 0)->get();
+        $tourTypes = TourType::all();
+
+        $vehicleSlabs = collect();
+        $tourSlabs = collect();
+        $taDaSlab = null;
+
+        if ($slabType === "Slab Wise") {
+            $taDaSlab = TaDaSlab::whereNull('user_id')->first();
+            $vehicleSlabs = TaDaVehicleSlab::where('type', 'slab_wise')->whereNull('user_id')->get();
+            $tourSlabs = TaDaTourSlab::where('type', 'slab_wise')->whereNull('user_id')->get();
+        } elseif ($slabType === "Individual") {
+            $taDaSlab = TaDaSlab::where('user_id', $userId)->first();
+            $vehicleSlabs = TaDaVehicleSlab::where('user_id', $userId)->get();
+            $tourSlabs = TaDaTourSlab::where('user_id', $userId)->get();
+        }
+
+        return response()->json([
+            'vehicle_types' => $vehicleTypes,
+            'tour_types' => $tourTypes,
+            'vehicle_slabs' => $vehicleSlabs,
+            'tour_slabs' => $tourSlabs,
+            'ta_da_slab' => $taDaSlab
+        ]);
     }
 
     /**

@@ -372,6 +372,41 @@
               <option value="Slab Wise">TA/DA - Slab Wise</option>
             </select>
           </div>
+          <div id="slabTables" class="row d-none">
+            <div class="col-md-6">
+                <div class="card border">
+                <div class="card-header fw-bold">Vehicle Type (Slab-wise)</div>
+                <div class="card-body p-0">
+                    <table class="table table-bordered mb-0 text-center">
+                    <thead class="table-light">
+                        <tr>
+                        <th>Vehicle Type</th>
+                        <th>Travelling Allow per KM</th>
+                        </tr>
+                    </thead>
+                    <tbody id="vehicleSlabBody"></tbody>
+                    </table>
+                </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card border">
+                <div class="card-header fw-bold">Tour Type (Slab-wise)</div>
+                <div class="card-body p-0">
+                    <table class="table table-bordered mb-0 text-center">
+                    <thead class="table-light">
+                        <tr>
+                        <th>Tour Type</th>
+                        <th>D.A. Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tourSlabBody"></tbody>
+                    </table>
+                </div>
+                </div>
+            </div>
+        </div>
         </form>
         <div id="slabAccessMessage"></div>
       </div>
@@ -415,6 +450,73 @@ $(document).ready(function() {
         $('#slabAccessMessage').html('');
         $('#slabAccessModal').modal('show');
     });
+
+    $('#slabSelect').change(function() {
+        var slabType = $(this).val();
+        var userId = $('#slabModalUserId').val();
+
+        $('#slabTables').addClass('d-none');
+        $('#vehicleSlabBody, #tourSlabBody').empty();
+
+        if (!slabType) return;
+
+        $.ajax({
+            url: '/admin/get-user-slab',
+            type: 'GET',
+            data: { user_id: userId, slab: slabType },
+            success: function(res) {
+                $('#slabTables').removeClass('d-none');
+
+                let readOnly = (slabType === "Slab Wise") ? 'readonly' : '';
+
+                // ---------- VEHICLE SLABS ----------
+                $.each(res.vehicle_types, function(i, vt) {
+                    let slabData = res.vehicle_slabs.find(s => s.vehicle_type_id === vt.id);
+                    
+                    let amount = slabData ? slabData.travelling_allow_per_km : '';
+                    $('#vehicleSlabBody').append(`
+                        <tr>
+                            <td>${vt.vehicle_type}</td>
+                            <td>
+                                <input type="hidden" name="vehicle_type_id[]" value="${vt.id}">
+                                <input type="number" step="0.01" class="form-control text-center" 
+                                    name="travelling_allow_per_km[]" value="${amount}" ${readOnly}>
+                            </td>
+                        </tr>
+                    `);
+                });
+
+                // ---------- TOUR SLABS ----------
+                $.each(res.tour_types, function(i, tt) {
+                    let slabData = res.tour_slabs.find(s => s.tour_type_id === tt.id);
+                    let amount = slabData ? slabData.da_amount : '';
+                    $('#tourSlabBody').append(`
+                        <tr>
+                            <td>${tt.name}</td>
+                            <td>
+                                <input type="hidden" name="tour_type_id[]" value="${tt.id}">
+                                <input type="number" step="0.01" class="form-control text-center" 
+                                    name="da_amount[]" value="${amount}" ${readOnly}>
+                            </td>
+                        </tr>
+                    `);
+                });
+
+                // Optional: populate general slab fields
+                if(res.ta_da_slab) {
+                    $('select[name="max_monthly_travel"]').val(res.ta_da_slab.max_monthly_travel).trigger('change');
+                    $('input[name="km"]').val(res.ta_da_slab.km);
+                    if(res.ta_da_slab.approved_bills_in_da){
+                        $('select[name="approved_bills_in_da[]"]').val(res.ta_da_slab.approved_bills_in_da).trigger('change');
+                    }
+                    $('select[name="designation_id"]').val(res.ta_da_slab.designation_id);
+                }
+            }
+        });
+    });
+
+
+
 
     $('#saveSlabBtn').click(function(){
         let formData = $('#slabAccessForm').serialize();

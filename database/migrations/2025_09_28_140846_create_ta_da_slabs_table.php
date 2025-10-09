@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('ta_da_slabs', function (Blueprint $table) {
             $table->id();
             $table->enum('type', ['individual', 'slab_wise'])->default('individual');
+            $table->integer('user_id')->nullable();
             $table->integer('designation')->nullable(); // Only for slab_wise type
             $table->enum('max_monthly_travel', ['yes', 'no'])->nullable();
             $table->integer('km')->nullable();
