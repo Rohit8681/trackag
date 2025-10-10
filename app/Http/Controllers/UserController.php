@@ -175,7 +175,7 @@ class UserController extends Controller
         $user->slab = $request->slab;
         $user->save();
 
-        // If slab is "Individual", insert detailed records
+        // If slab is "Individual", insert/update detailed records
         if ($request->slab != "Slab Wise") {
 
             $request->validate([
@@ -184,40 +184,53 @@ class UserController extends Controller
                 'approved_bills_in_da' => 'nullable|array',
                 'approved_bills_in_da.*' => 'string',
                 'designation_id' => 'nullable|exists:designations,id',
-                'vehicle_type' => 'nullable|array', // you can adjust according to your front-end
-                'vehicle_type.*.vehicle_id' => 'required|exists:vehicle_types,id',
-                'vehicle_type.*.travel_allow' => 'required|numeric',
-                'tour_type' => 'nullable|array',
-                'tour_type.*.tour_id' => 'required|exists:tour_types,id',
-                'tour_type.*.da_amount' => 'required|numeric',
+                'vehicle_type_id' => 'nullable|array',
+                'vehicle_type_id.*' => 'exists:vehicle_types,id',
+                'travelling_allow_per_km' => 'nullable|array',
+                'travelling_allow_per_km.*' => 'numeric',
+                'tour_type_id' => 'nullable|array',
+                'tour_type_id.*' => 'exists:tour_types,id',
+                'da_amount' => 'nullable|array',
+                'da_amount.*' => 'numeric',
             ]);
 
-            $taDaSlab = TaDaSlab::create([
-                'user_id' => $user->id,
-                'max_monthly_travel' => $request->max_monthly_travel,
-                'km' => $request->km,
-                'approved_bills_in_da' => $request->approved_bills_in_da ? json_encode($request->approved_bills_in_da) : null,
-                'designation_id' => $request->designation_id,
-            ]);
+            // Check if user already has a TA/DA slab
+            $taDaSlab = TaDaSlab::updateOrCreate(
+                ['user_id' => $user->id], // matching condition
+                [
+                    'max_monthly_travel' => $request->max_monthly_travel,
+                    'km' => $request->km,
+                    'approved_bills_in_da' => $request->approved_bills_in_da, // store array directly, cast in model
+                    'designation_id' => $request->designation_id,
+                ]
+            );
 
-            if ($request->vehicle_type) {
-                foreach ($request->vehicle_type as $vehicle) {
+            // Clear old vehicle and tour slabs for this user
+            TaDaVehicleSlab::where('ta_da_slab_id', $taDaSlab->id)->delete();
+            TaDaTourSlab::where('ta_da_slab_id', $taDaSlab->id)->delete();
+
+            // Vehicle slabs
+            if ($request->has('vehicle_type_id') && $request->has('travelling_allow_per_km')) {
+                foreach ($request->vehicle_type_id as $index => $vehicleId) {
                     TaDaVehicleSlab::create([
-                        'tada_slab_id' => $taDaSlab->id,
-                        'vehicle_type_id' => $vehicle['vehicle_id'],
-                        'travel_allow_per_km' => $vehicle['travel_allow'],
+                        'ta_da_slab_id' => $taDaSlab->id,
+                        'vehicle_type_id' => $vehicleId,
+                        'travelling_allow_per_km' => $request->travelling_allow_per_km[$index] ?? 0,
                         'user_id' => $user->id,
+                        'type' => "individual"
                     ]);
                 }
             }
 
-            if ($request->tour_type) {
-                foreach ($request->tour_type as $tour) {
+            // Tour slabs
+            if ($request->has('tour_type_id') && $request->has('da_amount')) {
+                foreach ($request->tour_type_id as $index => $tourId) {
                     TaDaTourSlab::create([
-                        'tada_slab_id' => $taDaSlab->id,
-                        'tour_type_id' => $tour['tour_id'],
-                        'da_amount' => $tour['da_amount'],
+                        'ta_da_slab_id' => $taDaSlab->id,
+                        'tour_type_id' => $tourId,
+                        'da_amount' => $request->da_amount[$index] ?? 0,
                         'user_id' => $user->id,
+                        'type' => "individual"
                     ]);
                 }
             }
@@ -225,6 +238,8 @@ class UserController extends Controller
 
         return response()->json(['message' => 'Slab saved successfully']);
     }
+
+
 
     public function getUserSlab(Request $request)
     {

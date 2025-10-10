@@ -397,7 +397,7 @@
             <div class="row g-3 mb-4">
                 <div class="col-md-6">
                     <label class="form-label fw-bold">Approved Bills in DA</label>
-                    <select name="approved_bills_in_da[]" class="form-select" multiple>
+                    <select name="approved_bills_in_da[]" id="approvedBills" class="form-select" multiple>
                         <option value="Petrol">Petrol</option>
                         <option value="Food">Food</option>
                         <option value="Accommodation">Accommodation</option>
@@ -479,10 +479,14 @@
 
 <script>
 $(document).ready(function() {
-    $('#slabAccessModal select[name="approved_bills_in_da[]"]').select2({
-        placeholder: "Select Approved Bills",
-        width: '100%'
+    $('#slabAccessModal').on('shown.bs.modal', function () {
+        $('#approvedBills').select2({
+            placeholder: "Select Approved Bills",
+            width: '100%',
+            dropdownParent: $('#slabAccessModal') // important for Bootstrap modal
+        });
     });
+
 
     $('#depoAccessModal').on('shown.bs.modal', function () {
         $('#depoId').select2({
@@ -501,7 +505,6 @@ $(document).ready(function() {
     $('.slab_access').click(function() {
         let userId = $(this).data('user-id');
         let userSlab = $(this).data('user-slab');
-
         $('#slabModalUserId').val(userId);
         $('#slabSelect').val(userSlab).trigger('change');
         $('#slabAccessMessage').html('');
@@ -511,9 +514,6 @@ $(document).ready(function() {
     $('#slabSelect').change(function() {
         var slabType = $(this).val();
         var userId = $('#slabModalUserId').val();
-
-        
-
         
         $('#slabTables').addClass('d-none');
         $('#vehicleSlabBody, #tourSlabBody').empty();
@@ -577,9 +577,33 @@ $(document).ready(function() {
                     $('select[name="max_monthly_travel"]').val(res.ta_da_slab.max_monthly_travel).trigger('change');
                     $('input[name="km"]').val(res.ta_da_slab.km);
                     if(res.ta_da_slab.approved_bills_in_da){
-                        $('select[name="approved_bills_in_da[]"]').val(res.ta_da_slab.approved_bills_in_da).trigger('change');
+                        let bills = res.ta_da_slab.approved_bills_in_da; // array of values
+                        let select = $('#slabAccessModal select[name="approved_bills_in_da[]"]');
+
+                        // Add missing options
+                        bills.forEach(function(val){
+                            if(select.find('option[value="'+val+'"]').length === 0){
+                                select.append(new Option(val, val, true, true));
+                            }
+                        });
+
+                        // Set selected values
+                        select.val(bills).trigger('change');
                     }
+
                     $('select[name="designation_id"]').val(res.ta_da_slab.designation);
+                }
+
+                if (slabType === "Slab Wise") {
+                    $('select[name="max_monthly_travel"]').prop('disabled', true);
+                    $('input[name="km"]').prop('readonly', true);
+                    $('select[name="approved_bills_in_da[]"]').prop('disabled', true).trigger('change.select2');
+                    $('select[name="designation_id"]').prop('disabled', true);
+                } else {
+                    $('select[name="max_monthly_travel"]').prop('disabled', false);
+                    $('input[name="km"]').prop('readonly', false);
+                    $('select[name="approved_bills_in_da[]"]').prop('disabled', false).trigger('change.select2');
+                    $('select[name="designation_id"]').prop('disabled', false);
                 }
             }
         });

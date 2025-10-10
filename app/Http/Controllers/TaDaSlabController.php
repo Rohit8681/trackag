@@ -54,16 +54,15 @@ class TaDaSlabController extends Controller
         ]);
 
         // Save or update main TA-DA slab
-        $slab = TaDaSlab::first() ?? new TaDaSlab();
+        $slab = TaDaSlab::whereNull('user_id')->first() ?? new TaDaSlab();
         $slab->designation = $request->designation_id;
         $slab->max_monthly_travel = $request->max_monthly_travel;
         $slab->km = $request->km;
         $slab->approved_bills_in_da = $request->approved_bills_in_da ?? [];
         $slab->save();
 
-        // Delete old related slabs
-        TaDaVehicleSlab::truncate();
-        TaDaTourSlab::truncate();
+        TaDaVehicleSlab::where('ta_da_slab_id', $slab->id)->whereNull('user_id')->delete();
+        TaDaTourSlab::where('ta_da_slab_id', $slab->id)->whereNull('user_id')->delete();
 
         // --- Individual Vehicle Slabs ---
         foreach ($request->vehicle_type_id as $i => $vtId) {
