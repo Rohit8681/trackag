@@ -353,70 +353,122 @@
 </div>
 {{-- TA/DA Slab Modal --}}
 <div class="modal fade" id="slabAccessModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-lg ">
+  <div class="modal-dialog modal-xl">
     <div class="modal-content">
-      <div class="modal-header">
+      <div class="modal-header bg-primary text-white">
         <h5 class="modal-title">Assign TA/DA Slab</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
       </div>
+
       <div class="modal-body">
         <form id="slabAccessForm">
           @csrf
           <input type="hidden" name="user_id" id="slabModalUserId">
 
-          <div class="mb-3">
-            <label class="form-label">Select Slab</label>
+          <!-- Slab Selection -->
+          <div class="mb-4">
+            <label class="form-label fw-bold">Select Slab</label>
             <select name="slab" id="slabSelect" class="form-select" required>
               <option value="">-- Select Slab --</option>
               <option value="Individual">TA/DA Slab - Individual</option>
               <option value="Slab Wise">TA/DA - Slab Wise</option>
             </select>
           </div>
-          <div id="slabTables" class="row d-none">
-            <div class="col-md-6">
-                <div class="card border">
-                <div class="card-header fw-bold">Vehicle Type (Slab-wise)</div>
-                <div class="card-body p-0">
-                    <table class="table table-bordered mb-0 text-center">
-                    <thead class="table-light">
-                        <tr>
-                        <th>Vehicle Type</th>
-                        <th>Travelling Allow per KM</th>
-                        </tr>
-                    </thead>
-                    <tbody id="vehicleSlabBody"></tbody>
-                    </table>
+
+          <!-- Slab Details -->
+          <div id="slabTables" class="d-none">
+            <div class="row g-3 mb-4">
+              <!-- Max Monthly Travel -->
+              <div class="col-md-6">
+                <label class="form-label fw-bold">Max Monthly Travel K.M.</label>
+                <select name="max_monthly_travel" class="form-select">
+                  <option value="">-- Select --</option>
+                  <option value="yes">Yes</option>
+                  <option value="no">No</option>
+                </select>
+              </div>
+
+              <!-- KM -->
+              <div class="col-md-6">
+                <label class="form-label fw-bold">KM</label>
+                <input type="number" name="km" class="form-control" placeholder="Enter KM">
+              </div>
+            </div>
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">Approved Bills in DA</label>
+                    <select name="approved_bills_in_da[]" class="form-select" multiple>
+                        <option value="Petrol">Petrol</option>
+                        <option value="Food">Food</option>
+                        <option value="Accommodation">Accommodation</option>
+                        <option value="Travel">Travel</option>
+                        <option value="Courier">Courier</option>
+                        <option value="Hotel">Hotel</option>
+                        <option value="Others">Others</option>
+                    </select>
                 </div>
+                <div class="col-md-6" id="designation_div">
+                    <label class="form-label fw-bold">Designation</label>
+                    <select name="designation_id" class="form-select">
+                        @foreach($designations as $d)
+                        <option value="{{ $d->id }}">{{ $d->name }}</option>
+                        @endforeach
+                    </select>
                 </div>
             </div>
 
-            <div class="col-md-6">
-                <div class="card border">
-                <div class="card-header fw-bold">Tour Type (Slab-wise)</div>
-                <div class="card-body p-0">
+            <!-- Vehicle & Tour Slabs -->
+            <div class="row g-3">
+              <!-- Vehicle Type Table -->
+              <div class="col-md-6">
+                <div class="card shadow-sm">
+                  <div class="card-header bg-secondary text-white fw-bold" >Vehicle Type <span id="vehicle_slab_title_name"></span></div>
+                  <div class="card-body p-0">
                     <table class="table table-bordered mb-0 text-center">
-                    <thead class="table-light">
+                      <thead class="table-light">
                         <tr>
-                        <th>Tour Type</th>
-                        <th>D.A. Amount</th>
+                          <th>Vehicle Type</th>
+                          <th>Travelling Allow per KM</th>
                         </tr>
-                    </thead>
-                    <tbody id="tourSlabBody"></tbody>
+                      </thead>
+                      <tbody id="vehicleSlabBody"></tbody>
                     </table>
+                  </div>
                 </div>
+              </div>
+
+              <!-- Tour Type Table -->
+              <div class="col-md-6">
+                <div class="card shadow-sm">
+                  <div class="card-header bg-secondary text-white fw-bold">Tour Type <span id="tour_slab_title_name"></span></div>
+                  <div class="card-body p-0">
+                    <table class="table table-bordered mb-0 text-center">
+                      <thead class="table-light">
+                        <tr>
+                          <th>Tour Type</th>
+                          <th>D.A. Amount</th>
+                        </tr>
+                      </thead>
+                      <tbody id="tourSlabBody"></tbody>
+                    </table>
+                  </div>
                 </div>
+              </div>
             </div>
-        </div>
+          </div>
         </form>
-        <div id="slabAccessMessage"></div>
+
+        <div id="slabAccessMessage" class="mt-3"></div>
       </div>
+
       <div class="modal-footer">
-        <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button class="btn btn-primary" id="saveSlabBtn">Save</button>
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="saveSlabBtn">Save</button>
       </div>
     </div>
   </div>
 </div>
+
 
 
 
@@ -427,6 +479,11 @@
 
 <script>
 $(document).ready(function() {
+    $('#slabAccessModal select[name="approved_bills_in_da[]"]').select2({
+        placeholder: "Select Approved Bills",
+        width: '100%'
+    });
+
     $('#depoAccessModal').on('shown.bs.modal', function () {
         $('#depoId').select2({
             placeholder: "Select Depos",
@@ -455,10 +512,23 @@ $(document).ready(function() {
         var slabType = $(this).val();
         var userId = $('#slabModalUserId').val();
 
+        
+
+        
         $('#slabTables').addClass('d-none');
         $('#vehicleSlabBody, #tourSlabBody').empty();
 
         if (!slabType) return;
+
+        if(slabType == "Slab Wise"){
+            $('#vehicle_slab_title_name').html('(Slab Wise)');
+            $('#tour_slab_title_name').html('(Slab Wise)');
+            $('#designation_div').show();
+        }else{
+            $('#vehicle_slab_title_name').html('(Individual)');
+            $('#tour_slab_title_name').html('(Individual)');
+            $('#designation_div').hide();
+        }
 
         $.ajax({
             url: '/admin/get-user-slab',
@@ -509,7 +579,7 @@ $(document).ready(function() {
                     if(res.ta_da_slab.approved_bills_in_da){
                         $('select[name="approved_bills_in_da[]"]').val(res.ta_da_slab.approved_bills_in_da).trigger('change');
                     }
-                    $('select[name="designation_id"]').val(res.ta_da_slab.designation_id);
+                    $('select[name="designation_id"]').val(res.ta_da_slab.designation);
                 }
             }
         });
