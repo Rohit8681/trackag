@@ -81,7 +81,7 @@
     function initMap() {
         const tripLogs = window.tripLogs || [];
         if (!tripLogs || tripLogs.length < 2) {
-            alert("Not enough trip logs to draw route.");
+            // alert("Not enough trip logs to draw route.");
             return;
         }
         const pathCoordinates = tripLogs.map(l => ({
