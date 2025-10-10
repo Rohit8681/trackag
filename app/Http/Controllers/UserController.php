@@ -149,8 +149,23 @@ class UserController extends Controller
         return response()->json(['success'=>true]);
     }
 
+    // public function saveSlab(Request $request)
+    // {
+    //     $request->validate([
+    //         'user_id' => 'required|exists:users,id',
+    //         'slab' => 'required|string',
+    //     ]);
+
+    //     $user = User::findOrFail($request->user_id);
+    //     $user->slab = $request->slab;
+    //     $user->save();
+
+    //     return response()->json(['message' => 'Slab updated successfully']);
+    // }
+
     public function saveSlab(Request $request)
     {
+        // Basic validation
         $request->validate([
             'user_id' => 'required|exists:users,id',
             'slab' => 'required|string',
@@ -160,14 +175,61 @@ class UserController extends Controller
         $user->slab = $request->slab;
         $user->save();
 
-        return response()->json(['message' => 'Slab updated successfully']);
+        // If slab is "Individual", insert detailed records
+        if ($request->slab != "Slab Wise") {
+
+            $request->validate([
+                'max_monthly_travel' => 'nullable|in:yes,no',
+                'km' => 'nullable|numeric',
+                'approved_bills_in_da' => 'nullable|array',
+                'approved_bills_in_da.*' => 'string',
+                'designation_id' => 'nullable|exists:designations,id',
+                'vehicle_type' => 'nullable|array', // you can adjust according to your front-end
+                'vehicle_type.*.vehicle_id' => 'required|exists:vehicle_types,id',
+                'vehicle_type.*.travel_allow' => 'required|numeric',
+                'tour_type' => 'nullable|array',
+                'tour_type.*.tour_id' => 'required|exists:tour_types,id',
+                'tour_type.*.da_amount' => 'required|numeric',
+            ]);
+
+            $taDaSlab = TaDaSlab::create([
+                'user_id' => $user->id,
+                'max_monthly_travel' => $request->max_monthly_travel,
+                'km' => $request->km,
+                'approved_bills_in_da' => $request->approved_bills_in_da ? json_encode($request->approved_bills_in_da) : null,
+                'designation_id' => $request->designation_id,
+            ]);
+
+            if ($request->vehicle_type) {
+                foreach ($request->vehicle_type as $vehicle) {
+                    TaDaVehicleSlab::create([
+                        'tada_slab_id' => $taDaSlab->id,
+                        'vehicle_type_id' => $vehicle['vehicle_id'],
+                        'travel_allow_per_km' => $vehicle['travel_allow'],
+                        'user_id' => $user->id,
+                    ]);
+                }
+            }
+
+            if ($request->tour_type) {
+                foreach ($request->tour_type as $tour) {
+                    TaDaTourSlab::create([
+                        'tada_slab_id' => $taDaSlab->id,
+                        'tour_type_id' => $tour['tour_id'],
+                        'da_amount' => $tour['da_amount'],
+                        'user_id' => $user->id,
+                    ]);
+                }
+            }
+        }
+
+        return response()->json(['message' => 'Slab saved successfully']);
     }
 
     public function getUserSlab(Request $request)
     {
         $userId = $request->user_id;
         $slabType = $request->slab;
-
         $vehicleTypes = VehicleType::where('is_deleted', 0)->get();
         $tourTypes = TourType::all();
 
@@ -183,6 +245,12 @@ class UserController extends Controller
             $taDaSlab = TaDaSlab::where('user_id', $userId)->first();
             $vehicleSlabs = TaDaVehicleSlab::where('user_id', $userId)->get();
             $tourSlabs = TaDaTourSlab::where('user_id', $userId)->get();
+
+            if (!$taDaSlab && $vehicleSlabs->isEmpty() && $tourSlabs->isEmpty()) {
+                $taDaSlab = TaDaSlab::whereNull('user_id')->first();
+                $vehicleSlabs = TaDaVehicleSlab::where('type', 'individual')->whereNull('user_id')->get();
+                $tourSlabs = TaDaTourSlab::where('type', 'individual')->whereNull('user_id')->get();
+            }
         }
 
         return response()->json([

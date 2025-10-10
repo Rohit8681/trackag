@@ -136,7 +136,8 @@
 
         <!-- Pass logs to JS -->
         <script>
-            const tripLogs = @json($tripLogs);
+            // const tripLogs = @json($tripLogs);
+            window.tripLogs = @json($tripLogs);
         </script>
 
     </main>
