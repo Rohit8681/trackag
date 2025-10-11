@@ -295,36 +295,86 @@ class ApiTripController extends BaseController
         return $this->sendResponse($trip->load(["purpose", "tourType", "travelMode", "company", "approvedByUser", "user"]), "Day logs created successfully");
     }
 
-    // Calculate total distance from trip logs
     private function calculateDistanceFromLogs($tripId)
     {
         $logs = TripLog::where('trip_id', $tripId)->orderBy('recorded_at')->get();
-        if ($logs->count() < 2) return 0;
+
+        if ($logs->count() < 2) {
+            Log::warning('Not enough trip logs to calculate distance', ['trip_id' => $tripId]);
+            return 0;
+        }
 
         $distance = 0;
         for ($i = 1; $i < $logs->count(); $i++) {
-            $distance += $this->calculateDistance(
+            $km = $this->calculateDistance(
                 $logs[$i - 1]->latitude,
                 $logs[$i - 1]->longitude,
                 $logs[$i]->latitude,
                 $logs[$i]->longitude
             );
+
+            if (is_numeric($km) && !is_nan($km) && !is_infinite($km)) {
+                $distance += $km;
+            } else {
+                Log::warning('Skipped invalid segment in distance calculation', [
+                    'trip_id' => $tripId,
+                    'index' => $i,
+                    'value' => $km
+                ]);
+            }
         }
 
         return round($distance, 2);
     }
 
-    // Calculate distance between two geo-points
     private function calculateDistance($lat1, $lon1, $lat2, $lon2)
     {
         $theta = $lon1 - $lon2;
         $dist  = sin(deg2rad($lat1)) * sin(deg2rad($lat2)) +
-            cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * cos(deg2rad($theta));
+                cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * cos(deg2rad($theta));
+
+        // 🧩 Clamp between -1 and 1 to prevent NaN from acos()
+        if ($dist > 1) $dist = 1;
+        if ($dist < -1) $dist = -1;
+
         $dist  = acos($dist);
         $dist  = rad2deg($dist);
         $km    = $dist * 111.13384;
+
         return round($km, 2);
     }
+
+
+    // Calculate total distance from trip logs
+    // private function calculateDistanceFromLogs($tripId)
+    // {
+    //     $logs = TripLog::where('trip_id', $tripId)->orderBy('recorded_at')->get();
+    //     if ($logs->count() < 2) return 0;
+
+    //     $distance = 0;
+    //     for ($i = 1; $i < $logs->count(); $i++) {
+    //         $distance += $this->calculateDistance(
+    //             $logs[$i - 1]->latitude,
+    //             $logs[$i - 1]->longitude,
+    //             $logs[$i]->latitude,
+    //             $logs[$i]->longitude
+    //         );
+    //     }
+
+    //     return round($distance, 2);
+    // }
+
+    // // Calculate distance between two geo-points
+    // private function calculateDistance($lat1, $lon1, $lat2, $lon2)
+    // {
+    //     $theta = $lon1 - $lon2;
+    //     $dist  = sin(deg2rad($lat1)) * sin(deg2rad($lat2)) +
+    //         cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * cos(deg2rad($theta));
+    //     $dist  = acos($dist);
+    //     $dist  = rad2deg($dist);
+    //     $km    = $dist * 111.13384;
+    //     return round($km, 2);
+    // }
     public function lastActive()
     {
         $user = Auth::user();
