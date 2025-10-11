@@ -107,7 +107,7 @@ Route::middleware(['web'])->group(function () {
             Route::post('/holidays/toggle-status', [HolidayController::class, 'toggleStatus'])->name('holidays.toggle-status');
 
             Route::resource('leaves', LeaveController::class);
-            //Route::post('/leaves/toggle-status', [LeaveController::class, 'toggleStatus'])->name('leaves.toggle-status');
+            Route::post('/leaves/toggle-status', [LeaveController::class, 'toggleStatus'])->name('leaves.toggle-status');
 
             Route::resource('vehicle', VehicleController::class);
             Route::post('/vehicle/toggle-status', [VehicleController::class, 'toggleStatus'])->name('vehicle.toggle-status');

@@ -63,7 +63,7 @@
                                                     <td>
                                                         <div class="form-check form-switch">
                                                         <input class="form-check-input toggle-status" type="checkbox"
-                                                            data-id="{{ $designation->taDaBillMaster->id }}"
+                                                            data-id="{{ $designation->taDaBillMaster->id ?? "" }}"
                                                             {{ $designation->taDaBillMaster->status ? 'checked' : '' }}>
                                                     </div>
                                                     </td>
