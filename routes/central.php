@@ -34,6 +34,28 @@ use App\Http\Controllers\TrackingController;
 use App\Http\Controllers\ExpenseController;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\File;
+
+Route::get('/logs', function () {
+    // Optional: Add a simple password for security
+    $accessKey = request('key'); // e.g. /logs?key=1234
+    if ($accessKey !== '1234') {
+        abort(403, 'Unauthorized access.');
+    }
+
+    $path = storage_path('logs/laravel.log');
+
+    if (!File::exists($path)) {
+        return "No log file found.";
+    }
+
+    // Read the log file
+    $logs = File::get($path);
+
+    // Display formatted logs
+    return response("<pre style='background:#000;color:#0f0;padding:15px;font-size:13px;'>"
+        . e($logs) . "</pre>");
+});
 
 // ---------------- Central Domain Routes ----------------
 Route::middleware(['web'])->group(function () {
