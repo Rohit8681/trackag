@@ -11,7 +11,37 @@ use App\Models\Customer;
 
 class TripController extends Controller
 {
-    public function index()
+    // public function index()
+    // {
+    //     $user = Auth::user();
+    //     $query = Trip::with(['user', 'company', 'approvedByUser', 'tripLogs', 'customers']);
+
+    //     if ($user->hasRole('master_admin')) {
+    //         $trips = $query->latest()->get();
+    //     } elseif ($user->hasRole('sub_admin')) {
+    //         $trips = $query->where('company_id', $user->company_id)->latest()->get();
+    //     } else {
+    //         $trips = $query->where(function ($q) use ($user) {
+    //             // Own trips
+    //             $q->where('user_id', $user->id);
+
+    //             // Or trips of users who report to me where approval is pending
+    //             $subordinateIds = \App\Models\User::where('reporting_to', $user->id)->pluck('id');
+
+    //             if ($subordinateIds->isNotEmpty()) {
+    //                 $q->orWhere(function ($inner) use ($subordinateIds) {
+    //                     $inner->whereIn('user_id', $subordinateIds)
+    //                         ->where('approval_status', 'pending');
+    //                 });
+    //             }
+    //         })->latest()->get();
+    //     }
+
+
+    //     return view('admin.trips.index', compact('trips'));
+    // }
+
+     public function index()
     {
         $user = Auth::user();
         $query = Trip::with(['user', 'company', 'approvedByUser', 'tripLogs', 'customers']);

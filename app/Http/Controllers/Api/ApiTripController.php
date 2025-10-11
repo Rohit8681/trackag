@@ -339,49 +339,131 @@ class ApiTripController extends BaseController
         }
         return $this->sendResponse($trip, "Trips fetched successfully");
     }
+    // public function close(Request $request)
+    // {
+    //     $validated = $request->validate([
+    //         'end_time' => 'required|date_format:H:i:s',   
+    //         'end_lat'  => 'required|numeric',
+    //         'end_lng'  => 'required|numeric',
+    //         'closenote'         => 'required|string',
+    //         'end_km'         => 'required|string',
+    //         'end_km_photo'   => 'required|mimes:jpeg,jpg,png,bmp,gif,svg,webp,tiff,ico|max:5120',
+    //         'status'   => 'in:completed',                
+    //     ]);
+    //     $trip = Trip::findOrFail($request->id);
+
+    //     $user = Auth::user();
+    //     if ($trip->user_id !== $user->id) {
+    //         return $this->sendError('Trip is not assigned you', [], 403);
+    //     }
+
+    //     // 3️⃣ Already closed
+    //     if ($trip->status === 'completed') {
+    //         return $this->sendError('Trip is already closed.', [], 400);
+    //     }
+    //     $endKmPhoto = $request->hasFile('end_km_photo')
+    //         ? $request->file('end_km_photo')->store('trip_photos', 'public')
+    //         : null;
+
+    //     $total_distance_km = $this->calculateDistanceFromLogs($request->id);
+    //     // 4️⃣  Update the trip.
+    //     $trip->update([
+    //         'end_time'          => $validated['end_time'],
+    //         'end_lat'           => $validated['end_lat'],
+    //         'end_lng'           => $validated['end_lng'],
+    //         'end_km'            => $request->end_km,
+    //         'end_km_photo'      => $endKmPhoto,
+    //         'total_distance_km'      => $total_distance_km,
+    //         'status'            => $validated['status']   ?? 'completed',
+    //         'updated_at'        => Carbon::now(),         // or leave for Eloquent timestamps
+    //     ]);
+
+    //     // 5️⃣  Return a consistent API response.
+    //     return $this->sendResponse($trip, "Trip has been closed");
+    // }
+
     public function close(Request $request)
     {
-        // 1️⃣  Authorise: only the owner (or an admin) may close the trip.
-        // 2️⃣  Validate incoming data.
-        $validated = $request->validate([
-            'end_time' => 'required|date_format:H:i:s',   // send as 24h time, e.g. 17:45:00
-            'end_lat'  => 'required|numeric',
-            'end_lng'  => 'required|numeric',
-            'closenote'         => 'required|string',
-            'end_km'         => 'required|string',
-            'end_km_photo'   => 'required|mimes:jpeg,jpg,png,bmp,gif,svg,webp,tiff,ico|max:5120',
-            'status'   => 'in:completed',                 // optional override; default below
-        ]);
-        $trip = Trip::findOrFail($request->id);
+        try {
+            Log::info('Trip close API called', ['request_data' => $request->all()]);
 
-        $user = Auth::user();
-        if ($trip->user_id !== $user->id) {
-            return $this->sendError('Trip is not assigned you', [], 403);
+            // 🧩 Step 1: Validate input
+            $validated = $request->validate([
+                'end_time'       => 'required|date_format:H:i:s',
+                'end_lat'        => 'required|numeric',
+                'end_lng'        => 'required|numeric',
+                'closenote'      => 'required|string',
+                'end_km'         => 'required|string',
+                'end_km_photo'   => 'required|mimes:jpeg,jpg,png,bmp,gif,svg,webp,tiff,ico|max:5120',
+                'status'         => 'in:completed',
+            ]);
+            Log::info('Validation passed successfully', ['validated_data' => $validated]);
+
+            // 🧩 Step 2: Find Trip
+            $trip = Trip::findOrFail($request->id);
+            Log::info('Trip found', ['trip_id' => $trip->id]);
+
+            // 🧩 Step 3: Auth check
+            $user = Auth::user();
+            if ($trip->user_id !== $user->id) {
+                Log::warning('Unauthorized trip access attempt', [
+                    'user_id' => $user->id,
+                    'trip_user_id' => $trip->user_id
+                ]);
+                return $this->sendError('Trip is not assigned you', [], 403);
+            }
+
+            // 🧩 Step 4: Already closed?
+            if ($trip->status === 'completed') {
+                Log::info('Trip already closed', ['trip_id' => $trip->id]);
+                return $this->sendError('Trip is already closed.', [], 400);
+            }
+
+            // 🧩 Step 5: Handle photo upload
+            $endKmPhoto = null;
+            if ($request->hasFile('end_km_photo')) {
+                $endKmPhoto = $request->file('end_km_photo')->store('trip_photos', 'public');
+                Log::info('End KM photo uploaded', ['photo_path' => $endKmPhoto]);
+            }
+
+            // 🧩 Step 6: Calculate distance
+            $total_distance_km = $this->calculateDistanceFromLogs($request->id);
+            Log::info('Total distance calculated', ['distance_km' => $total_distance_km]);
+
+            // 🧩 Step 7: Update trip
+            $trip->update([
+                'end_time'          => $validated['end_time'],
+                'end_lat'           => $validated['end_lat'],
+                'end_lng'           => $validated['end_lng'],
+                'end_km'            => $validated['end_km'],
+                'end_km_photo'      => $endKmPhoto,
+                'total_distance_km' => $total_distance_km,
+                'status'            => $validated['status'] ?? 'completed',
+                'updated_at'        => Carbon::now(),
+            ]);
+
+            Log::info('Trip updated successfully', ['trip_id' => $trip->id]);
+
+            // 🧩 Step 8: Return success
+            return $this->sendResponse($trip, "Trip has been closed");
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            Log::error('Validation error in trip close API', [
+                'errors' => $e->errors(),
+                'request_data' => $request->all()
+            ]);
+            return $this->sendError('Validation failed', $e->errors(), 422);
+
+        } catch (\Exception $e) {
+            Log::error('Unexpected error in trip close API', [
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString(),
+                'request_data' => $request->all(),
+            ]);
+            return $this->sendError('Something went wrong while closing trip.', [], 500);
         }
-
-        // 3️⃣ Already closed
-        if ($trip->status === 'completed') {
-            return $this->sendError('Trip is already closed.', [], 400);
-        }
-        $endKmPhoto = $request->hasFile('end_km_photo')
-            ? $request->file('end_km_photo')->store('trip_photos', 'public')
-            : null;
-
-        $total_distance_km = $this->calculateDistanceFromLogs($request->id);
-        // 4️⃣  Update the trip.
-        $trip->update([
-            'end_time'          => $validated['end_time'],
-            'end_lat'           => $validated['end_lat'],
-            'end_lng'           => $validated['end_lng'],
-            'end_km'            => $request->end_km,
-            'end_km_photo'      => $endKmPhoto,
-            'total_distance_km'      => $total_distance_km,
-            'status'            => $validated['status']   ?? 'completed',
-            'updated_at'        => Carbon::now(),         // or leave for Eloquent timestamps
-        ]);
-
-        // 5️⃣  Return a consistent API response.
-        return $this->sendResponse($trip, "Trip has been closed");
     }
 
     public function showTrip($id)
