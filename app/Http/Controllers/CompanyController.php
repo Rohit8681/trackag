@@ -222,6 +222,7 @@ class CompanyController extends Controller
                         'Database\\Seeders\\DatabaseSeeder',
                         'Database\\Seeders\\MultiCompanySeeder',
                         'Database\\Seeders\\TripSeeder',
+                        'Database\\Seeders\\UserSeeder',
                     ])) {
                         continue;
                     }
@@ -484,9 +485,8 @@ class CompanyController extends Controller
     
     public function edit(Company $company)
     {
-        $this->authorizeCompanyAccess($company);
+        // $this->authorizeCompanyAccess($company);
         $state = State::where('status',1)->get();
-
         return view('admin.companies.edit', compact('company','state'));
     }
 

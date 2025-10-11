@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Stancl\Tenancy\Database\Concerns\UsesTenantConnection;
 
 class Company extends Model
 {
@@ -19,6 +20,17 @@ class Company extends Model
         'subdomain','is_active','status','start_date','validity_upto','user_assigned',
         'created_at','updated_at'
     ];
+
+    public function getConnectionName()
+    {
+        // If tenant is initialized, use tenant DB
+        if (tenancy()->initialized) {
+            return tenancy()->tenant->database_connection ?? 'tenant';
+        }
+
+        // Otherwise, use central DB
+        return config('database.default');
+    }
 
     public function users()
     {

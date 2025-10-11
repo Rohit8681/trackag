@@ -90,6 +90,7 @@ class UserController extends Controller
         }
 
         $users = $query->get();
+      
         $currentUsers = $query->count();
 
         $states = State::where('status', 1)->get();
@@ -351,9 +352,9 @@ class UserController extends Controller
  */
 public function edit(User $user)
 {
-    if (auth()->user()->user_level !== 'master_admin' && $user->company_id !== auth()->user()->company_id) {
-        abort(403, 'Unauthorized access to user.');
-    }
+    // if (auth()->user()->user_level !== 'master_admin' && $user->company_id !== auth()->user()->company_id) {
+    //     abort(403, 'Unauthorized access to user.');
+    // }
 
     $authUser = auth()->user();
 
