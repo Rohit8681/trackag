@@ -27,7 +27,6 @@ class CompanyController extends Controller
     {
         $user = Auth::user();
         $companies = Company::get();
-
         
         return view('admin.companies.index', compact('companies'));
     }
@@ -223,6 +222,7 @@ class CompanyController extends Controller
                         'Database\\Seeders\\MultiCompanySeeder',
                         'Database\\Seeders\\TripSeeder',
                         'Database\\Seeders\\UserSeeder',
+                        'Database\\Seeders\\DesignationSeeder'
                     ])) {
                         continue;
                     }

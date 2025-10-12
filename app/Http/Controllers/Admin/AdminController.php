@@ -41,7 +41,6 @@ class AdminController extends Controller
         $onlineTimeout = now()->subMinutes(10);
 
         $isMasterAdmin = $user->hasRole('master_admin');
-
         if ($isMasterAdmin) {
             $totalUsers       = User::count();
             $totalRoles       = \Spatie\Permission\Models\Role::count();
@@ -86,6 +85,7 @@ class AdminController extends Controller
             'totalCustomers',
             'onlineUsers',
             'sessionsGrouped',
+            'isMasterAdmin'
         ));
     }
 
@@ -93,6 +93,7 @@ class AdminController extends Controller
     public function create()
     {
     
+        
         $defaultDb = Config::get('database.default');
         $defaultDbName = DB::connection()->getDatabaseName();
 
@@ -106,8 +107,7 @@ class AdminController extends Controller
 
     public function store(LoginRequest $request)
     {
-
-        $credentials = $request->only('email', 'password');
+        $credentials = $request->only('mobile', 'password');
 
         if (Auth::attempt($credentials)) {
             $user = Auth::user();
@@ -123,10 +123,10 @@ class AdminController extends Controller
             // }
 
             if (!empty($request->remember)) {
-                setcookie("email", $credentials["email"], time() + 3600);
+                setcookie("mobile", $credentials["mobile"], time() + 3600);
                 setcookie("password", $credentials["password"], time() + 3600);
             } else {
-                setcookie("email", "", time() - 3600);
+                setcookie("mobile", "", time() - 3600);
                 setcookie("password", "", time() - 3600);
             }
 

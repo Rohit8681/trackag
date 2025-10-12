@@ -68,7 +68,7 @@
                                                 value="{{ old('name') }}" required>
                                         </div>
                                         <div class="col-md-4">
-                                            <label class="form-label">Email <span class="text-danger">*</span></label>
+                                            <label class="form-label">Email </label>
                                             <input type="email" name="email" class="form-control"
                                                 value="{{ old('email') }}" required>
                                         </div>
@@ -391,7 +391,7 @@
                                 </div>
 
                                 <div class="card-footer text-end">
-                                    <button type="submit" class="btn btn-primary">Create Admin</button>
+                                    <button type="submit" class="btn btn-primary">Create</button>
                                 </div>
                             </form>
                             {{-- Form End --}}

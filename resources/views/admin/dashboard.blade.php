@@ -32,6 +32,7 @@
                         </div>
                     </div>
 
+                    @if($isMasterAdmin == true)
                     <div class="col-lg-3 col-6">
                         <div class="small-box bg-success">
                             <div class="inner">
@@ -57,6 +58,7 @@
                             <a href="{{ url('admin/permissions') }}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
                         </div>
                     </div>
+                    
                     <h2>{{ $databaseName ?? "" }}</h2>
 
                     @if (!is_null($totalCustomers))
@@ -72,6 +74,7 @@
                                 <a href="{{ url('admin/customers') }}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
                             </div>
                         </div>
+                    @endif
                     @endif
                 </div>
 

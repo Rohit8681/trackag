@@ -50,6 +50,8 @@
                                                 <th>Start Date</th>
                                                 <th>End Date</th>
                                                 <th>Assign User</th>
+                                                <th>Comapny Url</th>
+                                                <th>Password</th>
                                                 <th>Status</th>
                                                 <th>Created At</th>
                                                 <th>Updated At</th>
@@ -66,6 +68,8 @@
                                                     <td>{{ $company->validity_upto ? \Carbon\Carbon::parse($company->validity_upto)->format('m/d/Y') : '-' }}</td>
 
                                                     <td>{{ $company->user_assigned ?? '-' }}</td>
+                                                    <td>{{ $company->subdomain }}</td>
+                                                    <td>{{ $company->password }}</td>
                                                     <td>
                                                          @can('toggle_companies')
                                                         <form action="{{ route('companies.toggle', $company->id) }}" method="POST">
@@ -81,7 +85,7 @@
                                                             {{ $company->is_active ? 'Active' : 'Inactive' }}
                                                         @endcan
                                                     </td>
-
+                                                    
                                                     <td>{{ $company->created_at->format('Y-m-d H:i') }}</td>
                                                     <td>{{ $company->updated_at->format('Y-m-d H:i') }}</td>
                                                     <td>

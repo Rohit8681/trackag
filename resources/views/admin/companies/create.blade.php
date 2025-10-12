@@ -195,14 +195,17 @@
                 <div class="card-header"><h5>Admin User Information</h5></div>
                 <div class="card-body row g-3">
                     <div class="col-md-6">
-                        <label class="form-label">Password <span class="text-danger">*</span></label>
+                        {{-- <label class="form-label">Password <span class="text-danger">*</span></label> --}}
+                        <label class="form-label">Password </label>
+
                         <input type="password" name="user_password" class="form-control @error('user_password') is-invalid @enderror">
                         @error('user_password')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">Confirm Password <span class="text-danger">*</span></label>
+                        {{-- <label class="form-label">Confirm Password <span class="text-danger">*</span></label> --}}
+                        <label class="form-label">Confirm Password </label>
                         <input type="password" name="user_password_confirmation" class="form-control">
                     </div>
                 </div>

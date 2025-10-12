@@ -23,12 +23,12 @@
 <body class="login-page bg-body-secondary">
     <div class="login-box">
         <div class="card card-outline card-primary">
-            <div class="card-header">
+            {{-- <div class="card-header">
                 <a href="#"
                     class="link-dark text-center link-offset-2 link-opacity-100 link-opacity-50-hover">
                     <h1 class="mb-0"><b>FieldMaster</b>V1</h1>
                 </a>
-            </div>
+            </div> --}}
             <div class="card-body login-card-body">
                 <p class="login-box-msg">Sign in to start your session</p>
 
@@ -45,7 +45,7 @@
     @csrf
 
     <!-- Company Code Field -->
-    <div class="input-group mb-1">
+    {{-- <div class="input-group mb-1">
         <div class="form-floating">
             <input name="company_id" id="companyCode" type="text"
                 class="form-control @error('company_id') is-invalid @enderror"
@@ -56,10 +56,10 @@
             @enderror
         </div>
         <div class="input-group-text"><span class="bi bi-building"></span></div>
-    </div>
+    </div> --}}
 
     <!-- Email Field -->
-<div class="input-group mb-1">
+{{-- <div class="input-group mb-1">
     <div class="form-floating">
         <input name="email" id="loginEmail" type="email"
             class="form-control @error('email') is-invalid @enderror"
@@ -67,6 +67,19 @@
             @if(isset($_COOKIE["email"])) value="{{ $_COOKIE['email'] }}" @endif />
         <label for="loginEmail">Email</label>
         @error('email')
+            <div class="invalid-feedback">{{ $message }}</div>
+        @enderror
+    </div>
+    <div class="input-group-text"><span class="bi bi-envelope"></span></div>
+</div> --}}
+<div class="input-group mb-1">
+    <div class="form-floating">
+        <input name="mobile" id="mobile" type="number"
+            class="form-control @error('mobile') is-invalid @enderror"
+            placeholder="Mobile"
+            @if(isset($_COOKIE["mobile"])) value="{{ $_COOKIE['mobile'] }}" @endif />
+        <label for="loginMobile">Mobile</label>
+        @error('mobile')
             <div class="invalid-feedback">{{ $message }}</div>
         @enderror
     </div>

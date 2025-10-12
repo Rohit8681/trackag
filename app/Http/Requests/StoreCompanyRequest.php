@@ -39,10 +39,10 @@ class StoreCompanyRequest extends FormRequest
 
         if ($this->isMethod('post')) {
             // Create (store)
-            $rules['user_password'] = 'required|string|min:6|confirmed';
+            $rules['user_password'] = 'required|confirmed';
         } else {
             // Update
-            $rules['user_password'] = 'nullable|string|min:6|confirmed';
+            $rules['user_password'] = 'nullable|confirmed';
         }
 
         return $rules;

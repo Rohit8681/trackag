@@ -77,7 +77,7 @@ Route::prefix('admin')->group(function () {
         Route::post('/users/{user}/toggle', [UserController::class, 'toggle'])->name('users.toggle');
 
         // HR (tenant database)
-        Route::resource('/hr/designations', DesignationController::class)->names('hr.designations');
+        Route::resource('/hr/designations', DesignationController::class);
         Route::get('/hr/attendance', [AttendanceController::class, 'index'])->name('attendance.index');
 
         Route::resource('companies', CompanyController::class);
