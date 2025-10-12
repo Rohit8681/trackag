@@ -3,9 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\TenantConnectionTrait;
+
 
 class Depo extends Model
 {
+    use TenantConnectionTrait;
+
     protected $fillable = [
         'depo_code',
         'depo_name',

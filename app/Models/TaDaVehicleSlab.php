@@ -4,10 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\TenantConnectionTrait;
+
 
 class TaDaVehicleSlab extends Model
 {
-    use HasFactory;
+    use HasFactory, TenantConnectionTrait;
 
     protected $fillable = [
         'ta_da_slab_id',

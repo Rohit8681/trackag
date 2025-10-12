@@ -4,10 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\TenantConnectionTrait;
+
 
 class Vehicle extends Model
 {
-    use HasFactory;
+    use HasFactory, TenantConnectionTrait;
 
     // Table name (optional if using default 'vehicles')
     protected $table = 'vehicles';

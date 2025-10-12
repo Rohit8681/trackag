@@ -4,10 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\TenantConnectionTrait;
+
 
 class FailedJob extends Model
 {
-    use HasFactory;
+    use HasFactory, TenantConnectionTrait;
 
 
     protected $table = 'failed_jobs';

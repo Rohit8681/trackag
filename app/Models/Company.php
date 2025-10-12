@@ -3,14 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Stancl\Tenancy\Database\Concerns\UsesTenantConnection;
+use App\Traits\TenantConnectionTrait;
 
 class Company extends Model
 {
-    /**
-     * The connection name for the model.
-     * This model uses the central database connection.
-     */
+    use TenantConnectionTrait;
 
     
     protected $fillable = [
@@ -20,17 +17,6 @@ class Company extends Model
         'subdomain','is_active','status','start_date','validity_upto','user_assigned',
         'created_at','updated_at'
     ];
-
-    public function getConnectionName()
-    {
-        // If tenant is initialized, use tenant DB
-        if (tenancy()->initialized) {
-            return tenancy()->tenant->database_connection ?? 'tenant';
-        }
-
-        // Otherwise, use central DB
-        return config('database.default');
-    }
 
     public function users()
     {
