@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\TenantConnectionTrait;
+
 
 class UserStateAccess extends Model
 {
+    use TenantConnectionTrait;
     protected $fillable = ['user_id', 'state_ids'];
 
     protected $casts = [

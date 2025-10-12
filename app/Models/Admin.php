@@ -3,13 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\TenantConnectionTrait;
+
 
 class Admin extends Model
 {
-    /**
-     * The connection name for the model.
-     * This model uses the central database connection.
-     */
+    use TenantConnectionTrait;
     protected $connection = 'mysql';
     
     protected $fillable = [
