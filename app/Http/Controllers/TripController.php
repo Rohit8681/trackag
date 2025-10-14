@@ -68,7 +68,9 @@ class TripController extends Controller
         }
 
 
-        return view('admin.trips.index', compact('trips'));
+        // return view('admin.trips.index', compact('trips'));
+        return view('admin.trips.index_new', compact('trips'));
+
     }
 
     public function create()
@@ -158,7 +160,9 @@ class TripController extends Controller
             ->orderBy('recorded_at')
             ->get(['latitude', 'longitude', 'recorded_at']);
         
-        return view('admin.trips.show', compact('trip', 'tripLogs'));
+        // return view('admin.trips.show', compact('trip', 'tripLogs'));
+        return view('admin.trips.show_new', compact('trip', 'tripLogs'));
+
     }
 
     public function edit(Trip $trip)

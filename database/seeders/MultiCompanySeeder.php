@@ -129,6 +129,7 @@ class MultiCompanySeeder extends Seeder
             // Create sub-admin user for each company
             $admin = User::create([
                 'name' => "Admin {$company->name}",
+                'mobile' => '1234567890',
                 'email' => "admin{$company->id}@example.com",
                 'password' => bcrypt('password'),
                 'company_id' => $company->id,
@@ -141,6 +142,7 @@ class MultiCompanySeeder extends Seeder
             for ($i = 1; $i <= 2; $i++) {
                 $executive = User::create([
                     'name' => "Executive{$i} {$company->name}",
+                    'mobile' => '1234567890',
                     'email' => "executive{$i}_{$company->id}@example.com",
                     'password' => bcrypt('password'),
                     'company_id' => $company->id,
@@ -157,6 +159,7 @@ class MultiCompanySeeder extends Seeder
 
         $masterAdmin = User::create([
             'name' => 'Master Admin',
+            'mobile' => '1234567890',
             'email' => 'masteradmin@example.com',
             'password' => bcrypt('password'),
             'user_level' => 'master_admin',

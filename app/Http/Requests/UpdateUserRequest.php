@@ -86,7 +86,7 @@ class UpdateUserRequest extends FormRequest
             'district_id' => 'nullable|exists:districts,id',
             'city_id' => 'nullable|exists:cities,id',
             'tehsil_id' => 'nullable|exists:tehsils,id',
-            'pincode_id' => 'nullable|string|max:10',
+            'pincode' => 'nullable|string|max:10',
             'postal_address' => 'nullable|string|max:500',
             'latitude' => 'nullable|numeric|between:-90,90',
             'longitude' => 'nullable|numeric|between:-180,180',

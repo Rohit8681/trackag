@@ -139,11 +139,13 @@
                                         <label class="form-label">Village</label>
                                         <input type="text" name="village" class="form-control" value="{{ old('village', $user->village) }}">
                                     </div>
-                                    <div class="col-md-3">
+                                     <div class="col-md-3">
                                         <label class="form-label">Pincode</label>
-                                        <select name="pincode_id" id="pincode" class="form-select">
+                                        {{-- <select name="pincode_id" id="pincode" class="form-select">
                                             <option value="">Select Pincode</option>
-                                        </select>
+                                        </select> --}}
+                                        <input type="number" name="pincode" id="pincode" class="form-control"
+                                            value="{{ old('pincode',$user->pincode) }}">
                                     </div>
                                     <div class="col-md-4">
                                         <label class="form-label">Postal Address</label>
@@ -202,7 +204,7 @@
                                     </div>
                                     <div class="col-md-4">
                                         <label class="form-label">Joining Date</label>
-                                        <input type="date" name="joining_date" class="form-control" value="{{ old('joining_date', optional($user->joining_date)->format('Y-m-d')) }}">
+                                        <input type="date" name="joining_date" class="form-control" max="{{ date('Y-m-d') }}" value="{{ old('joining_date', optional($user->joining_date)->format('Y-m-d')) }}">
                                     </div>
                                     <div class="col-md-4">
                                         <label class="form-label">Emergency Contact</label>

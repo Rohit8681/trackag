@@ -378,7 +378,7 @@ public function edit(User $user)
     : Designation::where('company_id', $authUser->company_id)->get();
 
     $depos = Depo::where('status',1)->get();
-
+        
     return view('admin.users.edit', [
         'user' => $user,
         'roles' => $roles,

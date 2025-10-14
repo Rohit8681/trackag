@@ -156,9 +156,11 @@
 
                                         <div class="col-md-3">
                                             <label class="form-label">Pincode</label>
-                                            <select name="pincode_id" id="pincode" class="form-select">
+                                            {{-- <select name="pincode_id" id="pincode" class="form-select">
                                                 <option value="">Select Pincode</option>
-                                            </select>
+                                            </select> --}}
+                                            <input type="number" name="pincode" id="pincode" class="form-control"
+                                                value="{{ old('pincode') }}">
                                         </div>
 
                                         <div class="col-md-4">
@@ -224,7 +226,7 @@
                                         </div>
                                         <div class="col-md-4">
                                             <label class="form-label">Joining Date</label>
-                                            <input type="date" name="joining_date" class="form-control"
+                                            <input type="date" name="joining_date" class="form-control" max="{{ date('Y-m-d') }}"
                                                 value="{{ old('joining_date') }}">
                                         </div>
                                         <div class="col-md-4">

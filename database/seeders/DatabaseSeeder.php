@@ -20,15 +20,13 @@ class DatabaseSeeder extends Seeder
 
         // Call other seeders
         $this->call([
-            // Run location seeders first
             StateSeeder::class,
             DistrictSeeder::class,
             CitySeeder::class,
             TehsilSeeder::class,
             PincodeSeeder::class,
 
-            // Then run user and role seeders
-            // PermissionSeeder::class,
+            PermissionSeeder::class,
             RoleSeeder::class,
             // AdminsTableSeeder::class,
             UserSeeder::class,

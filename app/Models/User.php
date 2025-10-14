@@ -56,7 +56,7 @@ class User extends Authenticatable
         'tehsil_id',
         'latitude',
         'longitude',
-        'pincode_id',
+        'pincode',
         'depo',
         'postal_address',
         'status',

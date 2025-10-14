@@ -25,11 +25,11 @@
                         <div class="card mb-4">
                             <div class="card-header">
                                 <h3 class="card-title">Company Control Panel</h3>
-                                {{-- @can('create_companies') --}}
+                                @if(auth()->user() && auth()->user()->hasRole('master_admin'))
                                     <a href="{{ route('companies.create') }}" class="btn btn-primary float-end">
                                         Add New Company
                                     </a>
-                                {{-- @endcan --}}
+                                @endif
                             </div>
 
                             <div class="card-body">
@@ -92,10 +92,10 @@
                                                         <a href="{{ route('companies.show', $company) }}" class="text-info me-2" title="View">
                                                             <i class="fas fa-eye"></i></a>&nbsp;&nbsp;
 
-                                                        {{-- @can('edit_companies') --}}
+                                                        @if(auth()->user() && auth()->user()->hasRole('master_admin'))
                                                             <a href="{{ route('companies.edit', $company) }}" class="text-warning me-2" title="Edit">
                                                                 <i class="fas fa-edit"></i></a>&nbsp;&nbsp;
-                                                        {{-- @endcan --}}
+                                                        @endif
 
                                                         @can('delete_companies')
                                                             <form action="{{ route('companies.destroy', $company) }}" method="POST" class="d-inline"

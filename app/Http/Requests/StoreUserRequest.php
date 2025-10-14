@@ -28,7 +28,7 @@ class StoreUserRequest extends FormRequest
             'city_id' => 'nullable|exists:cities,id',
             'tehsil_id' => 'nullable|exists:tehsils,id',
 
-            'pincode_id' => 'nullable|string',
+            'pincode' => 'nullable|string',
             'postal_address' => 'nullable|string',
             'latitude' => 'nullable|string',
             'longitude' => 'nullable|string',
