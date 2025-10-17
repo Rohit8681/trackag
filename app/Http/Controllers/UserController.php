@@ -95,7 +95,7 @@ class UserController extends Controller
 
         $states = State::where('status', 1)->get();
         $designations = Designation::where('status', 1)->get();
-
+        $user = auth()->user();
         return view('admin.users.index', compact('users', 'maxUsers', 'currentUsers', 'states', 'designations'));
     }
 
@@ -138,7 +138,7 @@ class UserController extends Controller
 
     public function saveUserStateAccess(Request $request){
         $request->validate([
-            'user_id' => 'required|exists:users,id',
+            'user_id' => 'required',
             'state_ids' => 'required|array'
         ]);
 

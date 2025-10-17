@@ -32,7 +32,8 @@
                         <div class="row mb-4">
                             <div class="col-md-6">
                                 <label for="name" class="form-label fw-semibold">Role Name</label>
-                                <input type="text" class="form-control form-control-lg border-primary-subtle shadow-sm"
+                                <input type="text"
+                                       class="form-control form-control-lg border-primary-subtle shadow-sm"
                                        id="name" name="name"
                                        value="{{ $role->name }}" required>
                             </div>
@@ -46,60 +47,55 @@
 
                         {{-- Permissions Table --}}
                         <div class="table-responsive">
-                            <table class="table table-bordered align-middle text-nowrap">
-                                <thead class="table-primary text-center">
+                            <table class="table table-bordered align-middle text-center">
+                                <thead class="table-primary">
                                     <tr>
-                                        <th style="width: 25%">Module</th>
-                                        <th>Permissions</th>
+                                        <th>Module</th>
+                                        <th>Create</th>
+                                        <th>View</th>
+                                        <th>Edit</th>
+                                        <th>Delete</th>
+                                        <th>Approve</th>
+                                        <th>Reject</th>
+                                        <th>Verify</th>
+                                        <th>Dispatch</th>
+                                        <th>Remove Review</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @php
                                         $modules = [
-                                            'User Related' => 'user',
-                                            'Role Related' => 'role',
-                                            'Customer Related' => 'customer',
+                                            'User Related' => 'users',
+                                            'Role Related' => 'roles',
                                             'Company Related' => 'companies',
-                                            'Trip Related' => 'trip',
-                                            'Permission Related' => 'permission',
+                                            'Permission Related' => 'permissions',
                                         ];
+
+                                        $actions = ['create', 'view', 'edit', 'delete', 'approve', 'reject', 'verify', 'dispatch', 'remove_review'];
                                     @endphp
 
                                     @foreach ($modules as $moduleName => $keyword)
-                                        @php
-                                            $modulePermissions = $permissions->filter(fn($p) => str_contains($p->name, $keyword));
-                                        @endphp
-
                                         <tr>
-                                            <td class="fw-bold text-secondary">{{ $moduleName }}</td>
-                                            <td>
-                                                @if($modulePermissions->isNotEmpty())
-                                                    <table class="table table-borderless mb-0">
-                                                        <tr>
-                                                            @foreach($modulePermissions as $permission)
-                                                                <td class="p-2">
-                                                                    <div class="form-check">
-                                                                        <input type="checkbox"
-                                                                            class="form-check-input permission-checkbox"
-                                                                            name="permissions[{{ $permission->name }}]"
-                                                                            value="{{ $permission->name }}"
-                                                                            id="perm_{{ $permission->id }}"
-                                                                            {{ $role->hasPermissionTo($permission->name) ? 'checked' : '' }}>
-                                                                        <label class="form-check-label" for="perm_{{ $permission->id }}">
-                                                                            {{ ucwords(str_replace('_', ' ', $permission->name)) }}
-                                                                        </label>
-                                                                    </div>
-                                                                </td>
-                                                                @if(($loop->iteration % 4) == 0)
-                                                                    </tr><tr>
-                                                                @endif
-                                                            @endforeach
-                                                        </tr>
-                                                    </table>
-                                                @else
-                                                    <span class="text-muted fst-italic">No permissions found</span>
-                                                @endif
-                                            </td>
+                                            <td class="fw-semibold text-start">{{ $moduleName }}</td>
+                                            @foreach ($actions as $action)
+                                                @php
+                                                    // Match both naming patterns: "action_module" or "module_action"
+                                                    $permission = $permissions->firstWhere('name', "{$action}_{$keyword}")
+                                                        ?? $permissions->firstWhere('name', "{$keyword}_{$action}");
+                                                @endphp
+                                                <td>
+                                                    @if ($permission)
+                                                        <input type="checkbox"
+                                                            class="form-check-input permission-checkbox"
+                                                            name="permissions[]"
+                                                            value="{{ $permission->name }}"
+                                                            id="perm_{{ $permission->id }}"
+                                                            {{ $role->hasPermissionTo($permission->name) ? 'checked' : '' }}>
+                                                    @else
+                                                        <span class="text-muted">—</span>
+                                                    @endif
+                                                </td>
+                                            @endforeach
                                         </tr>
                                     @endforeach
                                 </tbody>

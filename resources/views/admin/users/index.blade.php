@@ -38,9 +38,11 @@
                     <div class="card card-primary card-outline">
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <h3 class="card-title">User Control Panel</h3>
+                            @can('create_users')
                             <a href="{{ route('users.create') }}" style="float: right;" class="btn btn-sm btn-primary">
                                 <i class="fas fa-user-plus me-1"></i> Add New User
                             </a>
+                            @endcan
                         </div>
 
                         <div class="card-body">
@@ -183,7 +185,6 @@
                                                             <span class="text-muted">No Role</span>
                                                         @endif
                                                     </small><br>
-                                                    
                                                     <small><strong>Depo:</strong> {{ $user->depos?->depo_name ?? '-' }}</small>
                                                 </td>
                                                 <td class="text-center">
@@ -214,18 +215,26 @@
                                                     <i class="fas fa-cog text-primary reset-password" style="cursor:pointer;" data-user-id="{{ $user->id }}"></i>
                                                 </td>   
                                                 <td class="text-center">
+                                                    @can('view_users')
                                                     <a href="{{ route('users.show', $user) }}" class="btn btn-sm btn-outline-info me-1" title="View">
                                                         <i class="fas fa-eye"></i>
                                                     </a>
+                                                    @endcan
+                                                    @can('edit_users')
                                                     <a href="{{ route('users.edit', $user) }}" class="btn btn-sm btn-outline-warning me-1" title="Edit">
                                                         <i class="fas fa-edit"></i>
                                                     </a>
+                                                    @endcan
+                                                    @can('edit_users')
+
                                                     <form action="{{ route('users.toggle', $user) }}" method="POST" class="d-inline">
                                                         @csrf
                                                         <button type="submit" class="btn btn-sm {{ $user->is_active ? 'btn-outline-danger' : 'btn-outline-success' }}" title="{{ $user->is_active ? 'Deactivate' : 'Activate' }}">
                                                             <i class="fas {{ $user->is_active ? 'fa-user-slash' : 'fa-user-check' }}"></i>
                                                         </button>
                                                     </form>
+                                                    @endcan
+                                                    @can('delete_users')
                                                     <form action="{{ route('users.destroy', $user) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure to delete this user?')">
                                                         @csrf
                                                         @method('DELETE')
@@ -233,6 +242,7 @@
                                                             <i class="fas fa-trash"></i>
                                                         </button>
                                                     </form>
+                                                    @endcan
                                                 </td>
                                             </tr>
                                         @empty

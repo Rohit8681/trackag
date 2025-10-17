@@ -89,15 +89,17 @@
                                                     <td>{{ $company->created_at->format('Y-m-d H:i') }}</td>
                                                     <td>{{ $company->updated_at->format('Y-m-d H:i') }}</td>
                                                     <td>
+                                                         @if(auth()->user() && auth()->user()->hasRole('master_admin'))
                                                         <a href="{{ route('companies.show', $company) }}" class="text-info me-2" title="View">
                                                             <i class="fas fa-eye"></i></a>&nbsp;&nbsp;
+                                                        @endif
 
                                                         @if(auth()->user() && auth()->user()->hasRole('master_admin'))
                                                             <a href="{{ route('companies.edit', $company) }}" class="text-warning me-2" title="Edit">
                                                                 <i class="fas fa-edit"></i></a>&nbsp;&nbsp;
                                                         @endif
 
-                                                        @can('delete_companies')
+                                                        @if(auth()->user() && auth()->user()->hasRole('master_admin'))
                                                             <form action="{{ route('companies.destroy', $company) }}" method="POST" class="d-inline"
                                                                 onsubmit="return confirm('Are you sure to delete this company?')">
                                                                 @csrf
@@ -106,12 +108,12 @@
                                                                     <i class="fas fa-trash"></i>
                                                                 </button>
                                                             </form>
-                                                        @endcan
+                                                        @endif
                                                     </td>
                                                 </tr>
                                             @empty
                                                 <tr>
-                                                    <td colspan="9" class="text-center text-muted">No companies found.</td>
+                                                    <td colspan="13" class="text-center text-muted">No companies found.</td>
                                                 </tr>
                                             @endforelse
                                         </tbody>

@@ -50,7 +50,7 @@ class DepoController extends Controller
             'city' => 'nullable|string|max:191',
             // 'status' => ['required', Rule::in(['0','1',0,1,true,false])],
         ]);
-
+        
         Depo::create($data);
 
         return redirect()->route('depos.index')->with('success','Depo created successfully.');

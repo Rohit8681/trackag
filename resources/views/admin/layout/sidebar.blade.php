@@ -206,6 +206,7 @@
                                 <p>Manage Roles</p>
                             </a>
                         </li>
+                        @if(auth()->user() && auth()->user()->hasRole('master_admin'))
                         <li class="nav-item">
                             <a href="{{ url('admin/permissions') }}"
                                 class="nav-link {{ request()->is('admin/permissions*') ? 'active' : '' }}">
@@ -213,6 +214,7 @@
                                 <p>Manage Permissions</p>
                             </a>
                         </li>
+                        @endif
                     </ul>
                 </li>
 

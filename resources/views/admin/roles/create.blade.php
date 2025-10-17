@@ -44,59 +44,54 @@
 
                         {{-- Permissions Table --}}
                         <div class="table-responsive">
-                            <table class="table table-bordered align-middle text-nowrap">
-                                <thead class="table-primary text-center">
+                            <table class="table table-bordered align-middle text-center">
+                                <thead class="table-primary">
                                     <tr>
-                                        <th style="width: 25%">Module</th>
-                                        <th>Permissions</th>
+                                        <th>Module</th>
+                                        <th>Create</th>
+                                        <th>View</th>
+                                        <th>Edit</th>
+                                        <th>Delete</th>
+                                        <th>Approve</th>
+                                        <th>Reject</th>
+                                        <th>Verify</th>
+                                        <th>Dispatch</th>
+                                        <th>Remove Review</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @php
                                         $modules = [
-                                            'User Related' => 'user',
-                                            'Role Related' => 'role',
-                                            'Customer Related' => 'customer',
+                                            'User Related' => 'users',
+                                            'Role Related' => 'roles',
+                                            // 'Customer Related' => 'customer',
                                             'Company Related' => 'companies',
-                                            'Trip Related' => 'trip',
-                                            'Permission Related' => 'permission',
+                                            // 'Trip Related' => 'trip',
+                                            'Permission Related' => 'permissions',
                                         ];
+
+                                        $actions = ['create','view', 'edit', 'delete', 'approve', 'reject', 'verify', 'dispatch', 'remove_review'];
                                     @endphp
 
                                     @foreach ($modules as $moduleName => $keyword)
-                                        @php
-                                            $modulePermissions = $permissions->filter(fn($p) => str_contains($p->name, $keyword));
-                                        @endphp
-
                                         <tr>
-                                            <td class="fw-bold text-secondary">{{ $moduleName }}</td>
-                                            <td>
-                                                @if($modulePermissions->isNotEmpty())
-                                                    <table class="table table-borderless mb-0">
-                                                        <tr>
-                                                            @foreach($modulePermissions as $permission)
-                                                                <td class="p-2">
-                                                                    <div class="form-check">
-                                                                        <input type="checkbox"
-                                                                            class="form-check-input permission-checkbox"
-                                                                            name="permissions[]"
-                                                                            value="{{ $permission->name }}"
-                                                                            id="perm_{{ $permission->id }}">
-                                                                        <label class="form-check-label" for="perm_{{ $permission->id }}">
-                                                                            {{ ucwords(str_replace('_', ' ', $permission->name)) }}
-                                                                        </label>
-                                                                    </div>
-                                                                </td>
-                                                                @if(($loop->iteration % 4) == 0)
-                                                                    </tr><tr>
-                                                                @endif
-                                                            @endforeach
-                                                        </tr>
-                                                    </table>
-                                                @else
-                                                    <span class="text-muted fst-italic">No permissions found</span>
-                                                @endif
-                                            </td>
+                                            <td class="fw-semibold text-start">{{ $moduleName }}</td>
+                                            @foreach ($actions as $action)
+                                                
+                                                @php
+                                                    $permission = $permissions->firstWhere('name', "{$action}_{$keyword}");
+                                                @endphp
+                                                <td>
+                                                    @if ($permission)
+                                                        
+                                                        <input type="checkbox" class="form-check-input permission-checkbox"
+                                                            name="permissions[]" value="{{ $permission->name }}"
+                                                            id="perm_{{ $permission->id }}">
+                                                    @else
+                                                        <span class="text-muted">—</span>
+                                                    @endif
+                                                </td>
+                                            @endforeach
                                         </tr>
                                     @endforeach
                                 </tbody>
