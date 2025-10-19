@@ -1,5 +1,5 @@
 @extends('admin.layout.layout')
-
+@section('title', 'Designations | Trackag')
 @section('content')
     <main class="app-main">
         <div class="app-content-header">

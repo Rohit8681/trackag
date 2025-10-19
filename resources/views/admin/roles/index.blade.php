@@ -1,4 +1,5 @@
 @extends('admin.layout.layout')
+@section('title', 'Manage Roles | Trackag')
 
 @section('content')
 <main class="app-main">

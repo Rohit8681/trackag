@@ -1,4 +1,5 @@
 @extends('admin.layout.layout')
+@section('title', 'View Permission | Trackag')
 
 @section('content')
 

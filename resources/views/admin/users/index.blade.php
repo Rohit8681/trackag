@@ -1,4 +1,5 @@
 @extends('admin.layout.layout')
+@section('title', 'Users | Trackag')
 
 @section('content')
 <style>
