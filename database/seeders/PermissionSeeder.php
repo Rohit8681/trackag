@@ -95,6 +95,8 @@ class PermissionSeeder extends Seeder
             'create_all_trip',
             'edit_all_trip',
             'delete_all_trip',
+            'approvals_all_trip',
+            'logs_all_trip',
             'view_trip_types',
             'create_trip_types',
             'edit_trip_types',

@@ -47,8 +47,8 @@
                             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                         </div>
                     @endif
-
-                    @can('view_trips')
+                    @can('view_all_trip')
+                    
                         <div class="table-responsive">
                             <table id="trips-table" class="table table-hover align-middle table-bordered text-nowrap">
                                 <thead class="table-primary text-center">
@@ -157,14 +157,16 @@
                                                     <i class="fas fa-eye"></i>
                                                 </a>
                                                 <br>
-                                                @can('view_trip_logs')
+                                                {{-- @can('view_trip_logs') --}}
                                                     <span class="badge bg-info mt-2">{{ $trip->tripLogs->count() }} logs</span><br>
                                                     <a href="#" class="text-primary small" data-bs-toggle="modal" data-bs-target="#logsModal{{ $trip->id }}">View Logs</a>
-                                                @endcan
+                                                {{-- @endcan --}}
                                             </td>
 
                                             <td class="text-center">
-                                                @if (auth()->user()->can('trip_approvals') && $trip->approval_status === 'pending')
+                                                approvals_all_trip
+                                                {{-- @if (auth()->user()->can('approvals_all_trip') && $trip->approval_status === 'pending') --}}
+                                                @if ($trip->approval_status === 'pending')
                                                     <div class="dropdown">
                                                         <button class="btn btn-warning btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
                                                             Pending
@@ -202,14 +204,14 @@
                                                     @endif
                                                 @endif
 
-                                                @can('delete_trips')
+                                                {{-- @can('delete_all_trip') --}}
                                                     <form action="{{ route('trips.destroy', $trip) }}" method="POST" class="d-inline">
                                                         @csrf @method('DELETE')
                                                         <button type="submit" class="btn btn-link p-0 text-danger" onclick="return confirm('Are you sure?')">
                                                             <i class="fas fa-trash"></i>
                                                         </button>
                                                     </form>
-                                                @endcan
+                                                {{-- @endcan --}}
                                             </td>
                                         </tr>
                                     @empty
@@ -228,7 +230,7 @@
 
     {{-- Deny Modals --}}
     @foreach ($trips as $trip)
-        @can('trip_approvals')
+        {{-- @can('approvals_all_trip') --}}
             @if ($trip->approval_status === 'pending')
                 <div class="modal fade" id="denyModal{{ $trip->id }}" tabindex="-1" aria-hidden="true">
                     <div class="modal-dialog">
@@ -257,12 +259,12 @@
                     </div>
                 </div>
             @endif
-        @endcan
+        {{-- @endcan --}}
     @endforeach
 
     {{-- Logs Modals --}}
     @foreach ($trips as $trip)
-        @can('view_trip_logs')
+        {{-- @can('logs_all_trip') --}}
             <div class="modal fade" id="logsModal{{ $trip->id }}" tabindex="-1" aria-hidden="true">
                 <div class="modal-dialog modal-xl">
                     <div class="modal-content border-0 shadow-sm">
@@ -315,7 +317,7 @@
                     </div>
                 </div>
             </div>
-        @endcan
+        {{-- @endcan --}}
     @endforeach
 </main>
 @endsection

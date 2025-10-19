@@ -1,4 +1,5 @@
 @extends('admin.layout.layout')
+@section('title', 'Manage Roles | Trackag')
 
 @section('content')
 <main class="app-main">
@@ -11,7 +12,7 @@
             </div>
             <div class="col-sm-6">
                <ol class="breadcrumb float-sm-end">
-                  <li class="breadcrumb-item"><a href="#">User Management</a></li>
+                  <li class="breadcrumb-item"><a href="{{ route('roles.index') }}">Roles</a></li>
                   <li class="breadcrumb-item active">Roles</li>
                </ol>
             </div>
@@ -24,7 +25,7 @@
       <div class="container-fluid">
          <div class="row">
             <div class="col-md-12">
-               <div class="card mb-4">
+               <div class="card card-primary card-outline mb-4">
                   <div class="card-header">
                      <h3 class="card-title">Role Control Panel</h3>
                      @can('create_roles')

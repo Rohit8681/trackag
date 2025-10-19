@@ -1,13 +1,25 @@
 @extends('admin.layout.layout')
+@section('title', 'View Role | Trackag')
 
 @section('content')
 
 <main class="app-main">
+  
   <div class="app-content-header">
-    <div class="container-fluid">
-      <h3>Role Details</h3>
+      <div class="container-fluid">
+         <div class="row">
+            <div class="col-sm-6">
+               <h3 class="mb-0">View Role</h3>
+            </div>
+            <div class="col-sm-6">
+               <ol class="breadcrumb float-sm-end">
+                  <li class="breadcrumb-item"><a href="{{ route('roles.index') }}">Roles</a></li>
+                  <li class="breadcrumb-item active">View Role</li>
+               </ol>
+            </div>
+         </div>
+      </div>
     </div>
-  </div>
 
   <div class="app-content">
     <div class="container-fluid">

@@ -1,19 +1,20 @@
 @extends('admin.layout.layout')
+@section('title', 'Manage Permissions | Trackag')
 
 @section('content')
 
     <main class="app-main">
 
         <!-- Page Header -->
-        <div class="app-content-header py-3 mb-4 bg-light border-bottom">
+        <div class="app-content-header ">
             <div class="container-fluid">
-                <div class="row align-items-center">
+                <div class="row ">
                     <div class="col-sm-6">
                         <h3 class="mb-0">Permissions</h3>
                     </div>
-                    <div class="col-sm-6 text-sm-end">
-                        <ol class="breadcrumb mb-0">
-                            <li class="breadcrumb-item"><a href="#">User Management</a></li>
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-end">
+                            <li class="breadcrumb-item"><a href="{{ route('permissions.index') }}">Permissions</a></li>
                             <li class="breadcrumb-item active">Permissions</li>
                         </ol>
                     </div>
@@ -25,9 +26,9 @@
         <div class="app-content">
             <div class="container-fluid">
                 <div class="row">
-                    <div class="col-12">
+                    <div class="col-md-12">
 
-                        <div class="card mb-4">
+                        <div class="card card-primary card-outline">
                             {{-- <div class="card-header d-flex justify-content-between align-items-center">
                             <h5 class="mb-0">Permission Control Panel</h5>
                             @can('create_permissions')

@@ -91,7 +91,6 @@ class CustomerController extends Controller
     {
         $customer = Customer::with(['user', 'company'])->findOrFail($id);
         $this->authorizeCustomerAccess($customer);
-
         return view('admin.customers.show', compact('customer'));
     }
 

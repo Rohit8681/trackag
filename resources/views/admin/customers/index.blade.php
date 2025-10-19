@@ -1,4 +1,5 @@
 @extends('admin.layout.layout')
+@section('title', 'List Customer | Trackag')
 
 @section('content')
     <main class="app-main">
@@ -22,7 +23,7 @@
         <!-- Content Section -->
         <div class="app-content">
             <div class="container-fluid">
-                <div class="card mb-4">
+                <div class="card card-primary card-outline mb-4">
                     <!-- Card Header -->
                     <div class="card-header">
                         <h5 class="card-title">Customer List</h5>
@@ -89,8 +90,8 @@
                                         @endcan
 
                                         <td>
-                                            <a href="{{ route('customers.show', $customer) }}" class="text-info me-2" title="View">
-                                                <i class="fas fa-eye"></i></a>
+                                            {{-- <a href="{{ route('customers.show', $customer) }}" class="text-info me-2" title="View">
+                                                <i class="fas fa-eye"></i></a> --}}
                                             
                                             @can('edit_customers')
                                                 <a href="{{ route('customers.edit', $customer) }}" class="text-warning me-2" title="Edit">
