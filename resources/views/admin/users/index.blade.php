@@ -40,8 +40,8 @@
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <h3 class="card-title">User Control Panel</h3>
                             @can('create_users')
-                            <a href="{{ route('users.create') }}" style="float: right;" class="btn btn-sm btn-primary ms-auto">
-                                <i class="fas fa-user-plus me-1"></i> Add New User
+                            <a href="{{ route('users.create') }}" style="float: right;" class="btn  btn-primary ms-auto">
+                                 Add New User
                             </a>
                             @endcan
                         </div>

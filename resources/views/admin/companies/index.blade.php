@@ -1,4 +1,5 @@
 @extends('admin.layout.layout')
+@section('title', 'Company List | Trackag')
 
 @section('content')
     <main class="app-main">
@@ -6,12 +7,12 @@
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-sm-6">
-                        <h3 class="mb-0">Companies</h3>
+                        <h3 class="mb-0">Company List</h3>
                     </div>
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-end">
-                            <li class="breadcrumb-item"><a href="#">Company Management</a></li>
-                            <li class="breadcrumb-item active">Companies</li>
+                            <li class="breadcrumb-item"><a href="#">Company </a></li>
+                            <li class="breadcrumb-item active">Company</li>
                         </ol>
                     </div>
                 </div>
@@ -22,9 +23,9 @@
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-md-12">
-                        <div class="card mb-4">
+                        <div class="card card-primary card-outline mb-4">
                             <div class="card-header">
-                                <h3 class="card-title">Company Control Panel</h3>
+                                <h3 class="card-title">Company List</h3>
                                 @if(auth()->user() && auth()->user()->hasRole('master_admin'))
                                     <a href="{{ route('companies.create') }}" class="btn btn-primary float-end">
                                         Add New Company

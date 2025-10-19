@@ -6,6 +6,22 @@
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-sm-6">
+                        <h3 class="mb-0">Designation List</h3>
+                    </div>
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-end">
+                            <li class="breadcrumb-item"><a href="{{ route('designations.index') }}">Designations</a></li>
+                            <li class="breadcrumb-item active">Add New Designation</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{-- <div class="app-content-header">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-sm-6">
                         <h3 class="mb-0">Designations</h3>
                     </div>
                     <div class="col-sm-6 text-end">
@@ -13,15 +29,25 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div> --}}
 
         <div class="app-content">
             <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-12">
                 @if (session('success'))
                     <div class="alert alert-success">{{ session('success') }}</div>
                 @endif
 
-                <div class="card">
+                <div class="card card-primary card-outline">
+
+                    <div class="card-header d-flex align-items-center">
+                        
+                        <h3 class="card-title mb-0">Designations</h3>
+                        <a href="{{ route('designations.create') }}" class="btn btn-primary ms-auto">Add New Designation</a>
+
+                    </div>
+                    
                     <div class="card-body table-responsive">
                         <table id="designation-table" class="table table-bordered table-striped align-middle">
                             <thead>
@@ -64,6 +90,8 @@
                             </tbody>
                         </table>
                     </div>
+                </div>
+                </div>
                 </div>
             </div>
         </div>

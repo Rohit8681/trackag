@@ -1,4 +1,5 @@
 @extends('admin.layout.layout')
+@section('title', 'List State | Trackag')
 
 @section('content')
     <main class="app-main">
@@ -28,7 +29,7 @@
                         <div class="card card-primary card-outline">
                             <div class="card-header d-flex align-items-center">
                                 <h3 class="card-title mb-0">State List</h3>
-                                <a href="{{ route('states.create') }}" class="btn btn-sm btn-primary ms-auto">
+                                <a href="{{ route('states.create') }}" class="btn btn-primary ms-auto">
                                     <i class="fas fa-plus me-1"></i> Add State
                                 </a>
                             </div>
