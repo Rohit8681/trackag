@@ -165,7 +165,8 @@
 
                                             <td class="text-center">
                                                 approvals_all_trip
-                                                @if (auth()->user()->can('approvals_all_trip') && $trip->approval_status === 'pending')
+                                                {{-- @if (auth()->user()->can('approvals_all_trip') && $trip->approval_status === 'pending') --}}
+                                                @if ($trip->approval_status === 'pending')
                                                     <div class="dropdown">
                                                         <button class="btn btn-warning btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
                                                             Pending
