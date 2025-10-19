@@ -75,7 +75,7 @@
 <div class="input-group mb-1">
     <div class="form-floating">
         <input name="mobile" id="mobile" type="number"
-            class="form-control @error('mobile') is-invalid @enderror"
+            class="form-control @error('mobile') is-invalid @enderror mobile_no"
             placeholder="Mobile"
             @if(isset($_COOKIE["mobile"])) value="{{ $_COOKIE['mobile'] }}" @endif />
         <label for="loginMobile">Mobile</label>
@@ -83,7 +83,7 @@
             <div class="invalid-feedback">{{ $message }}</div>
         @enderror
     </div>
-    <div class="input-group-text"><span class="bi bi-envelope"></span></div>
+    <div class="input-group-text"><span class="bi bi-phone-fill"></span></div>
 </div>
 
 <!-- Password Field -->
@@ -146,6 +146,15 @@
     </script>
     <script src="{{ asset('admin/js/adminlte.js') }}"></script>
     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileInput = document.querySelector('.mobile_no');
+            mobileInput.addEventListener('input', function() {
+                this.value = this.value.replace(/\D/g, '');
+                if (this.value.length > 10) {
+                    this.value = this.value.slice(0, 10);
+                }
+            });
+        });
         const SELECTOR_SIDEBAR_WRAPPER = '.sidebar-wrapper';
         const Default = {
             scrollbarTheme: 'os-theme-light',
