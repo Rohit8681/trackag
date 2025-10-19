@@ -241,6 +241,8 @@ class MultiCompanySeeder extends Seeder
             'edit_all_trip',
             'delete_all_trip',
             'view_trip_types',
+            'approvals_all_trip',
+            'logs_all_trip',
             'create_trip_types',
             'edit_trip_types',
             'delete_trip_types',

@@ -102,7 +102,7 @@
                                         $modules['Party (Customer)'] = 'customers';
 
 
-                                        $actions = ['create','view', 'edit', 'delete', 'approve', 'reject', 'verify', 'dispatch', 'remove_review'];
+                                        $actions = ['create','view', 'edit', 'delete', 'approvals', 'reject', 'verify', 'dispatch', 'remove_review'];
                                     @endphp
 
                                     @foreach ($modules as $moduleName => $keyword)

@@ -45,14 +45,14 @@
                                 </div>
                             @endif
 
-                            @if ($errors->any())
+                            {{-- @if ($errors->any())
                                 @foreach ($errors->all() as $error)
                                     <div class="alert alert-danger alert-dismissible fade show m-3">
                                         <strong>Error:</strong> {!! $error !!}
                                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                                     </div>
                                 @endforeach
-                            @endif
+                            @endif --}}
 
                             {{-- Form Start --}}
                             <form method="POST" action="{{ route('users.store') }}" enctype="multipart/form-data">
@@ -65,8 +65,11 @@
                                         {{-- Name, Email, Mobile --}}
                                         <div class="col-md-3">
                                             <label class="form-label">Name <span class="text-danger">*</span></label>
-                                            <input type="text" name="name" class="form-control"
+                                            <input type="text" name="name" class="form-control @error('name') is-invalid @enderror"
                                                 value="{{ old('name') }}" >
+                                            @error('name')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
                                         </div>
                                         <div class="col-md-3">
                                             <label class="form-label">Email </label>
@@ -81,8 +84,11 @@
                                         </div>
                                         <div class="col-md-3">
                                             <label class="form-label">Company Mobile<span class="text-danger">*</span></label>
-                                            <input type="text" name="company_mobile" class="form-control mobile_no"
+                                            <input type="text" name="company_mobile" class="form-control mobile_no @error('company_mobile') is-invalid @enderror"
                                                 value="{{ old('company_mobile') }}">
+                                                @error('company_mobile')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
                                         </div>
 
                                         {{-- DOB, Gender, Marital Status --}}
@@ -355,14 +361,20 @@
                                         
                                         <div class="col-md-4">
                                             <label class="form-label">Password <span class="text-danger">*</span></label>
-                                            <input type="password" name="password" class="form-control" 
+                                            <input type="password" name="password" class="form-control @error('password') is-invalid @enderror" 
                                                 placeholder="Enter password">
+                                                @error('password')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
                                         </div>
                                         <div class="col-md-4">
                                             <label class="form-label">Confirm Password <span
                                                     class="text-danger">*</span></label>
-                                            <input type="password" name="password_confirmation" class="form-control"
+                                            <input type="password" name="password_confirmation" class="form-control @error('password_confirmation') is-invalid @enderror"
                                                  placeholder="Confirm password">
+                                                 @error('password_confirmation')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
                                         </div>
                                     </div>
 
@@ -378,10 +390,16 @@
                                                     <label class="form-check-label" for="role-{{ $role->name }}">
                                                         {{ ucfirst($role->name) }}
                                                     </label>
+                                                    
                                                 </div>
                                             </div>
                                         @endforeach
                                     </div>
+                                    @error('roles')
+                                        <div class="text-danger small mt-1">
+                                            {{ $message }}
+                                        </div>
+                                    @enderror
                                 </div>
 
                                 <div class="card-footer text-end">
