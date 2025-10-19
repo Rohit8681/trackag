@@ -156,7 +156,7 @@ class User extends Authenticatable
 
     public function depos()
     {
-        return $this->belongsTo(Depo::class, 'depo', 'id');
+        return $this->belongsTo(Depo::class, 'depo_id', 'id');
     }
 
 }

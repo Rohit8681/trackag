@@ -76,9 +76,11 @@
                                  @can('view_roles')
                                  <a href="{{ route('roles.show', $role) }}" class="text-info me-2" title="View Role"><i class="fas fa-eye"></i></a>
                                  @endcan
-                                 @can('edit_roles')
+                                 {{-- @can('edit_roles') --}}
+                                 @if(auth()->user() && auth()->user()->hasRole('master_admin'))
                                  <a href="{{ route('roles.edit', $role) }}" class="text-warning me-2" title="Edit Role"><i class="fas fa-edit"></i></a>
-                                 @endcan
+                                 @endif
+                                 {{-- @endcan --}}
                                  @can('edit_roles')
                                  @if (isset($role->is_active))
                                  <form action="{{ route('roles.toggle', $role) }}" method="POST" class="d-inline">
@@ -91,7 +93,8 @@
                                  </form>
                                  @endif
                                  @endcan
-                                 @can('delete_roles')
+                                 @if(auth()->user() && auth()->user()->hasRole('master_admin'))
+                                 {{-- @can('delete_roles') --}}
                                  <form action="{{ route('roles.destroy', $role) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure to delete this role?')">
                                     @csrf
                                     @method('DELETE')
@@ -99,7 +102,8 @@
                                        <i class="fas fa-trash"></i>
                                     </button>
                                  </form>
-                                 @endcan
+                                 {{-- @endcan --}}
+                                 @endif
                               </td>
                            </tr>
 
@@ -146,3 +150,21 @@
    </div>
 </main>
 @endsection
+@push('scripts')
+<script>
+$(document).ready(function() {
+    var rolesCount = @json($roles->count());
+    if (rolesCount > 0) {
+        $('#roles-table').DataTable({
+            responsive: true,
+            autoWidth: false,
+            pageLength: 10,
+            lengthMenu: [5, 10, 25, 50],
+            columnDefs: [
+                { orderable: false, targets: -1 } 
+            ]
+        });
+    }
+});
+</script>
+@endpush

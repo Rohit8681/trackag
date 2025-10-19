@@ -65,11 +65,43 @@
                                 <tbody>
                                     @php
                                         $modules = [
-                                            'User Related' => 'users',
-                                            'Role Related' => 'roles',
-                                            'Company Related' => 'companies',
-                                            'Permission Related' => 'permissions',
+                                            'Budget Plan' => 'budget_plan',
+                                            'Monthly Plan' => 'monthly_plan',
+                                            'Plan Vs Achievement' => 'plan_vs_achievement',
+                                            'Party Visit' => 'party_visit',
+                                            'Order' => 'order',
+                                            'Stock' => 'stock',
+                                            'Tracking' => 'tracking',
+                                            'Attendance' => 'attendance',
+                                            'Expense' => 'expense',
+                                            'Manage User' => 'users',
+                                            'Manage Role' => 'roles',
+                                            
                                         ];
+                                        if (auth()->user() && auth()->user()->hasRole('master_admin')) {
+                                            $modules['Manage Permissions'] = 'permissions';
+                                        }
+                                        $modules['All Trips'] = 'all_trip';
+                                        $modules['Trip Types'] = 'trip_types';
+                                        $modules['Travel Modes'] = 'travel_modes';
+                                        $modules['Trip Purposes'] = 'trip_purposes';
+                                        //$modules['Employees'] = 'employees';
+                                        $modules['Designations'] = 'designations';
+                                        $modules['Attendance'] = 'attendance';
+                                        $modules['States'] = 'states';
+                                        $modules['Districts'] = 'districts';
+                                        $modules['Talukas'] = 'talukas';
+                                        $modules['Vehicle Types'] = 'vehicle_types';
+                                        // $modules['Vehicle Master'] = 'vehicle';
+                                        $modules['Depo Master'] = 'depo_master';
+                                        $modules['Holiday Master'] = 'holiday_master';
+                                        $modules['Leave Master'] = 'leave_master';
+                                        $modules['TA-DA'] = 'ta_da';
+                                        $modules['TA-DA Bill Master'] = 'ta_da_bill_master';
+                                        if (auth()->user() && auth()->user()->hasRole('master_admin')) {
+                                            $modules['Companies'] = 'companies';
+                                        }
+                                        $modules['Party (Customer)'] = 'customers';
 
                                         $actions = ['create', 'view', 'edit', 'delete', 'approve', 'reject', 'verify', 'dispatch', 'remove_review'];
                                     @endphp

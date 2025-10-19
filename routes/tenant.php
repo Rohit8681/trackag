@@ -70,7 +70,6 @@ Route::prefix('admin')->group(function () {
         Route::get('users/{userId}/sessions', [AdminController::class, 'getUserSessionHistory'])->name('admin.users.sessions');
         Route::delete('/customers/bulk-delete', [CustomerController::class, 'bulkDelete'])->name('customers.bulk-delete');
 
-        // Role, Permission, User Management (tenant database)
         Route::resource('roles', RoleController::class);
         Route::resource('permissions', PermissionController::class);
         Route::resource('users', UserController::class);
@@ -84,8 +83,6 @@ Route::prefix('admin')->group(function () {
         Route::patch('companies/{id}/toggle', [CompanyController::class, 'toggle'])->name('companies.toggle');
 
 
-        // Trips (tenant database)
-        // Route::prefix('trips')->group(function () {
         Route::resource('travelmode', TravelModeController::class)->names('travelmode');
         Route::resource('tourtype', TourTypeController::class)->names('tourtype');
         Route::resource('purpose', PurposeController::class)->names('purpose');

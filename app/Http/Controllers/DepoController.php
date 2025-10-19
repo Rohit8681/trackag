@@ -40,20 +40,29 @@ class DepoController extends Controller
 
     public function store(Request $request)
     {
+        // Check current connection (tenant or main)
+        $connection = tenancy()->tenant ? 'tenant' : 'mysql';
+
         $data = $request->validate([
-            'depo_code' => 'required|string|max:191|unique:depos,depo_code',
+            'depo_code' => [
+                'required',
+                'string',
+                'max:191',
+                // Unique validation per connection
+                Rule::unique($connection . '.depos', 'depo_code'),
+            ],
             'depo_name' => 'required|string|max:191',
-            'state_id'  => 'nullable|exists:states,id',
-            'district_id' => 'nullable|exists:districts,id',
-            'tehsil_id' => 'nullable|exists:tehsils,id',
+            'state_id' => 'nullable|exists:' . $connection . '.states,id',
+            'district_id' => 'nullable|exists:' . $connection . '.districts,id',
+            'tehsil_id' => 'nullable|exists:' . $connection . '.tehsils,id',
             'manage_by' => 'nullable|string|max:191',
             'city' => 'nullable|string|max:191',
             // 'status' => ['required', Rule::in(['0','1',0,1,true,false])],
         ]);
-        
+
         Depo::create($data);
 
-        return redirect()->route('depos.index')->with('success','Depo created successfully.');
+        return redirect()->route('depos.index')->with('success', 'Depo created successfully.');
     }
 
     public function edit(Depo $depo)
@@ -70,20 +79,29 @@ class DepoController extends Controller
 
     public function update(Request $request, Depo $depo)
     {
+        // Check current connection (tenant or main)
+        $connection = tenancy()->tenant ? 'tenant' : 'mysql';
+
         $data = $request->validate([
-            'depo_code' => ['required','string','max:191', Rule::unique('depos','depo_code')->ignore($depo->id)],
+            'depo_code' => [
+                'required',
+                'string',
+                'max:191',
+                // Unique check per database connection, ignore current record
+                Rule::unique($connection . '.depos', 'depo_code')->ignore($depo->id),
+            ],
             'depo_name' => 'required|string|max:191',
-            'state_id'  => 'nullable|exists:states,id',
-            'district_id' => 'nullable|exists:districts,id',
-            'tehsil_id' => 'nullable|exists:tehsils,id',
+            'state_id' => 'nullable|exists:' . $connection . '.states,id',
+            'district_id' => 'nullable|exists:' . $connection . '.districts,id',
+            'tehsil_id' => 'nullable|exists:' . $connection . '.tehsils,id',
             'manage_by' => 'nullable|string|max:191',
             'city' => 'nullable|string|max:191',
-            'status' => ['required', Rule::in(['0','1',0,1,true,false])],
+            // 'status' => ['required', Rule::in(['0','1',0,1,true,false])],
         ]);
 
         $depo->update($data);
 
-        return redirect()->route('depos.index')->with('success','Depo updated successfully.');
+        return redirect()->route('depos.index')->with('success', 'Depo updated successfully.');
     }
 
     public function destroy(Depo $depo)

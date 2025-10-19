@@ -39,7 +39,7 @@
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <h3 class="card-title">User Control Panel</h3>
                             @can('create_users')
-                            <a href="{{ route('users.create') }}" style="float: right;" class="btn btn-sm btn-primary">
+                            <a href="{{ route('users.create') }}" style="float: right;" class="btn btn-sm btn-primary ms-auto">
                                 <i class="fas fa-user-plus me-1"></i> Add New User
                             </a>
                             @endcan
@@ -345,8 +345,10 @@
             <label class="form-label">Select States</label>
             <select name="state_ids[]" id="stateIds" class="form-select" multiple required>
               @foreach($states as $state)
+                @if(empty($stateAccesCompany) || in_array($state->id, $stateAccesCompany))
                 <option value="{{ $state->id }}">{{ $state->name }}</option>
-              @endforeach
+                @endif
+            @endforeach
             </select>
           </div>
         </form>

@@ -63,8 +63,14 @@ Route::middleware(['web'])->group(function () {
         return redirect()->route('admin.login');
     });
 
+    
+
+
     // Admin (central) routes
     Route::prefix('admin')->group(function () {
+        Route::get('coming-soon', function () {
+            return view('coming-soon');
+        })->name('coming-soon');
         // Public routes
         Route::get('login', [AdminController::class, 'create'])->name('admin.login');
         Route::post('login', [AdminController::class, 'store'])->name('auth.login.request');
@@ -137,6 +143,18 @@ Route::middleware(['web'])->group(function () {
             Route::post('/admin/trips/{id}/complete', [TripController::class, 'completeTrip'])->name('trips.complete');
             Route::post('/trips/{trip}/toggle-status', [TripController::class, 'toggleStatus'])->name('trips.status.toggle');
             // });
+
+            Route::resource('budget', BudgetController::class);
+            Route::resource('monthly', MonthlyController::class);
+            Route::resource('achievement', AchievementController::class);
+            Route::resource('party', PartyController::class);
+            Route::resource('order', OrderController::class);
+            Route::resource('stock', StockController::class);
+            Route::resource('tracking', TrackingController::class);
+            Route::resource('expense', ExpenseController::class);
+
+             Route::resource('customers', CustomerController::class);
+        Route::patch('/customers/{id}/toggle', [CustomerController::class, 'toggleStatus'])->name('customers.toggle');
         });
     });
 });

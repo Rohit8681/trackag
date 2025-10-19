@@ -11,8 +11,8 @@
                     </div>
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-end">
-                            <li class="breadcrumb-item"><a href="#">Home</a></li>
-                            <li class="breadcrumb-item active">Create New Admin</li>
+                            <li class="breadcrumb-item"><a href="{{ route('users.index') }}">Users</a></li>
+                            <li class="breadcrumb-item active">Create New User</li>
                         </ol>
                     </div>
                 </div>
@@ -62,24 +62,24 @@
                                     <h5 class="mb-3">Personal Information</h5>
                                     <div class="row g-3 mb-4">
                                         {{-- Name, Email, Mobile --}}
-                                        <div class="col-md-4">
+                                        <div class="col-md-3">
                                             <label class="form-label">Name <span class="text-danger">*</span></label>
                                             <input type="text" name="name" class="form-control"
-                                                value="{{ old('name') }}" required>
+                                                value="{{ old('name') }}" >
                                         </div>
-                                        <div class="col-md-4">
+                                        <div class="col-md-3">
                                             <label class="form-label">Email </label>
                                             <input type="email" name="email" class="form-control"
-                                                value="{{ old('email') }}" required>
+                                                value="{{ old('email') }}">
                                         </div>
                                         
-                                        <div class="col-md-4">
+                                        <div class="col-md-3">
                                             <label class="form-label">Mobile</label>
                                             <input type="text" name="mobile" class="form-control mobile_no"
                                                 value="{{ old('mobile') }}">
                                         </div>
-                                        <div class="col-md-4">
-                                            <label class="form-label">Company Mobile</label>
+                                        <div class="col-md-3">
+                                            <label class="form-label">Company Mobile<span class="text-danger">*</span></label>
                                             <input type="text" name="company_mobile" class="form-control mobile_no"
                                                 value="{{ old('company_mobile') }}">
                                         </div>
@@ -118,7 +118,7 @@
                                         {{-- Address --}}
                                         <div class="col-md-12">
                                             <label class="form-label">Address</label>
-                                            <textarea name="address" class="form-control">{{ old('address') }}</textarea>
+                                            <textarea name="address" rows="1" class="form-control">{{ old('address') }}</textarea>
                                         </div>
 
                                         {{-- Location Dropdowns --}}
@@ -163,17 +163,17 @@
                                                 value="{{ old('pincode') }}">
                                         </div>
 
-                                        <div class="col-md-4">
+                                        <div class="col-md-3">
                                             <label class="form-label">Postal Address</label>
                                             <input type="text" name="postal_address" class="form-control"
                                                 value="{{ old('postal_address') }}">
                                         </div>
-                                        <div class="col-md-4">
+                                        <div class="col-md-3">
                                             <label class="form-label">Latitude</label>
                                             <input type="text" name="latitude" class="form-control"
                                                 value="{{ old('latitude') }}">
                                         </div>
-                                        <div class="col-md-4">
+                                        <div class="col-md-3">
                                             <label class="form-label">Longitude</label>
                                             <input type="text" name="longitude" class="form-control"
                                                 value="{{ old('longitude') }}">
@@ -183,13 +183,13 @@
                                     {{-- Employment Information --}}
                                     <h5 class="mb-3">Employment Information</h5>
                                     <div class="row g-3 mb-4">
-                                        <div class="col-md-4">
+                                        <div class="col-md-3">
                                             <label class="form-label">User Code</label>
                                             <input type="text" name="user_code" class="form-control"
                                                 value="{{ old('user_code') }}">
                                         </div>
 
-                                        <div class="col-md-4">
+                                        <div class="col-md-3">
                                             <label class="form-label">Designation</label>
                                             <select name="designation_id" class="form-select">
                                                 <option value="">Select Designation</option>
@@ -201,40 +201,40 @@
                                                 @endforeach
                                             </select>
                                         </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label">Reporting To</label>
+                                            <select name="reporting_to" class="form-select">
+                                                <option value="">Select Reporting To</option>
+                                                @foreach ($users as $user)
+                                                    <option value="{{ $user->id }}"
+                                                        {{ old('reporting_to') == $user->id ? 'selected' : '' }}>
+                                                        {{ $user->name }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
 
-
-                                        <select name="reporting_to" class="form-select">
-                                            <option value="">Select Reporting To</option>
-                                            @foreach ($users as $user)
-                                                <option value="{{ $user->id }}"
-                                                    {{ old('reporting_to') == $user->id ? 'selected' : '' }}>
-                                                    {{ $user->name }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-
-
-                                        <div class="col-md-4">
+                                        <div class="col-md-3">
                                             <label class="form-label">Headquarter</label>
                                             <input type="text" name="headquarter" class="form-control"
                                                 value="{{ old('headquarter') }}">
                                         </div>
-                                        <div class="col-md-4">
+                                        <div class="col-md-3">
                                             <label class="form-label">User Type</label>
                                             <input type="text" name="user_type" class="form-control"
                                                 value="{{ old('user_type') }}">
                                         </div>
-                                        <div class="col-md-4">
+                                        <div class="col-md-3">
                                             <label class="form-label">Joining Date</label>
                                             <input type="date" name="joining_date" class="form-control" max="{{ date('Y-m-d') }}"
                                                 value="{{ old('joining_date') }}">
                                         </div>
-                                        <div class="col-md-4">
+                                        <div class="col-md-3">
                                             <label class="form-label">Emergency Contact</label>
                                             <input type="text" name="emergency_contact_no" class="form-control"
                                                 value="{{ old('emergency_contact_no') }}">
                                         </div>
-                                        <div class="col-md-4">
+                                        <div class="col-md-3">
                                             <label class="form-label">Is Self Sale</label>
                                             <select name="is_self_sale" class="form-select">
                                                 <option value="0" {{ old('is_self_sale') == '0' ? 'selected' : '' }}>
@@ -243,7 +243,7 @@
                                                     Yes</option>
                                             </select>
                                         </div>
-                                        <div class="col-md-4">
+                                        <div class="col-md-3">
                                             <label class="form-label">Multi-Day Start/End Allowed</label>
                                             <select name="is_multi_day_start_end_allowed" class="form-select">
                                                 <option value="0"
@@ -254,7 +254,7 @@
                                                     Yes</option>
                                             </select>
                                         </div>
-                                        <div class="col-md-4">
+                                        <div class="col-md-3">
                                             <label class="form-label">Allow Tracking</label>
                                             <select name="is_allow_tracking" class="form-select">
                                                 <option value="1"
@@ -264,20 +264,20 @@
                                             </select>
                                         </div>
 
-                                        <div class="col-md-4">
+                                        <div class="col-md-3">
                                             <label class="form-label">Depo Assign</label>
-                                            <select name="depo" class="form-select">
+                                            <select name="depo_id" class="form-select">
                                                 <option value="">Select Depo</option>
                                                 @foreach ($depos as $depo)
                                                         <option value="{{ $depo->id }}"
-                                                            {{ old('depo') == $depo->id ? 'selected' : '' }}>
+                                                            {{ old('depo_id') == $depo->id ? 'selected' : '' }}>
                                                             {{ $depo->depo_name }}
                                                         </option>
                                                     @endforeach
                                             </select>
                                         </div>
 
-                                        <div class="col-md-4">
+                                        <div class="col-md-3">
                                             <label class="form-label">Is Web Login Access</label>
                                             <select name="is_web_login_access" class="form-select">
                                                 <option value="1"
@@ -291,42 +291,42 @@
                                     {{-- Other Info --}}
                                     <h5 class="mb-3">Other Info</h5>
                                     <div class="row g-3 mb-4">
-                                        <div class="col-md-4">
+                                        <div class="col-md-3">
                                             <label class="form-label">A/C No. </label>
                                             <input type="text" name="account_no" class="form-control"
                                                 value="{{ old('account_no') }}">
                                         </div>
-                                        <div class="col-md-4">
+                                        <div class="col-md-3">
                                             <label class="form-label">Branch Name</label>
                                             <input type="text" name="branch_name" class="form-control"
                                                 value="{{ old('branch_name') }}">
                                         </div>
-                                        <div class="col-md-4">
+                                        <div class="col-md-3">
                                             <label class="form-label">IFSC Code </label>
                                             <input type="text" name="ifsc_code" class="form-control"
                                                 value="{{ old('ifsc_code') }}">
                                         </div>
-                                        <div class="col-md-4">
+                                        <div class="col-md-3">
                                             <label class="form-label">PAN Card No. </label>
                                             <input type="text" name="pan_card_no" class="form-control"
                                                 value="{{ old('pan_card_no') }}">
                                         </div>
-                                        <div class="col-md-4">
+                                        <div class="col-md-3">
                                             <label class="form-label">Aadhar No. </label>
                                             <input type="text" name="aadhar_no" class="form-control"
                                                 value="{{ old('aadhar_no') }}">
                                         </div>
-                                        <div class="col-md-4">
+                                        <div class="col-md-3">
                                             <label class="form-label">Driving Lic No. </label>
                                             <input type="text" name="driving_lic_no" class="form-control"
                                                 value="{{ old('driving_lic_no') }}">
                                         </div>
-                                        <div class="col-md-4">
+                                        <div class="col-md-3">
                                             <label class="form-label">Driving Expiry</label>
                                             <input type="date" name="driving_expiry" class="form-control"
                                                 value="{{ old('driving_expiry') }}">
                                         </div>
-                                        <div class="col-md-4">
+                                        <div class="col-md-3">
                                             <label class="form-label">Passport No. </label>
                                             <input type="text" name="passport_no" class="form-control"
                                                 value="{{ old('passport_no') }}">
@@ -336,41 +336,32 @@
                                             <input type="date" name="passport_expiry" class="form-control"
                                                 value="{{ old('passport_expiry') }}">
                                         </div>
-                                    </div>
-
-                                    {{-- Cancel Cheque Photos --}}
-                                    <h5 class="mb-3">Cancel Cheque Photos (Max 3)</h5>
-                                    <div class="row g-3 mb-4">
-                                        <div class="col-md-12">
+                                        <div class="col-md-4">
                                             <label class="form-label">Upload Cancel Cheque Photos</label>
                                             <input type="file" name="cancel_cheque_photos[]" class="form-control" accept="image/*"
                                                    multiple onchange="validateChequePhotos(this)">
                                             <small class="text-muted">You can upload up to 3 images.</small>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Profile Image</label>
+                                            <input type="file" name="image" class="form-control" accept="image/*">
                                         </div>
                                     </div>
 
                                     {{-- Authentication --}}
                                     <h5 class="mb-3">Authentication</h5>
                                     <div class="row g-3 mb-4">
-                                        <div class="col-md-6">
+                                        
+                                        <div class="col-md-4">
                                             <label class="form-label">Password <span class="text-danger">*</span></label>
-                                            <input type="password" name="password" class="form-control" required
+                                            <input type="password" name="password" class="form-control" 
                                                 placeholder="Enter password">
                                         </div>
-                                        <div class="col-md-6">
+                                        <div class="col-md-4">
                                             <label class="form-label">Confirm Password <span
                                                     class="text-danger">*</span></label>
                                             <input type="password" name="password_confirmation" class="form-control"
-                                                required placeholder="Confirm password">
-                                        </div>
-                                    </div>
-
-                                    {{-- Profile Image --}}
-                                    <h5 class="mb-3">Profile Image</h5>
-                                    <div class="row g-3 mb-4">
-                                        <div class="col-md-6">
-                                            <label class="form-label">Image</label>
-                                            <input type="file" name="image" class="form-control" accept="image/*">
+                                                 placeholder="Confirm password">
                                         </div>
                                     </div>
 
@@ -378,7 +369,7 @@
                                     <h5 class="mb-3">Assign Roles</h5>
                                     <div class="row g-3 mb-3">
                                         @foreach ($roles as $role)
-                                            <div class="col-md-3">
+                                            <div class="col-md-2">
                                                 <div class="form-check">
                                                     <input type="checkbox" name="roles[]" value="{{ $role->name }}"
                                                         class="form-check-input" id="role-{{ $role->name }}"

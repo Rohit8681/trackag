@@ -27,7 +27,6 @@ class StoreUserRequest extends FormRequest
             'district_id' => 'nullable|exists:districts,id',
             'city_id' => 'nullable|exists:cities,id',
             'tehsil_id' => 'nullable|exists:tehsils,id',
-
             'pincode' => 'nullable|string',
             'postal_address' => 'nullable|string',
             'latitude' => 'nullable|string',
@@ -45,9 +44,7 @@ class StoreUserRequest extends FormRequest
             'image' => 'nullable|image|max:5120',
             'roles' => 'nullable|array',
             'company_id' => 'nullable|exists:companies,id',
-
-            // 🆕 Newly Added Fields
-            'company_mobile' => 'nullable|string|max:20',
+            'company_mobile' => 'required|string|max:20',
             'village' => 'nullable|string|max:100',
             'depo_id' => 'nullable|exists:depos,id',
             'is_web_login_access' => 'nullable|boolean',

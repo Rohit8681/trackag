@@ -13,7 +13,12 @@ class RoleController extends Controller
     public function index()
     {
         $user = Auth::user();
+        $roleName = $user->getRoleNames()->first();
         $roles = Role::all();
+        if($roleName == 'sub_admin'){
+            $roles = Role::where('name', '!=', 'sub_admin')->get();
+        }
+        
         return view('admin.roles.index', compact('roles'));
     }
 
