@@ -12,31 +12,29 @@ use Illuminate\Support\Facades\Session;
 class CustomerController extends Controller
 {
     public function index()
-{
-    Session::put('page', 'customers');
-    $admin = Auth::user();
+    {
+        Session::put('page', 'customers');
+        $admin = Auth::user();
 
-    if ($admin->hasRole('master_admin')) {
-        // Master admin sees all customers
-        $customers = Customer::with(['user', 'company'])->latest()->get();
-    } elseif ($admin->hasRole('sub_admin')) {
-        // Sub-admin sees all customers in their company
-        $customers = Customer::with(['user', 'company'])
-            ->where('company_id', $admin->company_id)
-            ->latest()
-            ->get();
-    } else {
-        // Other users see only customers assigned to them
-        $customers = Customer::with(['user', 'company'])
-            ->where('user_id', $admin->id)
-            ->latest()
-            ->get();
+        if ($admin->hasRole('master_admin')) {
+            // Master admin sees all customers
+            $customers = Customer::with(['user', 'company'])->latest()->get();
+        } elseif ($admin->hasRole('sub_admin')) {
+            // Sub-admin sees all customers in their company
+            $customers = Customer::with(['user', 'company'])
+                ->where('company_id', $admin->company_id)
+                ->latest()
+                ->get();
+        } else {
+            // Other users see only customers assigned to them
+            $customers = Customer::with(['user', 'company'])
+                ->where('user_id', $admin->id)
+                ->latest()
+                ->get();
+        }
+
+        return view('admin.customers.index', compact('customers'));
     }
-
-    return view('admin.customers.index', compact('customers'));
-}
-
-
 
     public function create()
     {

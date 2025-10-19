@@ -11,7 +11,7 @@ class ExpenseController extends Controller
      */
     public function index()
     {
-        //
+        return view('admin.expense.index');
     }
 
     /**

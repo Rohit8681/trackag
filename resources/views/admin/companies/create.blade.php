@@ -5,16 +5,6 @@
     <div class="container-fluid py-4">
         <h3>Create New Company with Admin</h3>
 
-        @if ($errors->any())
-            <div class="alert alert-danger">
-                <ul class="mb-0">
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
-
         <form action="{{ route('companies.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
             
@@ -22,7 +12,7 @@
                 <div class="card-header"><h5>Company Information</h5></div>
                 <div class="card-body row g-3">
 
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <label class="form-label">Company Name <span class="text-danger">*</span></label>
                         <input type="text" name="name" 
                                class="form-control @error('name') is-invalid @enderror"
@@ -32,7 +22,7 @@
                         @enderror
                     </div>
 
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <label class="form-label">Owner Name</label>
                         <input type="text" name="owner_name" class="form-control @error('owner_name') is-invalid @enderror"
                                value="{{ old('owner_name') }}">
@@ -41,7 +31,7 @@
                         @enderror
                     </div>
 
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <label class="form-label">Company Code <span class="text-danger">*</span></label>
                         <input type="text" name="code" class="form-control @error('code') is-invalid @enderror"
                                value="{{ old('code') }}">
@@ -50,7 +40,7 @@
                         @enderror
                     </div>
 
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <label class="form-label">GST Number</label>
                         <input type="text" name="gst_number" class="form-control @error('gst_number') is-invalid @enderror"
                                value="{{ old('gst_number') }}">
@@ -59,24 +49,17 @@
                         @enderror
                     </div>
 
-                    <div class="col-md-12">
+                    <div class="col-md-8">
                         <label class="form-label">Address</label>
-                        <textarea name="address" class="form-control @error('address') is-invalid @enderror">{{ old('address') }}</textarea>
+                        <textarea name="address" rows="1" class="form-control @error('address') is-invalid @enderror">{{ old('address') }}</textarea>
                         @error('address')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
 
-                    <div class="col-md-6">
-                        <label class="form-label">Contact No <span class="text-danger">*</span></label>
-                        <input type="text" name="contact_no" class="form-control mobile_no @error('contact_no') is-invalid @enderror"
-                               value="{{ old('contact_no') }}">
-                        @error('contact_no')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
+                    
 
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <label class="form-label">Contact No 2</label>
                         <input type="text" name="contact_no2" class="form-control mobile_no @error('contact_no2') is-invalid @enderror"
                                value="{{ old('contact_no2') }}">
@@ -85,7 +68,7 @@
                         @enderror
                     </div>
 
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <label class="form-label">Telephone No</label>
                         <input type="text" name="telephone_no" class="form-control @error('telephone_no') is-invalid @enderror"
                                value="{{ old('telephone_no') }}">
@@ -94,7 +77,7 @@
                         @enderror
                     </div>
 
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <label class="form-label">Email <span class="text-danger">*</span></label>
                         <input type="email" name="email" class="form-control @error('email') is-invalid @enderror"
                                value="{{ old('email') }}">
@@ -103,7 +86,7 @@
                         @enderror
                     </div>
 
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <label class="form-label">Logo (PNG)</label>
                         <input type="file" name="logo" class="form-control @error('logo') is-invalid @enderror" accept="image/png">
                         @error('logo')
@@ -111,7 +94,7 @@
                         @enderror
                     </div>
 
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <label class="form-label">Website</label>
                         <input type="url" name="website" class="form-control @error('website') is-invalid @enderror"
                                value="{{ old('website') }}">
@@ -120,7 +103,7 @@
                         @enderror
                     </div>
 
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <label class="form-label">State Working</label>
                         <select name="state[]" class="form-control @error('state') is-invalid @enderror" multiple>
                             @foreach ($states as $s)
@@ -136,7 +119,7 @@
                     </div>
 
 
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <label class="form-label">Product Name</label>
                         <input type="text" name="product_name" class="form-control @error('product_name') is-invalid @enderror"
                                value="{{ old('product_name') }}">
@@ -145,7 +128,7 @@
                         @enderror
                     </div>
 
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <label class="form-label">Subscription Type</label>
                         <input type="text" name="subscription_type" class="form-control @error('subscription_type') is-invalid @enderror"
                                value="{{ old('subscription_type') }}">
@@ -154,7 +137,7 @@
                         @enderror
                     </div>
 
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <label class="form-label">Tally Configuration</label>
                         <select name="tally_configuration" class="form-select @error('tally_configuration') is-invalid @enderror">
                             <option value="0" {{ old('tally_configuration') == '0' ? 'selected' : '' }}>No</option>
@@ -194,15 +177,26 @@
             <div class="card mb-4">
                 <div class="card-header"><h5>Admin User Information</h5></div>
                 <div class="card-body row g-3">
-                    <div class="col-md-6">
-                        <label class="form-label">Password <span class="text-danger">*</span></label>
+                    <div class="col-md-4">
+                        <label class="form-label">Contact No <span class="text-danger">*</span></label>
+                        <input type="text" name="contact_no" class="form-control mobile_no @error('contact_no') is-invalid @enderror"
+                               value="{{ old('contact_no') }}">
+                        @error('contact_no')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                    <div class="col-md-4">
+                        {{-- <label class="form-label">Password <span class="text-danger">*</span></label> --}}
+                        <label class="form-label">Password </label>
+
                         <input type="password" name="user_password" class="form-control @error('user_password') is-invalid @enderror">
                         @error('user_password')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Confirm Password <span class="text-danger">*</span></label>
+                    <div class="col-md-4">
+                        {{-- <label class="form-label">Confirm Password <span class="text-danger">*</span></label> --}}
+                        <label class="form-label">Confirm Password </label>
                         <input type="password" name="user_password_confirmation" class="form-control">
                     </div>
                 </div>

@@ -42,7 +42,7 @@
 <!-- Initialize DataTables -->
 <script>
     $(document).ready(function() {
-        $("#roles-table, #users-table, #permissions-table, #customers-table, #designation-table, #trips-table,#states-table,#tehsils-table,#districts-table")
+        $("#users-table, #permissions-table, #customers-table, #trips-table,#states-table,#tehsils-table,#districts-table")
             .DataTable();
     });
 </script>

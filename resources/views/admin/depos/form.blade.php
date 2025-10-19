@@ -2,96 +2,106 @@
     @csrf
     @if($method === 'PUT') @method('PUT') @endif
 
-    {{-- Depo Code --}}
-    <div class="mb-3 " >
-        <label for="depo_code" class="form-label">Depo Code <span class="text-danger">*</span></label>
-        <input type="text" name="depo_code" id="depo_code"
-               class="form-control @error('depo_code') is-invalid @enderror"
-               value="{{ old('depo_code', $depo->depo_code ?? '') }}" required>
-        @error('depo_code') <div class="text-danger">{{ $message }}</div> @enderror
-    </div>
+    <div class="row g-3">
+        {{-- LEFT SIDE --}}
+        <div class="col-md-6">
+            {{-- Depo Code --}}
+            <div class="mb-3">
+                <label for="depo_code" class="form-label">Depo Code <span class="text-danger">*</span></label>
+                <input type="text" name="depo_code" id="depo_code"
+                    class="form-control @error('depo_code') is-invalid @enderror"
+                    value="{{ old('depo_code', $depo->depo_code ?? '') }}" required>
+                @error('depo_code') <div class="text-danger">{{ $message }}</div> @enderror
+            </div>
 
-    {{-- Depo Name --}}
-    <div class="mb-3">
-        <label for="depo_name" class="form-label">Depo Name <span class="text-danger">*</span></label>
-        <input type="text" name="depo_name" id="depo_name"
-               class="form-control @error('depo_name') is-invalid @enderror"
-               value="{{ old('depo_name', $depo->depo_name ?? '') }}" required>
-        @error('depo_name') <div class="text-danger">{{ $message }}</div> @enderror
-    </div>
+            {{-- Depo Name --}}
+            <div class="mb-3">
+                <label for="depo_name" class="form-label">Depo Name <span class="text-danger">*</span></label>
+                <input type="text" name="depo_name" id="depo_name"
+                    class="form-control @error('depo_name') is-invalid @enderror"
+                    value="{{ old('depo_name', $depo->depo_name ?? '') }}" required>
+                @error('depo_name') <div class="text-danger">{{ $message }}</div> @enderror
+            </div>
 
-    {{-- Manage By --}}
-    <div class="mb-3">
-        <label for="manage_by" class="form-label">Manage By</label>
-        <select name="manage_by" id="manage_by" class="form-select">
-            <option value="">-- Select Manage By --</option>
-            @foreach($designation as $desig)
-                <option value="{{ $desig->id }}"
-                    {{ old('manage_by', $depo->manage_by ?? '') == $desig->id ? 'selected' : '' }}>
-                    {{ $desig->name }}
-                </option>
-            @endforeach
-        </select>
-    </div>
+            {{-- Manage By --}}
+            <div class="mb-3">
+                <label for="manage_by" class="form-label">Manage By</label>
+                <select name="manage_by" id="manage_by" class="form-select">
+                    <option value="">-- Select Manage By --</option>
+                    @foreach($designation as $desig)
+                        <option value="{{ $desig->id }}"
+                            {{ old('manage_by', $depo->manage_by ?? '') == $desig->id ? 'selected' : '' }}>
+                            {{ $desig->name }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
 
-    {{-- State --}}
-    <div class="mb-3">
-        <label for="state_id" class="form-label">State</label>
-        <select name="state_id" id="state_id" class="form-select">
-            <option value="">-- Select State --</option>
-            @foreach($states as $state)
-                <option value="{{ $state->id }}"
-                    {{ old('state_id', $depo->state_id ?? '') == $state->id ? 'selected' : '' }}>
-                    {{ $state->name }}
-                </option>
-            @endforeach
-        </select>
-    </div>
+            {{-- City --}}
+            <div class="mb-3">
+                <label for="city" class="form-label">City</label>
+                <input type="text" name="city" id="city" class="form-control"
+                    value="{{ old('city', $depo->city ?? '') }}">
+            </div>
+        </div>
 
-    {{-- District --}}
-    <div class="mb-3">
-        <label for="district_id" class="form-label">District</label>
-        <select name="district_id" id="district_id" class="form-select">
-            <option value="">-- Select District --</option>
-            @if(!empty($districts))
-                @foreach($districts as $district)
-                    <option value="{{ $district->id }}"
-                        {{ old('district_id', $depo->district_id ?? '') == $district->id ? 'selected' : '' }}>
-                        {{ $district->name }}
-                    </option>
-                @endforeach
-            @endif
-        </select>
-    </div>
+        {{-- RIGHT SIDE --}}
+        <div class="col-md-6">
+            {{-- State --}}
+            <div class="mb-3">
+                <label for="state_id" class="form-label">State</label>
+                <select name="state_id" id="state_id" class="form-select">
+                    <option value="">-- Select State --</option>
+                    @foreach($states as $state)
+                        <option value="{{ $state->id }}"
+                            {{ old('state_id', $depo->state_id ?? '') == $state->id ? 'selected' : '' }}>
+                            {{ $state->name }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
 
-    {{-- Tehsil --}}
-    <div class="mb-3">
-        <label for="tehsil_id" class="form-label">Tehsil (Taluka)</label>
-        <select name="tehsil_id" id="tehsil_id" class="form-select">
-            <option value="">-- Select Tehsil --</option>
-            @if(!empty($tehsils))
-                @foreach($tehsils as $tehsil)
-                    <option value="{{ $tehsil->id }}"
-                        {{ old('tehsil_id', $depo->tehsil_id ?? '') == $tehsil->id ? 'selected' : '' }}>
-                        {{ $tehsil->name }}
-                    </option>
-                @endforeach
-            @endif
-        </select>
-    </div>
+            {{-- District --}}
+            <div class="mb-3">
+                <label for="district_id" class="form-label">District</label>
+                <select name="district_id" id="district_id" class="form-select">
+                    <option value="">-- Select District --</option>
+                    @if(!empty($districts))
+                        @foreach($districts as $district)
+                            <option value="{{ $district->id }}"
+                                {{ old('district_id', $depo->district_id ?? '') == $district->id ? 'selected' : '' }}>
+                                {{ $district->name }}
+                            </option>
+                        @endforeach
+                    @endif
+                </select>
+            </div>
 
-    {{-- City --}}
-    <div class="mb-3">
-        <label for="city" class="form-label">City</label>
-        <input type="text" name="city" id="city" class="form-control"
-               value="{{ old('city', $depo->city ?? '') }}">
+            {{-- Tehsil --}}
+            <div class="mb-3">
+                <label for="tehsil_id" class="form-label">Tehsil (Taluka)</label>
+                <select name="tehsil_id" id="tehsil_id" class="form-select">
+                    <option value="">-- Select Tehsil --</option>
+                    @if(!empty($tehsils))
+                        @foreach($tehsils as $tehsil)
+                            <option value="{{ $tehsil->id }}"
+                                {{ old('tehsil_id', $depo->tehsil_id ?? '') == $tehsil->id ? 'selected' : '' }}>
+                                {{ $tehsil->name }}
+                            </option>
+                        @endforeach
+                    @endif
+                </select>
+            </div>
+        </div>
     </div>
-
-    
 
     {{-- Buttons --}}
-    <button type="submit" class="btn btn-primary">{{ $method === 'PUT' ? 'Update' : 'Save' }}</button>
-    <a href="{{ route('depos.index') }}" class="btn btn-secondary">Cancel</a>
+    <div class="mt-4 text-end">
+        <button type="submit" class="btn btn-primary">
+            {{ $method === 'PUT' ? 'Update' : 'Save' }}
+        </button>
+        <a href="{{ route('depos.index') }}" class="btn btn-secondary">Cancel</a>
+    </div>
 </form>
 
 @push('scripts')

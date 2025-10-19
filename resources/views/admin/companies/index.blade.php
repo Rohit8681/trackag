@@ -25,11 +25,11 @@
                         <div class="card mb-4">
                             <div class="card-header">
                                 <h3 class="card-title">Company Control Panel</h3>
-                                {{-- @can('create_companies') --}}
+                                @if(auth()->user() && auth()->user()->hasRole('master_admin'))
                                     <a href="{{ route('companies.create') }}" class="btn btn-primary float-end">
                                         Add New Company
                                     </a>
-                                {{-- @endcan --}}
+                                @endif
                             </div>
 
                             <div class="card-body">
@@ -50,6 +50,8 @@
                                                 <th>Start Date</th>
                                                 <th>End Date</th>
                                                 <th>Assign User</th>
+                                                <th>Comapny Url</th>
+                                                <th>Password</th>
                                                 <th>Status</th>
                                                 <th>Created At</th>
                                                 <th>Updated At</th>
@@ -66,6 +68,8 @@
                                                     <td>{{ $company->validity_upto ? \Carbon\Carbon::parse($company->validity_upto)->format('m/d/Y') : '-' }}</td>
 
                                                     <td>{{ $company->user_assigned ?? '-' }}</td>
+                                                    <td>{{ $company->subdomain }}</td>
+                                                    <td>{{ $company->password }}</td>
                                                     <td>
                                                          @can('toggle_companies')
                                                         <form action="{{ route('companies.toggle', $company->id) }}" method="POST">
@@ -81,19 +85,21 @@
                                                             {{ $company->is_active ? 'Active' : 'Inactive' }}
                                                         @endcan
                                                     </td>
-
+                                                    
                                                     <td>{{ $company->created_at->format('Y-m-d H:i') }}</td>
                                                     <td>{{ $company->updated_at->format('Y-m-d H:i') }}</td>
                                                     <td>
+                                                         @if(auth()->user() && auth()->user()->hasRole('master_admin'))
                                                         <a href="{{ route('companies.show', $company) }}" class="text-info me-2" title="View">
                                                             <i class="fas fa-eye"></i></a>&nbsp;&nbsp;
+                                                        @endif
 
-                                                        {{-- @can('edit_companies') --}}
+                                                        @if(auth()->user() && auth()->user()->hasRole('master_admin'))
                                                             <a href="{{ route('companies.edit', $company) }}" class="text-warning me-2" title="Edit">
                                                                 <i class="fas fa-edit"></i></a>&nbsp;&nbsp;
-                                                        {{-- @endcan --}}
+                                                        @endif
 
-                                                        @can('delete_companies')
+                                                        @if(auth()->user() && auth()->user()->hasRole('master_admin'))
                                                             <form action="{{ route('companies.destroy', $company) }}" method="POST" class="d-inline"
                                                                 onsubmit="return confirm('Are you sure to delete this company?')">
                                                                 @csrf
@@ -102,12 +108,12 @@
                                                                     <i class="fas fa-trash"></i>
                                                                 </button>
                                                             </form>
-                                                        @endcan
+                                                        @endif
                                                     </td>
                                                 </tr>
                                             @empty
                                                 <tr>
-                                                    <td colspan="9" class="text-center text-muted">No companies found.</td>
+                                                    <td colspan="13" class="text-center text-muted">No companies found.</td>
                                                 </tr>
                                             @endforelse
                                         </tbody>

@@ -5,7 +5,7 @@
     <div class="container-fluid py-4">
         <h3>Edit Company</h3>
 
-        @if ($errors->any())
+        {{-- @if ($errors->any())
             <div class="alert alert-danger">
                 <ul class="mb-0">
                     @foreach ($errors->all() as $error)
@@ -13,7 +13,7 @@
                     @endforeach
                 </ul>
             </div>
-        @endif
+        @endif --}}
 
         <form action="{{ route('companies.update', $company->id) }}" method="POST" enctype="multipart/form-data">
             @csrf
@@ -23,74 +23,81 @@
                 <div class="card-header"><h5>Company Information</h5></div>
                 <div class="card-body row g-3">
 
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <label class="form-label">Company Name <span class="text-danger">*</span></label>
                         <input type="text" name="name" class="form-control"
                                value="{{ old('name', $company->name) }}" required>
                     </div>
 
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <label class="form-label">Owner Name</label>
                         <input type="text" name="owner_name" class="form-control"
                                value="{{ old('owner_name', $company->owner_name) }}">
                     </div>
 
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <label class="form-label">Company Code <span class="text-danger">*</span></label>
                         <input type="text" readonly name="code" class="form-control"
                                value="{{ old('code', $company->code) }}">
                     </div>
 
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <label class="form-label">GST Number</label>
                         <input type="text" name="gst_number" class="form-control"
                                value="{{ old('gst_number', $company->gst_number) }}">
                     </div>
 
-                    <div class="col-md-12">
+                    <div class="col-md-8">
                         <label class="form-label">Address</label>
-                        <textarea name="address" class="form-control">{{ old('address', $company->address) }}</textarea>
+                        <textarea name="address" rows="1" class="form-control">{{ old('address', $company->address) }}</textarea>
                     </div>
 
-                    <div class="col-md-6">
-                        <label class="form-label">Contact No</label>
-                        <input type="text" name="contact_no" class="form-control"
-                               value="{{ old('contact_no', $company->contact_no) }}">
-                    </div>
+                    
 
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <label class="form-label">Contact No 2</label>
                         <input type="text" name="contact_no2" class="form-control mobile_no"
                                value="{{ old('contact_no2', $company->contact_no2) }}">
                     </div>
 
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <label class="form-label">Telephone No</label>
                         <input type="text" name="telephone_no" class="form-control mobile_no"
                                value="{{ old('telephone_no', $company->telephone_no) }}">
                     </div>
 
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <label class="form-label">Email</label>
                         <input type="email" name="email" class="form-control"
                                value="{{ old('email', $company->email) }}">
                     </div>
 
-                    <div class="col-md-6">
-                        <label class="form-label">Logo (PNG)</label><br>
-                        @if($company->logo)
-                            <img src="{{ asset('storage/'.$company->logo) }}" height="50" class="mb-2">
-                        @endif
-                        <input type="file" name="logo" class="form-control" accept="image/png">
+                    <div class="col-md-4">
+                        <label class="form-label d-block mb-2">Logo (PNG)</label>
+                        <div class="d-flex align-items-center gap-3">
+                            @if($company->logo)
+                                <img src="{{ asset('storage/'.$company->logo) }}" 
+                                    alt="Logo Preview"
+                                    height="50" width="50"
+                                    class="rounded border">
+                            @else
+                                <div class="border rounded bg-light d-flex align-items-center justify-content-center"
+                                    style="height:50px; width:50px;">
+                                    <i class="fas fa-image text-muted"></i>
+                                </div>
+                            @endif
+
+                            <input type="file" name="logo" class="form-control w-auto" accept="image/png">
+                        </div>
                     </div>
 
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <label class="form-label">Website</label>
                         <input type="url" name="website" class="form-control"
                                value="{{ old('website', $company->website) }}">
                     </div>
 
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <label class="form-label">State Working</label>
                         <select name="state[]" class="form-control" multiple>
                             @foreach($state as $s)
@@ -102,19 +109,19 @@
                         </select>
                     </div>
 
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <label class="form-label">Product Name</label>
                         <input type="text" name="product_name" class="form-control"
                                value="{{ old('product_name', $company->product_name) }}">
                     </div>
 
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <label class="form-label">Subscription Type</label>
                         <input type="text" name="subscription_type" class="form-control"
                                value="{{ old('subscription_type', $company->subscription_type) }}">
                     </div>
 
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <label class="form-label">Tally Configuration</label>
                         <select name="tally_configuration" class="form-select">
                             <option value="0" {{ old('tally_configuration', $company->tally_configuration) == 0 ? 'selected' : '' }}>No</option>
@@ -146,14 +153,19 @@
             <div class="card mb-4">
                 <div class="card-header"><h5>Admin User Information</h5></div>
                 <div class="card-body row g-3">
-                    <div class="col-md-6">
+                    <div class="col-md-4">
+                        <label class="form-label">Contact No<span class="text-danger">*</span></label>
+                        <input type="text" name="contact_no" class="form-control"
+                               value="{{ old('contact_no', $company->contact_no) }}">
+                    </div>
+                    <div class="col-md-4">
                         <label class="form-label">Password <span class="text-danger">*</span></label>
                         <input type="password" name="user_password" class="form-control @error('user_password') is-invalid @enderror">
                         @error('user_password')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <label class="form-label">Confirm Password <span class="text-danger">*</span></label>
                         <input type="password" name="user_password_confirmation" class="form-control">
                     </div>

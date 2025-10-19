@@ -56,7 +56,7 @@ class User extends Authenticatable
         'tehsil_id',
         'latitude',
         'longitude',
-        'pincode_id',
+        'pincode',
         'depo',
         'postal_address',
         'status',
@@ -156,7 +156,7 @@ class User extends Authenticatable
 
     public function depos()
     {
-        return $this->belongsTo(Depo::class, 'depo', 'id');
+        return $this->belongsTo(Depo::class, 'depo_id', 'id');
     }
 
 }

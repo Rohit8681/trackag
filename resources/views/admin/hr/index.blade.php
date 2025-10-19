@@ -58,7 +58,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="5">No designations found.</td>
+                                        <td colspan="5" class="text-center text-muted">No designations found.</td>
                                     </tr>
                                 @endforelse
                             </tbody>
@@ -72,6 +72,19 @@
 @push('scripts')
 <script>
 $(document).ready(function () {
+    var designationsCount = @json($designations->count());
+    if (designationsCount > 0) {
+        $('#designation-table').DataTable({
+            responsive: true,
+            autoWidth: false,
+            pageLength: 10,
+            lengthMenu: [5, 10, 25, 50],
+            columnDefs: [
+                { orderable: false, targets: -1 } 
+            ]
+        });
+    }
+
     $('.toggle-status').change(function () {
         let status = $(this).prop('checked') ? 1 : 0;
         let designation_id = $(this).data('id');

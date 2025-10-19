@@ -22,9 +22,8 @@ class Role extends Model
      */
     protected $fillable = [
         'name',
-        'guard_name', // optional, but usually needed for Spatie package
+        'guard_name', 
     ];
 
-    // If you have timestamps, you can add this or remove if not needed
     public $timestamps = true;
 }

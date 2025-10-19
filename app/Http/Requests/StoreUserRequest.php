@@ -16,7 +16,7 @@ class StoreUserRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
+            'email' => 'nullable|email|unique:users,email',
             'password' => 'required|confirmed|min:6',
             'mobile' => 'nullable|string|max:20',
             'date_of_birth' => 'nullable|date',
@@ -27,8 +27,7 @@ class StoreUserRequest extends FormRequest
             'district_id' => 'nullable|exists:districts,id',
             'city_id' => 'nullable|exists:cities,id',
             'tehsil_id' => 'nullable|exists:tehsils,id',
-
-            'pincode_id' => 'nullable|string',
+            'pincode' => 'nullable|string',
             'postal_address' => 'nullable|string',
             'latitude' => 'nullable|string',
             'longitude' => 'nullable|string',
@@ -45,9 +44,7 @@ class StoreUserRequest extends FormRequest
             'image' => 'nullable|image|max:5120',
             'roles' => 'nullable|array',
             'company_id' => 'nullable|exists:companies,id',
-
-            // 🆕 Newly Added Fields
-            'company_mobile' => 'nullable|string|max:20',
+            'company_mobile' => 'required|string|max:20',
             'village' => 'nullable|string|max:100',
             'depo_id' => 'nullable|exists:depos,id',
             'is_web_login_access' => 'nullable|boolean',
