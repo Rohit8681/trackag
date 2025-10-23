@@ -37,6 +37,7 @@ class Kernel extends HttpKernel
         'domain.redirect' => \App\Http\Middleware\DomainRedirectMiddleware::class,
         'ensure.tenant.db' => \App\Http\Middleware\EnsureTenantDatabase::class,
         'prevent.central' => \Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains::class,
+        'tenant.auth' => \App\Http\Middleware\TenantAuthenticate::class,
     ];
 
     // protected $routeMiddleware = [
