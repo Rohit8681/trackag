@@ -25,13 +25,21 @@
             <div class="container-fluid">
                 <div class="card card-primary card-outline mb-4">
                     <!-- Card Header -->
-                    <div class="card-header">
-                        <h5 class="card-title">Customer List</h5>
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">Customer List</h5>
+
                         @can('create_customers')
-                            <a href="{{ route('customers.create') }}" class="btn btn-sm btn-primary float-end">Add Customer</a>
-                            <button class="btn btn-sm btn-success float-end" data-bs-toggle="modal" data-bs-target="#importModal">
-                                <i class="fas fa-file-import"></i> Import Customers
-                            </button>
+                            <div class="d-flex ms-auto">
+                                <!-- Add Customer Button -->
+                                <a href="{{ route('customers.create') }}" class="btn btn-sm btn-primary me-2">
+                                    Add Customer
+                                </a>
+
+                                <!-- Import Customers Button -->
+                                <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#importModal">
+                                    <i class="fas fa-file-import me-1"></i> Import Customers
+                                </button>
+                            </div>
                         @endcan
                     </div>
 
