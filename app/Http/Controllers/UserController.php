@@ -26,17 +26,12 @@ use App\Models\TourType;
 use App\Models\VehicleType;
 use Illuminate\Support\Facades\Hash;
 
-
-
 class UserController extends Controller
 {
-    
     public function index(Request $request)
     {
         Session::put('page', 'dashboard');
-
         $query = User::with(['roles', 'permissions', 'state', 'district', 'tehsil', 'city', 'reportingManager', 'activeSessions', 'depos', 'designation'])->latest();
-
         // Filters
         if ($request->filled('state_id')) {
             $query->where('state_id', $request->state_id);
@@ -54,7 +49,6 @@ class UserController extends Controller
             $query->where('is_active', $request->status);
         }
 
-        // Company restriction
         $maxUsers = 0;
         if (auth()->user()->user_level !== 'master_admin') {
             $getcompany = Company::find(1);

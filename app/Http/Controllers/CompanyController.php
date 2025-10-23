@@ -30,7 +30,7 @@ class CompanyController extends Controller
         return view('admin.companies.index', compact('companies'));
     }
 
-    
+
     public function create()
     {
         $authUser = auth()->user();
@@ -41,19 +41,19 @@ class CompanyController extends Controller
 
         $companies = $authUser->user_level === 'master_admin'
             ? Company::all()
-            : collect(); 
+            : collect();
 
         $users = User::when($authUser->user_level !== 'master_admin', function ($query) use ($authUser) {
-                $query->where('company_id', $authUser->company_id);
-            })->get();
+            $query->where('company_id', $authUser->company_id);
+        })->get();
 
         $designations = $authUser->user_level === 'master_admin'
-        ? Designation::all()
-        : Designation::where('company_id', $authUser->company_id)->get();
+            ? Designation::all()
+            : Designation::where('company_id', $authUser->company_id)->get();
 
-        $state = State::where('status',1)->get();
-        
-        return view('admin.companies.create',[
+        $state = State::where('status', 1)->get();
+
+        return view('admin.companies.create', [
             'states' => State::all(),
             'designations' => $designations,
             'users' => $users, // ✅ added here
@@ -64,632 +64,240 @@ class CompanyController extends Controller
             'state' => $state
         ]);
     }
-    
-    // public function store(StoreCompanyRequest $request)
-    // {
-    //     $validated = $request->validated();
-    //     if ($request->hasFile('logo')) {
-    //         $validated['logo'] = $request->file('logo')->store('logos', 'public');
-    //     }
-
-    //     $subdomain = Str::slug($validated['code'], '-');
-    //     $centralDomain = env('CENTRAL_DOMAIN', 'test'); 
-    //     $fullDomain = $subdomain . '.' . $centralDomain;
-    //     $tenancyDbName = 'tenant_' . Str::slug($subdomain, '_');
-
-    //     $company = null;
-    //     $tenant = null;
-
-    //     try {
-    //         DB::statement("CREATE DATABASE IF NOT EXISTS `$tenancyDbName` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
-
-    //         DB::beginTransaction();
-    //         try {
-    //             $company = Company::create([
-    //                 'name' => $validated['name'],
-    //                 'code' => $validated['code'] ?? null,
-    //                 'owner_name' => $validated['owner_name'] ?? null,
-    //                 'email' => $validated['email'] ?? null,
-    //                 'password' => $validated['user_password'] ?? null,
-    //                 'gst_number' => $validated['gst_number'] ?? null,
-    //                 'address' => $validated['address'] ?? null,
-    //                 'contact_no' => $validated['contact_no'] ?? null,
-    //                 'contact_no2' => $validated['contact_no2'] ?? null,
-    //                 'telephone_no' => $validated['telephone_no'] ?? null,
-    //                 'website' => $validated['website'] ?? null,
-    //                 'state' => !empty($validated['state']) ? implode(',', $validated['state']) : null,
-    //                 'product_name' => $validated['product_name'] ?? null,
-    //                 'subscription_type' => $validated['subscription_type'] ?? null,
-    //                 'tally_configuration' => $validated['tally_configuration'] ?? 0,
-    //                 'logo' => $validated['logo'] ?? null,
-    //                 'subdomain' => $fullDomain,
-    //                 'start_date' => $validated['start_date'] ?? null,
-    //                 'validity_upto' => $validated['validity_upto'] ?? null,
-    //                 'user_assigned' => $validated['user_assigned'] ?? null,
-    //                 'created_at' => now(),
-    //                 'updated_at' => now()
-    //             ]);
-
-    //             $tenant = Tenant::create([
-    //                 'id' => (string) Str::uuid(),
-    //                 'data' => [
-    //                     'company_id' => $company->id,
-    //                     'database' => $tenancyDbName,
-    //                 ],
-    //                 'tenancy_db_name' => $tenancyDbName,
-    //             ]);
-
-    //             $tenant->domains()->create(['domain' => $fullDomain]);
-    //             $company->update(['tenant_id' => $tenant->id]);
-
-    //             DB::commit();
-    //         } catch (\Exception $e) {
-    //             try {
-    //                 DB::rollBack();
-    //             } catch (\Exception $rollbackEx) {
-    //                 Log::warning('Central DB rollback failed: ' . $rollbackEx->getMessage());
-    //             }
-    //             throw $e; 
-    //         }
-
-    //         tenancy()->initialize($tenant);
-    //         $tenantConnection = config('database.connections.tenant');
-    //         $tenantConnection['database'] = $tenancyDbName;
-    //         config(['database.connections.tenant' => $tenantConnection]);
-    //         DB::purge('tenant');
-    //         DB::reconnect('tenant');
-
-    //         $exitCode = Artisan::call('migrate', [
-    //             '--database' => 'tenant',
-    //             '--path' => 'database/migrations/tenant',
-    //             '--force' => true,
-    //         ]);
-
-    //         if ($exitCode !== 0) {
-    //             throw new \Exception('Tenant migrations failed: ' . Artisan::output());
-    //         }
-
-    //         $tenantData = [
-    //             'id' => $tenant->id,
-    //             'data' => $tenant->data,
-    //             'created_at' => now(),
-    //             'updated_at' => now(),
-    //         ];
-    //         $existingTenant = DB::connection('tenant')->table('tenants')
-    //             ->where('id', $tenant->id)
-    //             ->first();
-    //         if (!$existingTenant) {
-    //             DB::connection('tenant')->table('tenants')->insert($tenantData);
-    //         }
-
-    //         $tenantCompanyData = [
-    //             'name' => $company->name,
-    //             'code' => $company->code,
-    //             'owner_name' => $company->owner_name,
-    //             'email' => $company->email,
-    //             'password' => $validated['user_password'] ?? null,
-    //             'gst_number' => $company->gst_number,
-    //             'address' => $company->address,
-    //             'contact_no' => $company->contact_no,
-    //             'contact_no2' => $company->contact_no2,
-    //             'telephone_no' => $company->telephone_no,
-    //             'website' => $company->website,
-    //             'state' => $company->state,
-    //             'state' => !empty($company->state) ? $company->state : null,
-    //             'product_name' => $company->product_name,
-    //             'subscription_type' => $company->subscription_type,
-    //             'tally_configuration' => $company->tally_configuration,
-    //             'logo' => $company->logo,
-    //             'subdomain' => $fullDomain,
-    //             'start_date' => $validated['start_date'] ?? null,
-    //             'validity_upto' => $validated['validity_upto'] ?? null,
-    //             'user_assigned' => $validated['user_assigned'] ?? null,
-    //             'tenant_id' => $tenant->id,
-    //             'created_at' => now(),
-    //             'updated_at' => now(),
-    //         ];
-    //         $existingTenantCompany = DB::connection('tenant')->table('companies')
-    //             ->where('code', $company->code)
-    //             ->first();
-    //         if (!$existingTenantCompany) {
-    //             DB::connection('tenant')->table('companies')->insert($tenantCompanyData);
-    //         }
-
-    //         $seedersPath = database_path('seeders');
-    //         $seederFiles = collect(\File::files($seedersPath))
-    //             ->filter(fn($file) => str_ends_with($file->getFilename(), 'Seeder.php'))
-    //             ->map(fn($file) => 'Database\\Seeders\\' . str_replace('.php', '', $file->getFilename()))
-    //             ->values();
-
-    //         $seederOrder = [
-    //             'CountrySeeder',
-    //             'StateSeeder',
-    //             'DistrictSeeder',
-    //             'CitiesSeeder',
-    //             'TehsilSeeder',
-    //             'RoleSeeder',
-    //             'PermissionSeeder'
-    //         ];
-    //         $orderedSeederFiles = collect($seederOrder)
-    //             ->map(fn($class) => 'Database\\Seeders\\' . $class)
-    //             ->filter(fn($class) => $seederFiles->contains($class))
-    //             ->values();
-    //         $remainingSeeders = $seederFiles->diff($orderedSeederFiles)->values();
-    //         $finalSeederList = $orderedSeederFiles->merge($remainingSeeders);
-    //         DB::connection('tenant')->statement('SET FOREIGN_KEY_CHECKS=0;');
-    //         try {
-    //             foreach ($finalSeederList as $seederClass) {
-    //                 if (in_array($seederClass, [
-    //                     'Database\\Seeders\\DatabaseSeeder',
-    //                     'Database\\Seeders\\MultiCompanySeeder',
-    //                     'Database\\Seeders\\TripSeeder',
-    //                     'Database\\Seeders\\UserSeeder',
-    //                     'Database\\Seeders\\DesignationSeeder',
-    //                     'Database\\Seeders\\CitySeeder',
-    //                     'Database\\Seeders\\CustomerSeeder',
-    //                     'Database\\Seeders\\LookupTablesSeeder',
-    //                     'Database\\Seeders\\MultiCompanySeeder',
-    //                     'Database\\Seeders\\PincodeSeeder',
-    //                     'Database\\Seeders\\TripLogSeeder',
-    //                     'Database\\Seeders\\TripSeeder'
-    //                 ])) {
-    //                     continue;
-    //                 }
-    //                 Log::info("Seeder start: {$seederClass}");
-    //                 Artisan::call('db:seed', [
-    //                     '--class' => $seederClass,
-    //                     '--database' => 'tenant',
-    //                     '--force' => true,
-    //                 ]);
-    //             }
-    //         } catch (\Exception $seederEx) {
-    //             Log::error("Seeder failed: {$seederClass} - " . $seederEx->getMessage());
-    //             throw new \Exception("Seeder failed: {$seederClass} - " . $seederEx->getMessage());
-    //         } finally {
-    //             DB::connection('tenant')->statement('SET FOREIGN_KEY_CHECKS=1;');
-    //         }
-
-    //         $userData = [
-    //             'name' => $validated['name'],
-    //             'email' => $validated['email'],
-    //             'password' => Hash::make($validated['user_password']),
-    //             'mobile' => $validated['contact_no'] ?? null,
-    //             'address' => $validated['address'] ?? null,
-    //             'user_level' => 'company_admin',
-    //             'is_active' => true,
-    //             'created_at' => now(),
-    //             'updated_at' => now(),
-    //         ];
-    //         $userId = DB::connection('tenant')->table('users')->insertGetId($userData);
-    //         $tenantUserModel = new \App\Models\User(); // tenant user model
-    //         $tenantUserModel->setConnection('tenant');
-    //         $user = $tenantUserModel->find($userId);
-
-    //         if ($user) {
-    //             $user->assignRole('sub_admin');
-    //         }
-    //         return redirect()->route('companies.index')
-    //             ->with('success', "Company & Admin created successfully. Domain: {$fullDomain}");
-
-    //     } catch (\Exception $e) {
-    //         Log::error('Company/Tenant creation failed: ' . $e->getMessage());
-
-    //         // Clean up
-    //         if ($tenant) {
-    //             try { $tenant->delete(); } catch (\Throwable $ex) {
-    //                 Log::warning('Failed to delete tenant: ' . $ex->getMessage());
-    //             }
-    //         }
-    //         if ($company) {
-    //             try { $company->delete(); } catch (\Throwable $ex) {
-    //                 Log::warning('Failed to delete company: ' . $ex->getMessage());
-    //             }
-    //         }
-    //         try { DB::statement("DROP DATABASE IF EXISTS `$tenancyDbName`"); } catch (\Throwable $ex) {
-    //             Log::warning('Failed to drop database: ' . $ex->getMessage());
-    //         }
-
-    //         // Provide detailed error message
-    //         $errorMsg = $e->getMessage();
-    //         if (str_contains($errorMsg, 'Integrity constraint violation')) {
-    //             $errorMsg = "A database seeder failed due to missing parent data or foreign key mismatch. Ensure parent tables (e.g., tenants) are created and seeded. Error: " . $errorMsg;
-    //         } elseif (str_contains($errorMsg, "Field 'subdomain' doesn't have a default value")) {
-    //             $errorMsg = "The companies table in the tenant database requires a 'subdomain' value. Ensure the DatabaseSeeder or other seeders include the subdomain field. Error: " . $errorMsg;
-    //         } elseif (str_contains($errorMsg, 'no active transaction')) {
-    //             $errorMsg = "A transaction error occurred, likely due to a DDL operation. Error: " . $errorMsg;
-    //         }
-
-    //         return back()->withInput()
-    //             ->withErrors(['error' => 'Onboarding failed: ' . $errorMsg]);
-    //     }
-    // }
-
-    
 
 
-// public function store(StoreCompanyRequest $request)
-// {
-//     $validated = $request->validated();
 
-//     // Handle logo upload
-//     if ($request->hasFile('logo')) {
-//         $validated['logo'] = $request->file('logo')->store('logos', 'public');
-//     }
+    public function store(StoreCompanyRequest $request)
+    {
+        $validated = $request->validated();
 
-//     $subdomain = Str::slug($validated['code'], '-');
-//     $centralDomain = env('CENTRAL_DOMAIN', 'test'); 
-//     $fullDomain = $subdomain . '.' . $centralDomain;
-//     $tenancyDbName = 'tenant_' . Str::slug($subdomain, '_');
+        // Handle logo upload
+        if ($request->hasFile('logo')) {
+            $validated['logo'] = $request->file('logo')->store('logos', 'public');
+        }
 
-//     $company = null;
-//     $tenant = null;
+        $subdomain = Str::slug($validated['code'], '-');
+        $centralDomain = env('CENTRAL_DOMAIN', 'test');
+        $fullDomain = $subdomain . '.' . $centralDomain;
+        $tenancyDbName = 'tenant_' . Str::slug($subdomain, '_');
 
-//     try {
-//         // 1️⃣ Create tenant database
-//         DB::statement("CREATE DATABASE IF NOT EXISTS `$tenancyDbName` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+        $company = null;
+        $tenant = null;
 
-//         DB::beginTransaction();
-//         try {
-//             // 2️⃣ Create company in central DB
-//             $company = Company::create([
-//                 'name' => $validated['name'],
-//                 'code' => $validated['code'] ?? null,
-//                 'owner_name' => $validated['owner_name'] ?? null,
-//                 'email' => $validated['email'] ?? null,
-//                 'password' => $validated['user_password'] ?? null,
-//                 'gst_number' => $validated['gst_number'] ?? null,
-//                 'address' => $validated['address'] ?? null,
-//                 'contact_no' => $validated['contact_no'] ?? null,
-//                 'contact_no2' => $validated['contact_no2'] ?? null,
-//                 'telephone_no' => $validated['telephone_no'] ?? null,
-//                 'website' => $validated['website'] ?? null,
-//                 'state' => !empty($validated['state']) ? implode(',', $validated['state']) : null,
-//                 'product_name' => $validated['product_name'] ?? null,
-//                 'subscription_type' => $validated['subscription_type'] ?? null,
-//                 'tally_configuration' => $validated['tally_configuration'] ?? 0,
-//                 'logo' => $validated['logo'] ?? null,
-//                 'subdomain' => $fullDomain,
-//                 'start_date' => $validated['start_date'] ?? null,
-//                 'validity_upto' => $validated['validity_upto'] ?? null,
-//                 'user_assigned' => $validated['user_assigned'] ?? null,
-//                 'created_at' => now(),
-//                 'updated_at' => now()
-//             ]);
-
-//             // 3️⃣ Create tenant record
-//             $tenant = Tenant::create([
-//                 'id' => (string) Str::uuid(),
-//                 'data' => [
-//                     'company_id' => $company->id,
-//                     'database' => $tenancyDbName,
-//                 ],
-//                 'tenancy_db_name' => $tenancyDbName,
-//             ]);
-
-//             $tenant->domains()->create(['domain' => $fullDomain]);
-//             $company->update(['tenant_id' => $tenant->id]);
-
-//             DB::commit();
-//         } catch (\Exception $e) {
-//             DB::rollBack();
-//             throw $e;
-//         }
-
-//         // 4️⃣ Initialize tenant
-//         tenancy()->initialize($tenant);
-
-//         // 5️⃣ Set tenant DB connection dynamically
-//         $tenantConnection = config('database.connections.tenant');
-//         $tenantConnection['database'] = $tenancyDbName;
-//         config(['database.connections.tenant' => $tenantConnection]);
-//         DB::purge('tenant');
-//         DB::reconnect('tenant');
-
-//         // 6️⃣ Run tenant migrations
-//         Artisan::call('migrate', [
-//             '--database' => 'tenant',
-//             '--path' => 'database/migrations/tenant',
-//             '--force' => true,
-//         ]);
-
-//         // 7️⃣ Seed tenant data
-//         $seederOrder = [
-//             'CountrySeeder',
-//             'StateSeeder',
-//             'DistrictSeeder',
-//             'CitiesSeeder',
-//             'TehsilSeeder',
-//             // 'RoleSeeder',
-//             'PermissionSeeder'
-//         ];
-
-//         DB::connection('tenant')->statement('SET FOREIGN_KEY_CHECKS=0;');
-//         try {
-//             foreach ($seederOrder as $seederClass) {
-//                 $class = 'Database\\Seeders\\' . $seederClass;
-//                 if (class_exists($class)) {
-//                     Artisan::call('db:seed', [
-//                         '--class' => $class,
-//                         '--database' => 'tenant',
-//                         '--force' => true,
-//                     ]);
-//                 }
-//             }
-//         } finally {
-//             DB::connection('tenant')->statement('SET FOREIGN_KEY_CHECKS=1;');
-//         }
-
-//         // 8️⃣ Create tenant admin user
-//         $userData = [
-//             'name' => $validated['name'],
-//             'email' => $validated['email'],
-//             'password' => Hash::make($validated['user_password']),
-//             'mobile' => $validated['contact_no'] ?? null,
-//             'address' => $validated['address'] ?? null,
-//             'user_level' => 'company_admin',
-//             'is_active' => true,
-//             'created_at' => now(),
-//             'updated_at' => now(),
-//         ];
-
-//         $userId = DB::connection('tenant')->table('users')->insertGetId($userData);
-
-//         // 9️⃣ Load tenant user via Eloquent
-//         $tenantUserModel = new \App\Models\User();
-//         $tenantUserModel->setConnection('tenant');
-//         $user = $tenantUserModel->find($userId);
-
-//         if ($user) {
-//             // Load Role & Permission models for tenant
-//             $roleModel = new \Spatie\Permission\Models\Role();
-//             $roleModel->setConnection('tenant');
-
-//             $permissionModel = new \Spatie\Permission\Models\Permission();
-//             $permissionModel->setConnection('tenant');
-
-//             // 10️⃣ Assign all permissions to sub_admin role
-//             $role = $roleModel->firstOrCreate(['name' => 'sub_admin']);
-//             $allPermissionNames = $permissionModel->pluck('name')->toArray();
-//             $role->syncPermissions($allPermissionNames); // Fills role_has_permissions
-
-//             // 11️⃣ Assign role to user
-//             $user->assignRole($role->name); // User now gets all permissions from role
-//         }
-
-//         return redirect()->route('companies.index')
-//             ->with('success', "Company & Admin created successfully. Domain: {$fullDomain}");
-
-//     } catch (\Exception $e) {
-//         Log::error('Company/Tenant creation failed: ' . $e->getMessage());
-
-//         // Cleanup
-//         if ($tenant) { try { $tenant->delete(); } catch (\Throwable $ex) {} }
-//         if ($company) { try { $company->delete(); } catch (\Throwable $ex) {} }
-//         try { DB::statement("DROP DATABASE IF EXISTS `$tenancyDbName`"); } catch (\Throwable $ex) {}
-
-//         return back()->withInput()
-//             ->withErrors(['error' => 'Onboarding failed: ' . $e->getMessage()]);
-//     }
-// }
-
-public function store(StoreCompanyRequest $request)
-{
-    $validated = $request->validated();
-
-    // Handle logo upload
-    if ($request->hasFile('logo')) {
-        $validated['logo'] = $request->file('logo')->store('logos', 'public');
-    }
-
-    $subdomain = Str::slug($validated['code'], '-');
-    $centralDomain = env('CENTRAL_DOMAIN', 'test'); 
-    $fullDomain = $subdomain . '.' . $centralDomain;
-    $tenancyDbName = 'tenant_' . Str::slug($subdomain, '_');
-
-    $company = null;
-    $tenant = null;
-
-    try {
-        // 1️⃣ Create tenant database
-        DB::statement("CREATE DATABASE IF NOT EXISTS `$tenancyDbName` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
-
-        DB::beginTransaction();
         try {
-            // 2️⃣ Create company in central DB
-            $company = Company::create([
-                'name' => $validated['name'],
-                'code' => $validated['code'] ?? null,
-                'owner_name' => $validated['owner_name'] ?? null,
-                'email' => $validated['email'] ?? null,
+            // 1️⃣ Create tenant database
+            DB::statement("CREATE DATABASE IF NOT EXISTS `$tenancyDbName` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+
+            DB::beginTransaction();
+            try {
+                // 2️⃣ Create company in central DB
+                $company = Company::create([
+                    'name' => $validated['name'],
+                    'code' => $validated['code'] ?? null,
+                    'owner_name' => $validated['owner_name'] ?? null,
+                    'email' => $validated['email'] ?? null,
+                    'password' => $validated['user_password'] ?? null,
+                    'gst_number' => $validated['gst_number'] ?? null,
+                    'address' => $validated['address'] ?? null,
+                    'contact_no' => $validated['contact_no'] ?? null,
+                    'contact_no2' => $validated['contact_no2'] ?? null,
+                    'telephone_no' => $validated['telephone_no'] ?? null,
+                    'website' => $validated['website'] ?? null,
+                    'state' => !empty($validated['state']) ? implode(',', $validated['state']) : null,
+                    'product_name' => $validated['product_name'] ?? null,
+                    'subscription_type' => $validated['subscription_type'] ?? null,
+                    'tally_configuration' => $validated['tally_configuration'] ?? 0,
+                    'logo' => $validated['logo'] ?? null,
+                    'subdomain' => $fullDomain,
+                    'start_date' => $validated['start_date'] ?? null,
+                    'validity_upto' => $validated['validity_upto'] ?? null,
+                    'user_assigned' => $validated['user_assigned'] ?? null,
+                    'created_at' => now()->format('Y-m-d H:i:s'),
+                    'updated_at' => now()->format('Y-m-d H:i:s')
+                ]);
+
+                // 3️⃣ Create tenant record in central DB
+                $tenant = Tenant::create([
+                    'id' => (string) Str::uuid(),
+                    'data' => [
+                        'company_id' => $company->id,
+                        'database' => $tenancyDbName,
+                    ],
+                    'tenancy_db_name' => $tenancyDbName,
+                ]);
+
+                $tenant->domains()->create(['domain' => $fullDomain]);
+                $company->update(['tenant_id' => $tenant->id]);
+
+                DB::commit();
+            } catch (\Exception $e) {
+                DB::rollBack();
+                throw $e;
+            }
+
+            // 4️⃣ Initialize tenant
+            tenancy()->initialize($tenant);
+
+            // 5️⃣ Setup tenant DB connection dynamically
+            $tenantConnection = config('database.connections.tenant');
+            $tenantConnection['database'] = $tenancyDbName;
+            config(['database.connections.tenant' => $tenantConnection]);
+            DB::purge('tenant');
+            DB::reconnect('tenant');
+
+            // 6️⃣ Run tenant migrations
+            Artisan::call('migrate', [
+                '--database' => 'tenant',
+                '--path' => 'database/migrations/tenant',
+                '--force' => true,
+            ]);
+
+            // 7️⃣ Insert tenant record inside tenant DB to satisfy FK
+            DB::connection('tenant')->table('tenants')->insert([
+                'id' => $tenant->id,
+                'data' => json_encode($tenant->data),
+                'created_at' => now()->format('Y-m-d H:i:s'),
+                'updated_at' => now()->format('Y-m-d H:i:s'),
+            ]);
+
+            // 8️⃣ Insert company inside tenant DB (like old version)
+            $tenantCompanyData = [
+                'name' => $company->name,
+                'code' => $company->code,
+                'owner_name' => $company->owner_name,
+                'email' => $company->email,
                 'password' => $validated['user_password'] ?? null,
-                'gst_number' => $validated['gst_number'] ?? null,
-                'address' => $validated['address'] ?? null,
-                'contact_no' => $validated['contact_no'] ?? null,
-                'contact_no2' => $validated['contact_no2'] ?? null,
-                'telephone_no' => $validated['telephone_no'] ?? null,
-                'website' => $validated['website'] ?? null,
-                'state' => !empty($validated['state']) ? implode(',', $validated['state']) : null,
-                'product_name' => $validated['product_name'] ?? null,
-                'subscription_type' => $validated['subscription_type'] ?? null,
-                'tally_configuration' => $validated['tally_configuration'] ?? 0,
-                'logo' => $validated['logo'] ?? null,
+                'gst_number' => $company->gst_number,
+                'address' => $company->address,
+                'contact_no' => $company->contact_no,
+                'contact_no2' => $company->contact_no2,
+                'telephone_no' => $company->telephone_no,
+                'website' => $company->website,
+                'state' => $company->state,
+                'product_name' => $company->product_name,
+                'subscription_type' => $company->subscription_type,
+                'tally_configuration' => $company->tally_configuration,
+                'logo' => $company->logo,
                 'subdomain' => $fullDomain,
                 'start_date' => $validated['start_date'] ?? null,
                 'validity_upto' => $validated['validity_upto'] ?? null,
                 'user_assigned' => $validated['user_assigned'] ?? null,
+                'tenant_id' => $tenant->id,
                 'created_at' => now()->format('Y-m-d H:i:s'),
-                'updated_at' => now()->format('Y-m-d H:i:s')
-            ]);
+                'updated_at' => now()->format('Y-m-d H:i:s'),
+            ];
+            DB::connection('tenant')->table('companies')->insert($tenantCompanyData);
 
-            // 3️⃣ Create tenant record in central DB
-            $tenant = Tenant::create([
-                'id' => (string) Str::uuid(),
-                'data' => [
-                    'company_id' => $company->id,
-                    'database' => $tenancyDbName,
-                ],
-                'tenancy_db_name' => $tenancyDbName,
-            ]);
+            // 9️⃣ Run only important seeders
+            $seederOrder = [
+                'CountrySeeder',
+                'StateSeeder',
+                'DistrictSeeder',
+                'CitiesSeeder',
+                'TehsilSeeder',
+                // 'RoleSeeder',
+                'PermissionSeeder',
+                'LookupTablesSeeder'
+            ];
 
-            $tenant->domains()->create(['domain' => $fullDomain]);
-            $company->update(['tenant_id' => $tenant->id]);
+            DB::connection('tenant')->statement('SET FOREIGN_KEY_CHECKS=0;');
+            try {
+                foreach ($seederOrder as $seederClass) {
+                    $class = 'Database\\Seeders\\' . $seederClass;
+                    if (class_exists($class)) {
+                        Artisan::call('db:seed', [
+                            '--class' => $class,
+                            '--database' => 'tenant',
+                            '--force' => true,
+                        ]);
+                    }
+                }
+            } finally {
+                DB::connection('tenant')->statement('SET FOREIGN_KEY_CHECKS=1;');
+            }
 
-            DB::commit();
+            // 🔟 Create default admin user inside tenant DB
+            $userData = [
+                'name' => $validated['name'],
+                'email' => $validated['email'],
+                'password' => Hash::make($validated['user_password']),
+                'mobile' => $validated['contact_no'] ?? null,
+                'address' => $validated['address'] ?? null,
+                'user_level' => 'company_admin',
+                'is_active' => true,
+                'created_at' => now()->format('Y-m-d H:i:s'),
+                'updated_at' => now()->format('Y-m-d H:i:s'),
+            ];
+
+            $userId = DB::connection('tenant')->table('users')->insertGetId($userData);
+
+            // Assign role & all permissions
+            $tenantUserModel = new \App\Models\User();
+            $tenantUserModel->setConnection('tenant');
+            $user = $tenantUserModel->find($userId);
+
+            if ($user) {
+                $roleModel = new \Spatie\Permission\Models\Role();
+                $roleModel->setConnection('tenant');
+
+                $permissionModel = new \Spatie\Permission\Models\Permission();
+                $permissionModel->setConnection('tenant');
+
+                $role = $roleModel->firstOrCreate(['name' => 'sub_admin']);
+                $permissions = $permissionModel->pluck('name')->toArray();
+
+                if (!empty($permissions)) {
+                    $role->syncPermissions($permissions);
+                }
+
+                $user->assignRole($role->name);
+            }
+
+            return redirect()->route('companies.index')
+                ->with('success', "Company & Admin created successfully. Domain: {$fullDomain}");
         } catch (\Exception $e) {
-            DB::rollBack();
-            throw $e;
-        }
+            Log::error('Company/Tenant creation failed: ' . $e->getMessage());
 
-        // 4️⃣ Initialize tenant
-        tenancy()->initialize($tenant);
-
-        // 5️⃣ Setup tenant DB connection dynamically
-        $tenantConnection = config('database.connections.tenant');
-        $tenantConnection['database'] = $tenancyDbName;
-        config(['database.connections.tenant' => $tenantConnection]);
-        DB::purge('tenant');
-        DB::reconnect('tenant');
-
-        // 6️⃣ Run tenant migrations
-        Artisan::call('migrate', [
-            '--database' => 'tenant',
-            '--path' => 'database/migrations/tenant',
-            '--force' => true,
-        ]);
-
-        // 7️⃣ Insert tenant record inside tenant DB to satisfy FK
-        DB::connection('tenant')->table('tenants')->insert([
-            'id' => $tenant->id,
-            'data' => json_encode($tenant->data),
-            'created_at' => now()->format('Y-m-d H:i:s'),
-            'updated_at' => now()->format('Y-m-d H:i:s'),
-        ]);
-
-        // 8️⃣ Insert company inside tenant DB (like old version)
-        $tenantCompanyData = [
-            'name' => $company->name,
-            'code' => $company->code,
-            'owner_name' => $company->owner_name,
-            'email' => $company->email,
-            'password' => $validated['user_password'] ?? null,
-            'gst_number' => $company->gst_number,
-            'address' => $company->address,
-            'contact_no' => $company->contact_no,
-            'contact_no2' => $company->contact_no2,
-            'telephone_no' => $company->telephone_no,
-            'website' => $company->website,
-            'state' => $company->state,
-            'product_name' => $company->product_name,
-            'subscription_type' => $company->subscription_type,
-            'tally_configuration' => $company->tally_configuration,
-            'logo' => $company->logo,
-            'subdomain' => $fullDomain,
-            'start_date' => $validated['start_date'] ?? null,
-            'validity_upto' => $validated['validity_upto'] ?? null,
-            'user_assigned' => $validated['user_assigned'] ?? null,
-            'tenant_id' => $tenant->id,
-            'created_at' => now()->format('Y-m-d H:i:s'),
-            'updated_at' => now()->format('Y-m-d H:i:s'),
-        ];
-        DB::connection('tenant')->table('companies')->insert($tenantCompanyData);
-
-        // 9️⃣ Run only important seeders
-        $seederOrder = [
-            'CountrySeeder',
-            'StateSeeder',
-            'DistrictSeeder',
-            'CitiesSeeder',
-            'TehsilSeeder',
-            // 'RoleSeeder',
-            'PermissionSeeder'
-        ];
-
-        DB::connection('tenant')->statement('SET FOREIGN_KEY_CHECKS=0;');
-        try {
-            foreach ($seederOrder as $seederClass) {
-                $class = 'Database\\Seeders\\' . $seederClass;
-                if (class_exists($class)) {
-                    Artisan::call('db:seed', [
-                        '--class' => $class,
-                        '--database' => 'tenant',
-                        '--force' => true,
-                    ]);
+            // Cleanup
+            if ($tenant) {
+                try {
+                    $tenant->delete();
+                } catch (\Throwable $ex) {
                 }
             }
-        } finally {
-            DB::connection('tenant')->statement('SET FOREIGN_KEY_CHECKS=1;');
-        }
-
-        // 🔟 Create default admin user inside tenant DB
-        $userData = [
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'password' => Hash::make($validated['user_password']),
-            'mobile' => $validated['contact_no'] ?? null,
-            'address' => $validated['address'] ?? null,
-            'user_level' => 'company_admin',
-            'is_active' => true,
-            'created_at' => now()->format('Y-m-d H:i:s'),
-            'updated_at' => now()->format('Y-m-d H:i:s'),
-        ];
-
-        $userId = DB::connection('tenant')->table('users')->insertGetId($userData);
-
-        // Assign role & all permissions
-        $tenantUserModel = new \App\Models\User();
-        $tenantUserModel->setConnection('tenant');
-        $user = $tenantUserModel->find($userId);
-
-        if ($user) {
-            $roleModel = new \Spatie\Permission\Models\Role();
-            $roleModel->setConnection('tenant');
-
-            $permissionModel = new \Spatie\Permission\Models\Permission();
-            $permissionModel->setConnection('tenant');
-
-            $role = $roleModel->firstOrCreate(['name' => 'sub_admin']);
-            $permissions = $permissionModel->pluck('name')->toArray();
-
-            if (!empty($permissions)) {
-                $role->syncPermissions($permissions);
+            if ($company) {
+                try {
+                    $company->delete();
+                } catch (\Throwable $ex) {
+                }
+            }
+            try {
+                DB::statement("DROP DATABASE IF EXISTS `$tenancyDbName`");
+            } catch (\Throwable $ex) {
             }
 
-            $user->assignRole($role->name);
+            return back()->withInput()
+                ->withErrors(['error' => 'Onboarding failed: ' . $e->getMessage()]);
         }
-
-        return redirect()->route('companies.index')
-            ->with('success', "Company & Admin created successfully. Domain: {$fullDomain}");
-
-    } catch (\Exception $e) {
-        Log::error('Company/Tenant creation failed: ' . $e->getMessage());
-
-        // Cleanup
-        if ($tenant) { try { $tenant->delete(); } catch (\Throwable $ex) {} }
-        if ($company) { try { $company->delete(); } catch (\Throwable $ex) {} }
-        try { DB::statement("DROP DATABASE IF EXISTS `$tenancyDbName`"); } catch (\Throwable $ex) {}
-
-        return back()->withInput()
-            ->withErrors(['error' => 'Onboarding failed: ' . $e->getMessage()]);
     }
-}
 
 
 
-    
+
     public function show(Company $company)
     {
         //$this->authorizeCompanyAccess($company);
 
         return view('admin.companies.show', compact('company'));
     }
-    
+
     public function edit(Company $company)
     {
         // $this->authorizeCompanyAccess($company);
-        $state = State::where('status',1)->get();
-        return view('admin.companies.edit', compact('company','state'));
+        $state = State::where('status', 1)->get();
+        return view('admin.companies.edit', compact('company', 'state'));
     }
-    
+
     public function update(StoreCompanyRequest $request, Company $company)
     {
         $this->authorizeCompanyAccess($company);
@@ -708,7 +316,7 @@ public function store(StoreCompanyRequest $request)
         }
 
         // ✅ Central DB update
-        $company->update($validated);   
+        $company->update($validated);
         $tenant = $company->tenant_id;
         $tenantData = Tenant::where('id', $tenant)->first();
 
@@ -774,7 +382,7 @@ public function store(StoreCompanyRequest $request)
         return redirect()->route('companies.index')
             ->with('success', 'Company & Tenant updated successfully.');
     }
-    
+
     public function destroy(Company $company)
     {
         $this->authorizeMaster(); // Only master_admin can delete companies
@@ -784,7 +392,7 @@ public function store(StoreCompanyRequest $request)
         return redirect()->route('companies.index')->with('success', 'Company deleted successfully.');
     }
 
-   
+
     public function toggle($id)
     {
         $company = Company::findOrFail($id);
@@ -797,7 +405,7 @@ public function store(StoreCompanyRequest $request)
         return redirect()->route('companies.index')->with('success', 'Company status updated.');
     }
 
-    
+
     private function authorizeMaster()
     {
         $user = Auth::user();
@@ -806,13 +414,13 @@ public function store(StoreCompanyRequest $request)
         }
     }
 
-    
+
     private function authorizeCompanyAccess(Company $company)
     {
         $user = Auth::user();
 
         if ($user->hasRole('master_admin')) {
-            return; 
+            return;
         }
 
         if ($company->id !== $user->company_id) {

@@ -321,3 +321,20 @@
     @endforeach
 </main>
 @endsection
+@push('scripts')
+<script>
+$(document).ready(function () {
+    var tripsCount = @json($trips->count());
+    if (tripsCount > 0) {
+        $('#trips-table').DataTable({
+            responsive: true,
+            autoWidth: false,
+            pageLength: 10,
+            lengthMenu: [5, 10, 25, 50],
+            columnDefs: [
+                { orderable: false, targets: -1 } 
+            ]
+        });
+    }
+});
+</script>
