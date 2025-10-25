@@ -211,30 +211,30 @@ class ApiAuthController extends BaseController
     /**
      * Get API Authenticated User Profile
      */
-    // public function profile(Request $request)
-    // {
-    //     $user = $request->user();
-    //     $success['user'] =  $user;
-    //     return $this->sendResponse($success, 'User detail fetch successfully');
-    // }
-
     public function profile(Request $request)
     {
-        try {
-            $this->switchToTenantDB($request);
-
-            $userModel = new \App\Models\User();
-            if ($request->header('X-Company-Code')) {
-                $userModel->setConnection('tenant'); // tenant DB
-            }
-
-            $user = $userModel->find($request->user()->id);
-
-            return $this->sendResponse(['user' => $user], 'User detail fetched successfully');
-        } catch (\Exception $e) {
-            return $this->sendError('Error fetching profile', $e->getMessage(), 500);
-        }
+        $user = $request->user();
+        $success['user'] =  $user;
+        return $this->sendResponse($success, 'User detail fetch successfully');
     }
+
+    // public function profile(Request $request)
+    // {
+    //     try {
+    //         $this->switchToTenantDB($request);
+
+    //         $userModel = new \App\Models\User();
+    //         if ($request->header('X-Company-Code')) {
+    //             $userModel->setConnection('tenant'); // tenant DB
+    //         }
+
+    //         $user = $userModel->find($request->user()->id);
+
+    //         return $this->sendResponse(['user' => $user], 'User detail fetched successfully');
+    //     } catch (\Exception $e) {
+    //         return $this->sendError('Error fetching profile', $e->getMessage(), 500);
+    //     }
+    // }
 
     protected function switchToTenantDB(Request $request)
     {
