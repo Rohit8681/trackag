@@ -18,9 +18,9 @@ class LookupTablesSeeder extends Seeder
             ['name' => 'Two Wheeler Company'],
             ['name' => 'Four Wheeler Company'],
             ['name' => 'Other'],
-            ['name' => 'Car',],
-            ['name' => 'Bike'],
-            ['name' => 'Walk'],
+            // ['name' => 'Car',],
+            // ['name' => 'Bike'],
+            // ['name' => 'Walk'],
         ]);
 
         DB::table('purposes')->insert([
@@ -29,9 +29,9 @@ class LookupTablesSeeder extends Seeder
             ['name' => 'Office Visit'],
             ['name' => 'Work from home'],
             ['name' => 'Other',   ],
-            ['name' => 'Official',   ],
-            ['name' => 'Client Visit'],
-            ['name' => 'Inspection', ],
+            // ['name' => 'Official',   ],
+            // ['name' => 'Client Visit'],
+            // ['name' => 'Inspection', ],
         ]);
 
         DB::table('tour_types')->insert([
@@ -39,10 +39,10 @@ class LookupTablesSeeder extends Seeder
             ['name' => 'Out of Headquarter'],
             ['name' => 'Tour with senior'],
             ['name' => 'Work from home'],
-            ['name' => 'Farm Visit'],
-            ['name' => 'Local'],
-            ['name' => 'Outstation'],
-            ['name' => 'International'],
+            // ['name' => 'Farm Visit'],
+            // ['name' => 'Local'],
+            // ['name' => 'Outstation'],
+            // ['name' => 'International'],
         ]);
     }
 }

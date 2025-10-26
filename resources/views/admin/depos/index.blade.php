@@ -105,7 +105,7 @@
                                     <tbody>
                                         @forelse ($depos as $index => $depo)
                                             <tr>
-                                                <td>{{  $index }}</td>
+                                                <td>{{ $depo->id }}</td>
                                                 <td>{{ $depo->depo_code }}</td>
                                                 <td>{{ $depo->depo_name }}</td>
                                                 <td>{{ $depo->designation->name ?? '-' }}</td>

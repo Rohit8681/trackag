@@ -45,6 +45,19 @@
                                     @enderror
                                 </div>
 
+                                {{-- Agro Name --}}
+                                <div class="mb-3 col-md-4">
+                                    <label for="agro_name" class="form-label">
+                                        Contact Person Name <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="text" name="contact_person_name" id="contact_person_name"
+                                           class="form-control @error('contact_person_name') is-invalid @enderror"
+                                           value="{{ old('contact_person_name') }}">
+                                    @error('contact_person_name')
+                                        <small class="text-danger">{{ $message }}</small>
+                                    @enderror
+                                </div>
+
                                 {{-- Party Code --}}
                                 <div class="mb-3 col-md-4">
                                     <label for="party_code" class="form-label">
@@ -139,7 +152,7 @@
                                 {{-- Executive --}}
                                 <div class="mb-3 col-md-4">
                                     <label for="user_id" class="form-label">
-                                        Contact Person Name <span class="text-danger">*</span>
+                                        Assign Person <span class="text-danger">*</span>
                                     </label>
                                     <select name="user_id" id="user_id"
                                             class="form-select @error('user_id') is-invalid @enderror">

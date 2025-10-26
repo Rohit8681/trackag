@@ -11,6 +11,7 @@ class Customer extends Model
     
     protected $fillable = [
         'agro_name',
+        'contact_person_name',
         'party_code',
         'state_id',
         'district_id',

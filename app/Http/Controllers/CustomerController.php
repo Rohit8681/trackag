@@ -70,6 +70,7 @@ class CustomerController extends Controller
 
         $validated = $request->validate([
             'agro_name' => 'required|string|max:255',
+            'contact_person_name'  => 'required|string|max:255',
             'party_code' => 'required|string|max:255',
             'address'    => 'nullable|string|max:255',
             'phone' => 'required|string|max:255',
@@ -121,6 +122,7 @@ class CustomerController extends Controller
 
         $validated = $request->validate([
             'agro_name'          => 'required|string|max:255',
+            'contact_person_name'  => 'required|string|max:255',
             'party_code'         => 'required|string|max:255',
             'address'            => 'nullable|string|max:255',
             'phone'              => 'required|string|max:255',

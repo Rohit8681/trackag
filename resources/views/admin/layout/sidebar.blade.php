@@ -345,12 +345,12 @@
                             </ul>
                         </li>
 
-                        <li class="nav-item">
+                        {{-- <li class="nav-item">
                             <a href="{{ url('admin/vehicle-types') }}" class="nav-link {{ request()->is('admin/vehicle-types*') ? 'active' : '' }}">
                                 <i class="bi bi-circle me-2"></i>
                                 <p>Vehicle Types</p>
                             </a>
-                        </li>
+                        </li> --}}
 
                         {{-- Depo Master --}}
                         <li class="nav-item">
