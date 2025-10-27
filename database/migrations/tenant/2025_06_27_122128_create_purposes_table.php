@@ -12,19 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('purposes', function (Blueprint $table) {
-    $table->id();
-    $table->unsignedBigInteger('company_id'); // 👈 Added
-    $table->string('name');
-    $table->timestamps();
-
-    $table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade');
-});
-
+            $table->id();
+            $table->string('name');
+            $table->timestamps();
+        });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('purposes');

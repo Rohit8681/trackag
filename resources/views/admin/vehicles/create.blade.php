@@ -1,4 +1,5 @@
 @extends('admin.layout.layout')
+@section('title', 'Create Vehicle | Trackag')
 
 @section('content')
 <main class="app-main">

@@ -35,6 +35,8 @@ use App\Http\Controllers\ExpenseController;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Response;
+
 
 Route::get('/logs', function () {
     // Optional: Add a simple password for security
@@ -63,8 +65,17 @@ Route::middleware(['web'])->group(function () {
         return redirect()->route('admin.login');
     });
 
-    
+    Route::get('/sample-download', function () {
+        $filePath = public_path('sample-files\customers_sample.xlsx');
+       
+        if (!file_exists($filePath)) {
+            return abort(404, 'Sample file not found at: ' . $filePath);
+        }
 
+        return response()->download($filePath, 'customers_sample.xlsx', [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        ]);
+    })->name('customers.sample-download');
 
     // Admin (central) routes
     Route::prefix('admin')->group(function () {
@@ -78,6 +89,7 @@ Route::middleware(['web'])->group(function () {
 
         // Protected routes
         Route::middleware(['admin', 'last_seen'])->group(function () {
+            
             Route::resource('users', UserController::class);
             Route::post('/users/{user}/toggle', [UserController::class, 'toggle'])->name('users.toggle');
             Route::post('/users/reset-password', [UserController::class, 'resetPassword'])->name('users.reset-password');
@@ -154,7 +166,9 @@ Route::middleware(['web'])->group(function () {
             Route::resource('expense', ExpenseController::class);
 
              Route::resource('customers', CustomerController::class);
-        Route::patch('/customers/{id}/toggle', [CustomerController::class, 'toggleStatus'])->name('customers.toggle');
+            Route::patch('/customers/{id}/toggle', [CustomerController::class, 'toggleStatus'])->name('customers.toggle');
+            Route::post('/customers/import', [CustomerController::class, 'import'])->name('customers.import');
+            
         });
     });
 });

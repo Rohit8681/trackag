@@ -1,145 +1,292 @@
 @extends('admin.layout.layout')
+@section('title', 'Create Customer | Trackag')
 
 @section('content')
-    <main class="app-main">
-        <div class="app-content-header">
-            <div class="container-fluid">
-                <div class="row">
-                    <div class="col-sm-6">
-                        <h3 class="mb-0">Customer Management</h3>
-                    </div>
-                    <div class="col-sm-6">
-                        <ol class="breadcrumb float-sm-end">
-                            <li class="breadcrumb-item"><a href="{{ route('customers.index') }}">Customers</a></li>
-                            <li class="breadcrumb-item active">Add Customer</li>
-                        </ol>
-                    </div>
+<main class="app-main">
+    <div class="app-content-header">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-sm-6">
+                    <h3 class="mb-0">Customer Management</h3>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-end">
+                        <li class="breadcrumb-item"><a href="{{ route('customers.index') }}">Customers</a></li>
+                        <li class="breadcrumb-item active">Add Customer</li>
+                    </ol>
                 </div>
             </div>
         </div>
+    </div>
 
-        <div class="app-content">
-            <div class="container-fluid">
-                <div class="row">
-                    <div class="col-md-8">
-                        <div class="card card-primary card-outline mb-4">
-                            <div class="card-header">
-                                <div class="card-title">Add New Customer</div>
+    <div class="app-content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card card-primary card-outline mb-4">
+                        <div class="card-header">
+                            <div class="card-title">Add New Customer</div>
+                        </div>
+
+                        <form method="POST" action="{{ route('customers.store') }}">
+                            @csrf
+                            <div class="card-body row">
+
+                                {{-- Agro Name --}}
+                                <div class="mb-3 col-md-4">
+                                    <label for="agro_name" class="form-label">
+                                        Agro Name <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="text" name="agro_name" id="agro_name"
+                                           class="form-control @error('agro_name') is-invalid @enderror"
+                                           value="{{ old('agro_name') }}">
+                                    @error('agro_name')
+                                        <small class="text-danger">{{ $message }}</small>
+                                    @enderror
+                                </div>
+
+                                {{-- Agro Name --}}
+                                <div class="mb-3 col-md-4">
+                                    <label for="agro_name" class="form-label">
+                                        Contact Person Name <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="text" name="contact_person_name" id="contact_person_name"
+                                           class="form-control @error('contact_person_name') is-invalid @enderror"
+                                           value="{{ old('contact_person_name') }}">
+                                    @error('contact_person_name')
+                                        <small class="text-danger">{{ $message }}</small>
+                                    @enderror
+                                </div>
+
+                                {{-- Party Code --}}
+                                <div class="mb-3 col-md-4">
+                                    <label for="party_code" class="form-label">
+                                        Party Code <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="text" name="party_code" id="party_code"
+                                           class="form-control @error('party_code') is-invalid @enderror"
+                                           value="{{ old('party_code') }}">
+                                    @error('party_code')
+                                        <small class="text-danger">{{ $message }}</small>
+                                    @enderror
+                                </div>
+
+                                {{-- State --}}
+                                <div class="mb-3 col-md-4">
+                                    <label for="state_id" class="form-label">
+                                        State <span class="text-danger">*</span>
+                                    </label>
+                                    <select name="state_id" id="state_id"
+                                            class="form-select @error('state_id') is-invalid @enderror">
+                                        <option value="">-- Select State --</option>
+                                        @foreach($states as $state)
+                                            <option value="{{ $state->id }}">
+                                                {{ $state->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    @error('state_id')
+                                        <small class="text-danger">{{ $message }}</small>
+                                    @enderror
+                                </div>
+
+                                {{-- District --}}
+                                <div class="mb-3 col-md-4">
+                                    <label for="district_id" class="form-label">
+                                        District <span class="text-danger">*</span>
+                                    </label>
+                                    <select name="district_id" id="district_id"
+                                            class="form-select @error('district_id') is-invalid @enderror">
+                                        <option value="">-- Select District --</option>
+                                    </select>
+                                    @error('district_id')
+                                        <small class="text-danger">{{ $message }}</small>
+                                    @enderror
+                                </div>
+
+                                {{-- Tehsil --}}
+                                <div class="mb-3 col-md-4">
+                                    <label for="tehsil_id" class="form-label">
+                                        Tehsil <span class="text-danger">*</span>
+                                    </label>
+                                    <select name="tehsil_id" id="tehsil_id"
+                                            class="form-select @error('tehsil_id') is-invalid @enderror">
+                                        <option value="">-- Select Tehsil --</option>
+                                    </select>
+                                    @error('tehsil_id')
+                                        <small class="text-danger">{{ $message }}</small>
+                                    @enderror
+                                </div>
+
+                                {{-- Address --}}
+                                <div class="mb-3 col-md-4">
+                                    <label for="address" class="form-label">Address</label>
+                                    <input type="text" name="address" id="address"
+                                           class="form-control" value="{{ old('address') }}">
+                                </div>
+
+                                {{-- Phone --}}
+                                <div class="mb-3 col-md-4">
+                                    <label for="phone" class="form-label">
+                                        Mobile No <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="text" name="phone" id="phone"
+                                           class="form-control mobile_no @error('phone') is-invalid @enderror"
+                                           value="{{ old('phone') }}">
+                                    @error('phone')
+                                        <small class="text-danger">{{ $message }}</small>
+                                    @enderror
+                                </div>
+
+                                {{-- GST No --}}
+                                <div class="mb-3 col-md-4">
+                                    <label for="gst_no" class="form-label">GST No<span class="text-danger">*</span></label>
+                                    <input type="text" name="gst_no" id="gst_no"
+                                           class="form-control @error('gst_no') is-invalid @enderror"
+                                           value="{{ old('gst_no') }}">
+                                    @error('gst_no')
+                                        <small class="text-danger">{{ $message }}</small>
+                                    @enderror
+                                </div>
+
+                                {{-- Executive --}}
+                                <div class="mb-3 col-md-4">
+                                    <label for="user_id" class="form-label">
+                                        Assign Person <span class="text-danger">*</span>
+                                    </label>
+                                    <select name="user_id" id="user_id"
+                                            class="form-select @error('user_id') is-invalid @enderror">
+                                        <option value="">-- Select Executive --</option>
+                                        @foreach ($executives as $executive)
+                                            <option value="{{ $executive->id }}"
+                                                {{ old('user_id') == $executive->id ? 'selected' : '' }}>
+                                                {{ $executive->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    @error('user_id')
+                                        <small class="text-danger">{{ $message }}</small>
+                                    @enderror
+                                </div>
+
+                                {{-- Credit Limit --}}
+                                <div class="mb-3 col-md-4">
+                                    <label for="credit_limit" class="form-label">Credit Limit<span class="text-danger">*</span></label>
+                                    <input type="text" name="credit_limit" id="credit_limit"
+                                           class="form-control @error('credit_limit') is-invalid @enderror"
+                                           value="{{ old('credit_limit') }}">
+                                    @error('credit_limit')
+                                        <small class="text-danger">{{ $message }}</small>
+                                    @enderror
+                                </div>
+
+                                {{-- Depo --}}
+                                <div class="mb-3 col-md-4">
+                                    <label for="depo_id" class="form-label">Depo<span class="text-danger">*</span></label>
+                                    <select name="depo_id" id="depo_id"
+                                            class="form-select @error('depo_id') is-invalid @enderror">
+                                        <option value="">-- Select Depo --</option>
+                                        @foreach ($depos as $depo)
+                                            <option value="{{ $depo->id }}"
+                                                {{ old('depo_id') == $depo->id ? 'selected' : '' }}>
+                                                {{ $depo->depo_name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    @error('depo_id')
+                                        <small class="text-danger">{{ $message }}</small>
+                                    @enderror
+                                </div>
+
+                                {{-- Party Active Since --}}
+                                <div class="mb-3 col-md-4">
+                                    <label for="party_active_since" class="form-label">Party Active Since<span class="text-danger">*</span></label>
+                                    <input type="date" name="party_active_since" id="party_active_since"
+                                           class="form-control @error('party_active_since') is-invalid @enderror"
+                                           value="{{ old('party_active_since') }}"
+                                           max="{{ date('Y-m-d') }}">
+                                    @error('party_active_since')
+                                        <small class="text-danger">{{ $message }}</small>
+                                    @enderror
+                                </div>
+
+                                {{-- Status --}}
+                                <div class="mb-3 col-md-6">
+                                    <label class="form-label">Status</label><br>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="is_active" value="1"
+                                            {{ old('is_active', '1') == '1' ? 'checked' : '' }}>
+                                        <label class="form-check-label">Active</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="is_active" value="0"
+                                            {{ old('is_active') == '0' ? 'checked' : '' }}>
+                                        <label class="form-check-label">Inactive</label>
+                                    </div>
+                                </div>
+
                             </div>
 
-                            {{-- Flash & Error Messages --}}
-                            @if (session('success'))
-                                <div class="alert alert-success alert-dismissible fade show m-3" role="alert">
-                                    <strong>Success:</strong> {{ session('success') }}
-                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                                </div>
-                            @endif
-                            @if (session('error'))
-                                <div class="alert alert-danger alert-dismissible fade show m-3" role="alert">
-                                    <strong>Error:</strong> {{ session('error') }}
-                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                                </div>
-                            @endif
-                            @if ($errors->any())
-                                @foreach ($errors->all() as $error)
-                                    <div class="alert alert-danger alert-dismissible fade show m-3" role="alert">
-                                        <strong>Error:</strong> {{ $error }}
-                                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                                    </div>
-                                @endforeach
-                            @endif
+                            <div class="card-footer text-end">
+                                <button type="submit" class="btn btn-primary">Add Customer</button>
+                            </div>
+                        </form>
 
-                            <form method="POST" action="{{ route('customers.store') }}">
-                                @csrf
-                                <div class="card-body row">
-
-                                    {{-- Name --}}
-                                    <div class="mb-3 col-md-6">
-                                        <label for="name" class="form-label">Full Name</label>
-                                        <input type="text" name="name" id="name" class="form-control"
-                                            value="{{ old('name') }}" required>
-                                    </div>
-
-                                    {{-- Email --}}
-                                    <div class="mb-3 col-md-6">
-                                        <label for="email" class="form-label">Email</label>
-                                        <input type="email" name="email" id="email" class="form-control"
-                                            value="{{ old('email') }}">
-                                    </div>
-
-                                    {{-- Phone --}}
-                                    <div class="mb-3 col-md-6">
-                                        <label for="phone" class="form-label">Phone</label>
-                                        <input type="text" name="phone" id="phone" class="form-control"
-                                            value="{{ old('phone') }}" required>
-                                    </div>
-
-                                    {{-- Address --}}
-                                    <div class="mb-3 col-md-6">
-                                        <label for="address" class="form-label">Address</label>
-                                        <input type="text" name="address" id="address" class="form-control"
-                                            value="{{ old('address') }}">
-                                    </div>
-
-                                    {{-- Company (Only for Master Admin) --}}
-                                    @if (auth()->user()->hasRole('master_admin'))
-                                        <div class="mb-3 col-md-6">
-                                            <label for="company_id" class="form-label">Select Company</label>
-                                            <select class="form-select" name="company_id" id="company_id" required>
-                                                <option value="">-- Select Company --</option>
-                                                @foreach ($companies as $company)
-                                                    <option value="{{ $company->id }}"
-                                                        {{ old('company_id') == $company->id ? 'selected' : '' }}>
-                                                        {{ $company->name }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                    @endif
-
-                                    {{-- Executive --}}
-                                    <div class="mb-3 col-md-6">
-                                        <label for="user_id" class="form-label">Assign Executive</label>
-                                        <select class="form-select" name="user_id" id="user_id">
-                                            <option value="">-- Select Executive --</option>
-                                            @if (!auth()->user()->hasRole('master_admin'))
-                                                @foreach ($executives as $executive)
-                                                    <option value="{{ $executive->id }}"
-                                                        {{ old('user_id') == $executive->id ? 'selected' : '' }}>
-                                                        {{ $executive->name }}
-                                                    </option>
-                                                @endforeach
-                                            @endif
-                                        </select>
-                                    </div>
-
-
-                                    {{-- Active Status --}}
-                                    <div class="mb-3 col-md-6">
-                                        <label class="form-label">Status</label><br>
-                                        <div class="form-check form-check-inline">
-                                            <input class="form-check-input" type="radio" name="is_active" value="1"
-                                                {{ old('is_active', '1') == '1' ? 'checked' : '' }}>
-                                            <label class="form-check-label">Active</label>
-                                        </div>
-                                        <div class="form-check form-check-inline">
-                                            <input class="form-check-input" type="radio" name="is_active" value="0"
-                                                {{ old('is_active') == '0' ? 'checked' : '' }}>
-                                            <label class="form-check-label">Inactive</label>
-                                        </div>
-                                    </div>
-
-                                </div>
-
-                                <div class="card-footer text-end">
-                                    <button type="submit" class="btn btn-primary">Add Customer</button>
-                                </div>
-                            </form>
-
-                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </main>
+    </div>
+</main>
 @endsection
+
+@push('scripts')
+<script>
+$(document).ready(function() {
+
+    // ✅ Allow only 10-digit mobile numbers
+    $('.mobile_no').on('input', function () {
+        this.value = this.value.replace(/\D/g, '').slice(0, 10);
+    });
+
+    // ✅ Load Districts based on State
+    $('#state_id').on('change', function() {
+        let stateId = $(this).val();
+        $('#district_id').html('<option value="">Loading...</option>');
+        $('#tehsil_id').html('<option value="">-- Select Tehsil --</option>');
+
+        if (!stateId) {
+            $('#district_id').html('<option value="">-- Select District --</option>');
+            return;
+        }
+
+        $.get("{{ route('depos.get-districts') }}", { state_id: stateId }, function(data) {
+            let html = '<option value="">-- Select District --</option>';
+            $.each(data, function(i, d) {
+                html += `<option value="${d.id}">${d.name}</option>`;
+            });
+            $('#district_id').html(html);
+        });
+    });
+
+    // ✅ Load Tehsils based on District
+    $('#district_id').on('change', function() {
+        let districtId = $(this).val();
+        $('#tehsil_id').html('<option value="">Loading...</option>');
+
+        if (!districtId) {
+            $('#tehsil_id').html('<option value="">-- Select Tehsil --</option>');
+            return;
+        }
+
+        $.get("{{ route('depos.get-tehsils') }}", { district_id: districtId }, function(data) {
+            let html = '<option value="">-- Select Tehsil --</option>';
+            $.each(data, function(i, t) {
+                html += `<option value="${t.id}">${t.name}</option>`;
+            });
+            $('#tehsil_id').html(html);
+        });
+    });
+});
+</script>
+@endpush

@@ -159,6 +159,7 @@
                 @endcanany
 
                 <!-- Attendance -->
+                @canany(['view_attendance','create_attendance','edit_attendance','delete_attendance'])
                 <li class="nav-item {{ request()->is('admin/attendance*') ? 'menu-open' : '' }}">
                     <a href="#" class="nav-link {{ request()->is('admin/attendance*') ? 'active' : '' }}">
                         <i class="bi bi-people-fill me-2"></i>
@@ -176,8 +177,10 @@
                         </li>
                     </ul>
                 </li>
+                @endcanany
 
                 <!-- Expense -->
+                @canany(['view_expense','create_expense','edit_expense','delete_expense'])
                 <li class="nav-item {{ request()->is('admin/expense*') ? 'menu-open' : '' }}">
                     <a href="#" class="nav-link {{ request()->is('admin/expense*') ? 'active' : '' }}">
                         <i class="bi bi-people-fill me-2"></i>
@@ -195,26 +198,32 @@
                         </li>
                     </ul>
                 </li>
+                @endcanany
 
                 <!-- User Management -->
+                @canany(['view_users','create_users','edit_users','delete_users','view_roles','create_roles','edit_roles','delete_roles','view_permissions','create_permissions','edit_permissions','delete_permissions'])
                 <li class="nav-item {{ request()->is('admin/users*') || request()->is('admin/roles*') || request()->is('admin/permissions*') ? 'menu-open' : '' }}">
                     <a href="#" class="nav-link {{ request()->is('admin/users*') || request()->is('admin/roles*') || request()->is('admin/permissions*') ? 'active' : '' }}">
                         <i class="bi bi-people-fill me-2"></i>
                         <p>User Management <i class="bi bi-chevron-right ms-auto"></i></p>
                     </a>
                     <ul class="nav nav-treeview">
+                        @canany(['view_users','create_users','edit_users','delete_users'])
                         <li class="nav-item">
                             <a href="{{ url('admin/users') }}" class="nav-link {{ request()->is('admin/users*') ? 'active' : '' }}">
                                 <i class="bi bi-person-fill me-2"></i>
                                 <p>Manage Users</p>
                             </a>
                         </li>
+                        @endcanany
+                         @canany(['view_roles','create_roles','edit_roles','delete_roles'])
                         <li class="nav-item">
                             <a href="{{ url('admin/roles') }}" class="nav-link {{ request()->is('admin/roles*') ? 'active' : '' }}">
                                 <i class="bi bi-shield-lock me-2"></i>
                                 <p>Manage Roles</p>
                             </a>
                         </li>
+                        @endcanany
                         @if(auth()->user() && auth()->user()->hasRole('master_admin'))
                         <li class="nav-item">
                             <a href="{{ url('admin/permissions') }}" class="nav-link {{ request()->is('admin/permissions*') ? 'active' : '' }}">
@@ -225,64 +234,82 @@
                         @endif
                     </ul>
                 </li>
+                @endcanany
 
                 <!-- Trip Management -->
+                @canany(['view_all_trip','create_all_trip','edit_all_trip','delete_all_trip','view_trip_types','create_trip_types','edit_trip_types','delete_trip_types','view_travel_modes','create_travel_modes','edit_travel_modes','delete_travel_modes','view_trip_purposes','create_trip_purposes','edit_trip_purposes','delete_trip_purposes'])
                 <li class="nav-item {{ request()->is('admin/trip-types*') || request()->is('admin/travel-modes*') || request()->is('admin/purposes*') ? 'menu-open' : '' }}">
                     <a href="#" class="nav-link {{ request()->is('admin/trip-types*') || request()->is('admin/travel-modes*') || request()->is('admin/purposes*') ? 'active' : '' }}">
                         <i class="bi bi-truck-front me-2"></i>
                         <p>Trip Management <i class="bi bi-chevron-right ms-auto"></i></p>
                     </a>
                     <ul class="nav nav-treeview">
+                        @canany(['view_all_trip','create_all_trip','edit_all_trip','delete_all_trip'])
                         <li class="nav-item">
                             <a href="{{ url('admin/trips') }}" class="nav-link {{ request()->is('admin/trips*') ? 'active' : '' }}">
                                 <i class="bi bi-truck me-2"></i>
                                 <p>All Trips</p>
                             </a>
                         </li>
+                        @endcanany
+                        @canany(['view_trip_types','create_trip_types','edit_trip_types','delete_trip_types'])
                         <li class="nav-item">
                             <a href="{{ url('admin/tourtype') }}" class="nav-link {{ request()->is('admin/tourtype*') ? 'active' : '' }}">
                                 <i class="bi bi-tag me-2"></i>
                                 <p>Trip Types</p>
                             </a>
                         </li>
+                        @endcanany
+                        @canany(['view_travel_modes','create_travel_modes','edit_travel_modes','delete_travel_modes'])
                         <li class="nav-item">
                             <a href="{{ url('admin/travelmode') }}" class="nav-link {{ request()->is('admin/travelmode*') ? 'active' : '' }}">
                                 <i class="bi bi-signpost me-2"></i>
                                 <p>Travel Modes</p>
                             </a>
                         </li>
+                        @endcanany
+                        @canany(['view_trip_purposes','create_trip_purposes','edit_trip_purposes','delete_trip_purposes'])
                         <li class="nav-item">
                             <a href="{{ url('admin/purpose') }}" class="nav-link {{ request()->is('admin/purpose*') ? 'active' : '' }}">
                                 <i class="bi bi-bullseye me-2"></i>
                                 <p>Trip Purposes</p>
                             </a>
                         </li>
+                        @endcanany
                     </ul>
                 </li>
+                @endcanany
 
                 <!-- HR Module -->
+                @canany(['view_designations','create_designations','edit_designations','delete_designations','view_attendance','create_attendance','edit_attendance','delete_attendance'])
                 <li class="nav-item {{ request()->is('admin/hr/*') ? 'menu-open' : '' }}">
                     <a href="#" class="nav-link {{ request()->is('admin/hr/*') ? 'active' : '' }}">
                         <i class="bi bi-person-workspace me-2"></i>
                         <p>HR Module <i class="bi bi-chevron-right ms-auto"></i></p>
                     </a>
                     <ul class="nav nav-treeview">
+                        @canany(['view_designations','create_designations','edit_designations','delete_designations'])
                         <li class="nav-item">
                             <a href="{{ url('admin/hr/designations') }}" class="nav-link {{ request()->is('admin/hr/designations*') ? 'active' : '' }}">
                                 <i class="bi bi-person-vcard me-2"></i>
                                 <p>Designations</p>
                             </a>
                         </li>
+                        @endcanany
+                        @canany(['view_attendance','create_attendance','edit_attendance','delete_attendance'])
                         <li class="nav-item">
                             <a href="{{ url('admin/hr/attendance') }}" class="nav-link {{ request()->is('admin/hr/attendance*') ? 'active' : '' }}">
                                 <i class="bi bi-clock-history me-2"></i>
                                 <p>Attendance</p>
                             </a>
                         </li>
+                        @endcanany
                     </ul>
                 </li>
+                @endcanany
 
                 <!-- Master Management -->
+                @canany(['view_states','create_states','edit_states','delete_states','view_districts','create_districts','edit_districts','delete_districts','view_talukas','create_talukas','edit_talukas','delete_talukas','view_vehicle_types','create_vehicle_types','edit_vehicle_types','delete_vehicle_types','view_depo_master','create_depo_master','edit_depo_master','delete_depo_master','view_holiday_master','create_holiday_master','edit_holiday_master','delete_holiday_master','view_leave_master','create_leave_master','edit_leave_master','delete_leave_master'])
                 <li class="nav-item {{ request()->is('admin/states*') || request()->is('admin/districts*') || request()->is('admin/tehsils*') || request()->is('admin/vehicle-types*') || request()->is('admin/depos*') || request()->is('admin/holidays*') || request()->is('admin/leaves*') || request()->is('admin/ta-da-bill-master*') || request()->is('admin/vehicle*') ? 'menu-open' : '' }}">
                     <a href="#" class="nav-link {{ request()->is('admin/states*') || request()->is('admin/districts*') || request()->is('admin/tehsils*') || request()->is('admin/vehicle-types*') || request()->is('admin/depos*') || request()->is('admin/holidays*') || request()->is('admin/leaves*') || request()->is('admin/ta-da-bill-master*') || request()->is('admin/vehicle*') ? 'active' : '' }}">
                         <i class="bi bi-geo-alt-fill me-2"></i>
@@ -318,12 +345,12 @@
                             </ul>
                         </li>
 
-                        <li class="nav-item">
+                        {{-- <li class="nav-item">
                             <a href="{{ url('admin/vehicle-types') }}" class="nav-link {{ request()->is('admin/vehicle-types*') ? 'active' : '' }}">
                                 <i class="bi bi-circle me-2"></i>
                                 <p>Vehicle Types</p>
                             </a>
-                        </li>
+                        </li> --}}
 
                         {{-- Depo Master --}}
                         <li class="nav-item">
@@ -374,6 +401,7 @@
 
                     </ul>
                 </li>
+                @endcanany
 
                 <li class="nav-item">
                     <a href="{{ url('admin/companies') }}"

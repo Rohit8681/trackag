@@ -1,5 +1,5 @@
 @extends('admin.layout.layout')
-
+@section('title', 'TA-DA Bill Master | Trackag')
 @section('content')
 <main class="app-main">
     <!-- Page Header -->
@@ -64,7 +64,7 @@
                                                         <div class="form-check form-switch">
                                                         <input class="form-check-input toggle-status" type="checkbox"
                                                             data-id="{{ $designation->taDaBillMaster->id ?? "" }}"
-                                                            {{ $designation->taDaBillMaster->status ? 'checked' : '' }}>
+                                                            {{ optional($designation->taDaBillMaster)->status ? 'checked' : '' }}>
                                                     </div>
                                                     </td>
                                                 </tr>

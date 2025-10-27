@@ -1,4 +1,5 @@
 @extends('admin.layout.layout')
+@section('title', 'List Attendance | Trackag')
 
 @section('content')
     <main class="app-main">
@@ -27,7 +28,7 @@
 
         <div class="app-content">
             <div class="container-fluid">
-                <div class="card mt-3">
+                <div class="card card-primary card-outline">
                     <div class="card-body">
                         <div class="table-responsive">
                             <table class="table table-bordered text-center">

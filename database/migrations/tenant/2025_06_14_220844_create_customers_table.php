@@ -6,39 +6,29 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('customers', function (Blueprint $table) {
-        $table->id();
-
-        $table->string('name');
-        $table->string('email')->unique();
-        $table->string('phone', 20);
-        $table->string('address');
-
-        // Link to the company the customer belongs to
-        $table->foreignId('company_id')
-              ->constrained('companies')
-              ->onDelete('cascade');
-
-        // Assigned executive or user who manages the customer
-        $table->foreignId('user_id')
-              ->nullable()
-              ->constrained('users')
-              ->onDelete('set null');
-
-        $table->boolean('is_active')->default(true);
-
-        $table->timestamps();
-    });
+            $table->id();
+            $table->string('agro_name')->nullable();
+            $table->string('contact_person_name')->nullable();
+            $table->string('party_code')->nullable();
+            $table->integer('state_id')->nullable();
+            $table->integer('district_id')->nullable();
+            $table->integer('tehsil_id')->nullable();
+            $table->string('email')->unique()->nullable();
+            $table->string('phone', 20)->nullable();
+            $table->string('address')->nullable();
+            $table->string('gst_no')->nullable();
+            $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('set null');
+            $table->string('credit_limit')->nullable();
+            $table->tinyInteger('depo_id')->nullable();
+            $table->date('party_active_since')->nullable();
+            $table->boolean('is_active')->default(true);
+            $table->timestamps();
+        });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('customers');

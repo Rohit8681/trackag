@@ -26,17 +26,12 @@ use App\Models\TourType;
 use App\Models\VehicleType;
 use Illuminate\Support\Facades\Hash;
 
-
-
 class UserController extends Controller
 {
-    
     public function index(Request $request)
     {
         Session::put('page', 'dashboard');
-
         $query = User::with(['roles', 'permissions', 'state', 'district', 'tehsil', 'city', 'reportingManager', 'activeSessions', 'depos', 'designation'])->latest();
-
         // Filters
         if ($request->filled('state_id')) {
             $query->where('state_id', $request->state_id);
@@ -54,7 +49,6 @@ class UserController extends Controller
             $query->where('is_active', $request->status);
         }
 
-        // Company restriction
         $maxUsers = 0;
         if (auth()->user()->user_level !== 'master_admin') {
             $getcompany = Company::find(1);
@@ -222,7 +216,8 @@ class UserController extends Controller
 
 
     public function getDepos(Request $request){
-        $depos = Depo::where('state_id',$request->state_id)->get(['id','depo_name']);
+        // $depos = Depo::where('state_id',$request->state_id)->get(['id','depo_name']);
+        $depos = Depo::get(['id','depo_name']);
         return response()->json($depos);
     }
 
@@ -236,14 +231,14 @@ class UserController extends Controller
     {
         $data = $request->validate([
             'user_id' => 'required|exists:users,id',
-            'state_id' => 'required|exists:states,id',
+            // 'state_id' => 'required|exists:states,id',
             'depo_id' => 'required|array|min:1',
-            'depo_id.*' => 'exists:depos,id',
+            'depo_id.*' => 'required|integer',
         ]);
 
         // Save or update
         $access = UserDepoAccess::updateOrCreate(
-            ['user_id' => $data['user_id'], 'state_id' => $data['state_id']],
+            ['user_id' => $data['user_id']],
             ['depo_ids' => $data['depo_id']]
         );
 
@@ -275,7 +270,7 @@ class UserController extends Controller
     {
         // Basic validation
         $request->validate([
-            'user_id' => 'required|exists:users,id',
+            'user_id' => 'required',
             'slab' => 'required|string',
         ]);
 
@@ -397,7 +392,7 @@ class UserController extends Controller
     public function resetPassword(Request $request)
     {
         $request->validate([
-            'user_id' => 'required|exists:users,id',
+            'user_id' => 'required',
             'password' => 'required|min:6',
         ]);
 

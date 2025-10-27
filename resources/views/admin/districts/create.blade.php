@@ -1,4 +1,10 @@
 @extends('admin.layout.layout')
+@if(isset($district))
+@section('title', 'Edit District | Trackag')
+@else
+@section('title', 'Crate District | Trackag')
+
+@endif
 
 @section('content')
 <main class="app-main">
@@ -10,7 +16,7 @@
                     </div>
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-end">
-                            <li class="breadcrumb-item"><a href="#">District Master</a></li>
+                            <li class="breadcrumb-item"><a href="{{ route('districts.index') }}">District Master</a></li>
                             <li class="breadcrumb-item active">District</li>
                         </ol>
                     </div>

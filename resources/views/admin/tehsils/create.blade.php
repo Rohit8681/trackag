@@ -1,4 +1,5 @@
 @extends('admin.layout.layout')
+@section('title', 'Create Tehsil | Trackag')
 
 @section('content')
 <main class="app-main">
@@ -10,7 +11,7 @@
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-end">
-                        <li class="breadcrumb-item"><a href="#">Tehsil Master</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('tehsils.index') }}">Tehsil Master</a></li>
                         <li class="breadcrumb-item active">Tehsil</li>
                     </ol>
                 </div>

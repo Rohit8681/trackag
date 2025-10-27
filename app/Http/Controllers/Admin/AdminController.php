@@ -56,23 +56,19 @@ class AdminController extends Controller
             $sessionsQuery = UserSession::with('user')->whereDate('login_at', now());
         } else {
             $companyId        = $user->company_id;
-            $totalUsers       = User::where('company_id', $companyId)->count();
-            $totalRoles       = \Spatie\Permission\Models\Role::where('company_id', $companyId)->count();
-            $totalPermissions = \Spatie\Permission\Models\Permission::where('company_id', $companyId)->count();
-            $totalCustomers   = Customer::where('company_id', $companyId)->count();
+            $totalUsers       = User::count();
+            $totalRoles       = \Spatie\Permission\Models\Role::count();
+            $totalPermissions = \Spatie\Permission\Models\Permission::count();
+            $totalCustomers   = Customer::count();
 
-            $onlineUsers = User::where('company_id', $companyId)
-                ->whereHas('sessions', function ($query) {
-                    $query->whereNull('logout_at')->whereIn('platform', ['web', 'mobile']);
-                })
-                ->with(['roles', 'permissions'])
-                ->get();
+            $onlineUsers = User::whereHas('sessions', function ($query) {
+                $query->whereNull('logout_at')->whereIn('platform', ['web', 'mobile']);
+            })
+            ->with(['roles', 'permissions'])
+            ->get();
 
             $sessionsQuery = UserSession::with('user')
-                ->whereDate('login_at', now())
-                ->whereHas('user', function ($q) use ($companyId) {
-                    $q->where('company_id', $companyId);
-                });
+            ->whereDate('login_at', now());
         }
 
         $sessionsGrouped = $sessionsQuery->get()->groupBy('user_id');

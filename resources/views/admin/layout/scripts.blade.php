@@ -35,6 +35,7 @@
 <!-- Google Maps API -->
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB_-uOyQimLqBkDW_Vr8d88GX6Qk0lyksI&libraries=places">
 </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
 <!-- Custom JS -->
 <script src="{{ url('admin/js/custom.js') }}"></script>
@@ -42,7 +43,7 @@
 <!-- Initialize DataTables -->
 <script>
     $(document).ready(function() {
-        $("#users-table, #permissions-table, #customers-table, #trips-table,#states-table,#tehsils-table,#districts-table")
+        $("#users-table, #permissions-table,#states-table,#tehsils-table,#districts-table")
             .DataTable();
     });
 </script>
@@ -310,5 +311,22 @@
     });
 });
 
+</script>
+<script>
+    @if(Session::has('success'))
+        toastr.success("{{ Session::get('success') }}");
+    @endif
+
+    @if(Session::has('error'))
+        toastr.error("{{ Session::get('error') }}");
+    @endif
+
+    @if(Session::has('info'))
+        toastr.info("{{ Session::get('info') }}");
+    @endif
+
+    @if(Session::has('warning'))
+        toastr.warning("{{ Session::get('warning') }}");
+    @endif
 </script>
 @stack('scripts')

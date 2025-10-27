@@ -1,4 +1,5 @@
 @extends('admin.layout.layout')
+@section('title', 'Create State | Trackag')
 
 @section('content')
 <main class="app-main">
@@ -11,7 +12,7 @@
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-end">
-                        <li class="breadcrumb-item"><a href="#">State Master</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('states.index') }}">State Master</a></li>
                         <li class="breadcrumb-item active">Add State</li>
                     </ol>
                 </div>

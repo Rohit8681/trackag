@@ -1,26 +1,27 @@
 @extends('admin.layout.layout')
+@section('title', 'Create Role | Trackag')
 
 @section('content')
 <main class="app-main">
     <div class="app-content-header">
-        <div class="container-fluid">
-            <div class="row align-items-center">
-                <div class="col-sm-6">
-                    <h3 class="fw-bold text-primary mb-0">Create Role</h3>
-                </div>
-                <div class="col-sm-6 text-end">
-                    <ol class="breadcrumb mb-0">
-                        <li class="breadcrumb-item"><a href="{{ route('roles.index') }}">Roles</a></li>
-                        <li class="breadcrumb-item active">Create Role</li>
-                    </ol>
-                </div>
+      <div class="container-fluid">
+         <div class="row">
+            <div class="col-sm-6">
+               <h3 class="mb-0">Create Role</h3>
             </div>
-        </div>
+            <div class="col-sm-6">
+               <ol class="breadcrumb float-sm-end">
+                  <li class="breadcrumb-item"><a href="{{ route('roles.index') }}">Roles</a></li>
+                  <li class="breadcrumb-item active">Create Role</li>
+               </ol>
+            </div>
+         </div>
+      </div>
     </div>
 
     <div class="app-content">
         <div class="container-fluid">
-            <div class="card shadow-sm border-0">
+            <div class="card card-primary card-outline">
                 <div class="card-body p-4">
 
                     {{-- Role Create Form --}}
@@ -101,7 +102,7 @@
                                         $modules['Party (Customer)'] = 'customers';
 
 
-                                        $actions = ['create','view', 'edit', 'delete', 'approve', 'reject', 'verify', 'dispatch', 'remove_review'];
+                                        $actions = ['create','view', 'edit', 'delete', 'approvals', 'reject', 'verify', 'dispatch', 'remove_review'];
                                     @endphp
 
                                     @foreach ($modules as $moduleName => $keyword)

@@ -10,12 +10,21 @@ class Customer extends Model
     use TenantConnectionTrait;
     
     protected $fillable = [
+        'agro_name',
+        'contact_person_name',
+        'party_code',
+        'state_id',
+        'district_id',
+        'tehsil_id',
+        'gst_no',
+        'credit_limit',
+        'depo_id',
+        'party_active_since',
         'name',
         'email',
         'phone',
         'address',
-        'user_id',      // ✅ updated from executive_id
-        'company_id',
+        'user_id',      
         'is_active',
     ];
 
@@ -23,11 +32,6 @@ class Customer extends Model
     {
         return $this->belongsTo(User::class, 'user_id');
     }
-
-    // public function orders()
-    // {
-    //     return $this->hasMany(Order::class);
-    // }
 
     public function company()
     {
@@ -45,8 +49,23 @@ class Customer extends Model
     }
 
     public function trips()
-{
-    return $this->belongsToMany(Trip::class, 'customer_trip');
-}
+    {
+        return $this->belongsToMany(Trip::class, 'customer_trip');
+    }
+
+    public function state()
+    {
+        return $this->belongsTo(State::class, 'state_id');
+    }
+
+    public function district()
+    {
+        return $this->belongsTo(District::class, 'district_id');
+    }
+
+    public function tehsil()
+    {
+        return $this->belongsTo(Tehsil::class, 'tehsil_id');
+    }
 
 }
