@@ -138,7 +138,8 @@ class ApiTripController extends BaseController
         // Validate incoming request
         $validated = $request->validate([
             'location' => 'required|array|min:1',
-            'location.*.tripId' => 'required|exists:trips,id',
+            // 'location.*.tripId' => 'required|exists:trips,id',
+            'location.*.tripId' => 'required',
             'location.*.latitude' => 'required|numeric',
             'location.*.longitude' => 'required|numeric',
             'location.*.gps_status' => 'nullable',
@@ -216,14 +217,17 @@ class ApiTripController extends BaseController
             'start_time'     => 'nullable',
             'start_lat'      => 'required|numeric',
             'start_lng'      => 'required|numeric',
-            'travel_mode'    => 'required|exists:travel_modes,id',
-            'purpose'        => 'required|exists:purposes,id',
-            'tour_type'      => 'required|exists:tour_types,id',
+            // 'travel_mode'    => 'required|exists:travel_modes,id',
+            'travel_mode'    => 'required',
+            // 'purpose'        => 'required|exists:purposes,id',
+            'purpose'        => 'required',
+            // 'tour_type'      => 'required|exists:tour_types,id',
+            'tour_type'      => 'required',
             'place_to_visit' => 'nullable|string',
             'starting_km'    => 'nullable|string',
             'start_km_photo' => 'nullable|mimes:jpeg,jpg,png,bmp,gif,svg,webp,tiff,ico|max:5120',
             'customer_ids'   => 'nullable|array',
-            'customer_ids.*' => 'exists:customers,id'
+            // 'customer_ids.*' => 'exists:customers,id'
         ]);
 
         $user = Auth::user();
