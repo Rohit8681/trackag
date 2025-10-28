@@ -35,16 +35,13 @@ class ApiTripController extends BaseController
     }
     public function fetchCustomer()
     {
-        // Fetch all tour logs from the database
 
-        $user = Auth::user(); // or just Auth::user() if 'api' is default guard
+        $user = Auth::user(); 
 
-        // Only fetch day logs for the authenticated user
         $customers = Customer::where('is_active', true)
-            ->where('company_id', $user->company_id)
+            // ->where('company_id', $user->company_id)
             ->latest()
             ->get();
-
         // Return the view and pass the data
 
         return $this->sendResponse($customers, "Customers fetched successfully");

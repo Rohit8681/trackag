@@ -1,23 +1,23 @@
 <?php
-
 use App\Http\Controllers\Api\ApiAuthController;
 use App\Http\Controllers\Api\ApiTripController;
 use App\Http\Controllers\Api\FailedJobController;
 use App\Http\Controllers\Api\LocationApiController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Middleware\TenantAuthenticate;
 
 // Existing Auth API routes
 Route::post('/login', [ApiAuthController::class, 'login']);
-Route::post('/register', [ApiAuthController::class, 'register']);
+Route::post('/login_new', [ApiAuthController::class, 'login_new']);
 Route::get('locations', [LocationApiController::class, 'index']);
 Route::post('/failedJobs', [FailedJobController::class, 'store']);
 
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware([TenantAuthenticate::class])->group(function () {
+    // return response()->json(['ok' => true]);
     Route::post('/logout', [ApiAuthController::class, 'logout']);
     Route::post('/profile', [ApiAuthController::class, 'profile']);
     Route::post('/change-password', [ApiAuthController::class, 'changePassword']);
 
-    // ✅ New Trip API routes (appended here)
     Route::get('/trip/customers', [ApiTripController::class, 'fetchCustomer']);
     Route::get('/tourDetails', [ApiTripController::class, 'getTourDetails']);
     Route::get('/trips', [ApiTripController::class, 'index']);
