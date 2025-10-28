@@ -303,7 +303,7 @@
           <input type="hidden" name="user_id" id="depoModalUserId">
 
           {{-- State Dropdown --}}
-          <div class="mb-3">
+          {{-- <div class="mb-3">
             <label for="stateId" class="form-label">State Name</label>
             <select class="form-select" name="state_id" id="stateId" required>
                 <option value="">-- Select State --</option>
@@ -311,7 +311,7 @@
                     <option value="{{ $state->id }}">{{ $state->name }}</option>
                 @endforeach
             </select>
-          </div>
+          </div> --}}
 
           {{-- Depo Multiple Select --}}
           <div class="mb-3">
@@ -480,14 +480,9 @@
   </div>
 </div>
 
-
-
-
 </main>
 @endsection
-
 @push('scripts')
-
 <script>
 $(document).ready(function() {
     $('#slabAccessModal').on('shown.bs.modal', function () {
@@ -497,7 +492,6 @@ $(document).ready(function() {
             dropdownParent: $('#slabAccessModal') // important for Bootstrap modal
         });
     });
-
 
     $('#depoAccessModal').on('shown.bs.modal', function () {
         $('#depoId').select2({
@@ -690,7 +684,7 @@ $(document).ready(function() {
         });
     });
 
-    $('.depo_access').click(function() {
+    $('.depo_access').click(function () {
         $('#depoAccessMessage').html('');
         let userId = $(this).data('user-id');
         $('#depoModalUserId').val(userId);
@@ -702,58 +696,33 @@ $(document).ready(function() {
         // Show modal
         $('#depoAccessModal').modal('show');
 
-        // Optional: if you want to preselect state + depos
+        // 🔹 STEP 1: Load all depos first
         $.ajax({
-            url: 'get-user-depo-access', // New route
+            url: 'get-depos',
             type: 'GET',
-            data: { user_id: userId },
-            success: function(res) {
-                if(res.userAccess) {
-                    // Set state
-                    $('#stateId').val(res.userAccess.state_id).trigger('change');
+            success: function (depos) {
+                $('#depoId').empty();
 
-                    // Wait a bit for depos to load dynamically after state change
-                    setTimeout(function() {
-                        let selectedDepos = res.userAccess.depo_ids; // array
-                        $('#depoId').val(selectedDepos).trigger('change');
-                    }, 300); // 300ms delay for AJAX depos load
-                }
+                $.each(depos, function (i, depo) {
+                    $('#depoId').append(
+                        $('<option>', { value: depo.id, text: depo.depo_name })
+                    );
+                });
+
+                // 🔹 STEP 2: Now fetch user depo access and preselect
+                $.ajax({
+                    url: 'get-user-depo-access',
+                    type: 'GET',
+                    data: { user_id: userId },
+                    success: function (res) {
+                        if (res.userAccess && res.userAccess.depo_ids) {
+                            let selectedDepos = res.userAccess.depo_ids;
+                            $('#depoId').val(selectedDepos).trigger('change');
+                        }
+                    }
+                });
             }
         });
-    });
-
-
-    $('#stateId').change(function() {
-        let stateId = $(this).val();
-        if(stateId){
-            $.ajax({
-                url: '{{ route("admin.get.depos") }}',
-                type: 'GET',
-                data: { state_id: stateId },
-                success: function(data){
-                    console.log(data); // check data is coming
-                    // Clear old options
-                    $('#depoId').empty();
-
-                    // Add default placeholder
-                    $('#depoId').append(new Option('-- Select Depos --', '', false, false));
-
-                    // Append new options
-                    data.forEach(function(depo){
-                        let option = new Option(depo.depo_name, depo.id, false, false);
-                        $('#depoId').append(option);
-                    });
-
-                    // Update Select2
-                    $('#depoId').val(null).trigger('change');
-                },
-                error: function(err){
-                    console.log(err);
-                }
-            });
-        } else {
-            $('#depoId').empty().val(null).trigger('change');
-        }
     });
 
     $('#saveDepoAccessBtn').click(function() {
