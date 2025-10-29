@@ -1,6 +1,7 @@
 <?php
 use App\Http\Controllers\Api\ApiAuthController;
 use App\Http\Controllers\Api\ApiTripController;
+use App\Http\Controllers\Api\ExpenseController;
 use App\Http\Controllers\Api\FailedJobController;
 use App\Http\Controllers\Api\LocationApiController;
 use Illuminate\Support\Facades\Route;
@@ -28,4 +29,6 @@ Route::middleware([TenantAuthenticate::class])->group(function () {
     Route::get('/trip/active', [ApiTripController::class, 'lastActive']);
     Route::get('/trip/{tripId}/detail', [ApiTripController::class, 'showTrip']);
     Route::post('/trip/close', [ApiTripController::class, 'close']);
+    Route::post('/expenses', [ExpenseController::class, 'store']);
+    Route::get('/expenses', [ExpenseController::class, 'index']);
 });

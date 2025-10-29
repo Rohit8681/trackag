@@ -49,8 +49,10 @@ class AttendanceController extends Controller
         // Build attendance data for each day
         $attendanceData = [];
 
-        $currentDate = (clone $startDate)->startOfWeek(Carbon::SUNDAY);
-        $lastDate = (clone $endDate)->endOfWeek(Carbon::SATURDAY);
+        // $currentDate = (clone $startDate)->startOfWeek(Carbon::SUNDAY);
+        // $lastDate = (clone $endDate)->endOfWeek(Carbon::SATURDAY);
+        $currentDate = (clone $startDate);
+        $lastDate = (clone $endDate);
 
         while ($currentDate <= $lastDate) {
             $dateKey = $currentDate->format('Y-m-d');

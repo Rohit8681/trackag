@@ -66,8 +66,7 @@ Route::middleware(['web'])->group(function () {
     });
 
     Route::get('/sample-download', function () {
-        $filePath = public_path('sample-files/customers_sample.xlsx');
-        // dd($filePath);
+        $filePath = public_path('sample-files\customers_sample.xlsx');
         if (!file_exists($filePath)) {
             return abort(404, 'Sample file not found at: ' . $filePath);
         }
@@ -134,7 +133,7 @@ Route::middleware(['web'])->group(function () {
             Route::post('ta-da-bill-master', [TaDaBillMasterController::class, 'update'])->name('ta-da-bill-master.update');
             Route::post('/ta-da-bill-master/toggle-status', [TaDaBillMasterController::class, 'toggleStatus'])->name('ta-da-bill-master.toggle-status');
 
-
+            Route::get('/hr/attendance', [AttendanceController::class, 'index'])->name('attendance.index');
             Route::get('/get-districts/{state_id}', [UserController::class, 'getDistricts'])->name('get.districts');
             Route::get('/get-cities/{district_id}', [UserController::class, 'getCities'])->name('get.cities');
             Route::get('/get-tehsils/{city_id}', [UserController::class, 'getTehsils'])->name('get.tehsils');

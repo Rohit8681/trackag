@@ -23,9 +23,9 @@ class ApiTripController extends BaseController
     {
         $user = Auth::user(); // or just Auth::user() if 'api' is default guard
 
-        $tourPurposes = Purpose::where('company_id', $user->company_id)->get();
-        $vehicleTypes = TravelMode::where('company_id', $user->company_id)->get();
-        $tourTypes = TourType::where('company_id', $user->company_id)->get();
+        $tourPurposes = Purpose::get();
+        $vehicleTypes = TravelMode::get();
+        $tourTypes = TourType::get();
         $success = [];
         $success['tourPurposes'] = $tourPurposes;
         $success['vehicleTypes'] = $vehicleTypes;
