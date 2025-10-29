@@ -268,7 +268,7 @@ class ApiTripController extends BaseController
 
         $trip = Trip::create([
             'user_id'           => $user->id,
-            'company_id'        => $user->company_id,
+            'company_id' => isset($user->company_id) ? $user->company_id : 1,
             'trip_date'         => $validated['trip_date'] ?? now()->toDateString(),
             'start_time'        => $validated['start_time'] ?? now()->toTimeString(),
             'end_time'          => $validated['end_time'] ?? null,
