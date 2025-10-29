@@ -49,7 +49,7 @@ class TripController extends Controller
         if ($user->hasRole('master_admin')) {
             $trips = $query->latest()->get();
         } elseif ($user->hasRole('sub_admin')) {
-            $trips = $query->where('company_id', $user->company_id)->latest()->get();
+            $trips = $query->latest()->get();
         } else {
             $trips = $query->where(function ($q) use ($user) {
                 // Own trips
