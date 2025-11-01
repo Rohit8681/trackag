@@ -519,10 +519,6 @@
                             </a>
                         </li>
 
-                        {{-- Holiday Master --}}
-                        
-
-                        {{-- Leave Master --}}
                         
                         <li class="nav-item">
                             <a href="{{ url('admin/ta-da-slab') }}"
