@@ -14,6 +14,10 @@ class PartyController extends Controller
         return view('admin.party.index');
     }
 
+    public function newPartyList(){
+        return view('admin.new-party.index');
+    }
+
     /**
      * Show the form for creating a new resource.
      */

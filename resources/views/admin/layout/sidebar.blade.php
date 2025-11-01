@@ -91,6 +91,15 @@
                             </a>
                         </li>
                     </ul>
+                    <ul class="nav nav-treeview">
+                    <li class="nav-item">
+                        <a href="{{ url('admin/new-party') }}" 
+                        class="nav-link {{ request()->is('admin/new-party*') ? 'active' : '' }}">
+                            <i class="bi bi-people-fill me-2"></i>
+                            <p>New Party</p>
+                        </a>
+                    </li>
+                </ul>
                 </li>
                 @endcanany
 

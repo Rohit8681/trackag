@@ -159,6 +159,7 @@ Route::middleware(['web'])->group(function () {
             Route::resource('monthly', MonthlyController::class);
             Route::resource('achievement', AchievementController::class);
             Route::resource('party', PartyController::class);
+            Route::get('new-party', [PartyController::class, 'newPartyList'])->name('new-party.list');
             Route::resource('order', OrderController::class);
             Route::resource('stock', StockController::class);
             Route::resource('tracking', TrackingController::class);

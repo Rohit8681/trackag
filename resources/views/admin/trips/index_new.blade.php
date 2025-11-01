@@ -114,7 +114,7 @@
                                                 @endforelse
                                             </td>
 
-                                            <td class="text-center">
+                                            {{-- <td class="text-center">
                                                 <div class="mb-1">
                                                     <strong>Opening:</strong><br>
                                                     @if ($trip->start_km_photo)
@@ -135,6 +135,15 @@
                                                         <span class="text-muted">-</span>
                                                     @endif
                                                 </div>
+                                            </td> --}}
+                                            <td class="text-center">
+                                                @if ($trip->start_km_photo || $trip->end_km_photo)
+                                                    <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#kmImagesModal{{ $trip->id }}">
+                                                        <i class="fas fa-image me-1"></i> View
+                                                    </button>
+                                                @else
+                                                    <span class="text-muted">No Images</span>
+                                                @endif
                                             </td>
 
                                             <td>
@@ -319,6 +328,50 @@
             </div>
         {{-- @endcan --}}
     @endforeach
+
+    <!-- KM Images Modal -->
+    @foreach ($trips as $trip)
+    <div class="modal fade" id="kmImagesModal{{ $trip->id }}" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title mb-0">Trip #{{ $trip->id }} - KM Images</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <h6 class="fw-semibold text-success">Opening</h6>
+                            @if ($trip->start_km_photo)
+                                <a href="{{ asset('storage/' . $trip->start_km_photo) }}" target="_blank">
+                                    <img src="{{ asset('storage/' . $trip->start_km_photo) }}" class="img-fluid rounded shadow-sm border" alt="Opening KM">
+                                </a>
+                            @else
+                                <p class="text-muted mb-0">No Image</p>
+                            @endif
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="fw-semibold text-danger">Closing</h6>
+                            @if ($trip->end_km_photo)
+                                <a href="{{ asset('storage/' . $trip->end_km_photo) }}" target="_blank">
+                                    <img src="{{ asset('storage/' . $trip->end_km_photo) }}" class="img-fluid rounded shadow-sm border" alt="Closing KM">
+                                </a>
+                            @else
+                                <p class="text-muted mb-0">No Image</p>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endforeach
+
 </main>
 @endsection
 @push('scripts')
