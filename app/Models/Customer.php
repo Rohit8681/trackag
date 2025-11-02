@@ -8,8 +8,11 @@ use App\Traits\TenantConnectionTrait;
 class Customer extends Model
 {
     use TenantConnectionTrait;
-    
+
     protected $fillable = [
+        'type',
+        'visit_date',
+        'sales_person_name',
         'agro_name',
         'contact_person_name',
         'party_code',
@@ -24,11 +27,22 @@ class Customer extends Model
         'email',
         'phone',
         'address',
-        'user_id',      
+        'user_id',
         'is_active',
+        'working_with',
+        'party_documents',
+        'status',
+        'remarks',
     ];
 
-    public function user() // ✅ renamed from executive() to match user_id
+    protected $casts = [
+        'party_documents' => 'array',
+        'is_active' => 'boolean',
+        'visit_date' => 'date',
+        'party_active_since' => 'date',
+    ];
+
+    public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
     }
@@ -67,5 +81,4 @@ class Customer extends Model
     {
         return $this->belongsTo(Tehsil::class, 'tehsil_id');
     }
-
 }

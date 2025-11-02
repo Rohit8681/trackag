@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\ApiTripController;
 use App\Http\Controllers\Api\ExpenseController;
 use App\Http\Controllers\Api\FailedJobController;
 use App\Http\Controllers\Api\LocationApiController;
+use App\Http\Controllers\APi\PartyController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\TenantAuthenticate;
 
@@ -31,4 +32,6 @@ Route::middleware([TenantAuthenticate::class])->group(function () {
     Route::post('/trip/close', [ApiTripController::class, 'close']);
     Route::post('/expenses', [ExpenseController::class, 'store']);
     Route::get('/expenses', [ExpenseController::class, 'index']);
+    Route::post('/party-visits-store', [PartyController::class, 'partyVisitsStore']);
+    Route::post('/new-party-store', [PartyController::class, 'newPartyStore']);
 });

@@ -318,41 +318,8 @@
                     </ul>
                 </li>
 
-                <!-- User Management -->
-                @canany(['view_users','create_users','edit_users','delete_users','view_roles','create_roles','edit_roles','delete_roles','view_permissions','create_permissions','edit_permissions','delete_permissions'])
-                <li class="nav-item {{ request()->is('admin/users*') || request()->is('admin/roles*') || request()->is('admin/permissions*') ? 'menu-open' : '' }}">
-                    <a href="#" class="nav-link {{ request()->is('admin/users*') || request()->is('admin/roles*') || request()->is('admin/permissions*') ? 'active' : '' }}">
-                        <i class="bi bi-people-fill me-2"></i>
-                        <p>User Management <i class="bi bi-chevron-right ms-auto"></i></p>
-                    </a>
-                    <ul class="nav nav-treeview">
-                        @canany(['view_users','create_users','edit_users','delete_users'])
-                        <li class="nav-item">
-                            <a href="{{ url('admin/users') }}" class="nav-link {{ request()->is('admin/users*') ? 'active' : '' }}">
-                                <i class="bi bi-person-fill me-2"></i>
-                                <p>Manage Users</p>
-                            </a>
-                        </li>
-                        @endcanany
-                         @canany(['view_roles','create_roles','edit_roles','delete_roles'])
-                        <li class="nav-item">
-                            <a href="{{ url('admin/roles') }}" class="nav-link {{ request()->is('admin/roles*') ? 'active' : '' }}">
-                                <i class="bi bi-shield-lock me-2"></i>
-                                <p>Manage Roles</p>
-                            </a>
-                        </li>
-                        @endcanany
-                        @if(auth()->user() && auth()->user()->hasRole('master_admin'))
-                        <li class="nav-item">
-                            <a href="{{ url('admin/permissions') }}" class="nav-link {{ request()->is('admin/permissions*') ? 'active' : '' }}">
-                                <i class="bi bi-key me-2"></i>
-                                <p>Manage Permissions</p>
-                            </a>
-                        </li>
-                        @endif
-                    </ul>
-                </li>
-                @endcanany
+                
+                
 
                 <!-- Trip Management -->
                 @canany(['view_all_trip','create_all_trip','edit_all_trip','delete_all_trip','view_trip_types','create_trip_types','edit_trip_types','delete_trip_types','view_travel_modes','create_travel_modes','edit_travel_modes','delete_travel_modes','view_trip_purposes','create_trip_purposes','edit_trip_purposes','delete_trip_purposes'])
@@ -511,11 +478,57 @@
                             </a>
                         </li> --}}
 
+                        
+
+                        {{-- User Management --}}
+                        @canany(['view_users','create_users','edit_users','delete_users','view_roles','create_roles','edit_roles','delete_roles','view_permissions','create_permissions','edit_permissions','delete_permissions'])
+                        <li class="nav-item {{ request()->is('admin/users*') || request()->is('admin/roles*') || request()->is('admin/permissions*') ? 'menu-open' : '' }}">
+                            <a href="#" class="nav-link {{ request()->is('admin/users*') || request()->is('admin/roles*') || request()->is('admin/permissions*') ? 'active' : '' }}">
+                                <i class="bi bi-people-fill me-2"></i>
+                                <p>Sales Person<i class="bi bi-chevron-right ms-auto"></i></p>
+                            </a>
+                            <ul class="nav nav-treeview">
+                                @canany(['view_users','create_users','edit_users','delete_users'])
+                                <li class="nav-item">
+                                    <a href="{{ url('admin/users') }}" class="nav-link {{ request()->is('admin/users*') ? 'active' : '' }}">
+                                        <i class="bi bi-person-fill me-2"></i>
+                                        <p>Manage Users</p>
+                                    </a>
+                                </li>
+                                @endcanany
+                                @canany(['view_roles','create_roles','edit_roles','delete_roles'])
+                                <li class="nav-item">
+                                    <a href="{{ url('admin/roles') }}" class="nav-link {{ request()->is('admin/roles*') ? 'active' : '' }}">
+                                        <i class="bi bi-shield-lock me-2"></i>
+                                        <p>Manage Roles</p>
+                                    </a>
+                                </li>
+                                @endcanany
+                                @if(auth()->user() && auth()->user()->hasRole('master_admin'))
+                                <li class="nav-item">
+                                    <a href="{{ url('admin/permissions') }}" class="nav-link {{ request()->is('admin/permissions*') ? 'active' : '' }}">
+                                        <i class="bi bi-key me-2"></i>
+                                        <p>Manage Permissions</p>
+                                    </a>
+                                </li>
+                                @endif
+                            </ul>
+                        </li>
+                        @endcanany
+
                         {{-- Depo Master --}}
                         <li class="nav-item">
                             <a href="{{ url('admin/depos') }}" class="nav-link {{ request()->is('admin/depos*') ? 'active' : '' }}">
                                 <i class="bi bi-person-lines-fill me-2"></i>
                                 <p>Depo Master</p>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a href="{{ url('admin/customers') }}"
+                                class="nav-link {{ request()->is('admin/customers*') ? 'active' : '' }}">
+                                <i class="bi bi-person-lines-fill me-2"></i>
+                                <p>Party (Customers)</p>
                             </a>
                         </li>
 
@@ -547,13 +560,7 @@
                         <p>Companies</p>
                     </a>
                 </li>
-                <li class="nav-item">
-                    <a href="{{ url('admin/customers') }}"
-                        class="nav-link {{ request()->is('admin/customers*') ? 'active' : '' }}">
-                        <i class="bi bi-person-lines-fill me-2"></i>
-                        <p>Party (Customers)</p>
-                    </a>
-                </li>
+                
             </ul>
         </nav>
     </div>
