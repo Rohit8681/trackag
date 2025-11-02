@@ -1,8 +1,11 @@
 <?php
 
+use App\Http\Controllers\BrochureController;
 use App\Http\Controllers\DepoController;
 use App\Http\Controllers\HolidayController;
 use App\Http\Controllers\LeaveController;
+use App\Http\Controllers\PriceController;
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\TaDaBillMasterController;
 use App\Http\Controllers\TaDaSlabController;
 use App\Http\Controllers\VehicleController;
@@ -166,6 +169,9 @@ Route::middleware(['web'])->group(function () {
             Route::resource('stock', StockController::class);
             Route::resource('tracking', TrackingController::class);
             Route::resource('expense', ExpenseController::class);
+            Route::resource('brochure', BrochureController::class);
+            Route::resource('price', PriceController::class);
+            Route::resource('products', ProductController::class);
 
              Route::resource('customers', CustomerController::class);
             Route::patch('/customers/{id}/toggle', [CustomerController::class, 'toggleStatus'])->name('customers.toggle');

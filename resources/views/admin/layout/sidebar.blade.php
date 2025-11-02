@@ -363,6 +363,52 @@
                 </li>
                 @endcanany
 
+                <li class="nav-item {{ request()->is('admin/trips*') ? 'menu-open' : '' }}">
+                    <a href="#" class="nav-link {{ request()->is('admin/trips*') ? 'active' : '' }}">
+                        <i class="bi bi-people-fill me-2"></i>
+                        <p>Daily Activity<i class="bi bi-chevron-right ms-auto"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        @canany(['view_all_trip','create_all_trip','edit_all_trip','delete_all_trip'])
+                        <li class="nav-item">
+                            <a href="{{ url('admin/trips') }}" class="nav-link {{ request()->is('admin/trips*') ? 'active' : '' }}">
+                                <i class="bi bi-truck me-2"></i>
+                                <p>All Trips</p>
+                            </a>
+                        </li>
+                        @endcanany
+                        <li class="nav-item">
+                            <a href="{{ url('admin/party') }}" class="nav-link {{ request()->is('admin/party*') ? 'active' : '' }}">
+                                <i class="bi bi-cash-stack me-2"></i>
+                                <p>Party Visit</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ url('admin/new-party') }}"
+                                class="nav-link {{ request()->is('admin/new-party*') ? 'active' : '' }}">
+                                <i class="bi bi-people-fill me-2"></i>
+                                <p>New Party</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ url('admin/expense') }}" class="nav-link {{ request()->is('admin/expense*') ? 'active' : '' }}">
+                                <i class="bi bi-cash-stack me-2"></i>
+                                <p>Expense</p>
+                            </a>
+                        </li>
+                        @canany(['view_attendance','create_attendance','edit_attendance','delete_attendance'])
+                        <li class="nav-item">
+                            <a href="{{ url('admin/hr/attendance') }}" class="nav-link {{ request()->is('admin/hr/attendance*') ? 'active' : '' }}">
+                                <i class="bi bi-clock-history me-2"></i>
+                                <p>Attendance</p>
+                            </a>
+                        </li>
+                        @endcanany
+                    </ul>
+                    
+                </li>
+
                 <!-- Master Management -->
                 @canany(['view_states','create_states','edit_states','delete_states','view_districts','create_districts','edit_districts','delete_districts','view_talukas','create_talukas','edit_talukas','delete_talukas','view_vehicle_types','create_vehicle_types','edit_vehicle_types','delete_vehicle_types','view_depo_master','create_depo_master','edit_depo_master','delete_depo_master','view_holiday_master','create_holiday_master','edit_holiday_master','delete_holiday_master','view_leave_master','create_leave_master','edit_leave_master','delete_leave_master'])
                 <li class="nav-item {{ request()->is('admin/states*') || request()->is('admin/districts*') || request()->is('admin/tehsils*') || request()->is('admin/vehicle-types*') || request()->is('admin/depos*') || request()->is('admin/holidays*') || request()->is('admin/leaves*') || request()->is('admin/ta-da-bill-master*') || request()->is('admin/vehicle*') ? 'menu-open' : '' }}">
@@ -515,12 +561,21 @@
                             </ul>
                         </li>
                         @endcanany
+                        
 
                         {{-- Depo Master --}}
                         <li class="nav-item">
                             <a href="{{ url('admin/depos') }}" class="nav-link {{ request()->is('admin/depos*') ? 'active' : '' }}">
                                 <i class="bi bi-person-lines-fill me-2"></i>
                                 <p>Depo Master</p>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a href="{{ url('admin/companies') }}"
+                                class="nav-link {{ request()->is('admin/companies*') ? 'active' : '' }}">
+                                <i class="bi bi-buildings me-2"></i>
+                                <p>Companies</p>
                             </a>
                         </li>
 
@@ -532,34 +587,121 @@
                             </a>
                         </li>
 
-                        
-                        <li class="nav-item">
-                            <a href="{{ url('admin/ta-da-slab') }}"
-                                class="nav-link {{ request()->is('admin/ta-da-slab*') ? 'active' : '' }}">
-                                <i class="bi bi-circle me-2"></i>
-                                <p>TA-DA</p>
+                        <li class="nav-item {{ request()->is('admin/products*') ? 'menu-open' : '' }}">
+                            <a href="#" class="nav-link {{ request()->is('admin/products*')  ? 'active' : '' }}">
+                                <i class="bi bi-people-fill me-2"></i>
+                                <p>Product Master<i class="bi bi-chevron-right ms-auto"></i></p>
                             </a>
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a href="{{ url('admin/products') }}" class="nav-link {{ request()->is('admin/products*') ? 'active' : '' }}">
+                                        <i class="bi bi-person-fill me-2"></i>
+                                        <p>Sales Product Master</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{{ url('admin/products') }}" class="nav-link {{ request()->is('admin/products*') ? 'active' : '' }}">
+                                        <i class="bi bi-person-fill me-2"></i>
+                                        <p>Technical Master</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{{ url('admin/products') }}" class="nav-link {{ request()->is('admin/products*') ? 'active' : '' }}">
+                                        <i class="bi bi-person-fill me-2"></i>
+                                        <p>Product Category</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{{ url('admin/products') }}" class="nav-link {{ request()->is('admin/products*') ? 'active' : '' }}">
+                                        <i class="bi bi-person-fill me-2"></i>
+                                        <p>Product Price</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{{ url('admin/products') }}" class="nav-link {{ request()->is('admin/products*') ? 'active' : '' }}">
+                                        <i class="bi bi-person-fill me-2"></i>
+                                        <p>Product Collection</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{{ url('admin/products') }}" class="nav-link {{ request()->is('admin/products*') ? 'active' : '' }}">
+                                        <i class="bi bi-person-fill me-2"></i>
+                                        <p>Product Financial Mapping</p>
+                                    </a>
+                                </li>
+                                
+                            </ul>
                         </li>
 
-                        {{-- TA-DA Bill Master --}}
-                        <li class="nav-item">
-                            <a href="{{ url('admin/ta-da-bill-master') }}" class="nav-link {{ request()->is('admin/ta-da-bill-master*') ? 'active' : '' }}">
-                                <i class="bi bi-file-earmark-text me-2"></i>
-                                <p>TA-DA Bill Master</p>
+                        <li class="nav-item {{ request()->is('admin/price*') ? 'menu-open' : '' }}">
+                            <a href="#" class="nav-link {{ request()->is('admin/price*')  ? 'active' : '' }}">
+                                <i class="bi bi-people-fill me-2"></i>
+                                <p>Price<i class="bi bi-chevron-right ms-auto"></i></p>
                             </a>
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a href="{{ url('admin/price') }}" class="nav-link {{ request()->is('admin/price*') ? 'active' : '' }}">
+                                        <i class="bi bi-person-fill me-2"></i>
+                                        <p>Price Master</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{{ url('admin/price') }}" class="nav-link {{ request()->is('admin/price*') ? 'active' : '' }}">
+                                        <i class="bi bi-person-fill me-2"></i>
+                                        <p>Price List</p>
+                                    </a>
+                                </li>
+                                
+                            </ul>
                         </li>
+
+                        <li class="nav-item {{ request()->is('admin/brochure*') ? 'menu-open' : '' }}">
+                            <a href="#" class="nav-link {{ request()->is('admin/brochure*')  ? 'active' : '' }}">
+                                <i class="bi bi-people-fill me-2"></i>
+                                <p>Brochure<i class="bi bi-chevron-right ms-auto"></i></p>
+                            </a>
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a href="{{ url('admin/brochure') }}" class="nav-link {{ request()->is('admin/brochure*') ? 'active' : '' }}">
+                                        <i class="bi bi-person-fill me-2"></i>
+                                        <p>Upload Brochure</p>
+                                    </a>
+                                </li>
+                                
+                            </ul>
+                        </li>
+
+                        <li class="nav-item {{ request()->is('admin/ta-da-slab*') || request()->is('admin/ta-da-bill-master*')  ? 'menu-open' : '' }}">
+                            <a href="#" class="nav-link {{ request()->is('admin/ta-da-slab*') || request()->is('admin/ta-da-bill-master*')  ? 'active' : '' }}">
+                                <i class="bi bi-flag me-2"></i>
+                                <p>Expense Master<i class="bi bi-chevron-right ms-auto"></i></p>
+                            </a>
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a href="{{ url('admin/ta-da-slab') }}"
+                                        class="nav-link {{ request()->is('admin/ta-da-slab*') ? 'active' : '' }}">
+                                        <i class="bi bi-circle me-2"></i>
+                                        <p>TA-DA</p>
+                                    </a>
+                                </li>
+
+                                {{-- TA-DA Bill Master --}}
+                                <li class="nav-item">
+                                    <a href="{{ url('admin/ta-da-bill-master') }}" class="nav-link {{ request()->is('admin/ta-da-bill-master*') ? 'active' : '' }}">
+                                        <i class="bi bi-file-earmark-text me-2"></i>
+                                        <p>TA-DA Bill Master</p>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        
+
+                        
+                        
 
                     </ul>
                 </li>
                 @endcanany
-
-                <li class="nav-item">
-                    <a href="{{ url('admin/companies') }}"
-                        class="nav-link {{ request()->is('admin/companies*') ? 'active' : '' }}">
-                        <i class="bi bi-buildings me-2"></i>
-                        <p>Companies</p>
-                    </a>
-                </li>
                 
             </ul>
         </nav>
