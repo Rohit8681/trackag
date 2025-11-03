@@ -7,6 +7,7 @@ use App\Models\TaDaSlab;
 use App\Models\TaDaTourSlab;
 use App\Models\TaDaVehicleSlab;
 use App\Models\TourType;
+use App\Models\TravelMode;
 use App\Models\VehicleType;
 use Illuminate\Http\Request;
 
@@ -24,10 +25,10 @@ class TaDaSlabController extends Controller
         $individualTourSlabs = TaDaTourSlab::where('type', 'individual')->get();
         $slabWiseTourSlabs   = TaDaTourSlab::where('type', 'slab_wise')->get();
 
-        $vehicleTypes = VehicleType::where('is_deleted', 0)->get();
+        // $vehicleTypes = VehicleType::where('is_deleted', 0)->get();
+        $vehicleTypes = TravelMode::get();
         $tourTypes = TourType::all();
         $designations = Designation::all();
-
         return view('admin.ta_da_slab.form', compact(
             'slab', 'vehicleTypes', 'tourTypes', 'designations',
             'individualVehicleSlabs', 'slabWiseVehicleSlabs',

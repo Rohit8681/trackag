@@ -322,7 +322,7 @@
                 
 
                 <!-- Trip Management -->
-                @canany(['view_all_trip','create_all_trip','edit_all_trip','delete_all_trip','view_trip_types','create_trip_types','edit_trip_types','delete_trip_types','view_travel_modes','create_travel_modes','edit_travel_modes','delete_travel_modes','view_trip_purposes','create_trip_purposes','edit_trip_purposes','delete_trip_purposes'])
+                {{-- @canany(['view_all_trip','create_all_trip','edit_all_trip','delete_all_trip','view_trip_types','create_trip_types','edit_trip_types','delete_trip_types','view_travel_modes','create_travel_modes','edit_travel_modes','delete_travel_modes','view_trip_purposes','create_trip_purposes','edit_trip_purposes','delete_trip_purposes'])
                 <li class="nav-item {{ request()->is('admin/trip-types*') || request()->is('admin/travel-modes*') || request()->is('admin/purposes*') ? 'menu-open' : '' }}">
                     <a href="#" class="nav-link {{ request()->is('admin/trip-types*') || request()->is('admin/travel-modes*') || request()->is('admin/purposes*') ? 'active' : '' }}">
                         <i class="bi bi-truck-front me-2"></i>
@@ -340,10 +340,10 @@
                         
                     </ul>
                 </li>
-                @endcanany
+                @endcanany --}}
 
                 <!-- HR Module -->
-                @canany(['view_designations','create_designations','edit_designations','delete_designations','view_attendance','create_attendance','edit_attendance','delete_attendance'])
+                {{-- @canany(['view_designations','create_designations','edit_designations','delete_designations','view_attendance','create_attendance','edit_attendance','delete_attendance'])
                 <li class="nav-item {{ request()->is('admin/hr/*') ? 'menu-open' : '' }}">
                     <a href="#" class="nav-link {{ request()->is('admin/hr/*') ? 'active' : '' }}">
                         <i class="bi bi-person-workspace me-2"></i>
@@ -361,7 +361,7 @@
                         @endcanany
                     </ul>
                 </li>
-                @endcanany
+                @endcanany --}}
 
                 <li class="nav-item {{ request()->is('admin/trips*') ? 'menu-open' : '' }}">
                     <a href="#" class="nav-link {{ request()->is('admin/trips*') ? 'active' : '' }}">

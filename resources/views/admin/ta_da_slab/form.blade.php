@@ -104,7 +104,7 @@
                                                         $value = $individualVehicleSlabs->where('vehicle_type_id', $vt->id)->first()->travelling_allow_per_km ?? '';
                                                     @endphp
                                                     <tr>
-                                                        <td>{{ $vt->vehicle_type }}</td>
+                                                        <td>{{ $vt->name }}</td>
                                                         <td>
                                                             <input type="hidden" name="vehicle_type_id[]" value="{{ $vt->id }}">
                                                             <input type="number" step="0.01" name="travelling_allow_per_km[]" class="form-control"
@@ -173,7 +173,7 @@
                                                         $value = $slabWiseVehicleSlabs->where('vehicle_type_id', $vt->id)->first()->travelling_allow_per_km ?? '';
                                                     @endphp
                                                     <tr>
-                                                        <td>{{ $vt->vehicle_type }}</td>
+                                                        <td>{{ $vt->name }}</td>
                                                         <td>
                                                             <input type="hidden" name="slab_wise_vehicle_type_id[]" value="{{ $vt->id }}">
                                                             <input type="number" step="0.01" name="slab_wise_travelling_allow_per_km[]" class="form-control"

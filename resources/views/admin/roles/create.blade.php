@@ -4,19 +4,19 @@
 @section('content')
 <main class="app-main">
     <div class="app-content-header">
-      <div class="container-fluid">
-         <div class="row">
-            <div class="col-sm-6">
-               <h3 class="mb-0">Create Role</h3>
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-sm-6">
+                    <h3 class="mb-0">Create Role</h3>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-end">
+                        <li class="breadcrumb-item"><a href="{{ route('roles.index') }}">Roles</a></li>
+                        <li class="breadcrumb-item active">Create Role</li>
+                    </ol>
+                </div>
             </div>
-            <div class="col-sm-6">
-               <ol class="breadcrumb float-sm-end">
-                  <li class="breadcrumb-item"><a href="{{ route('roles.index') }}">Roles</a></li>
-                  <li class="breadcrumb-item active">Create Role</li>
-               </ol>
-            </div>
-         </div>
-      </div>
+        </div>
     </div>
 
     <div class="app-content">
@@ -33,7 +33,7 @@
                             <div class="col-md-6">
                                 <label for="name" class="form-label fw-semibold">Role Name</label>
                                 <input type="text" class="form-control form-control-lg border-primary-subtle shadow-sm"
-                                       id="name" name="name" placeholder="Enter role name" required>
+                                    id="name" name="name" placeholder="Enter role name" required>
                             </div>
                         </div>
 
@@ -49,17 +49,45 @@
                                 <thead class="table-primary">
                                     <tr>
                                         <th>Module</th>
-                                        <th>Create</th>
-                                        <th>View</th>
-                                        <th>Edit</th>
-                                        <th>Delete</th>
-                                        <th>Approve</th>
-                                        <th>Reject</th>
-                                        <th>Verify</th>
-                                        <th>Dispatch</th>
-                                        <th>Remove Review</th>
+                                        <th>
+                                            <input type="checkbox" class="form-check-input column-select" data-column="create">
+                                            Create
+                                        </th>
+                                        <th>
+                                            <input type="checkbox" class="form-check-input column-select" data-column="view">
+                                            View
+                                        </th>
+                                        <th>
+                                            <input type="checkbox" class="form-check-input column-select" data-column="edit">
+                                            Edit
+                                        </th>
+                                        <th>
+                                            <input type="checkbox" class="form-check-input column-select" data-column="delete">
+                                            Delete
+                                        </th>
+                                        <th>
+                                            <input type="checkbox" class="form-check-input column-select" data-column="approvals">
+                                            Approve
+                                        </th>
+                                        <th>
+                                            <input type="checkbox" class="form-check-input column-select" data-column="reject">
+                                            Reject
+                                        </th>
+                                        <th>
+                                            <input type="checkbox" class="form-check-input column-select" data-column="verify">
+                                            Verify
+                                        </th>
+                                        <th>
+                                            <input type="checkbox" class="form-check-input column-select" data-column="dispatch">
+                                            Dispatch
+                                        </th>
+                                        <th>
+                                            <input type="checkbox" class="form-check-input column-select" data-column="remove_review">
+                                            Remove Review
+                                        </th>
                                     </tr>
                                 </thead>
+
                                 <tbody>
                                     @php
                                         $modules = [
@@ -74,33 +102,34 @@
                                             'Expense' => 'expense',
                                             'Manage User' => 'users',
                                             'Manage Role' => 'roles',
-                                            
                                         ];
+
                                         if (auth()->user() && auth()->user()->hasRole('master_admin')) {
                                             $modules['Manage Permissions'] = 'permissions';
                                         }
-                                        $modules['All Trips'] = 'all_trip';
-                                        $modules['Trip Types'] = 'trip_types';
-                                        $modules['Travel Modes'] = 'travel_modes';
-                                        $modules['Trip Purposes'] = 'trip_purposes';
-                                        //$modules['Employees'] = 'employees';
-                                        $modules['Designations'] = 'designations';
-                                        $modules['Attendance'] = 'attendance';
-                                        $modules['States'] = 'states';
-                                        $modules['Districts'] = 'districts';
-                                        $modules['Talukas'] = 'talukas';
-                                        $modules['Vehicle Types'] = 'vehicle_types';
-                                        // $modules['Vehicle Master'] = 'vehicle';
-                                        $modules['Depo Master'] = 'depo_master';
-                                        $modules['Holiday Master'] = 'holiday_master';
-                                        $modules['Leave Master'] = 'leave_master';
-                                        $modules['TA-DA'] = 'ta_da';
-                                        $modules['TA-DA Bill Master'] = 'ta_da_bill_master';
+
+                                        $modules = array_merge($modules, [
+                                            'All Trips' => 'all_trip',
+                                            'Trip Types' => 'trip_types',
+                                            'Travel Modes' => 'travel_modes',
+                                            'Trip Purposes' => 'trip_purposes',
+                                            'Designations' => 'designations',
+                                            'Attendance' => 'attendance',
+                                            'States' => 'states',
+                                            'Districts' => 'districts',
+                                            'Talukas' => 'talukas',
+                                            'Vehicle Types' => 'vehicle_types',
+                                            'Depo Master' => 'depo_master',
+                                            'Holiday Master' => 'holiday_master',
+                                            'Leave Master' => 'leave_master',
+                                            'TA-DA' => 'ta_da',
+                                            'TA-DA Bill Master' => 'ta_da_bill_master',
+                                            'Party (Customer)' => 'customers',
+                                        ]);
+
                                         if (auth()->user() && auth()->user()->hasRole('master_admin')) {
                                             $modules['Companies'] = 'companies';
                                         }
-                                        $modules['Party (Customer)'] = 'customers';
-
 
                                         $actions = ['create','view', 'edit', 'delete', 'approvals', 'reject', 'verify', 'dispatch', 'remove_review'];
                                     @endphp
@@ -109,16 +138,17 @@
                                         <tr>
                                             <td class="fw-semibold text-start">{{ $moduleName }}</td>
                                             @foreach ($actions as $action)
-                                                
                                                 @php
                                                     $permission = $permissions->firstWhere('name', "{$action}_{$keyword}");
                                                 @endphp
                                                 <td>
                                                     @if ($permission)
-                                                        
-                                                        <input type="checkbox" class="form-check-input permission-checkbox"
-                                                            name="permissions[]" value="{{ $permission->name }}"
-                                                            id="perm_{{ $permission->id }}">
+                                                        <input type="checkbox" 
+                                                            class="form-check-input permission-checkbox"
+                                                            name="permissions[]" 
+                                                            value="{{ $permission->name }}"
+                                                            id="perm_{{ $permission->id }}"
+                                                            data-action="{{ $action }}">
                                                     @else
                                                         <span class="text-muted">—</span>
                                                     @endif
@@ -147,10 +177,32 @@
     </div>
 </main>
 
-{{-- Select All Script --}}
+{{-- Select All + Column Select Script --}}
 <script>
+    // Select all permissions
     document.getElementById('select-all').addEventListener('change', function (event) {
-        document.querySelectorAll('.permission-checkbox').forEach(cb => cb.checked = event.target.checked);
+        const isChecked = event.target.checked;
+        document.querySelectorAll('.permission-checkbox, .column-select').forEach(cb => cb.checked = isChecked);
+    });
+
+    // Column-wise select/deselect
+    document.querySelectorAll('.column-select').forEach(headerCb => {
+        headerCb.addEventListener('change', function () {
+            const column = this.getAttribute('data-column');
+            document.querySelectorAll(`.permission-checkbox[data-action="${column}"]`).forEach(cb => cb.checked = this.checked);
+        });
+    });
+
+    // Auto update header checkbox if all column items are selected
+    document.querySelectorAll('.permission-checkbox').forEach(cb => {
+        cb.addEventListener('change', function () {
+            const column = this.getAttribute('data-action');
+            const allBoxes = document.querySelectorAll(`.permission-checkbox[data-action="${column}"]`);
+            const headerBox = document.querySelector(`.column-select[data-column="${column}"]`);
+            if (headerBox) {
+                headerBox.checked = Array.from(allBoxes).every(b => b.checked);
+            }
+        });
     });
 </script>
 
