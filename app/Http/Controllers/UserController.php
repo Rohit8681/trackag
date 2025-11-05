@@ -271,10 +271,11 @@ class UserController extends Controller
     {
         $userId = $request->user_id;
         $slabType = $request->slab;
-
+        
         $travelModes = TravelMode::get();
         $tourTypes = TourType::all();
         $designations = Designation::all();
+        $user = User::findOrFail($request->user_id);
 
         $vehicleSlabs = collect();
         $tourSlabs = collect();
@@ -282,21 +283,12 @@ class UserController extends Controller
 
         if ($slabType === "Slab Wise") {
             $designationId = $request->designation_id;
-            $taDaSlab = TaDaSlab::whereNull('user_id')
-                ->where('designation_id', $designationId)
-                ->first();
+            $taDaSlab = TaDaSlab::whereNull('user_id')->first();
+            
+            $vehicleSlabs = TaDaVehicleSlab::where('type', 'slab_wise')->where('designation_id', $designationId)->whereNull('user_id')->get();
+            
+            $tourSlabs = TaDaTourSlab::where('type', 'slab_wise')->where('designation_id', $designationId)->whereNull('user_id')->get();
 
-            $vehicleSlabs = TaDaVehicleSlab::where('type', 'slab_wise')
-                ->whereHas('taDaSlab', function ($q) use ($designationId) {
-                    $q->where('designation_id', $designationId)->whereNull('user_id');
-                })
-                ->get();
-
-            $tourSlabs = TaDaTourSlab::where('type', 'slab_wise')
-                ->whereHas('taDaSlab', function ($q) use ($designationId) {
-                    $q->where('designation_id', $designationId)->whereNull('user_id');
-                })
-                ->get();
         } elseif ($slabType === "Individual") {
             $taDaSlab = TaDaSlab::where('user_id', $userId)->first();
 
@@ -316,7 +308,8 @@ class UserController extends Controller
             'designations' => $designations,
             'vehicle_slabs' => $vehicleSlabs,
             'tour_slabs' => $tourSlabs,
-            'ta_da_slab' => $taDaSlab
+            'ta_da_slab' => $taDaSlab,
+            'user_slab' => $user->slab,
         ]);
     }
 
@@ -326,19 +319,17 @@ class UserController extends Controller
             'user_id' => 'required',
             'slab' => 'required|string',
         ]);
-
         $user = User::findOrFail($request->user_id);
         $user->slab = $request->slab;
         $user->save();
 
-        // Only Individual slab can be edited
         if ($request->slab === "Individual") {
 
             $request->validate([
                 'max_monthly_travel' => 'nullable|in:yes,no',
                 'km' => 'nullable|numeric',
                 'approved_bills_in_da' => 'nullable|array',
-                'designation_id' => 'nullable|exists:designations,id',
+                // 'designation_id' => 'nullable|exists:designations,id',
                 'travel_mode_id' => 'nullable|array',
                 'travel_mode_id.*' => 'exists:travel_modes,id',
                 'travelling_allow_per_km' => 'nullable|array',
@@ -355,7 +346,7 @@ class UserController extends Controller
                     'max_monthly_travel' => $request->max_monthly_travel,
                     'km' => $request->km,
                     'approved_bills_in_da' => $request->approved_bills_in_da,
-                    'designation_id' => $request->designation_id,
+                    // 'designation_id' => $request->designation_id,
                 ]
             );
 
