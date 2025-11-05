@@ -195,7 +195,13 @@
                                                 </td>
                                                 <td class="text-center"><i class="fas fa-cog text-muted"></i></td>
                                                <td class="text-center">
-                                                <i class="fas fa-cog text-muted slab_access" style="cursor:pointer;" data-user-id="{{ $user->id }}" data-user-slab="{{ $user->slab }}"></i>
+                                                {{-- <i class="fas fa-cog text-muted slab_access" style="cursor:pointer;" data-user-id="{{ $user->id }}" data-user-slab="{{ $user->slab }}"></i> --}}
+                                                <button 
+                                                    class="btn btn-sm btn-primary"
+                                                    onclick="openSlabModal('{{ $user->id }}')"
+                                                >
+                                                    <i class="bi bi-gear"></i> Set Slab
+                                                </button>   
                                                 </td>
                                                 <td class="text-center"><i class="fas fa-cog text-muted depo_access" style="cursor:pointer;" data-user-id="{{ $user->id }}"></i></td>
                                                 <td class="text-center"><i class="fas fa-cog text-muted state_access" style="cursor:pointer;" data-user-id="{{ $user->id }}"></i></td>
@@ -363,7 +369,7 @@
   </div>
 </div>
 {{-- TA/DA Slab Modal --}}
-<div class="modal fade" id="slabAccessModal" tabindex="-1" aria-hidden="true">
+{{-- <div class="modal fade" id="slabAccessModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-xl">
     <div class="modal-content">
       <div class="modal-header bg-primary text-white">
@@ -478,20 +484,167 @@
       </div>
     </div>
   </div>
+</div> --}}
+
+<div class="modal fade" id="slabModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">User TA/DA Slab</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="slabForm">
+                <div class="modal-body">
+                    @csrf
+                    <input type="hidden" name="user_id" id="user_id">
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label>Slab Type</label>
+                            <select class="form-control" id="slabSelect" name="slab">
+                                <option value="Slab Wise">Slab Wise</option>
+                                <option value="Individual">Individual</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label>Designation</label>
+                            <select class="form-control" id="designation_id" name="designation_id"></select>
+                        </div>
+                    </div>
+
+                    <hr>
+                    <h6>Travel Mode Allowance (Per KM)</h6>
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Travel Mode</th>
+                                <th>Allowance</th>
+                            </tr>
+                        </thead>
+                        <tbody id="vehicleSlabBody"></tbody>
+                    </table>
+
+                    <hr>
+                    <h6>Tour Type Allowance</h6>
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Tour Type</th>
+                                <th>DA Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tourSlabBody"></tbody>
+                    </table>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" id="saveSlabBtn" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
+
 
 </main>
 @endsection
 @push('scripts')
 <script>
+    function openSlabModal(userId) {
+        $('#user_id').val(userId);
+        $('#slabModal').modal('show');
+
+        // Default slab type = Slab Wise
+        $('#slabSelect').val('Slab Wise').trigger('change');
+    }
 $(document).ready(function() {
-    $('#slabAccessModal').on('shown.bs.modal', function () {
-        $('#approvedBills').select2({
-            placeholder: "Select Approved Bills",
-            width: '100%',
-            dropdownParent: $('#slabAccessModal') // important for Bootstrap modal
-        });
+    
+
+// When slab type or designation changes
+$('#slabSelect, #designation_id').on('change', function () {
+    loadSlabData();
+});
+
+function loadSlabData() {
+    let userId = $('#user_id').val();
+    let slab = $('#slabSelect').val();
+    let designationId = $('#designation_id').val();
+
+    $.ajax({
+        url: "{{ route('admin.get-user-slab') }}",
+        method: "GET",
+        data: { user_id: userId, slab: slab, designation_id: designationId },
+        success: function (res) {
+            $('#designation_id').html('');
+            $.each(res.designations, function (i, d) {
+                $('#designation_id').append(`<option value="${d.id}">${d.name}</option>`);
+            });
+
+            let readOnly = (slab === "Slab Wise") ? "readonly" : "";
+
+            // Travel Mode slab
+            $('#vehicleSlabBody').html('');
+            $.each(res.travel_modes, function (i, vt) {
+                let slabData = res.vehicle_slabs.find(s => s.travel_mode_id === vt.id);
+                let amount = slabData ? slabData.travelling_allow_per_km : '';
+                $('#vehicleSlabBody').append(`
+                    <tr>
+                        <td>${vt.name}</td>
+                        <td>
+                            <input type="hidden" name="travel_mode_id[]" value="${vt.id}">
+                            <input type="number" class="form-control text-center" name="travelling_allow_per_km[]" value="${amount}" ${readOnly}>
+                        </td>
+                    </tr>
+                `);
+            });
+
+            // Tour slab
+            $('#tourSlabBody').html('');
+            $.each(res.tour_types, function (i, tt) {
+                let slabData = res.tour_slabs.find(s => s.tour_type_id === tt.id);
+                let da = slabData ? slabData.da_amount : '';
+                $('#tourSlabBody').append(`
+                    <tr>
+                        <td>${tt.name}</td>
+                        <td>
+                            <input type="hidden" name="tour_type_id[]" value="${tt.id}">
+                            <input type="number" class="form-control text-center" name="da_amount[]" value="${da}" ${readOnly}>
+                        </td>
+                    </tr>
+                `);
+            });
+
+            // Hide Save button for Slab Wise
+            if (slab === "Slab Wise") {
+                $('#saveSlabBtn').hide();
+            } else {
+                $('#saveSlabBtn').show();
+            }
+        }
     });
+}
+
+// Save Form
+$('#slabForm').on('submit', function (e) {
+    e.preventDefault();
+    $.ajax({
+        url: "{{ route('admin.save.user.slab') }}",
+        method: "POST",
+        data: $(this).serialize(),
+        success: function (res) {
+            alert(res.message);
+            $('#slabModal').modal('hide');
+        }
+    });
+});
+
+    // $('#slabAccessModal').on('shown.bs.modal', function () {
+    //     $('#approvedBills').select2({
+    //         placeholder: "Select Approved Bills",
+    //         width: '100%',
+    //         dropdownParent: $('#slabAccessModal') // important for Bootstrap modal
+    //     });
+    // });
 
     $('#depoAccessModal').on('shown.bs.modal', function () {
         $('#depoId').select2({
@@ -507,135 +660,133 @@ $(document).ready(function() {
             dropdownParent: $('#stateAccessModal') 
         });
     });
-    $('.slab_access').click(function() {
-        let userId = $(this).data('user-id');
-        let userSlab = $(this).data('user-slab');
-        $('#slabModalUserId').val(userId);
-        $('#slabSelect').val(userSlab).trigger('change');
-        $('#slabAccessMessage').html('');
-        $('#slabAccessModal').modal('show');
-    });
+    // $('.slab_access').click(function() {
+    //     let userId = $(this).data('user-id');
+    //     let userSlab = $(this).data('user-slab');
+    //     $('#slabModalUserId').val(userId);
+    //     $('#slabSelect').val(userSlab).trigger('change');
+    //     $('#slabAccessMessage').html('');
+    //     $('#slabAccessModal').modal('show');
+    // });
 
-    $('#slabSelect').change(function() {
-        var slabType = $(this).val();
-        var userId = $('#slabModalUserId').val();
+    // $('#slabSelect').change(function() {
+    //     var slabType = $(this).val();
+    //     var userId = $('#slabModalUserId').val();
         
-        $('#slabTables').addClass('d-none');
-        $('#vehicleSlabBody, #tourSlabBody').empty();
+    //     $('#slabTables').addClass('d-none');
+    //     $('#vehicleSlabBody, #tourSlabBody').empty();
 
-        if (!slabType) return;
+    //     if (!slabType) return;
 
-        if(slabType == "Slab Wise"){
-            $('#vehicle_slab_title_name').html('(Slab Wise)');
-            $('#tour_slab_title_name').html('(Slab Wise)');
-            $('#designation_div').show();
-        }else{
-            $('#vehicle_slab_title_name').html('(Individual)');
-            $('#tour_slab_title_name').html('(Individual)');
-            $('#designation_div').hide();
-        }
+    //     if(slabType == "Slab Wise"){
+    //         $('#vehicle_slab_title_name').html('(Slab Wise)');
+    //         $('#tour_slab_title_name').html('(Slab Wise)');
+    //         $('#designation_div').show();
+    //     }else{
+    //         $('#vehicle_slab_title_name').html('(Individual)');
+    //         $('#tour_slab_title_name').html('(Individual)');
+    //         $('#designation_div').hide();
+    //     }
 
-        $.ajax({
-            url: '/admin/get-user-slab',
-            type: 'GET',
-            data: { user_id: userId, slab: slabType },
-            success: function(res) {
-                $('#slabTables').removeClass('d-none');
+    //     $.ajax({
+    //         url: '/admin/get-user-slab',
+    //         type: 'GET',
+    //         data: { user_id: userId, slab: slabType },
+    //         success: function(res) {
+    //             $('#slabTables').removeClass('d-none');
 
-                let readOnly = (slabType === "Slab Wise") ? 'readonly' : '';
+    //             let readOnly = (slabType === "Slab Wise") ? 'readonly' : '';
 
-                // ---------- VEHICLE SLABS ----------
-                $.each(res.vehicle_types, function(i, vt) {
-                    let slabData = res.vehicle_slabs.find(s => s.vehicle_type_id === vt.id);
+    //             // ---------- VEHICLE SLABS ----------
+    //             $.each(res.vehicle_types, function(i, vt) {
+    //                 let slabData = res.vehicle_slabs.find(s => s.vehicle_type_id === vt.id);
                     
-                    let amount = slabData ? slabData.travelling_allow_per_km : '';
-                    $('#vehicleSlabBody').append(`
-                        <tr>
-                            <td>${vt.vehicle_type}</td>
-                            <td>
-                                <input type="hidden" name="vehicle_type_id[]" value="${vt.id}">
-                                <input type="number" step="0.01" class="form-control text-center" 
-                                    name="travelling_allow_per_km[]" value="${amount}" ${readOnly}>
-                            </td>
-                        </tr>
-                    `);
-                });
+    //                 let amount = slabData ? slabData.travelling_allow_per_km : '';
+    //                 $('#vehicleSlabBody').append(`
+    //                     <tr>
+    //                         <td>${vt.vehicle_type}</td>
+    //                         <td>
+    //                             <input type="hidden" name="vehicle_type_id[]" value="${vt.id}">
+    //                             <input type="number" step="0.01" class="form-control text-center" 
+    //                                 name="travelling_allow_per_km[]" value="${amount}" ${readOnly}>
+    //                         </td>
+    //                     </tr>
+    //                 `);
+    //             });
 
-                // ---------- TOUR SLABS ----------
-                $.each(res.tour_types, function(i, tt) {
-                    let slabData = res.tour_slabs.find(s => s.tour_type_id === tt.id);
-                    let amount = slabData ? slabData.da_amount : '';
-                    $('#tourSlabBody').append(`
-                        <tr>
-                            <td>${tt.name}</td>
-                            <td>
-                                <input type="hidden" name="tour_type_id[]" value="${tt.id}">
-                                <input type="number" step="0.01" class="form-control text-center" 
-                                    name="da_amount[]" value="${amount}" ${readOnly}>
-                            </td>
-                        </tr>
-                    `);
-                });
+    //             // ---------- TOUR SLABS ----------
+    //             $.each(res.tour_types, function(i, tt) {
+    //                 let slabData = res.tour_slabs.find(s => s.tour_type_id === tt.id);
+    //                 let amount = slabData ? slabData.da_amount : '';
+    //                 $('#tourSlabBody').append(`
+    //                     <tr>
+    //                         <td>${tt.name}</td>
+    //                         <td>
+    //                             <input type="hidden" name="tour_type_id[]" value="${tt.id}">
+    //                             <input type="number" step="0.01" class="form-control text-center" 
+    //                                 name="da_amount[]" value="${amount}" ${readOnly}>
+    //                         </td>
+    //                     </tr>
+    //                 `);
+    //             });
 
-                // Optional: populate general slab fields
-                if(res.ta_da_slab) {
-                    $('select[name="max_monthly_travel"]').val(res.ta_da_slab.max_monthly_travel).trigger('change');
-                    $('input[name="km"]').val(res.ta_da_slab.km);
-                    if(res.ta_da_slab.approved_bills_in_da){
-                        let bills = res.ta_da_slab.approved_bills_in_da; // array of values
-                        let select = $('#slabAccessModal select[name="approved_bills_in_da[]"]');
+    //             // Optional: populate general slab fields
+    //             if(res.ta_da_slab) {
+    //                 $('select[name="max_monthly_travel"]').val(res.ta_da_slab.max_monthly_travel).trigger('change');
+    //                 $('input[name="km"]').val(res.ta_da_slab.km);
+    //                 if(res.ta_da_slab.approved_bills_in_da){
+    //                     let bills = res.ta_da_slab.approved_bills_in_da; // array of values
+    //                     let select = $('#slabAccessModal select[name="approved_bills_in_da[]"]');
 
-                        // Add missing options
-                        bills.forEach(function(val){
-                            if(select.find('option[value="'+val+'"]').length === 0){
-                                select.append(new Option(val, val, true, true));
-                            }
-                        });
+    //                     // Add missing options
+    //                     bills.forEach(function(val){
+    //                         if(select.find('option[value="'+val+'"]').length === 0){
+    //                             select.append(new Option(val, val, true, true));
+    //                         }
+    //                     });
 
-                        // Set selected values
-                        select.val(bills).trigger('change');
-                    }
+    //                     // Set selected values
+    //                     select.val(bills).trigger('change');
+    //                 }
 
-                    $('select[name="designation_id"]').val(res.ta_da_slab.designation);
-                }
+    //                 $('select[name="designation_id"]').val(res.ta_da_slab.designation);
+    //             }
 
-                if (slabType === "Slab Wise") {
-                    $('select[name="max_monthly_travel"]').prop('disabled', true);
-                    $('input[name="km"]').prop('readonly', true);
-                    $('select[name="approved_bills_in_da[]"]').prop('disabled', true).trigger('change.select2');
-                    $('select[name="designation_id"]').prop('disabled', true);
-                } else {
-                    $('select[name="max_monthly_travel"]').prop('disabled', false);
-                    $('input[name="km"]').prop('readonly', false);
-                    $('select[name="approved_bills_in_da[]"]').prop('disabled', false).trigger('change.select2');
-                    $('select[name="designation_id"]').prop('disabled', false);
-                }
-            }
-        });
-    });
-
-
+    //             if (slabType === "Slab Wise") {
+    //                 $('select[name="max_monthly_travel"]').prop('disabled', true);
+    //                 $('input[name="km"]').prop('readonly', true);
+    //                 $('select[name="approved_bills_in_da[]"]').prop('disabled', true).trigger('change.select2');
+    //                 $('select[name="designation_id"]').prop('disabled', true);
+    //             } else {
+    //                 $('select[name="max_monthly_travel"]').prop('disabled', false);
+    //                 $('input[name="km"]').prop('readonly', false);
+    //                 $('select[name="approved_bills_in_da[]"]').prop('disabled', false).trigger('change.select2');
+    //                 $('select[name="designation_id"]').prop('disabled', false);
+    //             }
+    //         }
+    //     });
+    // });
 
 
-    $('#saveSlabBtn').click(function(){
-        let formData = $('#slabAccessForm').serialize();
+    // $('#saveSlabBtn').click(function(){
+    //     let formData = $('#slabAccessForm').serialize();
 
-        $.ajax({
-            url: '/admin/save-user-slab',
-            type: 'POST',
-            data: formData,
-            success: function(res){
-                $('#slabAccessMessage').html('<div class="alert alert-success">Slab saved successfully!</div>');
-                setTimeout(() => { $('#slabAccessModal').modal('hide'); }, 1500);
-            },
-            error: function(xhr){
-                let errors = xhr.responseJSON.errors;
-                let msg = '';
-                $.each(errors, function(k,v){ msg += v[0]+'<br>'; });
-                $('#slabAccessMessage').html('<div class="alert alert-danger">'+msg+'</div>');
-            }
-        });
-    });
+    //     $.ajax({
+    //         url: '/admin/save-user-slab',
+    //         type: 'POST',
+    //         data: formData,
+    //         success: function(res){
+    //             $('#slabAccessMessage').html('<div class="alert alert-success">Slab saved successfully!</div>');
+    //             setTimeout(() => { $('#slabAccessModal').modal('hide'); }, 1500);
+    //         },
+    //         error: function(xhr){
+    //             let errors = xhr.responseJSON.errors;
+    //             let msg = '';
+    //             $.each(errors, function(k,v){ msg += v[0]+'<br>'; });
+    //             $('#slabAccessMessage').html('<div class="alert alert-danger">'+msg+'</div>');
+    //         }
+    //     });
+    // });
     // Open modal and set user id
     $('.reset-password').click(function() {
         let userId = $(this).data('user-id');

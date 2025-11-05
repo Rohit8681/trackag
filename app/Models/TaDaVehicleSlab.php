@@ -13,10 +13,12 @@ class TaDaVehicleSlab extends Model
 
     protected $fillable = [
         'ta_da_slab_id',
-        'vehicle_type_id',
+        'travel_mode_id',
+        // 'vehicle_type_id',
         'travelling_allow_per_km',
         'type',
-        'user_id'
+        'user_id',
+        'designation_id'
     ];
 
     // Relation to main slab
