@@ -31,7 +31,8 @@ trait TenantConnectionTrait
         
         // Check if we're on a tenant domain but tenancy is not initialized
         $domain = request()->getHost();
-        $centralDomains = ['127.0.0.1', 'localhost'];
+        // $centralDomains = ['127.0.0.1', 'localhost'];
+        $centralDomains = ['127.0.0.1', 'localhost', 'trackag.in', 'www.trackag.in'];
         
         if (!in_array($domain, $centralDomains)) {
             // We're on a tenant domain, try to find and initialize tenant
