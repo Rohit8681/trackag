@@ -33,7 +33,7 @@ trait TenantConnectionTrait
         $domain = request()->getHost();
         // $centralDomains = ['127.0.0.1', 'localhost'];
         $centralDomains = ['127.0.0.1', 'localhost', 'trackag.in', 'www.trackag.in'];
-        
+
         if (!in_array($domain, $centralDomains)) {
             // We're on a tenant domain, try to find and initialize tenant
             $tenant = \App\Models\Tenant::whereHas('domains', function($query) use ($domain) {
