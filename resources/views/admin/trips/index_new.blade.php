@@ -100,6 +100,9 @@
                                                 <span class="badge bg-info text-dark px-3 py-2">
                                                     {{ $trip->travelMode->name ?? '-' }}
                                                 </span>
+                                                <span class="badge bg-info text-dark px-3 py-2">
+                                                    {{ $trip->tourType->name ?? "-" }}
+                                                </span>
                                             </td>
 
                                             <td>{{ $trip->place_to_visit ?? '-' }}</td>

@@ -15,11 +15,6 @@ class Role extends Model
         return $this->belongsToMany(Permission::class, 'role_has_permissions');
     }
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
         'name',
         'guard_name', 
