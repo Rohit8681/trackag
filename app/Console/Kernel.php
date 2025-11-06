@@ -12,7 +12,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command('trip:close')->dailyAt('23:58'); 
+        $schedule->command('trip:close')->everyMinute();
     }
 
     /**
