@@ -329,7 +329,6 @@ class UserController extends Controller
                 'max_monthly_travel' => 'nullable|in:yes,no',
                 'km' => 'nullable|numeric',
                 'approved_bills_in_da' => 'nullable|array',
-                // 'designation_id' => 'nullable|exists:designations,id',
                 'travel_mode_id' => 'nullable|array',
                 'travel_mode_id.*' => 'exists:travel_modes,id',
                 'travelling_allow_per_km' => 'nullable|array',
@@ -346,7 +345,6 @@ class UserController extends Controller
                     'max_monthly_travel' => $request->max_monthly_travel,
                     'km' => $request->km,
                     'approved_bills_in_da' => $request->approved_bills_in_da,
-                    // 'designation_id' => $request->designation_id,
                 ]
             );
 

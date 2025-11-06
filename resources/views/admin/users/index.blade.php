@@ -362,123 +362,7 @@
     </div>
   </div>
 </div>
-{{-- TA/DA Slab Modal --}}
-{{-- <div class="modal fade" id="slabAccessModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-xl">
-    <div class="modal-content">
-      <div class="modal-header bg-primary text-white">
-        <h5 class="modal-title">Assign TA/DA Slab</h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-      </div>
 
-      <div class="modal-body">
-        <form id="slabAccessForm">
-          @csrf
-          <input type="hidden" name="user_id" id="slabModalUserId">
-
-          <!-- Slab Selection -->
-          <div class="mb-4">
-            <label class="form-label fw-bold">Select Slab</label>
-            <select name="slab" id="slabSelect" class="form-select" required>
-              <option value="">-- Select Slab --</option>
-              <option value="Individual">TA/DA Slab - Individual</option>
-              <option value="Slab Wise">TA/DA - Slab Wise</option>
-            </select>
-          </div>
-
-          <!-- Slab Details -->
-          <div id="slabTables" class="d-none">
-            <div class="row g-3 mb-4">
-              <!-- Max Monthly Travel -->
-              <div class="col-md-6">
-                <label class="form-label fw-bold">Max Monthly Travel K.M.</label>
-                <select name="max_monthly_travel" class="form-select">
-                  <option value="">-- Select --</option>
-                  <option value="yes">Yes</option>
-                  <option value="no">No</option>
-                </select>
-              </div>
-
-              <!-- KM -->
-              <div class="col-md-6">
-                <label class="form-label fw-bold">KM</label>
-                <input type="number" name="km" class="form-control" placeholder="Enter KM">
-              </div>
-            </div>
-            <div class="row g-3 mb-4">
-                <div class="col-md-6">
-                    <label class="form-label fw-bold">Approved Bills in DA</label>
-                    <select name="approved_bills_in_da[]" id="approvedBills" class="form-select" multiple>
-                        <option value="Petrol">Petrol</option>
-                        <option value="Food">Food</option>
-                        <option value="Accommodation">Accommodation</option>
-                        <option value="Travel">Travel</option>
-                        <option value="Courier">Courier</option>
-                        <option value="Hotel">Hotel</option>
-                        <option value="Others">Others</option>
-                    </select>
-                </div>
-                <div class="col-md-6" id="designation_div">
-                    <label class="form-label fw-bold">Designation</label>
-                    <select name="designation_id" class="form-select">
-                        @foreach($designations as $d)
-                        <option value="{{ $d->id }}">{{ $d->name }}</option>
-                        @endforeach
-                    </select>
-                </div>
-            </div>
-
-            <!-- Vehicle & Tour Slabs -->
-            <div class="row g-3">
-              <!-- Vehicle Type Table -->
-              <div class="col-md-6">
-                <div class="card shadow-sm">
-                  <div class="card-header bg-secondary text-white fw-bold" >Vehicle Type <span id="vehicle_slab_title_name"></span></div>
-                  <div class="card-body p-0">
-                    <table class="table table-bordered mb-0 text-center">
-                      <thead class="table-light">
-                        <tr>
-                          <th>Vehicle Type</th>
-                          <th>Travelling Allow per KM</th>
-                        </tr>
-                      </thead>
-                      <tbody id="vehicleSlabBody"></tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Tour Type Table -->
-              <div class="col-md-6">
-                <div class="card shadow-sm">
-                  <div class="card-header bg-secondary text-white fw-bold">Tour Type <span id="tour_slab_title_name"></span></div>
-                  <div class="card-body p-0">
-                    <table class="table table-bordered mb-0 text-center">
-                      <thead class="table-light">
-                        <tr>
-                          <th>Tour Type</th>
-                          <th>D.A. Amount</th>
-                        </tr>
-                      </thead>
-                      <tbody id="tourSlabBody"></tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </form>
-
-        <div id="slabAccessMessage" class="mt-3"></div>
-      </div>
-
-      <div class="modal-footer">
-        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary" id="saveSlabBtn">Save</button>
-      </div>
-    </div>
-  </div>
-</div> --}}
 
 <div class="modal fade" id="slabModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
@@ -505,6 +389,34 @@
                             <select class="form-control" id="designation_id" name="designation_id"></select>
                         </div>
                     </div>
+                    <div id="individualFields" class="row g-3 mb-3" style="display:none;">
+  <div class="col-md-6">
+    <label class="form-label fw-bold">Max Monthly Travel K.M.</label>
+    <select name="max_monthly_travel" id="max_monthly_travel" class="form-select">
+      <option value="">-- Select --</option>
+      <option value="yes">Yes</option>
+      <option value="no">No</option>
+    </select>
+  </div>
+
+  <div class="col-md-6">
+    <label class="form-label fw-bold">KM</label>
+    <input type="number" name="km" id="km" class="form-control" placeholder="Enter KM">
+  </div>
+
+  <div class="col-md-12">
+    <label class="form-label fw-bold">Approved Bills in DA</label>
+    <select name="approved_bills_in_da[]" id="approvedBills" class="form-select" multiple>
+      <option value="Petrol">Petrol</option>
+      <option value="Food">Food</option>
+      <option value="Accommodation">Accommodation</option>
+      <option value="Travel">Travel</option>
+      <option value="Courier">Courier</option>
+      <option value="Hotel">Hotel</option>
+      <option value="Others">Others</option>
+    </select>
+  </div>
+</div>
 
                     <hr>
                     <h6>Travel Mode Allowance (Per KM)</h6>
@@ -567,8 +479,14 @@ function openSlabModal(userId) {
         }
     });
 }
+$('#slabModal').on('shown.bs.modal', function () {
+    $('#approvedBills').select2({
+        placeholder: "Select Approved Bills",
+        width: '100%',
+        dropdownParent: $('#slabModal') // dropdown modal ni andar show thaye
+    });
+});
 $(document).ready(function() {
-    // When slab type or designation changes
     $('#slabSelect, #designation_id').on('change', function () {
         loadSlabData();
     });
@@ -584,21 +502,17 @@ $(document).ready(function() {
             data: { user_id: userId, slab: slab, designation_id: designationId },
             success: function (res) {
 
-                // 🔹 Designation dropdown reload
-                let currentDesignation = $('#designation_id').val();
+                // 🔹 Designation dropdown
                 $('#designation_id').html('');
                 $.each(res.designations, function (i, d) {
                     $('#designation_id').append(`<option value="${d.id}">${d.name}</option>`);
                 });
-                if (currentDesignation) {
-                    $('#designation_id').val(currentDesignation);
-                }
 
-                // 🔹 Determine readOnly state
+                // 🔹 Slab Type logic
                 let isSlabWise = (slab === "Slab Wise");
                 let readOnlyAttr = isSlabWise ? "readonly" : "";
 
-                // 🔹 Vehicle slab
+                // 🔹 Vehicle slabs
                 $('#vehicleSlabBody').html('');
                 $.each(res.travel_modes, function (i, vt) {
                     let slabData = res.vehicle_slabs.find(s => s.travel_mode_id === vt.id);
@@ -614,7 +528,7 @@ $(document).ready(function() {
                     `);
                 });
 
-                // 🔹 Tour slab
+                // 🔹 Tour slabs
                 $('#tourSlabBody').html('');
                 $.each(res.tour_types, function (i, tt) {
                     let slabData = res.tour_slabs.find(s => s.tour_type_id === tt.id);
@@ -630,20 +544,36 @@ $(document).ready(function() {
                     `);
                 });
 
-                // 🔹 Control buttons & dropdown states
+                // 🔹 Show / Hide extra fields
                 if (isSlabWise) {
+                    $('#individualFields').hide();
                     $('#saveSlabBtn').hide();
-                    $('#designation_id').prop('disabled', false); 
-                    $('#slabSelect').prop('disabled', false); 
-                    $('.vehicle-amount, .tour-amount').prop('readonly', true); 
+                    $('#designation_id').prop('disabled', false);
+                    $('.vehicle-amount, .tour-amount').prop('readonly', true);
                 } else {
+                    $('#individualFields').show();
                     $('#saveSlabBtn').show();
-                    $('#designation_id').prop('disabled', true); 
+                    $('#designation_id').prop('disabled', true);
                     $('.vehicle-amount, .tour-amount').prop('readonly', false);
+
+                    // --- Load individual data if available ---
+                    if (res.ta_da_slab) {
+                        $('#max_monthly_travel').val(res.ta_da_slab.max_monthly_travel ?? '');
+                        $('#km').val(res.ta_da_slab.km ?? '');
+                        
+                        // Set multi-select
+                        if (res.ta_da_slab.approved_bills_in_da) {
+                            let bills = Array.isArray(res.ta_da_slab.approved_bills_in_da)
+                                ? res.ta_da_slab.approved_bills_in_da
+                                : JSON.parse(res.ta_da_slab.approved_bills_in_da);
+                            $('#approvedBills').val(bills).trigger('change');
+                        }
+                    }
                 }
             }
         });
     }
+
 
    // Save Form
     $('#slabForm').on('submit', function (e) {
@@ -659,13 +589,6 @@ $(document).ready(function() {
         });
     });
 
-    // $('#slabAccessModal').on('shown.bs.modal', function () {
-    //     $('#approvedBills').select2({
-    //         placeholder: "Select Approved Bills",
-    //         width: '100%',
-    //         dropdownParent: $('#slabAccessModal') // important for Bootstrap modal
-    //     });
-    // });
 
     $('#depoAccessModal').on('shown.bs.modal', function () {
         $('#depoId').select2({
