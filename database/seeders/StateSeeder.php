@@ -10,14 +10,33 @@ class StateSeeder extends Seeder
     public function run()
     {
         $states = ['AndhraPradesh', 'Assam', 'Bihar', 'Chattisgarh', 'Goa','Gujarat','Haryana','HimachalPradesh','Jharkhand','Karnataka
-    ','Kerala','MadhyaPradesh','Maharashtra','Manipur','Meghalaya','Mizoram','Nagaland','Puducherry','Punjab','Rajasthan
-    ','TamilNadu','Telangana','Tripura','Uttarakhand','UttarPradesh','WestBengal'];
+        ','Kerala','MadhyaPradesh','Maharashtra','Manipur','Meghalaya','Mizoram','Nagaland','Puducherry','Punjab','Rajasthan
+        ','TamilNadu','Telangana','Tripura','Uttarakhand','UttarPradesh','WestBengal'];
 
-        foreach ($states as $state) {
+        $stateCodes = [
+            'AP', 'AS', 'BR', 'CG', 'GA',
+            'GJ', 'HR', 'HP', 'JH', 'KA',
+            'KL', 'MP', 'MH', 'MN', 'ML',
+            'MZ', 'NL', 'PY', 'PB', 'RJ',
+            'TN', 'TS', 'TR', 'UK', 'UP', 'WB'
+        ];
+
+        foreach ($states as $index => $state) {
             DB::table('states')->updateOrInsert(
-                ['name' => $state],              // condition (check if state exists)
-                ['country_id' => 1, 'name' => $state] // values to insert/update
+                ['name' => $state], // condition (check if state exists)
+                [
+                    'country_id' => 1,
+                    'name' => $state,
+                    'state_code' => $stateCodes[$index],
+                ]
             );
         }
+
+        // foreach ($states as $state) {
+        //     DB::table('states')->updateOrInsert(
+        //         ['name' => $state],              // condition (check if state exists)
+        //         ['country_id' => 1, 'name' => $state] // values to insert/update
+        //     );
+        // }
     }
 }

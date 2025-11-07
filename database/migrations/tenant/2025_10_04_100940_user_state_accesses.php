@@ -14,7 +14,7 @@ return new class extends Migration
        Schema::create('user_state_accesses', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            // $table->json('state_ids'); // multiple states
+            $table->json('state_ids'); 
             $table->timestamps();
         });
     }
