@@ -34,19 +34,7 @@
                 </div>
 
                 <div class="card-body">
-                    {{-- Alerts --}}
-                    @if (session('success'))
-                        <div class="alert alert-success alert-dismissible fade show" role="alert">
-                            <strong><i class="fas fa-check-circle me-1"></i>Success:</strong> {{ session('success') }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
-                    @endif
-                    @if (session('error'))
-                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                            <strong><i class="fas fa-exclamation-triangle me-1"></i>Error:</strong> {{ session('error') }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
-                    @endif
+                    
                     @can('view_all_trip')
                     
                         <div class="table-responsive">
@@ -99,7 +87,7 @@
                                             <td>
                                                 <span class="badge bg-info text-dark px-3 py-2">
                                                     {{ $trip->travelMode->name ?? '-' }}
-                                                </span>
+                                                </span><br><br>
                                                 <span class="badge bg-info text-dark px-3 py-2">
                                                     {{ $trip->tourType->name ?? "-" }}
                                                 </span>
@@ -117,28 +105,7 @@
                                                 @endforelse
                                             </td>
 
-                                            {{-- <td class="text-center">
-                                                <div class="mb-1">
-                                                    <strong>Opening:</strong><br>
-                                                    @if ($trip->start_km_photo)
-                                                        <a href="{{ asset('storage/' . $trip->start_km_photo) }}" target="_blank">
-                                                            <img src="{{ asset('storage/' . $trip->start_km_photo) }}" class="rounded shadow-sm" width="60">
-                                                        </a>
-                                                    @else
-                                                        <span class="text-muted">-</span>
-                                                    @endif
-                                                </div>
-                                                <div>
-                                                    <strong>Closing:</strong><br>
-                                                    @if ($trip->end_km_photo)
-                                                        <a href="{{ asset('storage/' . $trip->end_km_photo) }}" target="_blank">
-                                                            <img src="{{ asset('storage/' . $trip->end_km_photo) }}" class="rounded shadow-sm" width="60">
-                                                        </a>
-                                                    @else
-                                                        <span class="text-muted">-</span>
-                                                    @endif
-                                                </div>
-                                            </td> --}}
+                                            
                                             <td class="text-center">
                                                 @if ($trip->start_km_photo || $trip->end_km_photo)
                                                     <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#kmImagesModal{{ $trip->id }}">
@@ -176,7 +143,11 @@
                                             </td>
 
                                             <td class="text-center">
-                                                approvals_all_trip
+                                                <button class="btn btn-outline-secondary btn-sm mb-2"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#editKmModal{{ $trip->id }}">
+                                                    <i class="fas fa-edit me-1"></i> Edit KM
+                                                </button>
                                                 {{-- @if (auth()->user()->can('approvals_all_trip') && $trip->approval_status === 'pending') --}}
                                                 @if ($trip->approval_status === 'pending')
                                                     <div class="dropdown">
@@ -217,12 +188,12 @@
                                                 @endif
 
                                                 {{-- @can('delete_all_trip') --}}
-                                                    <form action="{{ route('trips.destroy', $trip) }}" method="POST" class="d-inline">
-                                                        @csrf @method('DELETE')
-                                                        <button type="submit" class="btn btn-link p-0 text-danger" onclick="return confirm('Are you sure?')">
-                                                            <i class="fas fa-trash"></i>
-                                                        </button>
-                                                    </form>
+                                                <form action="{{ route('trips.destroy', $trip) }}" method="POST" class="d-inline">
+                                                    @csrf @method('DELETE')
+                                                    <button type="submit" class="btn btn-link p-0 text-danger" onclick="return confirm('Are you sure?')">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </form>
                                                 {{-- @endcan --}}
                                             </td>
                                         </tr>
@@ -330,6 +301,45 @@
                 </div>
             </div>
         {{-- @endcan --}}
+        <div class="modal fade" id="editKmModal{{ $trip->id }}" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <form method="POST" action="{{ route('trips.updateKm', $trip->id) }}" class="modal-content border-0 shadow">
+                @csrf
+                @method('PUT')
+                <div class="modal-header bg-secondary text-white">
+                    <h5 class="modal-title">Edit KM for Trip #{{ $trip->id }}</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Starting KM</label>
+                        <input type="number" name="starting_km"
+                            class="form-control"
+                            value="{{ $trip->starting_km ?? '' }}"
+                            readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Ending KM</label>
+                        <input type="number" name="end_km"
+                            class="form-control"
+                            value="{{ $trip->end_km ?? '' }}"
+                            placeholder="Enter end KM"
+                            min="0"
+                            oninput="if(this.value < 0) this.value = '';"
+                            required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-secondary">
+                        <i class="fas fa-save me-1"></i> Save Changes
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
     @endforeach
 
     <!-- KM Images Modal -->

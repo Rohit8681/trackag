@@ -36,3 +36,13 @@
     </div>
 </main>
 @endsection
+@push('scripts')
+<script>
+    $(document).ready(function() {
+        $('#state_ids').select2({
+            placeholder: "Select one or more states",
+            width: '100%'
+        });
+    });
+</script>
+@endpush

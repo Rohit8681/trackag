@@ -36,13 +36,13 @@
 
                         <div class="card-body">
                             {{-- ✅ Success Message --}}
-                            @if (session('success'))
+                            {{-- @if (session('success'))
                                 <div class="alert alert-success alert-dismissible fade show" role="alert">
                                     <strong>Success:</strong> {{ session('success') }}
                                     <button type="button" class="btn-close" data-bs-dismiss="alert"
                                         aria-label="Close"></button>
                                 </div>
-                            @endif
+                            @endif --}}
 
                             {{-- 📋 Holiday Table --}}
                             <div class="table-responsive" style="max-height: 600px;">
@@ -66,7 +66,23 @@
                                                 <td>{{ $holiday->holiday_date }}</td>
                                                 <td>{{ $holiday->holiday_name }}</td>
                                                 <td>{{ $holiday->holiday_type }}</td>
-                                                <td>{{ $holiday->state->name ?? 'All States' }}</td>
+                                                
+                                                <td>
+                                                    @php
+                                                        $stateNames = [];
+                                                        if (!empty($holiday->state_ids)) {
+                                                            $stateNames = \App\Models\State::whereIn('id', $holiday->state_ids)->pluck('name')->toArray();
+                                                        }
+                                                    @endphp
+
+                                                    @if(empty($stateNames))
+                                                        <span class="text-muted">All States</span>
+                                                    @else
+                                                        @foreach($stateNames as $name)
+                                                            <span class="badge bg-primary">{{ $name }}</span>
+                                                        @endforeach
+                                                    @endif
+                                                </td>
                                                 <td>{{ $holiday->is_paid }}</td>
                                                 <td>
                                                     <div class="form-check form-switch">

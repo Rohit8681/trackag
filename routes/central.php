@@ -153,6 +153,7 @@ Route::middleware(['web'])->group(function () {
             Route::resource('tourtype', TourTypeController::class)->names('tourtype');
             Route::resource('purpose', PurposeController::class)->names('purpose');
             Route::resource('trips', TripController::class)->names('trips');
+            Route::put('trips/{trip}/update-km', [TripController::class, 'updateKm'])->name('trips.updateKm');
             Route::post('/trips/{trip}/approve', [TripController::class, 'approve'])->name('trips.approve');
             Route::post('/admin/trips/{id}/complete', [TripController::class, 'completeTrip'])->name('trips.complete');
             Route::post('/trips/{trip}/toggle-status', [TripController::class, 'toggleStatus'])->name('trips.status.toggle');

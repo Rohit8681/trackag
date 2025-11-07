@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('holidays', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('state_id')->nullable();
+            $table->json('state_ids')->nullable();
             $table->date('holiday_date');
             $table->string('holiday_name');
             $table->string('holiday_type');
@@ -21,7 +21,7 @@ return new class extends Migration
             $table->boolean('status')->default(1);
             $table->timestamps();
 
-            $table->foreign('state_id')->references('id')->on('states')->onDelete('set null');
+            // $table->foreign('state_id')->references('id')->on('states')->onDelete('set null');
         });
     }
 

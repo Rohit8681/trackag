@@ -30,9 +30,9 @@
 
             <div class="card-body">
                 {{-- Success Message --}}
-                @if(session('success'))
+                {{-- @if(session('success'))
                     <div class="alert alert-success">{{ session('success') }}</div>
-                @endif
+                @endif --}}
 
                 {{-- 🔎 Filter Form --}}
                 <form method="GET" action="{{ route('districts.index') }}" class="mb-3">

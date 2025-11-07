@@ -33,7 +33,7 @@
         @enderror
     </div>
 
-    <div class="col-md-6">
+    {{-- <div class="col-md-6">
         <label for="state_id" class="form-label">State</label>
         <select name="state_id" id="state_id" class="form-select @error('state_id') is-invalid @enderror">
             <option value="">All States</option>
@@ -42,6 +42,20 @@
             @endforeach
         </select>
         @error('state_id')
+            <div class="invalid-feedback">{{ $message }}</div>
+        @enderror
+    </div> --}}
+    <div class="col-md-6">
+        <label for="state_ids" class="form-label">Select States</label>
+        <select name="state_ids[]" id="state_ids" class="form-select @error('state_ids') is-invalid @enderror" multiple>
+            @foreach($states as $state)
+                <option value="{{ $state->id }}"
+                    @if(in_array($state->id, old('state_ids', $holiday?->state_ids ?? []))) selected @endif>
+                    {{ $state->name }}
+                </option>
+            @endforeach
+        </select>
+        @error('state_ids')
             <div class="invalid-feedback">{{ $message }}</div>
         @enderror
     </div>

@@ -20,72 +20,6 @@
 
         <!-- End Navbar -->
         <ul class="navbar-nav ms-auto align-items-center">
-            <!-- Search -->
-            <li class="nav-item">
-                <a class="nav-link" data-widget="navbar-search" href="#" role="button">
-                    <i class="bi bi-search"></i>
-                </a>
-            </li>
-
-            <!-- Messages Dropdown -->
-            <li class="nav-item dropdown">
-                <a class="nav-link" data-bs-toggle="dropdown" href="#">
-                    <i class="bi bi-chat-text"></i>
-                    <span class="badge text-bg-danger navbar-badge">3</span>
-                </a>
-                <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end">
-                    @foreach ([['name'=>'Brad Diesel','img'=>'user1-128x128.jpg','text'=>'Call me whenever you can...','time'=>'4 Hours Ago','star'=>'text-danger'],
-                              ['name'=>'John Pierce','img'=>'user8-128x128.jpg','text'=>'I got your message bro','time'=>'4 Hours Ago','star'=>'text-secondary'],
-                              ['name'=>'Nora Silvester','img'=>'user3-128x128.jpg','text'=>'The subject goes here','time'=>'4 Hours Ago','star'=>'text-warning']] as $msg)
-                    <a href="#" class="dropdown-item">
-                        <div class="d-flex align-items-start">
-                            <img src="{{ asset('admin/images/' . $msg['img']) }}" alt="User Avatar" class="rounded-circle me-3" width="50" height="50">
-                            <div class="flex-grow-1">
-                                <h6 class="dropdown-item-title mb-0">
-                                    {{ $msg['name'] }}
-                                    <span class="float-end fs-7 {{ $msg['star'] }}">
-                                        <i class="bi bi-star-fill"></i>
-                                    </span>
-                                </h6>
-                                <p class="fs-7 mb-0">{{ $msg['text'] }}</p>
-                                <small class="text-muted"><i class="bi bi-clock-fill me-1"></i> {{ $msg['time'] }}</small>
-                            </div>
-                        </div>
-                    </a>
-                    <div class="dropdown-divider"></div>
-                    @endforeach
-                    <a href="#" class="dropdown-item dropdown-footer">See All Messages</a>
-                </div>
-            </li>
-
-            <!-- Notifications Dropdown -->
-            <li class="nav-item dropdown">
-                <a class="nav-link" data-bs-toggle="dropdown" href="#">
-                    <i class="bi bi-bell-fill"></i>
-                    <span class="badge text-bg-warning navbar-badge">15</span>
-                </a>
-                <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end">
-                    <span class="dropdown-header">15 Notifications</span>
-                    <div class="dropdown-divider"></div>
-                    <a href="#" class="dropdown-item">
-                        <i class="bi bi-envelope me-2"></i> 4 new messages
-                        <span class="float-end text-secondary fs-7">3 mins</span>
-                    </a>
-                    <div class="dropdown-divider"></div>
-                    <a href="#" class="dropdown-item">
-                        <i class="bi bi-people-fill me-2"></i> 8 friend requests
-                        <span class="float-end text-secondary fs-7">12 hours</span>
-                    </a>
-                    <div class="dropdown-divider"></div>
-                    <a href="#" class="dropdown-item">
-                        <i class="bi bi-file-earmark-fill me-2"></i> 3 new reports
-                        <span class="float-end text-secondary fs-7">2 days</span>
-                    </a>
-                    <div class="dropdown-divider"></div>
-                    <a href="#" class="dropdown-item dropdown-footer">See All Notifications</a>
-                </div>
-            </li>
-
             <!-- Fullscreen Toggle -->
             <li class="nav-item">
                 <a class="nav-link" href="#" data-lte-toggle="fullscreen">
@@ -120,14 +54,14 @@
                         <small>Member since {{ $user->created_at->format('M Y') }}</small>
                     </li>
 
-                    <!-- User Body -->
+                    {{-- <!-- User Body -->
                     <li class="user-body px-3 py-2">
                         <div class="row text-center">
                             <div class="col-4"><a href="#">Followers</a></div>
                             <div class="col-4"><a href="#">Sales</a></div>
                             <div class="col-4"><a href="#">Friends</a></div>
                         </div>
-                    </li>
+                    </li> --}}
 
                     <!-- Footer -->
                     <li class="user-footer d-flex justify-content-between px-3 py-2">

@@ -25,12 +25,15 @@ class HolidayController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'state_id' => 'nullable|exists:states,id',
+            // 'state_id' => 'nullable|exists:states,id',
+            'state_ids' => 'nullable|array',
+            'state_ids.*' => 'exists:states,id',
             'holiday_date' => 'required|date',
             'holiday_name' => 'required|string|max:191',
             'holiday_type' => ['required', Rule::in(['Public', 'National', 'State', 'Festival'])],
             'is_paid' => ['required', Rule::in(['Yes', 'No'])],
         ]);
+        $data['state_ids'] = $data['state_ids'] ?? [];
 
         Holiday::create($data);
 
@@ -46,13 +49,16 @@ class HolidayController extends Controller
     public function update(Request $request, Holiday $holiday)
     {
         $data = $request->validate([
-            'state_id' => 'nullable|exists:states,id',
+            // 'state_id' => 'nullable|exists:states,id',
+            'state_ids' => 'nullable|array',
+            'state_ids.*' => 'exists:states,id',
             'holiday_date' => 'required|date',
             'holiday_name' => 'required|string|max:191',
             'holiday_type' => ['required', Rule::in(['Public', 'National', 'State', 'Festival'])],
             'is_paid' => ['required', Rule::in(['Yes', 'No'])],
             'status' => ['required', Rule::in(['0', '1', 0, 1, true, false])],
         ]);
+        $data['state_ids'] = $data['state_ids'] ?? [];
 
         $holiday->update($data);
 

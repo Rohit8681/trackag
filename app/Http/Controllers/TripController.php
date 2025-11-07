@@ -174,6 +174,20 @@ class TripController extends Controller
         return view('admin.trips.edit', compact('trip', 'customers', 'travelModes', 'purposes', 'tourTypes'));
     }
 
+    public function updateKm(Request $request, $id)
+    {
+        $trip = Trip::findOrFail($id);
+
+        $request->validate([
+            'end_km' => 'required',
+        ]);
+
+        $trip->end_km = $request->end_km;
+        $trip->save();
+
+        return redirect()->back()->with('success', 'End KM updated successfully!');
+    }
+
     public function update(Request $request, Trip $trip)
     {
         $validated = $request->validate([
