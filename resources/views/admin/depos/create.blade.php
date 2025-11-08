@@ -35,7 +35,7 @@
                                 'states' => $states,
                                 'districts' => collect(),
                                 'tehsils' => collect(),
-                                'designation' => $designation,
+                                'users' => $users,
                             ])
                     </div>
                 </div>

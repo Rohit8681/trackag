@@ -38,11 +38,10 @@ class ApiTripController extends BaseController
 
         $user = Auth::user(); 
 
-        $customers = Customer::where('is_active', true)
-            // ->where('company_id', $user->company_id)
+        $customers = Customer::where('is_active', 1)
+            ->where('user_id', $user->id)
             ->latest()
             ->get();
-        // Return the view and pass the data
 
         return $this->sendResponse($customers, "Customers fetched successfully");
     }

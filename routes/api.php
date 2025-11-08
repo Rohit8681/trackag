@@ -31,7 +31,7 @@ Route::middleware([TenantAuthenticate::class])->group(function () {
     Route::get('/trip/{tripId}/detail', [ApiTripController::class, 'showTrip']);
     Route::post('/trip/close', [ApiTripController::class, 'close']);
     Route::post('/expenses', [ExpenseController::class, 'store']);
-    Route::get('/expenses', [ExpenseController::class, 'index']);
+    Route::get('/get-expenses', [ExpenseController::class, 'index']);
     Route::post('/party-visits-store', [PartyController::class, 'partyVisitsStore']);
     Route::post('/new-party-store', [PartyController::class, 'newPartyStore']);
 });

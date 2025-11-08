@@ -19,7 +19,7 @@ class ExpenseController extends Controller
         // ✅ Validation rules
         $validator = Validator::make($request->all(), [
             'bill_date' => 'required|date',
-            'bill_type' => 'required|array', // multiple value support
+            'bill_type' => 'required|array', 
             'bill_details_description' => 'nullable|string',
             'bill_title' => 'nullable|string|max:255',
             'travel_mode_id' => 'nullable|integer',

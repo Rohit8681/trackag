@@ -21,7 +21,7 @@ class CustomerController extends Controller
     {
         $admin = Auth::user();
 
-        $query = Customer::with(['user', 'company', 'state', 'district', 'tehsil']);
+        $query = Customer::with(['user', 'company', 'state', 'district', 'tehsil'])->where('type','web');
         if (!($admin->hasRole('master_admin') || $admin->hasRole('sub_admin'))) {
             $query->where('user_id', $admin->id);
         }
@@ -87,6 +87,7 @@ class CustomerController extends Controller
         ]);
 
         $validated['is_active'] = $request->has('is_active') ? (int) $request->input('is_active') : 1;
+        $validated['type'] = "web";
 
         Customer::create($validated);
 

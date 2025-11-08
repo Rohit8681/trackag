@@ -28,10 +28,10 @@
                 <label for="manage_by" class="form-label">Manage By</label>
                 <select name="manage_by" id="manage_by" class="form-select">
                     <option value="">-- Select Manage By --</option>
-                    @foreach($designation as $desig)
-                        <option value="{{ $desig->id }}"
-                            {{ old('manage_by', $depo->manage_by ?? '') == $desig->id ? 'selected' : '' }}>
-                            {{ $desig->name }}
+                    @foreach($users as $user)
+                        <option value="{{ $user->id }}"
+                            {{ old('manage_by', $depo->manage_by ?? '') == $user->id ? 'selected' : '' }}>
+                            {{ $user->name }}
                         </option>
                     @endforeach
                 </select>
