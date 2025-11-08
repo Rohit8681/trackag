@@ -40,4 +40,8 @@ class Depo extends Model
     {
         return $this->belongsTo(Designation::class, 'manage_by', 'id');
     }
+
+    public function users(){
+        return $this->belongsTo(User::class,'manage_by', 'id');
+    }
 }

@@ -108,7 +108,7 @@
                                                 <td>{{ $depo->id }}</td>
                                                 <td>{{ $depo->depo_code }}</td>
                                                 <td>{{ $depo->depo_name }}</td>
-                                                <td>{{ $depo->designation->name ?? '-' }}</td>
+                                                <td>{{ $depo->users->name ?? '-' }}</td>
                                                 <td>{{ $depo->state?->name ?? '-' }}</td>
                                                 <td>{{ $depo->district?->name ?? '-' }}</td>
                                                 <td>{{ $depo->tehsil?->name ?? '-' }}</td>

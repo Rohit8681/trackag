@@ -34,6 +34,67 @@
                 </div>
 
                 <div class="card-body">
+                    {{-- 🔹 Filter Section --}}
+                    <form method="GET" action="{{ route('trips.index') }}" class="mb-4">
+                        <div class="row g-3 align-items-end">
+                            <div class="col-md-2">
+                                <label class="form-label fw-semibold">From Date</label>
+                                <input type="date" name="from_date" value="{{ request('from_date') }}" class="form-control">
+                            </div>
+
+                            <div class="col-md-2">
+                                <label class="form-label fw-semibold">To Date</label>
+                                <input type="date" name="to_date" value="{{ request('to_date') }}" class="form-control">
+                            </div>
+
+                            <div class="col-md-2">
+                                <label class="form-label fw-semibold">State</label>
+                                <select name="state" class="form-select">
+                                    <option value="">All</option>
+                                    @foreach($states as $state)
+                                        <option value="{{ $state->id }}" {{ request('state') == $state->id ? 'selected' : '' }}>
+                                            {{ $state->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div class="col-md-2">
+                                <label class="form-label fw-semibold">Employee Name</label>
+                                <select name="employee" class="form-select">
+                                    <option value="">All</option>
+                                    @foreach($employees as $emp)
+                                        <option value="{{ $emp->id }}" {{ request('employee') == $emp->id ? 'selected' : '' }}>
+                                            {{ $emp->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div class="col-md-2">
+                                <label class="form-label fw-semibold">Approval Status</label>
+                                <select name="approval_status" class="form-select">
+                                    <option value="">All</option>
+                                    <option value="approved" {{ request('approval_status') == 'approved' ? 'selected' : '' }}>Approved</option>
+                                    <option value="pending" {{ request('approval_status') == 'pending' ? 'selected' : '' }}>Pending</option>
+                                    <option value="denied" {{ request('approval_status') == 'denied' ? 'selected' : '' }}>Denied</option>
+                                </select>
+                            </div>
+
+                            
+                            <div class="col-md-1">
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="fas fa-search me-1"></i>
+                                </button>
+                            </div>
+                            <div class="col-md-1">
+                                <a href="{{ route('trips.index') }}" class="btn btn-secondary w-100">
+                                    <i class="fas fa-undo me-1"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                    {{-- 🔹 End Filter Section --}}
                     
                     @can('view_all_trip')
                     
@@ -132,22 +193,24 @@
                                             </td>
 
                                             <td class="text-center">
-                                                <a href="{{ route('trips.show', $trip) }}" class="btn btn-sm btn-outline-primary" title="View Trip">
-                                                    <i class="fas fa-eye"></i>
+                                                <a href="{{ route('trips.show', $trip) }}" class="text-primary small" title="view map">
+                                                    View Map
                                                 </a>
                                                 <br>
                                                 {{-- @can('view_trip_logs') --}}
                                                     <span class="badge bg-info mt-2">{{ $trip->tripLogs->count() }} logs</span><br>
-                                                    <a href="#" class="text-primary small" data-bs-toggle="modal" data-bs-target="#logsModal{{ $trip->id }}">View Logs</a>
+                                                    <a href="#" class="text-primary small" data-bs-toggle="modal" title="view log" data-bs-target="#logsModal{{ $trip->id }}">View Logs</a>
                                                 {{-- @endcan --}}
                                             </td>
 
                                             <td class="text-center">
+                                                @if($trip->approval_status == "pending")
                                                 <button class="btn btn-outline-secondary btn-sm mb-2"
                                                         data-bs-toggle="modal"
                                                         data-bs-target="#editKmModal{{ $trip->id }}">
                                                     <i class="fas fa-edit me-1"></i> Edit KM
                                                 </button>
+                                                @endif
                                                 {{-- @if (auth()->user()->can('approvals_all_trip') && $trip->approval_status === 'pending') --}}
                                                 @if ($trip->approval_status === 'pending')
                                                     <div class="dropdown">

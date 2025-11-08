@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Models\Customer;
+use App\Models\State;
+use App\Models\User;
 
 class TripController extends Controller
 {
@@ -41,36 +43,77 @@ class TripController extends Controller
     //     return view('admin.trips.index', compact('trips'));
     // }
 
-     public function index()
+    // public function index()
+    // {
+    //     $user = Auth::user();
+    //     $query = Trip::with(['user', 'company', 'approvedByUser', 'tripLogs', 'customers']);
+
+    //     if ($user->hasRole('master_admin')) {
+    //         $trips = $query->latest()->get();
+    //     } elseif ($user->hasRole('sub_admin')) {
+    //         $trips = $query->latest()->get();
+    //     } else {
+    //         $trips = $query->where(function ($q) use ($user) {
+    //             // Own trips
+    //             $q->where('user_id', $user->id);
+
+    //             // Or trips of users who report to me where approval is pending
+    //             $subordinateIds = \App\Models\User::where('reporting_to', $user->id)->pluck('id');
+
+    //             if ($subordinateIds->isNotEmpty()) {
+    //                 $q->orWhere(function ($inner) use ($subordinateIds) {
+    //                     $inner->whereIn('user_id', $subordinateIds)
+    //                         ->where('approval_status', 'pending');
+    //                 });
+    //             }
+    //         })->latest()->get();
+    //     }
+    //     return view('admin.trips.index_new', compact('trips'));
+    // }
+    public function index(Request $request)
     {
         $user = Auth::user();
-        $query = Trip::with(['user', 'company', 'approvedByUser', 'tripLogs', 'customers']);
+        $query = Trip::with(['user', 'company', 'approvedByUser', 'tripLogs', 'customers', 'travelMode', 'tourType']);
 
-        if ($user->hasRole('master_admin')) {
-            $trips = $query->latest()->get();
-        } elseif ($user->hasRole('sub_admin')) {
-            $trips = $query->latest()->get();
-        } else {
-            $trips = $query->where(function ($q) use ($user) {
-                // Own trips
+        // 🔹 Role-based access
+        if (!($user->hasRole('master_admin') || $user->hasRole('sub_admin'))) {
+            $query->where(function ($q) use ($user) {
                 $q->where('user_id', $user->id);
-
-                // Or trips of users who report to me where approval is pending
                 $subordinateIds = \App\Models\User::where('reporting_to', $user->id)->pluck('id');
-
                 if ($subordinateIds->isNotEmpty()) {
                     $q->orWhere(function ($inner) use ($subordinateIds) {
                         $inner->whereIn('user_id', $subordinateIds)
                             ->where('approval_status', 'pending');
                     });
                 }
-            })->latest()->get();
+            });
         }
 
+        // 🔹 Apply Filters
+        if ($request->filled('from_date')) {
+            $query->whereDate('trip_date', '>=', $request->from_date);
+        }
 
-        // return view('admin.trips.index', compact('trips'));
-        return view('admin.trips.index_new', compact('trips'));
+        if ($request->filled('to_date')) {
+            $query->whereDate('trip_date', '<=', $request->to_date);
+        }
+        if ($request->filled('state')) {
+            $query->where('state_id', $request->state);
+        }
+        if ($request->filled('employee')) {
+            $query->where('user_id', $request->employee);
+        }
+        if ($request->filled('approval_status')) {
+            $query->where('approval_status', $request->approval_status);
+        }
 
+        $trips = $query->latest()->get();
+
+        // Data for dropdowns
+        $states = State::all(['id', 'name']);
+        $employees = User::select('id', 'name')->get();
+
+        return view('admin.trips.index_new', compact('trips', 'states', 'employees'));
     }
 
     public function create()
@@ -160,7 +203,6 @@ class TripController extends Controller
             ->orderBy('recorded_at')
             ->get(['latitude', 'longitude', 'recorded_at']);
         
-        // return view('admin.trips.show', compact('trip', 'tripLogs'));
         return view('admin.trips.show_new', compact('trip', 'tripLogs'));
 
     }

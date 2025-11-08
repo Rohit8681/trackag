@@ -80,7 +80,7 @@
 </script>
 
 <!-- Google Maps Polyline and Markers -->
-<script>
+{{-- <script>
     function initMap() {
         const tripLogs = window.tripLogs || [];
         if (!tripLogs || tripLogs.length < 2) {
@@ -130,59 +130,6 @@
         document.getElementById("distance-display").innerText = distance.toFixed(2) + " km";
     }
 
-    // function initMap() {
-    //     const tripLogs = window.tripLogs || [];
-    //     if (!tripLogs || tripLogs.length < 2) {
-    //         return;
-    //     }
-
-    //     const pathCoordinates = tripLogs.map(l => ({
-    //         lat: +l.latitude,
-    //         lng: +l.longitude,
-    //         recorded_at: l.recorded_at ?? ''
-    //     }));
-
-    //     // ✅ Ahmedabad center coordinates
-    //     const ahmedabadCenter = { lat: 23.0225, lng: 72.5714 };
-
-    //     const map = new google.maps.Map(document.getElementById("map"), {
-    //         zoom: 13, // ✅ Fixed zoom for Ahmedabad area
-    //         center: ahmedabadCenter
-    //     });
-
-    //     const tripPath = new google.maps.Polyline({
-    //         path: pathCoordinates,
-    //         geodesic: true,
-    //         strokeColor: "#007bff",
-    //         strokeOpacity: 1,
-    //         strokeWeight: 4
-    //     });
-    //     tripPath.setMap(map);
-
-    //     // ✅ Add markers
-    //     pathCoordinates.forEach((coord, index) => {
-    //         new google.maps.Marker({
-    //             position: coord,
-    //             map,
-    //             label: {
-    //                 text: `${index + 1}`,
-    //                 color: '#FFFFFF',
-    //                 fontSize: '12px'
-    //             },
-    //             title: coord.recorded_at ?? '',
-    //             icon: {
-    //                 url: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png"
-    //             }
-    //         });
-    //     });
-
-    //     // ✅ Optional: calculate total distance
-    //     let distance = 0;
-    //     for (let i = 1; i < pathCoordinates.length; i++)
-    //         distance += haversineDistance(pathCoordinates[i - 1], pathCoordinates[i]);
-    //     document.getElementById("distance-display").innerText = distance.toFixed(2) + " km";
-    // }
-
     function toRad(v) {
         return v * Math.PI / 180;
     }
@@ -198,7 +145,100 @@
     }
     
     document.addEventListener("DOMContentLoaded", initMap);
+</script> --}}
+<script>
+function initMap() {
+    const tripLogs = window.tripLogs || [];
+
+    // No logs
+    if (!tripLogs || tripLogs.length === 0) {
+        console.warn("No trip logs available.");
+        return;
+    }
+
+    // Convert logs to coordinates
+    const pathCoordinates = tripLogs.map(l => ({
+        lat: parseFloat(l.latitude),
+        lng: parseFloat(l.longitude),
+        recorded_at: l.recorded_at ?? ''
+    }));
+
+    // Initialize map centered at first point with zoom 13
+    const map = new google.maps.Map(document.getElementById("map"), {
+        zoom: 13,
+        center: pathCoordinates[0],
+        mapTypeId: google.maps.MapTypeId.ROADMAP,
+    });
+
+    // Draw route if multiple points
+    if (pathCoordinates.length > 1) {
+        const tripPath = new google.maps.Polyline({
+            path: pathCoordinates,
+            geodesic: true,
+            strokeColor: "#007bff",
+            strokeOpacity: 1,
+            strokeWeight: 4
+        });
+        tripPath.setMap(map);
+    }
+
+    // Add markers
+    pathCoordinates.forEach((coord, index) => {
+        new google.maps.Marker({
+            position: coord,
+            map,
+            label: {
+                text: `${index + 1}`,
+                color: '#FFFFFF',
+                fontSize: '12px'
+            },
+            title: coord.recorded_at ?? '',
+            icon: {
+                url: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png"
+            }
+        });
+    });
+
+    // If more than 2 points, adjust map bounds slightly (but don’t over-zoom)
+    if (pathCoordinates.length > 2) {
+        const bounds = new google.maps.LatLngBounds();
+        pathCoordinates.forEach(c => bounds.extend(c));
+        map.fitBounds(bounds);
+
+        // After fitting bounds, keep zoom around 13–15 range
+        const listener = google.maps.event.addListenerOnce(map, 'bounds_changed', function() {
+            if (map.getZoom() > 15) map.setZoom(15);
+            if (map.getZoom() < 13) map.setZoom(13);
+        });
+    }
+
+    // Calculate distance
+    let distance = 0;
+    for (let i = 1; i < pathCoordinates.length; i++) {
+        distance += haversineDistance(pathCoordinates[i - 1], pathCoordinates[i]);
+    }
+    const distanceDisplay = document.getElementById("distance-display");
+    if (distanceDisplay) distanceDisplay.innerText = distance.toFixed(2) + " km";
+}
+
+// Utility functions
+function toRad(v) {
+    return v * Math.PI / 180;
+}
+
+function haversineDistance(c1, c2) {
+    const R = 6371;
+    const dLat = toRad(c2.lat - c1.lat);
+    const dLon = toRad(c2.lng - c1.lng);
+    const lat1 = toRad(c1.lat);
+    const lat2 = toRad(c2.lat);
+    const a = Math.sin(dLat / 2) ** 2 + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) ** 2;
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+document.addEventListener("DOMContentLoaded", initMap);
 </script>
+
 
 <!-- Dependent Dropdowns (District/City/Tehsil/Pincode) -->
 <script>

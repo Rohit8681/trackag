@@ -17,7 +17,7 @@ class DepoController extends Controller
     public function index()
     {
         
-        $depos = Depo::with(['state','district','tehsil','designation'])->orderBy('id','desc')->get();
+        $depos = Depo::with(['state','district','tehsil','users'])->orderBy('id','desc')->get();
         return view('admin.depos.index', compact('depos'));
     }
 
