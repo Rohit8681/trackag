@@ -37,7 +37,7 @@ class ExpenseController extends Controller
 
         try {
             $data = $validator->validated();
-            $data['user_id'] = Auth::id() ?? $request->user_id; // for mobile app user_id
+            $data['user_id'] = Auth::id() ?? $request->user_id; 
 
             // ✅ Handle file upload (if exists)
             if ($request->hasFile('image')) {
