@@ -19,6 +19,7 @@ return new class extends Migration
             $table->enum('max_monthly_travel', ['yes', 'no'])->nullable();
             $table->integer('km')->nullable();
             $table->json('approved_bills_in_da')->nullable();
+            $table->json('approved_bills_in_da_slab_wise')->nullable();
             $table->timestamps();
         });
 

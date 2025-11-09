@@ -140,12 +140,14 @@ class TaDaSlabController extends Controller
             'max_monthly_travel' => 'nullable|in:yes,no',
             'km' => 'nullable|numeric',
             'approved_bills_in_da' => 'nullable|array',
+            'approved_bills_in_da_slab_wise' => 'nullable|array',
         ]);
 
         $slab = TaDaSlab::whereNull('user_id')->first() ?? new TaDaSlab();
         $slab->max_monthly_travel = $request->max_monthly_travel;
         $slab->km = $request->km;
         $slab->approved_bills_in_da = $request->approved_bills_in_da ?? [];
+        $slab->approved_bills_in_da_slab_wise = $request->approved_bills_in_da_slab_wise ?? [];
         $slab->save();
 
         // Clear existing slab-wise records

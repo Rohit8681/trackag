@@ -301,7 +301,6 @@ class UserController extends Controller
                 $tourSlabs = TaDaTourSlab::where('type', 'individual')->whereNull('user_id')->get();
             }
         }
-
         return response()->json([
             'travel_modes' => $travelModes,
             'tour_types' => $tourTypes,
@@ -310,6 +309,7 @@ class UserController extends Controller
             'tour_slabs' => $tourSlabs,
             'ta_da_slab' => $taDaSlab,
             'user_slab' => $user->slab,
+            'approved_bills_in_da_slab_wise' => $taDaSlab->approved_bills_in_da_slab_wise ?? [],
         ]);
     }
 

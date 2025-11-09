@@ -138,10 +138,24 @@
                                 </div>
                             </div>
                         </div>
-
+                        <hr>
                         {{-- ==================== SLAB-WISE (DESIGNATION-WISE) ==================== --}}
                         <div class="row g-4 mt-4">
                             <h5 class="text-primary fw-bold">Slab-wise (Designation-wise Rates)</h5>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">Approved Bills in DA</label>
+                                <select name="approved_bills_in_da_slab_wise[]" class="form-select select2 @error('approved_bills_in_da_slab_wise') is-invalid @enderror" multiple>
+                                    @foreach(['Petrol','Food','Accomodation','Travel','Courier','Hotel','Others'] as $opt)
+                                        <option value="{{ $opt }}"
+                                            {{ (is_array(old('approved_bills_in_da_slab_wise', $slab->approved_bills_in_da_slab_wise ?? [])) && in_array($opt, old('approved_bills_in_da_slab_wise', $slab->approved_bills_in_da_slab_wise ?? []))) ? 'selected':'' }}>
+                                            {{ $opt }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('approved_bills_in_da')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
 
                             <ul class="nav nav-tabs" id="designationTabs" role="tablist">
                                 @foreach($designations as $i => $d)
