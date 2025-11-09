@@ -29,15 +29,6 @@
                     <div class="col-md-12">
 
                         <div class="card card-primary card-outline">
-                            {{-- <div class="card-header d-flex justify-content-between align-items-center">
-                            <h5 class="mb-0">Permission Control Panel</h5>
-                            @can('create_permissions')
-                                <a href="{{ route('permissions.create') }}" class="btn btn-sm btn-primary">
-                                    <i class="fas fa-plus me-1"></i> Add New Permission
-                                </a>
-                            @endcan
-                        </div> --}}
-
 
                             <div class="card-header">
                                 <h3 class="card-title">Permission Control Panel</h3>
