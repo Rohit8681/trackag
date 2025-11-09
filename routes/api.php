@@ -4,7 +4,7 @@ use App\Http\Controllers\Api\ApiTripController;
 use App\Http\Controllers\Api\ExpenseController;
 use App\Http\Controllers\Api\FailedJobController;
 use App\Http\Controllers\Api\LocationApiController;
-use App\Http\Controllers\APi\PartyController;
+use App\Http\Controllers\Api\PartyController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\TenantAuthenticate;
 
