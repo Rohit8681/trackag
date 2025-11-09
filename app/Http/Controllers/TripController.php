@@ -13,63 +13,54 @@ use App\Models\User;
 
 class TripController extends Controller
 {
-    // public function index()
+    // public function index(Request $request)
     // {
     //     $user = Auth::user();
-    //     $query = Trip::with(['user', 'company', 'approvedByUser', 'tripLogs', 'customers']);
+    //     $query = Trip::with(['user', 'company', 'approvedByUser', 'tripLogs', 'customers', 'travelMode', 'tourType']);
 
-    //     if ($user->hasRole('master_admin')) {
-    //         $trips = $query->latest()->get();
-    //     } elseif ($user->hasRole('sub_admin')) {
-    //         $trips = $query->where('company_id', $user->company_id)->latest()->get();
-    //     } else {
-    //         $trips = $query->where(function ($q) use ($user) {
-    //             // Own trips
+    //     // 🔹 Role-based access
+    //     if (!($user->hasRole('master_admin') || $user->hasRole('sub_admin'))) {
+    //         $query->where(function ($q) use ($user) {
     //             $q->where('user_id', $user->id);
-
-    //             // Or trips of users who report to me where approval is pending
     //             $subordinateIds = \App\Models\User::where('reporting_to', $user->id)->pluck('id');
-
     //             if ($subordinateIds->isNotEmpty()) {
     //                 $q->orWhere(function ($inner) use ($subordinateIds) {
     //                     $inner->whereIn('user_id', $subordinateIds)
     //                         ->where('approval_status', 'pending');
     //                 });
     //             }
-    //         })->latest()->get();
+    //         });
     //     }
 
-
-    //     return view('admin.trips.index', compact('trips'));
-    // }
-
-    // public function index()
-    // {
-    //     $user = Auth::user();
-    //     $query = Trip::with(['user', 'company', 'approvedByUser', 'tripLogs', 'customers']);
-
-    //     if ($user->hasRole('master_admin')) {
-    //         $trips = $query->latest()->get();
-    //     } elseif ($user->hasRole('sub_admin')) {
-    //         $trips = $query->latest()->get();
-    //     } else {
-    //         $trips = $query->where(function ($q) use ($user) {
-    //             // Own trips
-    //             $q->where('user_id', $user->id);
-
-    //             // Or trips of users who report to me where approval is pending
-    //             $subordinateIds = \App\Models\User::where('reporting_to', $user->id)->pluck('id');
-
-    //             if ($subordinateIds->isNotEmpty()) {
-    //                 $q->orWhere(function ($inner) use ($subordinateIds) {
-    //                     $inner->whereIn('user_id', $subordinateIds)
-    //                         ->where('approval_status', 'pending');
-    //                 });
-    //             }
-    //         })->latest()->get();
+    //     // 🔹 Apply Filters
+    //     if ($request->filled('from_date')) {
+    //         $query->whereDate('trip_date', '>=', $request->from_date);
     //     }
-    //     return view('admin.trips.index_new', compact('trips'));
+
+    //     if ($request->filled('to_date')) {
+    //         $query->whereDate('trip_date', '<=', $request->to_date);
+    //     }
+    //     if ($request->filled('state')) {
+    //         $query->where('state_id', $request->state);
+    //     }
+    //     if ($request->filled('employee')) {
+    //         $query->where('user_id', $request->employee);
+    //     }
+    //     if ($request->filled('approval_status')) {
+    //         $query->where('approval_status', $request->approval_status);
+    //     }
+
+    //     $trips = $query->latest()->get();
+
+    //     // Data for dropdowns
+    //     $states = State::all(['id', 'name']);
+    //     $employees = User::select('id', 'name')->get();
+
+    //     return view('admin.trips.index_new', compact('trips', 'states', 'employees'));
     // }
+
+    
+    
     public function index(Request $request)
     {
         $user = Auth::user();
@@ -89,14 +80,15 @@ class TripController extends Controller
             });
         }
 
-        // 🔹 Apply Filters
-        if ($request->filled('from_date')) {
-            $query->whereDate('trip_date', '>=', $request->from_date);
-        }
+        // 🔹 Default date setup (if no filters applied)
+        $fromDate = $request->from_date ?? date('Y-m-d');
+        $toDate   = $request->to_date ?? date('Y-m-d');
 
-        if ($request->filled('to_date')) {
-            $query->whereDate('trip_date', '<=', $request->to_date);
-        }
+        // 🔹 Apply date filters
+        $query->whereDate('trip_date', '>=', $fromDate)
+            ->whereDate('trip_date', '<=', $toDate);
+
+        // 🔹 Other Filters
         if ($request->filled('state')) {
             $query->where('state_id', $request->state);
         }
@@ -112,8 +104,11 @@ class TripController extends Controller
         // Data for dropdowns
         $states = State::all(['id', 'name']);
         $employees = User::select('id', 'name')->get();
-
-        return view('admin.trips.index_new', compact('trips', 'states', 'employees'));
+        return view('admin.trips.index_new', compact('trips', 'states', 'employees'))
+            ->with([
+                'from_date' => $fromDate,
+                'to_date' => $toDate,
+            ]);
     }
 
     public function create()
@@ -221,9 +216,11 @@ class TripController extends Controller
         $trip = Trip::findOrFail($id);
 
         $request->validate([
+            'starting_km' => 'required',
             'end_km' => 'required',
+            
         ]);
-
+        $trip->starting_km = $request->starting_km;
         $trip->end_km = $request->end_km;
         $trip->save();
 
@@ -304,28 +301,63 @@ class TripController extends Controller
         return redirect()->route('trips.index')->with('success', 'Trip deleted successfully.');
     }
 
+    // public function approve(Request $request, $id)
+    // {
+    //     $trip = Trip::findOrFail($id);
+    //     $status = $request->input('status', 'approved');
+    //     $reason = $request->input('reason');
+
+    //     if ($status === 'denied') {
+    //         $request->validate(['reason' => 'required|string|max:255']);
+    //     }
+
+    //     $calculatedDistance = $this->calculateDistanceFromLogs($trip->id);
+
+    //     $trip->update([
+    //         'approval_status'   => $status,
+    //         'approval_reason'   => $status === 'denied' ? $reason : null,
+    //         'approved_by'       => Auth::id(),
+    //         'approved_at'       => now(),
+    //         'total_distance_km' => $calculatedDistance,
+    //     ]);
+
+    //     return redirect()->back()->with('success', 'Trip approval status updated.');
+    // }
+
     public function approve(Request $request, $id)
     {
         $trip = Trip::findOrFail($id);
         $status = $request->input('status', 'approved');
         $reason = $request->input('reason');
+        $tripType = $request->input('trip_type'); // full or half
 
         if ($status === 'denied') {
             $request->validate(['reason' => 'required|string|max:255']);
         }
 
+        if ($status === 'approved') {
+            $request->validate(['trip_type' => 'required|in:full,half']);
+        }
+
         $calculatedDistance = $this->calculateDistanceFromLogs($trip->id);
+
+        // NaN or negative check
+        if (!is_numeric($calculatedDistance) || $calculatedDistance < 0) {
+            $calculatedDistance = 0;
+        }
 
         $trip->update([
             'approval_status'   => $status,
             'approval_reason'   => $status === 'denied' ? $reason : null,
-            'approved_by'       => Auth::id(),
+            'approved_by'       => auth()->id(),
             'approved_at'       => now(),
             'total_distance_km' => $calculatedDistance,
+            'trip_type'         => $status === 'approved' ? $tripType : null,
         ]);
 
-        return redirect()->back()->with('success', 'Trip approval status updated.');
+        return redirect()->back()->with('success', 'Trip approval status updated successfully.');
     }
+
 
     public function logPoint(Request $request)
     {

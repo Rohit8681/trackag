@@ -13,7 +13,7 @@
                     <h3 class="fw-bold text-dark mb-1 d-flex align-items-center">
                         <i class="fas fa-map-marked-alt text-primary me-2"></i> Trip Route Map
                     </h3>
-                    <div class="text-muted small">
+                    <div class="text-muted">
                         <div><strong>Agent:</strong> {{ $trip->user->name ?? 'N/A' }}</div>
                         <div><strong>Place to Visit:</strong> {{ $trip->place_to_visit ?? 'N/A' }}</div>
                         <div><strong>Date:</strong> {{ \Carbon\Carbon::parse($trip->trip_date)->format('d-m-Y') }}</div>
@@ -40,6 +40,7 @@
     <!-- Pass tripLogs to JS -->
     <script>
         window.tripLogs = @json($tripLogs);
+        window.tripEnded = {{ $trip->end_time ? 'true' : 'false' }};
     </script>
 
     <!-- Enhanced CSS -->

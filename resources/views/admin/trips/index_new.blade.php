@@ -39,12 +39,12 @@
                         <div class="row g-3 align-items-end">
                             <div class="col-md-2">
                                 <label class="form-label fw-semibold">From Date</label>
-                                <input type="date" name="from_date" value="{{ request('from_date') }}" class="form-control">
+                                <input type="date" name="from_date" value="{{ $from_date }}" class="form-control">
                             </div>
 
                             <div class="col-md-2">
                                 <label class="form-label fw-semibold">To Date</label>
-                                <input type="date" name="to_date" value="{{ request('to_date') }}" class="form-control">
+                                <input type="date" name="to_date" value="{{ $to_date }}" class="form-control">
                             </div>
 
                             <div class="col-md-2">
@@ -117,7 +117,7 @@
                                 <tbody>
                                     @forelse($trips as $trip)
                                         <tr>
-                                            <td class="text-center fw-semibold text-secondary">{{ $trip->id }}</td>
+                                            <td class="text-center fw-semibold text-secondary">{{ $loop->iteration }}</td>
 
                                             <td>
                                                 <span class="fw-semibold text-dark">{{ $trip->user->name ?? 'N/A' }}</span><br>
@@ -218,7 +218,7 @@
                                                             Pending
                                                         </button>
                                                         <ul class="dropdown-menu shadow-sm">
-                                                            <li>
+                                                            {{-- <li>
                                                                 <form method="POST" action="{{ route('trips.approve', $trip->id) }}">
                                                                     @csrf
                                                                     <input type="hidden" name="status" value="approved">
@@ -226,6 +226,12 @@
                                                                         <i class="fas fa-check me-1"></i> Approve
                                                                     </button>
                                                                 </form>
+                                                            </li> --}}
+                                                             <li>
+                                                                <a href="#" class="dropdown-item text-success" data-bs-toggle="modal"
+                                                                data-bs-target="#approveModal{{ $trip->id }}">
+                                                                    <i class="fas fa-check me-1"></i> Approve
+                                                                </a>
                                                             </li>
                                                             <li>
                                                                 <a href="#" class="dropdown-item text-danger" data-bs-toggle="modal"
@@ -251,12 +257,14 @@
                                                 @endif
 
                                                 {{-- @can('delete_all_trip') --}}
+                                                @if ($trip->approval_status === 'pending')
                                                 <form action="{{ route('trips.destroy', $trip) }}" method="POST" class="d-inline">
                                                     @csrf @method('DELETE')
                                                     <button type="submit" class="btn btn-link p-0 text-danger" onclick="return confirm('Are you sure?')">
                                                         <i class="fas fa-trash"></i>
                                                     </button>
                                                 </form>
+                                                @endif
                                                 {{-- @endcan --}}
                                             </td>
                                         </tr>
@@ -378,8 +386,10 @@
                         <label class="form-label fw-semibold">Starting KM</label>
                         <input type="number" name="starting_km"
                             class="form-control"
-                            value="{{ $trip->starting_km ?? '' }}"
-                            readonly>
+                            min="0"
+                            oninput="if(this.value < 0) this.value = '';"
+                            value="{{ $trip->starting_km ?? '' }}" required
+                            >
                     </div>
                     <div class="mb-3">
                         <label class="form-label fw-semibold">Ending KM</label>
@@ -391,6 +401,26 @@
                             oninput="if(this.value < 0) this.value = '';"
                             required>
                     </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Diff</label>
+                        <input type="number" name="diff"
+                            class="form-control"
+                            value="{{ (float) $trip->end_km - (float) $trip->starting_km }}"
+                            placeholder="Enter end KM"
+                            min="0"
+                            oninput="if(this.value < 0) this.value = '';"
+                            readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">gps</label>
+                        <input type="number" name="gps"
+                            class="form-control"
+                            value="{{ $trip->total_distance_km ?? '' }}"
+                            placeholder="Enter end KM"
+                            min="0"
+                            oninput="if(this.value < 0) this.value = '';"
+                            readonly>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-secondary">
@@ -401,6 +431,38 @@
                     </button>
                 </div>
             </form>
+        </div>
+        </div>
+
+        <div class="modal fade" id="approveModal{{ $trip->id }}" tabindex="-1" aria-labelledby="approveModalLabel{{ $trip->id }}" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <form method="POST" action="{{ route('trips.approve', $trip->id) }}">
+                    @csrf
+                    <input type="hidden" name="status" value="approved">
+
+                    <div class="modal-header bg-success text-white">
+                        <h5 class="modal-title" id="approveModalLabel{{ $trip->id }}">Approve Trip</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+
+                    <div class="modal-body">
+                        <p class="fw-semibold mb-2">Select Trip Type:</p>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="trip_type" id="fullDay{{ $trip->id }}" value="full" required>
+                            <label class="form-check-label" for="fullDay{{ $trip->id }}">Full Day</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="trip_type" id="halfDay{{ $trip->id }}" value="half" required>
+                            <label class="form-check-label" for="halfDay{{ $trip->id }}">Half Day</label>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-success">Approve</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
     @endforeach

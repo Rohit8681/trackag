@@ -80,73 +80,8 @@
 </script>
 
 <!-- Google Maps Polyline and Markers -->
+
 {{-- <script>
-    function initMap() {
-        const tripLogs = window.tripLogs || [];
-        if (!tripLogs || tripLogs.length < 2) {
-            // alert("Not enough trip logs to draw route.");
-            return;
-        }
-        const pathCoordinates = tripLogs.map(l => ({
-            lat: +l.latitude,
-            lng: +l.longitude,
-            recorded_at: l.recorded_at ?? ''
-        }));
-        const map = new google.maps.Map(document.getElementById("map"), {
-            zoom: 13,
-            center: pathCoordinates[0]
-        });
-        const tripPath = new google.maps.Polyline({
-            path: pathCoordinates,
-            geodesic: true,
-            strokeColor: "#007bff",
-            strokeOpacity: 1,
-            strokeWeight: 4
-        });
-        tripPath.setMap(map);
-        const bounds = new google.maps.LatLngBounds();
-        pathCoordinates.forEach(c => bounds.extend(c));
-        map.fitBounds(bounds);
-        pathCoordinates.forEach((coord, index) => {
-            new google.maps.Marker({
-                position: coord,
-                map,
-                // label: `${index + 1}`, // Optional: label as number or timestamp
-                label: {
-                    text: `${index + 1}`,
-                    color: '#FFFFFF',
-                    fontSize: '12px'
-                },
-                title: coord.recorded_at ?? '',
-                icon: {
-                    url: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png" // You can change icon color here
-                }
-            });
-        });
-
-        let distance = 0;
-        for (let i = 1; i < pathCoordinates.length; i++) distance += haversineDistance(pathCoordinates[i - 1],
-            pathCoordinates[i]);
-        document.getElementById("distance-display").innerText = distance.toFixed(2) + " km";
-    }
-
-    function toRad(v) {
-        return v * Math.PI / 180;
-    }
-
-    function haversineDistance(c1, c2) {
-        const R = 6371,
-            dLat = toRad(c2.lat - c1.lat),
-            dLon = toRad(c2.lng - c1.lng),
-            lat1 = toRad(c1.lat),
-            lat2 = toRad(c2.lat);
-        const a = Math.sin(dLat / 2) ** 2 + Math.sin(dLon / 2) ** 2 * Math.cos(lat1) * Math.cos(lat2);
-        return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    }
-    
-    document.addEventListener("DOMContentLoaded", initMap);
-</script> --}}
-<script>
 function initMap() {
     const tripLogs = window.tripLogs || [];
 
@@ -234,6 +169,99 @@ function haversineDistance(c1, c2) {
     const lat2 = toRad(c2.lat);
     const a = Math.sin(dLat / 2) ** 2 + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) ** 2;
     return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+document.addEventListener("DOMContentLoaded", initMap);
+</script> --}}
+<script>
+function initMap() {
+    const tripLogs = window.tripLogs || [];
+    const tripEnded = window.tripEnded;
+
+    if (!tripLogs.length) {
+        console.warn("No trip logs available.");
+        return;
+    }
+
+    const pathCoordinates = tripLogs.map(l => ({
+        lat: parseFloat(l.latitude),
+        lng: parseFloat(l.longitude),
+        recorded_at: l.recorded_at ?? ''
+    }));
+
+    const map = new google.maps.Map(document.getElementById("map"), {
+        zoom: 13,
+        center: pathCoordinates[0],
+        mapTypeId: google.maps.MapTypeId.ROADMAP,
+    });
+
+    if (pathCoordinates.length > 1) {
+        const tripPath = new google.maps.Polyline({
+            path: pathCoordinates,
+            geodesic: true,
+            strokeColor: "#007bff",
+            strokeOpacity: 1,
+            strokeWeight: 4
+        });
+        tripPath.setMap(map);
+    }
+
+    // START MARKER (first log)
+    new google.maps.Marker({
+        position: pathCoordinates[0],
+        map,
+        title: "Start Point: " + (pathCoordinates[0].recorded_at || ''),
+        icon: {
+            url: "http://maps.google.com/mapfiles/ms/icons/red-dot.png",
+            scaledSize: new google.maps.Size(40, 40)
+        },
+        label: {
+            text: "Start",
+            color: "#fff",
+            fontSize: "10px"
+        }
+    });
+
+    // NORMAL POINTS
+    for (let i = 1; i < pathCoordinates.length - 1; i++) {
+        new google.maps.Marker({
+            position: pathCoordinates[i],
+            map,
+            title: pathCoordinates[i].recorded_at,
+            icon: {
+                url: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png"
+            }
+        });
+    }
+
+    // END MARKER (only if trip ended)
+    if (tripEnded && pathCoordinates.length > 1) {
+        const last = pathCoordinates[pathCoordinates.length - 1];
+        new google.maps.Marker({
+            position: last,
+            map,
+            title: "End Point: " + (last.recorded_at || ''),
+            icon: {
+                url: "http://maps.google.com/mapfiles/ms/icons/red-dot.png",
+                scaledSize: new google.maps.Size(60, 60)
+            },
+            label: {
+                text: "End",
+                color: "#fff",
+                fontSize: "12px"
+            }
+        });
+    }
+
+    if (pathCoordinates.length > 2) {
+        const bounds = new google.maps.LatLngBounds();
+        pathCoordinates.forEach(c => bounds.extend(c));
+        map.fitBounds(bounds);
+        google.maps.event.addListenerOnce(map, 'bounds_changed', function() {
+            if (map.getZoom() > 15) map.setZoom(15);
+            if (map.getZoom() < 13) map.setZoom(13);
+        });
+    }
 }
 
 document.addEventListener("DOMContentLoaded", initMap);

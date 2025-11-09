@@ -33,7 +33,7 @@
                             <!-- Basic Details -->
                             <div class="col-md-4">
                                 <strong>Trip Date:</strong><br>
-                                <span class="text-muted">{{ $trip->trip_date }}</span>
+                                <span >{{ $trip->trip_date }}</span>
                             </div>
 
                             <div class="col-md-4">
