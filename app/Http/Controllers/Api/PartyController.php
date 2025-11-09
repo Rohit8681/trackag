@@ -5,10 +5,17 @@ namespace App\Http\Controllers\Api;
 use App\Models\Customer;
 use App\Models\PartyVisit;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
 class PartyController extends BaseController
 {
+    public function index(){
+        $user = Auth::user();
+        $visits = PartyVisit::where('user_id', $user->id)->orderByDesc('id')
+            ->get();
+        return $this->sendResponse($visits, 'Party visits fetch successfully');
+    }
     public function partyVisitsStore(Request $request)
     {
         $validated = $request->validate([

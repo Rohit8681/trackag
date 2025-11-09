@@ -631,6 +631,21 @@
                             </ul>
                         </li>
 
+                        {{-- Sales Person --}}
+                        <li class="nav-item {{ request()->is('admin/users*') || request()->is('admin/roles*') || request()->is('admin/permissions*') ? 'menu-open' : '' }}">
+                            <a href="#" class="nav-link {{ request()->is('admin/users*') || request()->is('admin/roles*') || request()->is('admin/permissions*') ? 'active' : '' }}">
+                                <i class="bi bi-people-fill me-2"></i>
+                                <p>Sales Person<i class="bi bi-chevron-right ms-auto"></i></p>
+                            </a>
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item"><a href="{{ url('admin/users') }}" class="nav-link {{ request()->is('admin/users*') ? 'active' : '' }}"><i class="bi bi-person-fill me-2"></i><p>Manage Users</p></a></li>
+                                <li class="nav-item"><a href="{{ url('admin/roles') }}" class="nav-link {{ request()->is('admin/roles*') ? 'active' : '' }}"><i class="bi bi-shield-lock me-2"></i><p>Manage Roles</p></a></li>
+                                @if(auth()->user() && auth()->user()->hasRole('master_admin'))
+                                <li class="nav-item"><a href="{{ url('admin/permissions') }}" class="nav-link {{ request()->is('admin/permissions*') ? 'active' : '' }}"><i class="bi bi-key me-2"></i><p>Manage Permissions</p></a></li>
+                                @endif
+                            </ul>
+                        </li>
+
                         {{-- Depo Master --}}
                         <li class="nav-item">
                             <a href="{{ url('admin/depos') }}" class="nav-link {{ request()->is('admin/depos*') ? 'active' : '' }}">
@@ -721,20 +736,7 @@
                             </ul>
                         </li>
 
-                        {{-- Sales Person --}}
-                        <li class="nav-item {{ request()->is('admin/users*') || request()->is('admin/roles*') || request()->is('admin/permissions*') ? 'menu-open' : '' }}">
-                            <a href="#" class="nav-link {{ request()->is('admin/users*') || request()->is('admin/roles*') || request()->is('admin/permissions*') ? 'active' : '' }}">
-                                <i class="bi bi-people-fill me-2"></i>
-                                <p>Sales Person<i class="bi bi-chevron-right ms-auto"></i></p>
-                            </a>
-                            <ul class="nav nav-treeview">
-                                <li class="nav-item"><a href="{{ url('admin/users') }}" class="nav-link {{ request()->is('admin/users*') ? 'active' : '' }}"><i class="bi bi-person-fill me-2"></i><p>Manage Users</p></a></li>
-                                <li class="nav-item"><a href="{{ url('admin/roles') }}" class="nav-link {{ request()->is('admin/roles*') ? 'active' : '' }}"><i class="bi bi-shield-lock me-2"></i><p>Manage Roles</p></a></li>
-                                @if(auth()->user() && auth()->user()->hasRole('master_admin'))
-                                <li class="nav-item"><a href="{{ url('admin/permissions') }}" class="nav-link {{ request()->is('admin/permissions*') ? 'active' : '' }}"><i class="bi bi-key me-2"></i><p>Manage Permissions</p></a></li>
-                                @endif
-                            </ul>
-                        </li>
+                        
                     </ul>
                 </li>
                 @endcanany
