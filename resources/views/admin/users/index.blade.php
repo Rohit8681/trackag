@@ -215,12 +215,17 @@
                                                 <td class="text-center">
                                                     <i class="fas fa-cog text-primary reset-password" style="cursor:pointer;" data-user-id="{{ $user->id }}"></i>
                                                 </td>   
-                                                <td class="text-center">
+                                                {{-- <td class="text-center">
                                                     @can('view_users')
+                                                    @if(auth()->user()->id == $user->id && auth()->user()->hasRole('sub_admin'))
+
+                                                    @elseif (!auth()->user()->hasRole('sub_admin'))
                                                     <a href="{{ route('users.show', $user) }}" class="btn btn-sm btn-outline-info me-1" title="View">
                                                         <i class="fas fa-eye"></i>
                                                     </a>
+                                                    @endif
                                                     @endcan
+
                                                     @can('edit_users')
                                                     <a href="{{ route('users.edit', $user) }}" class="btn btn-sm btn-outline-warning me-1" title="Edit">
                                                         <i class="fas fa-edit"></i>
@@ -244,7 +249,81 @@
                                                         </button>
                                                     </form>
                                                     @endcan
-                                                </td>
+                                                </td> --}}
+                                                <td class="text-center">
+                                                @php
+                                                    $authUser = auth()->user();
+                                                    $isSubAdmin = $authUser->hasRole('sub_admin');
+                                                    $isOwnRecord = $authUser->id === $user->id;
+                                                @endphp
+
+                                                {{-- ✅ Case 1: Logged-in user is SUB_ADMIN --}}
+                                                @if($isSubAdmin)
+                                                    {{-- Hide all buttons if it's their own record --}}
+                                                    @if(!$isOwnRecord)
+                                                        {{-- Sub_admin can only Edit + Activate/Deactivate other users --}}
+                                                        <a href="{{ route('users.edit', $user) }}" 
+                                                        class="btn btn-sm btn-outline-warning me-1" 
+                                                        title="Edit">
+                                                            <i class="fas fa-edit"></i>
+                                                        </a>
+
+                                                        <form action="{{ route('users.toggle', $user) }}" 
+                                                            method="POST" class="d-inline">
+                                                            @csrf
+                                                            <button type="submit" 
+                                                                    class="btn btn-sm {{ $user->is_active ? 'btn-outline-danger' : 'btn-outline-success' }}" 
+                                                                    title="{{ $user->is_active ? 'Deactivate' : 'Activate' }}">
+                                                                <i class="fas {{ $user->is_active ? 'fa-user-slash' : 'fa-user-check' }}"></i>
+                                                            </button>
+                                                        </form>
+                                                    @endif
+
+                                                {{-- ✅ Case 2: Any other role (admin, superadmin, etc.) --}}
+                                                @else
+                                                    @can('view_users')
+                                                    <a href="{{ route('users.show', $user) }}" 
+                                                    class="btn btn-sm btn-outline-info me-1" 
+                                                    title="View">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+                                                    @endcan
+
+                                                    @can('edit_users')
+                                                    <a href="{{ route('users.edit', $user) }}" 
+                                                    class="btn btn-sm btn-outline-warning me-1" 
+                                                    title="Edit">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                    @endcan
+
+                                                    @can('edit_users')
+                                                    <form action="{{ route('users.toggle', $user) }}" 
+                                                        method="POST" class="d-inline">
+                                                        @csrf
+                                                        <button type="submit" 
+                                                                class="btn btn-sm {{ $user->is_active ? 'btn-outline-danger' : 'btn-outline-success' }}" 
+                                                                title="{{ $user->is_active ? 'Deactivate' : 'Activate' }}">
+                                                            <i class="fas {{ $user->is_active ? 'fa-user-slash' : 'fa-user-check' }}"></i>
+                                                        </button>
+                                                    </form>
+                                                    @endcan
+
+                                                    @can('delete_users')
+                                                    <form action="{{ route('users.destroy', $user) }}" 
+                                                        method="POST" class="d-inline" 
+                                                        onsubmit="return confirm('Are you sure you want to delete this user?')">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" 
+                                                                class="btn btn-sm btn-outline-danger" 
+                                                                title="Delete">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    </form>
+                                                    @endcan
+                                                @endif
+                                            </td>
                                             </tr>
                                         @empty
                                             <tr>
