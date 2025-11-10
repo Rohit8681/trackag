@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Api\BaseController;
+use App\Models\ApkUpload;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Company;
@@ -257,5 +258,21 @@ class ApiAuthController extends BaseController
         DB::reconnect('tenant');
 
         return $tenant;
+    }
+
+    public function getApklist(){
+        $apks = ApkUpload::latest()->get(['id', 'version_code', 'version_name', 'file_path', 'created_at']);
+
+        // Convert file path to public URL
+        $apks->transform(function ($apk) {
+            $apk->file_url = asset('storage/' . $apk->file_path);
+            return $apk;
+        });
+
+        return response()->json([
+            'status' => true,
+            'message' => 'APK list fetched successfully.',
+            'data' => $apks
+        ]);
     }
 }

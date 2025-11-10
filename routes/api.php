@@ -13,6 +13,7 @@ Route::post('/login', [ApiAuthController::class, 'login']);
 Route::post('/login_new', [ApiAuthController::class, 'login_new']);
 Route::get('locations', [LocationApiController::class, 'index']);
 Route::post('/failedJobs', [FailedJobController::class, 'store']);
+Route::get('/apk-list', [ApiAuthController::class, 'getApklist']);
 
 Route::middleware([TenantAuthenticate::class])->group(function () {
     // return response()->json(['ok' => true]);

@@ -65,6 +65,9 @@
 
                     <!-- Footer -->
                     <li class="user-footer d-flex justify-content-between px-3 py-2">
+                        @if($user && $user->hasRole('master_admin'))
+                        <a href="{{ route('apk.create') }}" target="_blank" class="btn btn-outline-primary btn-sm">APK upload</a>
+                        @endif
                         <a href="#" class="btn btn-outline-primary btn-sm">Profile</a>
                         <a href="{{ url('admin/logout') }}" class="btn btn-outline-danger btn-sm">Sign out</a>
                     </li>

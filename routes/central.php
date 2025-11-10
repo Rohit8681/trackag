@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ApkUploadController;
 use App\Http\Controllers\BrochureController;
 use App\Http\Controllers\DepoController;
 use App\Http\Controllers\HolidayController;
@@ -91,7 +92,8 @@ Route::middleware(['web'])->group(function () {
 
         // Protected routes
         Route::middleware(['admin', 'last_seen'])->group(function () {
-            
+            Route::get('/upload-apk', [ApkUploadController::class, 'create'])->name('apk.create');
+            Route::post('/upload-apk', [ApkUploadController::class, 'store'])->name('apk.store');
             Route::resource('users', UserController::class);
             Route::post('/users/{user}/toggle', [UserController::class, 'toggle'])->name('users.toggle');
             Route::post('/users/reset-password', [UserController::class, 'resetPassword'])->name('users.reset-password');
