@@ -2,6 +2,7 @@
 
 @section('content')
 <main class="app-main">
+    {{-- 🔷 Header --}}
     <div class="app-content-header py-3 bg-light border-bottom">
         <div class="container-fluid px-4">
             <div class="d-flex align-items-center justify-content-between flex-wrap">
@@ -25,41 +26,44 @@
             {{-- 🔍 Filters Section --}}
             <div class="card shadow-sm border-0 mb-4">
                 <div class="card-body">
-                    <form class="row g-3 align-items-end">
+                    <form id="filterForm" class="row g-3 align-items-end">
                         <div class="col-md-2">
                             <label class="form-label fw-semibold">Financial Year</label>
-                            <select class="form-select">
-                                <option selected>2024-2025</option>
-                                <option>2023-2024</option>
+                            <select id="financialYear" class="form-select">
+                                <option value="2024-2025" selected>2024-2025</option>
+                                <option value="2023-2024">2023-2024</option>
                             </select>
                         </div>
                         <div class="col-md-2">
                             <label class="form-label fw-semibold">From Date</label>
-                            <input type="date" class="form-control">
+                            <input type="date" id="fromDate" class="form-control">
                         </div>
                         <div class="col-md-2">
                             <label class="form-label fw-semibold">To Date</label>
-                            <input type="date" class="form-control">
+                            <input type="date" id="toDate" class="form-control">
                         </div>
                         <div class="col-md-2">
                             <label class="form-label fw-semibold">State</label>
-                            <select class="form-select">
-                                <option>Gujarat</option>
-                                <option>Maharashtra</option>
+                            <select id="stateSelect" class="form-select">
+                                <option value="">All</option>
+                                <option value="Gujarat">Gujarat</option>
+                                <option value="Maharashtra">Maharashtra</option>
                             </select>
                         </div>
                         <div class="col-md-2">
                             <label class="form-label fw-semibold">Employee Name</label>
-                            <select class="form-select">
-                                <option>Rohit Panchal</option>
-                                <option>Vivek Patel</option>
+                            <select id="employeeSelect" class="form-select">
+                                <option value="">All</option>
+                                <option value="Rohit Panchal">Rohit Panchal</option>
+                                <option value="Vivek Patel">Vivek Patel</option>
                             </select>
                         </div>
                         <div class="col-md-2">
                             <label class="form-label fw-semibold">Agro Name</label>
-                            <select class="form-select">
-                                <option>ABC Agro</option>
-                                <option>XYZ Agro</option>
+                            <select id="agroSelect" class="form-select">
+                                <option value="">All</option>
+                                <option value="ABC Agro">ABC Agro</option>
+                                <option value="XYZ Agro">XYZ Agro</option>
                             </select>
                         </div>
                     </form>
@@ -76,10 +80,12 @@
             <div id="dailyTable">
                 <div class="card shadow-sm border-0">
                     <div class="card-header bg-white border-0 py-3">
-                        <h5 class="mb-0 text-primary fw-semibold"><i class="fas fa-calendar-day me-2"></i>Daily Visit List</h5>
+                        <h5 class="mb-0 text-primary fw-semibold">
+                            <i class="fas fa-calendar-day me-2"></i>Daily Visit List
+                        </h5>
                     </div>
                     <div class="card-body table-responsive">
-                        <table class="table table-bordered align-middle text-nowrap">
+                        <table class="table table-bordered align-middle text-nowrap" id="dailyTableData">
                             <thead class="table-primary text-center">
                                 <tr>
                                     <th>Sr. No.</th>
@@ -93,38 +99,7 @@
                                     <th>Remark</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                <tr>
-                                    <td class="text-center">1</td>
-                                    <td>01-11-2025</td>
-                                    <td>Rohit Panchal</td>
-                                    <td>ABC Agro</td>
-                                    <td>10:00 AM - 10:30 AM (30 min)</td>
-                                    <td>New Order</td>
-                                    <td>03-11-2025</td>
-                                    <td class="text-center">
-                                        <a href="#" class="btn btn-sm btn-outline-primary">
-                                            <i class="fas fa-image"></i> View
-                                        </a>
-                                    </td>
-                                    <td>Good response</td>
-                                </tr>
-                                <tr>
-                                    <td class="text-center">2</td>
-                                    <td>01-11-2025</td>
-                                    <td>Vivek Patel</td>
-                                    <td>XYZ Agro</td>
-                                    <td>11:00 AM - 12:00 PM (1 hr)</td>
-                                    <td>Payment Collection</td>
-                                    <td>05-11-2025</td>
-                                    <td class="text-center">
-                                        <a href="#" class="btn btn-sm btn-outline-primary">
-                                            <i class="fas fa-image"></i> View
-                                        </a>
-                                    </td>
-                                    <td>Collected ₹10,000</td>
-                                </tr>
-                            </tbody>
+                            <tbody id="dailyData"></tbody>
                         </table>
                     </div>
                 </div>
@@ -134,10 +109,12 @@
             <div id="monthlyTable" class="d-none">
                 <div class="card shadow-sm border-0">
                     <div class="card-header bg-white border-0 py-3">
-                        <h5 class="mb-0 text-primary fw-semibold"><i class="fas fa-calendar-alt me-2"></i>Monthly Visit Summary</h5>
+                        <h5 class="mb-0 text-primary fw-semibold">
+                            <i class="fas fa-calendar-alt me-2"></i>Monthly Visit Summary
+                        </h5>
                     </div>
                     <div class="card-body table-responsive">
-                        <table class="table table-bordered align-middle text-nowrap">
+                        <table class="table table-bordered align-middle text-nowrap" id="monthlyTableData">
                             <thead class="table-primary text-center">
                                 <tr>
                                     <th>Sr. No.</th>
@@ -147,34 +124,7 @@
                                     <th>Visit Purpose Count</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                <tr>
-                                    <td class="text-center">1</td>
-                                    <td>ABC Agro</td>
-                                    <td>Rohit Panchal</td>
-                                    <td>5 (28-10-2025)</td>
-                                    <td>
-                                        <div>New Order - 2</div>
-                                        <div>Payment Collection - 3</div>
-                                        <div>Product Query - 2</div>
-                                        <div>Complaint - 0</div>
-                                        <div>Others - 0</div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="text-center">2</td>
-                                    <td>XYZ Agro</td>
-                                    <td>Vivek Patel</td>
-                                    <td>3 (30-10-2025)</td>
-                                    <td>
-                                        <div>New Order - 1</div>
-                                        <div>Payment Collection - 2</div>
-                                        <div>Product Query - 1</div>
-                                        <div>Complaint - 0</div>
-                                        <div>Others - 0</div>
-                                    </td>
-                                </tr>
-                            </tbody>
+                            <tbody id="monthlyData"></tbody>
                         </table>
                     </div>
                 </div>
@@ -187,25 +137,172 @@
 
 @push('scripts')
 <script>
-    $(document).ready(function () {
-        // Toggle between Daily and Monthly
-        $('#dailyBtn').click(function () {
-            $('#dailyTable').removeClass('d-none');
-            $('#monthlyTable').addClass('d-none');
-            $('#dailyBtn').addClass('btn-warning text-dark fw-bold active-mode')
-                          .removeClass('btn-outline-warning');
-            $('#monthlyBtn').removeClass('btn-warning text-dark fw-bold active-mode')
-                            .addClass('btn-outline-warning');
+$(document).ready(function () {
+
+    let currentType = 'daily';
+    loadPartyVisits(currentType);
+
+    // 🔘 Toggle between Daily and Monthly
+    $('#dailyBtn').click(function () {
+        $('#dailyTable').removeClass('d-none');
+        $('#monthlyTable').addClass('d-none');
+        toggleActive($(this), $('#monthlyBtn'));
+        currentType = 'daily';
+        loadPartyVisits('daily');
+    });
+
+    $('#monthlyBtn').click(function () {
+        $('#dailyTable').addClass('d-none');
+        $('#monthlyTable').removeClass('d-none');
+        toggleActive($(this), $('#dailyBtn'));
+        currentType = 'monthly';
+        loadPartyVisits('monthly');
+    });
+
+    function toggleActive(activeBtn, inactiveBtn) {
+        activeBtn.addClass('btn-warning text-dark fw-bold active-mode').removeClass('btn-outline-warning');
+        inactiveBtn.removeClass('btn-warning text-dark fw-bold active-mode').addClass('btn-outline-warning');
+    }
+
+    // 🔍 Reload on Filter Change
+    $('#filterForm select, #fromDate, #toDate').on('change', function () {
+        loadPartyVisits(currentType);
+    });
+
+    // 🧩 Load Data via AJAX
+    function loadPartyVisits(type) {
+        $.ajax({
+            url: "{{ route('admin.get-party-visits') }}",
+            type: 'GET',
+            data: {
+                type: type,
+                user_id: $('#employeeSelect').val(),
+                from_date: $('#fromDate').val(),
+                to_date: $('#toDate').val(),
+                state: $('#stateSelect').val(),
+                agro_name: $('#agroSelect').val()
+            },
+            beforeSend: function() {
+                if(type === 'daily') $('#dailyData').html('<tr><td colspan="9" class="text-center">Loading...</td></tr>');
+                else $('#monthlyData').html('<tr><td colspan="5" class="text-center">Loading...</td></tr>');
+            },
+            success: function(res) {
+                if (res.success) {
+                    if (type === 'daily') renderDaily(res.data);
+                    else renderMonthly(res.data);
+                }
+            },
+            error: function() {
+                alert('Error loading data');
+            }
+        });
+    }
+
+    // 🧾 Render Daily Table
+    function renderMonthly(data) {
+        let html = '';
+        const $table = $('#monthlyTableData');
+
+        // 🧹 Destroy if already initialized
+        if ($.fn.DataTable.isDataTable($table)) {
+            $table.DataTable().clear().destroy();
+        }
+
+        if (!data || data.length === 0) {
+            html = '<tr><td colspan="5" class="text-center text-muted">No monthly data found</td></tr>';
+            $('#monthlyTableData tbody').html(html);
+            return; // 🚫 Stop here - don’t init DataTable
+        }
+
+        // ✅ Otherwise render rows
+        data.forEach((item, index) => {
+            let purposes = '';
+            if (item.visit_purpose_count) {
+                Object.entries(item.visit_purpose_count).forEach(([key, val]) => {
+                    purposes += `<div>${key} - ${val}</div>`;
+                });
+            }
+
+            html += `
+                <tr>
+                    <td class="text-center">${index + 1}</td>
+                    <td>${item.shop_name ?? '-'}</td>
+                    <td>${item.employee_name ?? '-'}</td>
+                    <td>${item.visit_count ?? 0} (${item.last_visit_date ?? '-'})</td>
+                    <td>${purposes || '-'}</td>
+                </tr>`;
         });
 
-        $('#monthlyBtn').click(function () {
-            $('#dailyTable').addClass('d-none');
-            $('#monthlyTable').removeClass('d-none');
-            $('#monthlyBtn').addClass('btn-warning text-dark fw-bold active-mode')
-                            .removeClass('btn-outline-warning');
-            $('#dailyBtn').removeClass('btn-warning text-dark fw-bold active-mode')
-                          .addClass('btn-outline-warning');
+        $('#monthlyTableData tbody').html(html);
+
+        // ✅ Initialize DataTable only when rows exist
+        $table.DataTable({
+            responsive: true,
+            autoWidth: false,
+            pageLength: 10,
+            lengthMenu: [5, 10, 25, 50],
+            order: [[3, 'desc']]
         });
+    }
+
+
+    // 🧾 Render Monthly Table
+    function renderDaily(data) {
+    let html = '';
+    const $table = $('#dailyTableData');
+
+    // 🧹 Destroy old DataTable instance if exists
+    if ($.fn.DataTable.isDataTable($table)) {
+        $table.DataTable().clear().destroy();
+    }
+
+    // 🕳️ If no data, show friendly message and skip init
+    if (!data || data.length === 0) {
+        html = '<tr><td colspan="9" class="text-center text-muted">No daily visits found</td></tr>';
+        $('#dailyTableData tbody').html(html);
+        return; // 🚫 Stop here - don’t init DataTable
+    }
+
+    // ✅ Build rows dynamically
+    data.forEach((item, index) => {
+        html += `
+            <tr>
+                <td class="text-center">${index + 1}</td>
+                <td>${item.visited_date ?? '-'}</td>
+                <td>${item.employee_name ?? '-'}</td>
+                <td>${item.agro_name ?? '-'}</td>
+                <td>${item.check_in_out_duration ?? '-'}</td>
+                <td>${item.visit_purpose ?? '-'}</td>
+                <td>${item.followup_date ?? '-'}</td>
+                <td class="text-center">
+                    ${
+                        item.agro_visit_image
+                            ? `<a href="/storage/${item.agro_visit_image}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-image"></i> View
+                              </a>`
+                            : '-'
+                    }
+                </td>
+                <td>${item.remarks ?? '-'}</td>
+            </tr>`;
     });
+
+    // 🧩 Replace tbody content
+    $('#dailyTableData tbody').html(html);
+
+    // 🚀 Initialize DataTable only when data exists
+    $table.DataTable({
+        responsive: true,
+        autoWidth: false,
+        pageLength: 10,
+        lengthMenu: [5, 10, 25, 50],
+        order: [[1, 'desc']],
+        columnDefs: [
+            { orderable: false, targets: -1 } // last column (remarks or image) not sortable
+        ]
+    });
+}
+
+});
 </script>
 @endpush
