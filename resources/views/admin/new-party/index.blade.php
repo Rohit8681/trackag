@@ -93,55 +93,12 @@
                         </thead>
                         <tbody>
                             <tr>
-                                <td class="text-center">1</td>
-                                <td>01-11-2025</td>
-                                <td>Rohit Panchal</td>
-                                <td>ABC Agro</td>
-                                <td>9876543210</td>
-                                <td>Ahmedabad, Gujarat</td>
-                                <td>Rajesh</td>
-                                <td>Distributor</td>
-                                <td class="text-center">
-                                    <button class="btn btn-sm btn-outline-primary">
-                                        <i class="fas fa-image me-1"></i> View (3)
-                                    </button>
-                                </td>
-                                <td class="text-center">
-                                    <button class="btn btn-sm btn-outline-danger">Reject</button>
-                                </td>
-                                <td class="text-center">
-                                    <button class="btn btn-sm btn-outline-warning">Hold</button>
-                                </td>
-                                <td class="text-center">
-                                    <button class="btn btn-sm btn-outline-success">Approve</button>
-                                </td>
-                                <td>Verified by Admin</td>
-                            </tr>
-                            <tr>
-                                <td class="text-center">2</td>
-                                <td>30-10-2025</td>
-                                <td>Vivek Patel</td>
-                                <td>XYZ Agro</td>
-                                <td>9998887770</td>
-                                <td>Surat, Gujarat</td>
-                                <td>Mahesh</td>
-                                <td>Retailer</td>
-                                <td class="text-center">
-                                    <button class="btn btn-sm btn-outline-primary">
-                                        <i class="fas fa-image me-1"></i> View (2)
-                                    </button>
-                                </td>
-                                <td class="text-center">
-                                    <button class="btn btn-sm btn-outline-danger">Reject</button>
-                                </td>
-                                <td class="text-center">
-                                    <button class="btn btn-sm btn-outline-warning">Hold</button>
-                                </td>
-                                <td class="text-center">
-                                    <button class="btn btn-sm btn-outline-success">Approve</button>
-                                </td>
-                                <td>Pending Verification</td>
-                            </tr>
+                                <td colspan="13" class="text-center text-muted py-4">
+                                        <i class="fas fa-exclamation-circle me-2 text-warning"></i>
+                                        <strong>No data found</strong>
+                                    </td>
+                                </tr>
+                            
                         </tbody>
                     </table>
                 </div>
