@@ -17,7 +17,7 @@ class ApkUploadController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'apkFile' => 'required|file|mimetypes:application/vnd.android.package-archive,application/octet-stream,application/zip|max:50000',
+            'apkFile' => 'required|file|mimetypes:application/vnd.android.package-archive,application/octet-stream,application/zip|max:102400',
             'versionCode' => 'required',
             'versionName' => 'required',
         ]);
