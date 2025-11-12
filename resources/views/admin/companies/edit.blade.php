@@ -35,26 +35,38 @@
 
                                     <div class="col-md-4">
                                         <label class="form-label">Company Name <span class="text-danger">*</span></label>
-                                        <input type="text" name="name" class="form-control"
-                                            value="{{ old('name', $company->name) }}" required>
+                                        <input type="text" name="name" class="form-control @error('name') is-invalid @enderror"
+                                            value="{{ old('name', $company->name) }}">
+                                        @error('name')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
                                     </div>
 
                                     <div class="col-md-4">
-                                        <label class="form-label">Owner Name</label>
-                                        <input type="text" name="owner_name" class="form-control"
+                                        <label class="form-label">Owner Name<span class="text-danger">*</span></label>
+                                        <input type="text" name="owner_name" class="form-control @error('owner_name') is-invalid @enderror"
                                             value="{{ old('owner_name', $company->owner_name) }}">
+                                            @error('owner_name')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
                                     </div>
 
                                     <div class="col-md-4">
                                         <label class="form-label">Company Code <span class="text-danger">*</span></label>
-                                        <input type="text" readonly name="code" class="form-control"
+                                        <input type="text" readonly name="code" class="form-control @error('code') is-invalid @enderror"
                                             value="{{ old('code', $company->code) }}">
+                                            @error('code')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
                                     </div>
 
                                     <div class="col-md-4">
-                                        <label class="form-label">GST Number</label>
-                                        <input type="text" name="gst_number" class="form-control"
+                                        <label class="form-label">GST Number<span class="text-danger">*</span></label>
+                                        <input type="text" name="gst_number" class="form-control @error('gst_number') is-invalid @enderror"
                                             value="{{ old('gst_number', $company->gst_number) }}">
+                                            @error('gst_number')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
                                     </div>
 
                                     <div class="col-md-8">
@@ -78,13 +90,17 @@
                                     </div>
 
                                     <div class="col-md-4">
-                                        <label class="form-label">Email</label>
-                                        <input type="email" name="email" class="form-control"
-                                            value="{{ old('email', $company->email) }}">
+                                        <label class="form-label">Email <span class="text-danger">*</span></label>
+                                        <input type="email" name="email"
+                                            class="form-control @error('email') is-invalid @enderror"
+                                            value="{{ old('email',$company->email) }}">
+                                        @error('email')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
                                     </div>
 
                                     <div class="col-md-4">
-                                        <label class="form-label d-block mb-2">Logo (PNG)</label>
+                                        <label class="form-label d-block mb-2">Logo (PNG)<span class="text-danger">*</span></label>
                                         <div class="d-flex align-items-center gap-3">
                                             @if($company->logo)
                                                 <img src="{{ asset('storage/' . $company->logo) }}" alt="Logo Preview" height="50"
@@ -96,25 +112,35 @@
                                                 </div>
                                             @endif
 
-                                            <input type="file" name="logo" class="form-control w-auto" accept="image/png">
+                                            <input type="file" name="logo" class="form-control w-auto @error('logo') is-invalid @enderror" accept="image/png">
+                                            @error('logo')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
                                         </div>
                                     </div>
-
                                     <div class="col-md-4">
-                                        <label class="form-label">Website</label>
-                                        <input type="url" name="website" class="form-control"
-                                            value="{{ old('website', $company->website) }}">
+                                        <label class="form-label">Website<span class="text-danger">*</span></label>
+                                        <input type="url" name="website"
+                                            class="form-control @error('website') is-invalid @enderror"
+                                            value="{{ old('website',$company->website) }}">
+                                        @error('website')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
                                     </div>
 
                                     <div class="col-md-4">
-                                        <label class="form-label">State Working</label>
-                                        <select name="state[]" class="form-control" multiple>
+                                        <label class="form-label">State Working<span class="text-danger">*</span></label>
+                                        <select name="state[]" class="form-control @error('state') is-invalid @enderror"
+                                            multiple>
                                             @foreach($state as $s)
                                                 <option value="{{ $s->id }}" {{ in_array($s->id, explode(',', old('state', $company->state ?? ''))) ? 'selected' : '' }}>
                                                     {{ $s->name }}
                                                 </option>
                                             @endforeach
                                         </select>
+                                        @error('state')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
                                     </div>
 
                                     <div class="col-md-4">
@@ -138,22 +164,31 @@
                                     </div>
 
                                     <div class="col-md-4">
-                                        <label class="form-label">Start Date</label>
-                                        <input type="date" name="start_date" class="form-control"
+                                        <label class="form-label">Start Date<span class="text-danger">*</span></label>
+                                        <input type="date" name="start_date" class="form-control @error('start_date') is-invalid @enderror"
                                             value="{{ old('start_date', $company->start_date ? \Carbon\Carbon::parse($company->start_date)->format('Y-m-d') : '') }}">
+                                            @error('start_date')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
                                     </div>
 
 
                                     <div class="col-md-4">
-                                        <label class="form-label">Validity Upto</label>
-                                        <input type="date" name="validity_upto" class="form-control"
+                                        <label class="form-label">Validity Upto<span class="text-danger">*</span></label>
+                                        <input type="date" name="validity_upto" class="form-control @error('validity_upto') is-invalid @enderror"
                                             value="{{ old('validity_upto', $company->validity_upto ? \Carbon\Carbon::parse($company->validity_upto)->format('Y-m-d') : '') }}">
+                                            @error('validity_upto')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
                                     </div>
 
                                     <div class="col-md-4">
-                                        <label class="form-label">User Assigned</label>
-                                        <input type="text" name="user_assigned" class="form-control"
+                                        <label class="form-label">User Assigned<span class="text-danger">*</span></label>
+                                        <input type="text" name="user_assigned" class="form-control @error('user_assigned') is-invalid @enderror"
                                             value="{{ old('user_assigned', $company->user_assigned) }}">
+                                            @error('user_assigned')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
                                     </div>
                                 </div>
                             </div>
@@ -165,21 +200,38 @@
                                 <div class="card-body row g-3">
                                     <div class="col-md-4">
                                         <label class="form-label">Contact No<span class="text-danger">*</span></label>
-                                        <input type="text" name="contact_no" class="form-control"
+                                        <input type="text" name="contact_no" class="form-control @error('contact_no') is-invalid @enderror"
                                             value="{{ old('contact_no', $company->contact_no) }}">
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label class="form-label">Password <span class="text-danger">*</span></label>
-                                        <input type="password" name="user_password"
-                                            class="form-control @error('user_password') is-invalid @enderror">
-                                        @error('user_password')
+                                            @error('contact_no')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
                                     </div>
                                     <div class="col-md-4">
-                                        <label class="form-label">Confirm Password <span
-                                                class="text-danger">*</span></label>
-                                        <input type="password" name="user_password_confirmation" class="form-control">
+                                        <label class="form-label">Password </label>
+                                        <div class="input-group">
+                                        <input type="password" name="user_password" id="user_password"
+                                            class="form-control @error('user_password') is-invalid @enderror">
+                                            <button type="button" class="btn btn-outline-secondary" 
+                                                    onclick="togglePassword('user_password', this)">
+                                                <i class="fa fa-eye"></i>
+                                            </button>
+                                        @error('user_password')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Confirm Password </label>
+                                        <div class="input-group">
+                                        <input type="password" name="user_password_confirmation" id="user_password_confirmation" class="form-control @error('user_password_confirmation') is-invalid @enderror">
+                                        <button type="button" class="btn btn-outline-secondary" 
+                                                    onclick="togglePassword('user_password_confirmation', this)">
+                                                <i class="fa fa-eye"></i>
+                                            </button>
+                                        @error('user_password_confirmation')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -197,6 +249,20 @@
 @endsection
 @push('scripts')
     <script>
+        function togglePassword(id, btn) {
+            const input = document.getElementById(id);
+            const icon = btn.querySelector('i');
+
+            if (input.type === "password") {
+                input.type = "text";
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = "password";
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
         $('.mobile_no').on('input', function () {
             // Remove non-digit characters
             this.value = this.value.replace(/\D/g, '');

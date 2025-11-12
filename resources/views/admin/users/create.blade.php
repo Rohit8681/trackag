@@ -432,7 +432,7 @@
                                     </div>
 
                                     {{-- Roles --}}
-                                    <h5 class="mb-3">Assign Roles</h5>
+                                    <h5 class="mb-3">Assign Roles<span class="text-danger">*</span></h5>
                                     <div class="row g-3 mb-3">
                                         @foreach ($roles as $role)
                                             <div class="col-md-2">
