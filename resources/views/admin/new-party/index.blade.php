@@ -51,15 +51,15 @@
                         <div class="col-md-2">
                             <label class="form-label fw-semibold text-dark">Employee Name</label>
                             <select class="form-select">
-                                <option>Rohit Panchal</option>
-                                <option>Vivek Patel</option>
+                                {{-- <option>Rohit Panchal</option>
+                                <option>Vivek Patel</option> --}}
                             </select>
                         </div>
                         <div class="col-md-2">
                             <label class="form-label fw-semibold text-dark">Agro Name</label>
                             <select class="form-select">
-                                <option>ABC Agro</option>
-                                <option>XYZ Agro</option>
+                                {{-- <option>ABC Agro</option>
+                                <option>XYZ Agro</option> --}}
                             </select>
                         </div>
                     </form>

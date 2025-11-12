@@ -54,16 +54,16 @@
                             <label class="form-label fw-semibold">Employee Name</label>
                             <select id="employeeSelect" class="form-select">
                                 <option value="">All</option>
-                                <option value="Rohit Panchal">Rohit Panchal</option>
-                                <option value="Vivek Patel">Vivek Patel</option>
+                                {{-- <option value="Rohit Panchal">Rohit Panchal</option>
+                                <option value="Vivek Patel">Vivek Patel</option> --}}
                             </select>
                         </div>
                         <div class="col-md-2">
                             <label class="form-label fw-semibold">Agro Name</label>
                             <select id="agroSelect" class="form-select">
                                 <option value="">All</option>
-                                <option value="ABC Agro">ABC Agro</option>
-                                <option value="XYZ Agro">XYZ Agro</option>
+                                {{-- <option value="ABC Agro">ABC Agro</option>
+                                <option value="XYZ Agro">XYZ Agro</option> --}}
                             </select>
                         </div>
                     </form>
