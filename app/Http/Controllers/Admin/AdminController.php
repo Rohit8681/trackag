@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Models\Admin;
+use App\Models\Company;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
@@ -262,9 +263,53 @@ class AdminController extends Controller
         return $html;
     }
 
-    public function changePassword(Request $request){
+    // public function changePassword(Request $request){
+        
+        
+    //     $user = Auth::user();
+    //     $getCompany = Company::first();
+
+    //     $request->validate([
+    //         'current_password' => ['required'],
+    //         'new_password' => ['required', 'string', 'confirmed'],
+    //     ], [
+    //         'new_password.confirmed' => 'New password and confirm password do not match.',
+    //     ]);
+
+    //     if (!Hash::check($request->current_password, $user->password)) {
+    //         throw ValidationException::withMessages([
+    //             'current_password' => ['Your current password is incorrect.'],
+    //         ]);
+    //     }
+
+    //     $user->update([ 
+    //         'password' => Hash::make($request->new_password),
+    //     ]);
+
+    //     if($user->hasRole('sub_admin') && !empty($getCompany->tenant_id)){
+             
+    //         $tenantId = $getCompany->tenant_id;
+    //         $centralDb = DB::connection('central');
+    //         $centralDb->table('companies')
+    //             ->where('tenant_id', $tenantId)
+    //             ->update([
+    //                 'password' => Hash::make($request->new_password),
+    //                 'updated_at' => now(),
+    //             ]);
+    //     }
+
+        
+
+    //     return response()->json(['message' => 'Password updated successfully.']);
+    
+    // }
+
+
+    public function changePassword(Request $request)
+    {
         $user = Auth::user();
 
+        // 🧩 Step 1: Validate input
         $request->validate([
             'current_password' => ['required'],
             'new_password' => ['required', 'string', 'confirmed'],
@@ -272,20 +317,42 @@ class AdminController extends Controller
             'new_password.confirmed' => 'New password and confirm password do not match.',
         ]);
 
+        // ❌ Step 2: Verify current password
         if (!Hash::check($request->current_password, $user->password)) {
             throw ValidationException::withMessages([
                 'current_password' => ['Your current password is incorrect.'],
             ]);
         }
 
+        // ✅ Step 3: Update password in tenant (current DB)
         $user->update([
             'password' => Hash::make($request->new_password),
         ]);
 
+        // 🔄 Step 4: If role is sub_admin → update password in central DB too
+        if ($user->hasRole('sub_admin')) {
+            $company = Company::first(); 
+            
+            if ($company && !empty($company->tenant_id)) {
+                $company->update(['password'=> $request->new_password]);
+                try {
+                    DB::connection('central')
+                        ->table('companies')
+                        ->where('tenant_id', $company->tenant_id)
+                        ->update([
+                            'password' => $request->new_password,
+                            'updated_at' => now(),
+                        ]);
+
+                    \Log::info("Central password updated for tenant: {$company->tenant_id}");
+                } catch (\Exception $e) {
+                    \Log::error('Central password update failed: ' . $e->getMessage());
+                }
+            }
+        }
+
+        // ✅ Step 5: Return JSON response
         return response()->json(['message' => 'Password updated successfully.']);
-    
     }
-
-
 
 }

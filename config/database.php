@@ -65,6 +65,22 @@ return [
         'engine' => null,
     ],
 
+    'central' => [
+        'driver' => 'mysql',
+        'host' => env('CENTRAL_DB_HOST', env('DB_HOST', '127.0.0.1')),
+        'port' => env('CENTRAL_DB_PORT', env('DB_PORT', '3306')),
+        'database' => env('CENTRAL_DB_DATABASE', env('DB_DATABASE', 'central_db')),
+        'username' => env('CENTRAL_DB_USERNAME', env('DB_USERNAME', 'root')),
+        'password' => env('CENTRAL_DB_PASSWORD', env('DB_PASSWORD', '')),
+        'unix_socket' => env('DB_SOCKET', ''),
+        'charset' => 'utf8mb4',
+        'collation' => 'utf8mb4_unicode_ci',
+        'prefix' => '',
+        'prefix_indexes' => true,
+        'strict' => true,
+        'engine' => null,
+    ],
+
 ],
 
 
