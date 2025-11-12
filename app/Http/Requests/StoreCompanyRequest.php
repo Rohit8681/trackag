@@ -17,21 +17,21 @@ class StoreCompanyRequest extends FormRequest
 
         $rules = [
             'name' => 'required|string|max:255',
-            'owner_name' => 'nullable|string|max:255',
+            'owner_name' => 'required|string|max:255',
             'code' => 'required|string|unique:companies,code' . ($companyId ? ',' . $companyId : ''),
-            'gst_number' => 'nullable|string|max:50',
+            'gst_number' => 'required|string|max:50',
             'address' => 'nullable|string',
             'contact_no' => 'required|string|max:20',
             'contact_no2' => 'nullable|string|max:20',
             'telephone_no' => 'nullable|string|max:20',
             'email' => 'required|email',
-            'website' => 'nullable|url',
-            'state' => 'nullable|array',
+            'website' => 'required|url',
+            'state' => 'required|array',
             'state.*' => 'exists:states,id',
             'product_name' => 'nullable|string|max:255',
             'subscription_type' => 'nullable|string|max:100',
             'tally_configuration' => 'nullable|boolean',
-            'logo' => 'nullable|image|mimes:png|max:2048',
+            
             'start_date' => 'required|date',
             'validity_upto' => 'required|date|after_or_equal:start_date',
             'user_assigned' => 'required|integer',
@@ -40,9 +40,11 @@ class StoreCompanyRequest extends FormRequest
         if ($this->isMethod('post')) {
             // Create (store)
             $rules['user_password'] = 'required|confirmed';
+            $rules['logo'] = 'required|image|mimes:png|max:2048';
         } else {
             // Update
             $rules['user_password'] = 'nullable|confirmed';
+            $rules['logo'] = 'nullable|image|mimes:png|max:2048';
         }
 
         return $rules;

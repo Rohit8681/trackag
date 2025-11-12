@@ -63,7 +63,7 @@
                                     </div>
 
                                     <div class="col-md-4">
-                                        <label class="form-label">GST Number</label>
+                                        <label class="form-label">GST Number<span class="text-danger">*</span></label>
                                         <input type="text" name="gst_number"
                                             class="form-control @error('gst_number') is-invalid @enderror"
                                             value="{{ old('gst_number') }}">
@@ -184,7 +184,7 @@
 
                                     <div class="col-md-4">
                                         <label class="form-label">Start Date<span class="text-danger">*</span></label>
-                                        <input type="date" name="start_date" class="form-control">
+                                        <input type="date" name="start_date" class="form-control @error('start_date') is-invalid @enderror">
                                         @error('start_date')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
@@ -192,7 +192,7 @@
 
                                     <div class="col-md-4">
                                         <label class="form-label">VALIDITY UPTO<span class="text-danger">*</span></label>
-                                        <input type="date" name="validity_upto" class="form-control">
+                                        <input type="date" name="validity_upto" class="form-control @error('validity_upto') is-invalid @enderror">
                                         @error('validity_upto')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
@@ -200,7 +200,7 @@
 
                                     <div class="col-md-4">
                                         <label class="form-label">USER ASSIGNED<span class="text-danger">*</span></label>
-                                        <input type="number" name="user_assigned" class="form-control">
+                                        <input type="number" name="user_assigned" class="form-control @error('user_assigned') is-invalid @enderror">
                                         @error('user_assigned')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
@@ -212,7 +212,9 @@
                                 <div class="card-header">
                                     <h5>Admin User Information</h5>
                                 </div>
+
                                 <div class="card-body row g-3">
+                                    <!-- 📞 Contact No -->
                                     <div class="col-md-4">
                                         <label class="form-label">Contact No <span class="text-danger">*</span></label>
                                         <input type="text" name="contact_no"
@@ -222,25 +224,43 @@
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
                                     </div>
-                                    <div class="col-md-4">
-                                        {{-- <label class="form-label">Password <span class="text-danger">*</span></label>
-                                        --}}
-                                        <label class="form-label">Password </label>
 
-                                        <input type="password" name="user_password"
-                                            class="form-control @error('user_password') is-invalid @enderror">
-                                        @error('user_password')
-                                            <div class="invalid-feedback">{{ $message }}</div>
-                                        @enderror
-                                    </div>
+                                    <!-- 🔐 Password -->
                                     <div class="col-md-4">
-                                        {{-- <label class="form-label">Confirm Password <span
-                                                class="text-danger">*</span></label> --}}
-                                        <label class="form-label">Confirm Password </label>
-                                        <input type="password" name="user_password_confirmation" class="form-control">
+                                        <label class="form-label">Password <span class="text-danger">*</span></label>
+                                        <div class="input-group">
+                                            <input type="password" id="user_password" name="user_password"
+                                                class="form-control @error('user_password') is-invalid @enderror"
+                                                placeholder="Enter password">
+                                            <button type="button" class="btn btn-outline-secondary" 
+                                                    onclick="togglePassword('user_password', this)">
+                                                <i class="fa fa-eye"></i>
+                                            </button>
+                                            @error('user_password')
+                                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                    </div>
+
+                                    <!-- 🔐 Confirm Password -->
+                                    <div class="col-md-4">
+                                        <label class="form-label">Confirm Password <span class="text-danger">*</span></label>
+                                        <div class="input-group">
+                                            <input type="password" id="user_password_confirmation" name="user_password_confirmation"
+                                                class="form-control @error('user_password_confirmation') is-invalid @enderror"
+                                                placeholder="Confirm password">
+                                            <button type="button" class="btn btn-outline-secondary" 
+                                                    onclick="togglePassword('user_password_confirmation', this)">
+                                                <i class="fa fa-eye"></i>
+                                            </button>
+                                            @error('user_password_confirmation')
+                                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                                            @enderror
+                                        </div>
                                     </div>
                                 </div>
                             </div>
+
 
                             <div class="text-end">
                                 <button type="submit" class="btn btn-primary">Save Company & Admin</button>
@@ -255,6 +275,20 @@
 @endsection
 @push('scripts')
     <script>
+        function togglePassword(id, btn) {
+            const input = document.getElementById(id);
+            const icon = btn.querySelector('i');
+
+            if (input.type === "password") {
+                input.type = "text";
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = "password";
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
         $('.mobile_no').on('input', function () {
             // Remove non-digit characters
             this.value = this.value.replace(/\D/g, '');

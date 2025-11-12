@@ -32,8 +32,8 @@ return new class extends Migration
             $table->string('name'); // Already present
             $table->string('role')->nullable(); // Already present
             $table->string('mobile', 20)->nullable(); // Already present
-            $table->string('email')->unique(); // Already present
-            $table->timestamp('email_verified_at')->nullable(); // Already present
+            $table->string('email')->nullable()->unique();
+            $table->timestamp('email_verified_at')->nullable(); 
             $table->string('password'); // Already present
             $table->boolean('is_active')->default(true); // Already present
             $table->string('image')->nullable(); // Already present
