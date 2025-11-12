@@ -12,7 +12,9 @@ class PartyController extends Controller
      */
     public function index()
     {
-        return view('admin.party.index');
+        // return view('admin.party.index');
+        return view('coming-soon');
+
     }
 
     // public function getPartyVisits(Request $request)
@@ -130,7 +132,8 @@ class PartyController extends Controller
     }
 
     public function newPartyList(){
-        return view('admin.new-party.index');
+        // return view('admin.new-party.index');
+        return view('coming-soon');
     }
 
     /**
