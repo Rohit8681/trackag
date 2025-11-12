@@ -25,7 +25,7 @@
             @endif
             <div class="mb-3">
                 <label for="apkFile" class="form-label">APK File</label>
-                <input type="file" class="form-control" id="apkFile" name="apkFile" required>
+                <input type="file" class="form-control" accept=".apk" id="apkFile" name="apkFile" required>
                 @error('apkFile') <div class="text-danger">{{ $message }}</div> @enderror
             </div>
 

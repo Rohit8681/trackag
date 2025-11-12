@@ -12,6 +12,8 @@ use App\Models\UserSession;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
+use ZipArchive;
+use Illuminate\Support\Facades\Storage;
 
 
 class ApiAuthController extends BaseController
@@ -260,12 +262,45 @@ class ApiAuthController extends BaseController
         return $tenant;
     }
 
-    public function getApklist(){
+    // public function getApklist(){
+    //     $apks = ApkUpload::latest()->get(['id', 'version_code', 'version_name', 'file_path', 'created_at']);
+
+    //     // Convert file path to public URL
+    //     $apks->transform(function ($apk) {
+    //         $apk->file_url = asset('storage/' . $apk->file_path);
+    //         return $apk;
+    //     });
+
+    //     return response()->json([
+    //         'status' => true,
+    //         'message' => 'APK list fetched successfully.',
+    //         'data' => $apks
+    //     ]);
+    // }
+
+    public function getApklist()
+    {
         $apks = ApkUpload::latest()->get(['id', 'version_code', 'version_name', 'file_path', 'created_at']);
 
-        // Convert file path to public URL
         $apks->transform(function ($apk) {
             $apk->file_url = asset('storage/' . $apk->file_path);
+
+            // ✅ Unzip APK to read inside (no permanent extract)
+            $zip = new ZipArchive;
+            $apkFilePath = storage_path('app/public/' . $apk->file_path);
+            $fileList = [];
+
+            if ($zip->open($apkFilePath) === TRUE) {
+                for ($i = 0; $i < $zip->numFiles; $i++) {
+                    $stat = $zip->statIndex($i);
+                    $fileList[] = $stat['name'];
+                }
+                $zip->close();
+            }
+
+            // ✅ Optional: limit output for performance
+            $apk->files_inside = array_slice($fileList, 0, 20); // just 20 files preview
+
             return $apk;
         });
 

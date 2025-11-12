@@ -109,6 +109,7 @@ Route::middleware(['web'])->group(function () {
 
 
             Route::get('dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
+            Route::post('change-password', [AdminController::class, 'changePassword'])->name('change-password');
             Route::resource('companies', CompanyController::class);
             Route::patch('companies/{id}/toggle', [CompanyController::class, 'toggle'])->name('companies.toggle');
             Route::resource('states', StateController::class);

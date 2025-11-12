@@ -14,6 +14,37 @@ class ApkUploadController extends Controller
         return view('apk-upload',compact('apkData'));
     }
 
+    // public function store(Request $request)
+    // {
+    //     $request->validate([
+    //         'apkFile' => 'required|file|mimetypes:application/vnd.android.package-archive,application/octet-stream,application/zip|max:102400',
+    //         'versionCode' => 'required',
+    //         'versionName' => 'required',
+    //     ]);
+
+    //     $path = $request->file('apkFile')->store('apk_files', 'public');
+
+    //     $apk = ApkUpload::where('id', $request->main_id)->first();
+
+    //     if(!empty($apk)){
+    //         $apk->update([
+    //             'version_code' => $request->versionCode,
+    //             'version_name' => $request->versionName,
+    //             'file_path' => $path,
+    //         ]);
+
+    //     }else{
+    //         ApkUpload::create([
+    //             'version_code' => $request->versionCode,
+    //             'version_name' => $request->versionName,
+    //             'file_path' => $path,
+    //         ]);
+    //     }
+        
+    //     return back()->with('success', 'APK uploaded and saved successfully!')
+    //                 ->with('file', $path);
+    // }
+
     public function store(Request $request)
     {
         $request->validate([
@@ -22,26 +53,29 @@ class ApkUploadController extends Controller
             'versionName' => 'required',
         ]);
 
-        $path = $request->file('apkFile')->store('apk_files', 'public');
+        $file = $request->file('apkFile');
 
-        $apk = ApkUpload::where('id', $request->main_id)->first();
+        // 🧩 Force .apk extension rakhiye
+        $fileName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+        $storedPath = $file->storeAs('apk_files', $fileName . '.apk', 'public');
 
-        if(!empty($apk)){
+        $apk = ApkUpload::find($request->main_id);
+
+        if ($apk) {
             $apk->update([
                 'version_code' => $request->versionCode,
                 'version_name' => $request->versionName,
-                'file_path' => $path,
+                'file_path' => $storedPath,
             ]);
-
-        }else{
+        } else {
             ApkUpload::create([
                 'version_code' => $request->versionCode,
                 'version_name' => $request->versionName,
-                'file_path' => $path,
+                'file_path' => $storedPath,
             ]);
         }
-        
+
         return back()->with('success', 'APK uploaded and saved successfully!')
-                    ->with('file', $path);
+                    ->with('file', $storedPath);
     }
 }

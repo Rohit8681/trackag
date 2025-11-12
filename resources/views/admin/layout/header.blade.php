@@ -54,14 +54,18 @@
                         <small>Member since {{ $user->created_at->format('M Y') }}</small>
                     </li>
 
-                    {{-- <!-- User Body -->
+                    <!-- User Body -->
                     <li class="user-body px-3 py-2">
                         <div class="row text-center">
-                            <div class="col-4"><a href="#">Followers</a></div>
-                            <div class="col-4"><a href="#">Sales</a></div>
-                            <div class="col-4"><a href="#">Friends</a></div>
+                            <div class="col-12">
+                                <a href="#" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#changePasswordModal">
+                                Change Password
+                                </a>
+                            </div>
+                            {{-- <div class="col-4"><a href="#">Sales</a></div>
+                            <div class="col-4"><a href="#">Friends</a></div> --}}
                         </div>
-                    </li> --}}
+                    </li>
 
                     <!-- Footer -->
                     <li class="user-footer d-flex justify-content-between px-3 py-2">
@@ -75,4 +79,6 @@
             </li>
         </ul>
     </div>
+    
 </nav>
+@include('admin.users.change-password-modal');

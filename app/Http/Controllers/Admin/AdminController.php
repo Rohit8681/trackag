@@ -13,6 +13,8 @@ use App\Models\UserSession;
 use App\Models\Customer;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\ValidationException;
 
 use Session;
 
@@ -197,68 +199,92 @@ class AdminController extends Controller
      * ✅ Fetch user session logs and total logged-in time for today (for dashboard modal popup)
      */
     public function getUserSessionHistory(Request $request, $userId)
-{
-    $loggedInUser = Auth::user();
-    $targetUser   = User::find($userId);
+    {
+        $loggedInUser = Auth::user();
+        $targetUser   = User::find($userId);
 
-    if (!$targetUser) {
-        return '<p class="text-danger">User not found.</p>';
-    }
+        if (!$targetUser) {
+            return '<p class="text-danger">User not found.</p>';
+        }
 
-    $isMasterAdmin = $loggedInUser->hasRole('master_admin');
+        $isMasterAdmin = $loggedInUser->hasRole('master_admin');
 
-    // ✅ Restrict company admins from viewing other companies' user sessions
-    if (!$isMasterAdmin && $loggedInUser->company_id !== $targetUser->company_id) {
-        return '<p class="text-danger">Unauthorized access. You can only view session logs of your own company\'s users.</p>';
-    }
+        // ✅ Restrict company admins from viewing other companies' user sessions
+        if (!$isMasterAdmin && $loggedInUser->company_id !== $targetUser->company_id) {
+            return '<p class="text-danger">Unauthorized access. You can only view session logs of your own company\'s users.</p>';
+        }
 
-    // ✅ Fetch sessions for this user
-    $sessions = UserSession::where('user_id', $userId)
-    ->whereDate('login_at', now()->toDateString())
-    ->orderByDesc('login_at')
-    ->get();
-
-
-    if ($sessions->isEmpty()) {
-        return '<p class="text-muted">No session records found.</p>';
-    }
-
-    // ✅ Calculate today's total session duration for this user
-    $todayTotalSeconds = UserSession::where('user_id', $userId)
-        ->whereNotNull('session_duration')
+        // ✅ Fetch sessions for this user
+        $sessions = UserSession::where('user_id', $userId)
         ->whereDate('login_at', now()->toDateString())
-        ->sum('session_duration');
+        ->orderByDesc('login_at')
+        ->get();
 
-    $html = '<p><strong>Total Active Time Today:</strong> ' . gmdate('H:i:s', $todayTotalSeconds) . '</p>';
 
-    // ✅ Add new Platform column in header
-    $html .= '<table class="table table-bordered table-striped">';
-    $html .= '<thead><tr>
-                <th>Platform</th>
-                <th>Login Time</th>
-                <th>Logout Time</th>
-                <th>Duration</th>
-              </tr></thead><tbody>';
+        if ($sessions->isEmpty()) {
+            return '<p class="text-muted">No session records found.</p>';
+        }
 
-    foreach ($sessions as $session) {
-        $platform = ucfirst($session->platform ?? 'N/A');
-        $login    = $session->formatted_login_at;
-        $logout   = $session->formatted_logout_at;
-        $duration = $session->formatted_duration;
+        // ✅ Calculate today's total session duration for this user
+        $todayTotalSeconds = UserSession::where('user_id', $userId)
+            ->whereNotNull('session_duration')
+            ->whereDate('login_at', now()->toDateString())
+            ->sum('session_duration');
 
-        // ✅ Add platform in each row
-        $html .= "<tr>
-                    <td>{$platform}</td>
-                    <td>{$login}</td>
-                    <td>{$logout}</td>
-                    <td>{$duration}</td>
-                  </tr>";
+        $html = '<p><strong>Total Active Time Today:</strong> ' . gmdate('H:i:s', $todayTotalSeconds) . '</p>';
+
+        // ✅ Add new Platform column in header
+        $html .= '<table class="table table-bordered table-striped">';
+        $html .= '<thead><tr>
+                    <th>Platform</th>
+                    <th>Login Time</th>
+                    <th>Logout Time</th>
+                    <th>Duration</th>
+                </tr></thead><tbody>';
+
+        foreach ($sessions as $session) {
+            $platform = ucfirst($session->platform ?? 'N/A');
+            $login    = $session->formatted_login_at;
+            $logout   = $session->formatted_logout_at;
+            $duration = $session->formatted_duration;
+
+            // ✅ Add platform in each row
+            $html .= "<tr>
+                        <td>{$platform}</td>
+                        <td>{$login}</td>
+                        <td>{$logout}</td>
+                        <td>{$duration}</td>
+                    </tr>";
+        }
+
+        $html .= '</tbody></table>';
+
+        return $html;
     }
 
-    $html .= '</tbody></table>';
+    public function changePassword(Request $request){
+        $user = Auth::user();
 
-    return $html;
-}
+        $request->validate([
+            'current_password' => ['required'],
+            'new_password' => ['required', 'string', 'confirmed'],
+        ], [
+            'new_password.confirmed' => 'New password and confirm password do not match.',
+        ]);
+
+        if (!Hash::check($request->current_password, $user->password)) {
+            throw ValidationException::withMessages([
+                'current_password' => ['Your current password is incorrect.'],
+            ]);
+        }
+
+        $user->update([
+            'password' => Hash::make($request->new_password),
+        ]);
+
+        return response()->json(['message' => 'Password updated successfully.']);
+    
+    }
 
 
 
