@@ -95,7 +95,7 @@ class AdminController extends Controller
         $defaultDbName = DB::connection()->getDatabaseName();
         $company = Company::first();        
         
-       
+        dd($company);
         return view('admin.login',compact('company'));
     }
 
