@@ -93,7 +93,13 @@ class AdminController extends Controller
     {
         $defaultDb = Config::get('database.default');
         $defaultDbName = DB::connection()->getDatabaseName();
-        $company = Company::first();        
+        $companyCount = Company::count();
+        $company = null;
+
+        if($companyCount == 1){
+            $company = Company::first();
+        }
+                
         
         return view('admin.login',compact('company'));
     }
