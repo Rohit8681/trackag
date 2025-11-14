@@ -301,28 +301,6 @@ class TripController extends Controller
         return redirect()->route('trips.index')->with('success', 'Trip deleted successfully.');
     }
 
-    // public function approve(Request $request, $id)
-    // {
-    //     $trip = Trip::findOrFail($id);
-    //     $status = $request->input('status', 'approved');
-    //     $reason = $request->input('reason');
-
-    //     if ($status === 'denied') {
-    //         $request->validate(['reason' => 'required|string|max:255']);
-    //     }
-
-    //     $calculatedDistance = $this->calculateDistanceFromLogs($trip->id);
-
-    //     $trip->update([
-    //         'approval_status'   => $status,
-    //         'approval_reason'   => $status === 'denied' ? $reason : null,
-    //         'approved_by'       => Auth::id(),
-    //         'approved_at'       => now(),
-    //         'total_distance_km' => $calculatedDistance,
-    //     ]);
-
-    //     return redirect()->back()->with('success', 'Trip approval status updated.');
-    // }
 
     public function approve(Request $request, $id)
     {

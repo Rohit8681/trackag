@@ -434,37 +434,77 @@
         </div>
         </div>
 
-        <div class="modal fade" id="approveModal{{ $trip->id }}" tabindex="-1" aria-labelledby="approveModalLabel{{ $trip->id }}" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <form method="POST" action="{{ route('trips.approve', $trip->id) }}">
-                    @csrf
-                    <input type="hidden" name="status" value="approved">
+        {{-- <div class="modal fade" id="approveModal{{ $trip->id }}" tabindex="-1" aria-labelledby="approveModalLabel{{ $trip->id }}" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <form method="POST" action="{{ route('trips.approve', $trip->id) }}">
+                        @csrf
+                        <input type="hidden" name="status" value="approved">
 
-                    <div class="modal-header bg-success text-white">
-                        <h5 class="modal-title" id="approveModalLabel{{ $trip->id }}">Approve Trip</h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                    </div>
-
-                    <div class="modal-body">
-                        <p class="fw-semibold mb-2">Select Trip Type:</p>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="trip_type" id="fullDay{{ $trip->id }}" value="full" required>
-                            <label class="form-check-label" for="fullDay{{ $trip->id }}">Full Day</label>
+                        <div class="modal-header bg-success text-white">
+                            <h5 class="modal-title" id="approveModalLabel{{ $trip->id }}">Approve Trip</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                         </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="trip_type" id="halfDay{{ $trip->id }}" value="half" required>
-                            <label class="form-check-label" for="halfDay{{ $trip->id }}">Half Day</label>
-                        </div>
-                    </div>
 
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-success">Approve</button>
-                    </div>
-                </form>
+                        <div class="modal-body">
+                            <p class="fw-semibold mb-2">Select Trip Type:</p>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="trip_type" id="fullDay{{ $trip->id }}" value="full" required>
+                                <label class="form-check-label" for="fullDay{{ $trip->id }}">Full Day</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="trip_type" id="halfDay{{ $trip->id }}" value="half" required>
+                                <label class="form-check-label" for="halfDay{{ $trip->id }}">Half Day</label>
+                            </div>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-success">Approve</button>
+                        </div>
+                    </form>
+                </div>
             </div>
+        </div> --}}
+        <div class="modal fade" id="approveModal{{ $trip->id }}" tabindex="-1" aria-labelledby="approveModalLabel{{ $trip->id }}" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            
+            <form id="approveForm{{ $trip->id }}" method="POST" action="{{ route('trips.approve', $trip->id) }}">
+                @csrf
+                <input type="hidden" name="status" value="approved">
+
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title" id="approveModalLabel{{ $trip->id }}">Approve Trip</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    <p class="fw-semibold mb-2">Select Trip Type:</p>
+
+                    <div class="form-check">
+                        <input class="form-check-input trip-type-btn"
+                               type="radio"
+                               name="trip_type"
+                               value="full"
+                               data-form="approveForm{{ $trip->id }}">
+                        <label class="form-check-label">Full Day</label>
+                    </div>
+
+                    <div class="form-check">
+                        <input class="form-check-input trip-type-btn"
+                               type="radio"
+                               name="trip_type"
+                               value="half"
+                               data-form="approveForm{{ $trip->id }}">
+                        <label class="form-check-label">Half Day</label>
+                    </div>
+                </div>
+
+            </form>
+
         </div>
     </div>
+</div>
     @endforeach
 
     <!-- KM Images Modal -->
@@ -514,6 +554,14 @@
 @endsection
 @push('scripts')
 <script>
+document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".trip-type-btn").forEach(radio => {
+        radio.addEventListener("change", function () {
+            const formId = this.getAttribute("data-form");
+            document.getElementById(formId).submit();
+        });
+    });
+});
 $(document).ready(function () {
     var tripsCount = @json($trips->count());
     if (tripsCount > 0) {
