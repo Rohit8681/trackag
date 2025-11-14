@@ -1,5 +1,57 @@
 @extends('admin.layout.layout')
+<style>
+    .trip-type-group {
+    display: flex;
+    gap: 12px;
+    margin-top: 10px;
+}
 
+/* Base button look */
+.trip-type-btn {
+    padding: 10px 20px;
+    border-radius: 8px;
+    border: 2px solid transparent;
+    cursor: pointer;
+    font-weight: 600;
+    background: #e9e9e9;
+    transition: 0.25s ease-in-out;
+    user-select: none;
+}
+
+/* Hide radio */
+.trip-type-btn input {
+    display: none;
+}
+
+/* FULL DAY – Green */
+.trip-type-btn.full {
+    border-color: #28a745;
+}
+.trip-type-btn.full input:checked + span,
+.trip-type-btn.full input:checked {
+    background: #28a745;
+    color: #fff;
+    border-radius: 8px;
+    padding: 10px 20px;
+}
+
+/* HALF DAY – Yellow */
+.trip-type-btn.half {
+    border-color: #ffc107;
+}
+.trip-type-btn.half input:checked + span,
+.trip-type-btn.half input:checked {
+    background: #ffc107;
+    color: #000;
+    border-radius: 8px;
+    padding: 10px 20px;
+}
+
+/* Hover effect */
+.trip-type-btn:hover {
+    background: #f1f1f1;
+}
+</style>
 @section('content')
 <main class="app-main">
 
@@ -481,22 +533,18 @@
                 <div class="modal-body">
                     <p class="fw-semibold mb-2">Select Trip Type:</p>
 
-                    <div class="form-check">
-                        <input class="form-check-input trip-type-btn"
-                               type="radio"
-                               name="trip_type"
-                               value="full"
-                               data-form="approveForm{{ $trip->id }}">
-                        <label class="form-check-label">Full Day</label>
-                    </div>
+                    <div class="trip-type-group">
 
-                    <div class="form-check">
-                        <input class="form-check-input trip-type-btn"
-                               type="radio"
-                               name="trip_type"
-                               value="half"
-                               data-form="approveForm{{ $trip->id }}">
-                        <label class="form-check-label">Half Day</label>
+                        <label class="trip-type-btn full">
+                            <input type="radio" name="trip_type" value="full" data-form="approveForm{{ $trip->id }}">
+                            <span>Full Day</span>
+                        </label>
+
+                        <label class="trip-type-btn half">
+                            <input type="radio" name="trip_type" value="half" data-form="approveForm{{ $trip->id }}">
+                            <span>Half Day</span>
+                        </label>
+
                     </div>
                 </div>
 
