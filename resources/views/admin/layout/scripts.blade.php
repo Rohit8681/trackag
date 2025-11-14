@@ -298,7 +298,7 @@ function initMap() {
         mapTypeId: google.maps.MapTypeId.ROADMAP,
     });
 
-    // 🟦 Draw route line
+    // Draw Route Line
     if (pathCoordinates.length > 1) {
         const tripPath = new google.maps.Polyline({
             path: pathCoordinates,
@@ -310,18 +310,28 @@ function initMap() {
         tripPath.setMap(map);
     }
 
-    // CUSTOM ICON PATH
-    const customIcon = {
-        url: "{{ asset('img/location-icon.png') }}",
-        scaledSize: new google.maps.Size(40, 40)
+    // CUSTOM ICONS
+    const startIcon = {
+        url: "{{ asset('img/start-green.png') }}",
+        scaledSize: new google.maps.Size(60, 60) // LARGE
     };
 
-    // 🟢 START MARKER
-    const startMarker = new google.maps.Marker({
+    const middleIcon = {
+        url: "{{ asset('img/mid-blue.png') }}",
+        scaledSize: new google.maps.Size(30, 30) // MEDIUM
+    };
+
+    const endIcon = {
+        url: "{{ asset('img/end-red.png') }}",
+        scaledSize: new google.maps.Size(60, 60) // LARGE
+    };
+
+    // START MARKER (GREEN)
+    new google.maps.Marker({
         position: pathCoordinates[0],
         map,
         title: "Start Point: " + (pathCoordinates[0].recorded_at || ''),
-        icon: customIcon,
+        icon: startIcon,
         label: {
             text: "Start",
             color: "#fff",
@@ -330,24 +340,24 @@ function initMap() {
         }
     });
 
-    // 🔵 MIDDLE MARKERS
+    // MIDDLE MARKERS (BLUE)
     for (let i = 1; i <= pathCoordinates.length - 2; i++) {
         new google.maps.Marker({
             position: pathCoordinates[i],
             map,
             title: pathCoordinates[i].recorded_at,
-            icon: customIcon
+            icon: middleIcon
         });
     }
 
-    // 🔴 END MARKER
+    // END MARKER (RED)
     if (pathCoordinates.length > 1) {
         const last = pathCoordinates[pathCoordinates.length - 1];
-        const endMarker = new google.maps.Marker({
+        new google.maps.Marker({
             position: last,
             map,
             title: "End Point: " + (last.recorded_at || ''),
-            icon: customIcon,
+            icon: endIcon,
             label: {
                 text: "End",
                 color: "#fff",
@@ -357,13 +367,13 @@ function initMap() {
         });
     }
 
-    // Auto-fit zoom
+    // Auto-fit Zoom
     if (pathCoordinates.length > 1) {
         const bounds = new google.maps.LatLngBounds();
         pathCoordinates.forEach(c => bounds.extend(c));
         map.fitBounds(bounds);
 
-        google.maps.event.addListenerOnce(map, 'bounds_changed', function () {
+        google.maps.event.addListenerOnce(map, 'bounds_changed', function() {
             const currentZoom = map.getZoom();
             if (currentZoom > 16) map.setZoom(16);
             if (currentZoom < 12) map.setZoom(12);
@@ -373,6 +383,7 @@ function initMap() {
 
 document.addEventListener("DOMContentLoaded", initMap);
 </script>
+
 
 
 
