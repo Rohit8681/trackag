@@ -603,13 +603,14 @@
 @push('scripts')
 <script>
 document.addEventListener("DOMContentLoaded", function () {
-    document.querySelectorAll(".trip-type-btn").forEach(radio => {
-        radio.addEventListener("change", function () {
+    document.querySelectorAll(".trip-type-btn input").forEach(input => {
+        input.addEventListener("change", function () {
             const formId = this.getAttribute("data-form");
             document.getElementById(formId).submit();
         });
     });
 });
+
 $(document).ready(function () {
     var tripsCount = @json($trips->count());
     if (tripsCount > 0) {
