@@ -26,8 +26,8 @@
                         <div class="card card-primary card-outline">
                             <div class="card-header d-flex justify-content-between align-items-center">
                                 <h3 class="card-title">Travel Modes</h3>
-                                <a href="{{ route('travelmode.create') }}" class="btn btn-sm btn-primary ms-auto">Add Travel
-                                    Modes</a>
+                                {{-- <a href="{{ route('travelmode.create') }}" class="btn btn-sm btn-primary ms-auto">Add Travel
+                                    Modes</a> --}}
                             </div>
                             <div class="card-body table-responsive">
                                 <table id="trips-table" class="table table-bordered table-striped align-middle">

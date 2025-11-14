@@ -128,12 +128,28 @@
                                         @enderror
                                     </div>
 
-                                    <div class="col-md-4">
+                                    {{-- <div class="col-md-4">
                                         <label class="form-label">State Working<span class="text-danger">*</span></label>
                                         <select name="state[]" class="form-control @error('state') is-invalid @enderror"
                                             multiple>
                                             @foreach($state as $s)
                                                 <option value="{{ $s->id }}" {{ in_array($s->id, explode(',', old('state', $company->state ?? ''))) ? 'selected' : '' }}>
+                                                    {{ $s->name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        @error('state')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div> --}}
+                                    @php
+                                        $selectedStates = old('state') ?? explode(',', $company->state ?? '');
+                                    @endphp
+                                    <div class="col-md-4">
+                                        <label class="form-label">State Working<span class="text-danger">*</span></label>
+                                        <select name="state[]" class="form-control @error('state') is-invalid @enderror" multiple>
+                                            @foreach($state as $s)
+                                                <option value="{{ $s->id }}" {{ in_array($s->id, $selectedStates) ? 'selected' : '' }}>
                                                     {{ $s->name }}
                                                 </option>
                                             @endforeach
@@ -215,21 +231,18 @@
                                                     onclick="togglePassword('user_password', this)">
                                                 <i class="fa fa-eye"></i>
                                             </button>
-                                        @error('user_password')
-                                            <div class="invalid-feedback">{{ $message }}</div>
-                                        @enderror
                                         </div>
                                     </div>
                                     <div class="col-md-4">
                                         <label class="form-label">Confirm Password </label>
                                         <div class="input-group">
-                                        <input type="password" name="user_password_confirmation" id="user_password_confirmation" class="form-control @error('user_password_confirmation') is-invalid @enderror">
+                                        <input type="password" name="user_password_confirmation" id="user_password_confirmation" class="form-control @error('user_password') is-invalid @enderror">
                                         <button type="button" class="btn btn-outline-secondary" 
                                                     onclick="togglePassword('user_password_confirmation', this)">
                                                 <i class="fa fa-eye"></i>
                                             </button>
-                                        @error('user_password_confirmation')
-                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @error('user_password')
+                                            <div class="invalid-feedback d-block">{{ $message }}</div>
                                         @enderror
                                         </div>
                                     </div>

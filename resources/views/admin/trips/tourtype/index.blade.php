@@ -25,7 +25,7 @@
                         <div class="card card-primary card-outline">
                             <div class="card-header d-flex justify-content-between align-items-center">
                                 <h3 class="card-title">Trip Types</h3>
-                                <a href="{{ route('tourtype.create') }}" class="btn btn-sm btn-primary ms-auto">Add Trip Type</a>
+                                {{-- <a href="{{ route('tourtype.create') }}" class="btn btn-sm btn-primary ms-auto">Add Trip Type</a> --}}
                             </div>
                             <div class="card-body table-responsive">
                                 <table id="trips-table" class="table table-bordered table-striped align-middle">

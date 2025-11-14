@@ -91,17 +91,12 @@ class AdminController extends Controller
 
     public function create()
     {
-    
-        
         $defaultDb = Config::get('database.default');
         $defaultDbName = DB::connection()->getDatabaseName();
-
-        $tenantDb = null;
-        if (tenancy()->initialized) {
-            $tenantDb = DB::connection('tenant')->getDatabaseName();
-        }
+        $company = Company::first();        
+        
        
-        return view('admin.login');
+        return view('admin.login',compact('company'));
     }
 
     public function store(LoginRequest $request)
