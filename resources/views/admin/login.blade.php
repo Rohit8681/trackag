@@ -17,8 +17,8 @@
 
     <style>
         .login-logo img {
-            width: 115px;
-            height: 115px;
+            width: 50px;
+            height: 50px;
             object-fit: cover;
             border-radius: 50%;
             box-shadow: 0 3px 12px rgba(0,0,0,0.25);
