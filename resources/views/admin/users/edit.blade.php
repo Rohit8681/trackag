@@ -390,20 +390,26 @@
                                     <div class="col-md-4">
                                         <label class="form-label">Password <small>(Leave blank to keep existing)</small></label>
                                          <div class="input-group">
-                                        <input type="password" id="password" name="password" class="form-control" placeholder="Enter new password">
+                                        <input type="password" id="password" name="password" class="form-control @error('password') is-invalid @enderror" placeholder="Enter new password">
                                         <button type="button" class="btn btn-outline-secondary" onclick="togglePassword('password', this)">
                                                     <i class="fa fa-eye"></i>
                                                 </button>
                                         </div>
+                                        @error('password')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
                                     </div>
                                     <div class="col-md-4">
                                         <label class="form-label">Confirm Password</label>
                                         <div class="input-group">
-                                        <input type="password" id="password_confirmation" name="password_confirmation" class="form-control" placeholder="Confirm new password">
+                                        <input type="password" id="password_confirmation" name="password_confirmation" class="form-control @error('password_confirmation') is-invalid @enderror" placeholder="Confirm new password">
                                         <button type="button" class="btn btn-outline-secondary" onclick="togglePassword('password_confirmation', this)">
                                                     <i class="fa fa-eye"></i>
                                                 </button>
                                         </div>
+                                        @error('password_confirmation')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
                                     </div>
                                 </div>
 
