@@ -103,7 +103,7 @@ class TripClose extends Command
                         'trip_id' => $trip->id,
                         'latitude' => $last_log->latitude ?? null,
                         'longitude' => $last_log->longitude ?? null,
-                        'gps_status' => null,
+                        'gps_status' => 1,
                         'recorded_at' => now('Asia/Kolkata'),
                         'created_at' => now('Asia/Kolkata'),
                         'updated_at' => now('Asia/Kolkata'),
