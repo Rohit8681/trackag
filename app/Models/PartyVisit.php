@@ -12,26 +12,37 @@ class PartyVisit extends Model
     use HasFactory,TenantConnectionTrait;
 
     protected $fillable = [
-        'type',
         'user_id',
-        'employee_name',
+        'customer_id',
         'visited_date',
-        'agro_name',
-        'check_in_out_duration',
-        'visit_purpose',
+        'check_in_time',
+        'check_out_time',
+        'visit_purpose_id',
         'followup_date',
         'agro_visit_image',
         'remarks',
-        'shop_name',
-        'visit_count',
-        'last_visit_date',
-        'visit_purpose_count',
     ];
 
     protected $casts = [
-        'visit_purpose_count' => 'array',
         'visited_date' => 'date',
         'followup_date' => 'date',
+        'check_in_time' => 'datetime',
+        'check_out_time' => 'datetime',
     ];
+
+    public function customer()
+    {
+        return $this->belongsTo(Customer::class, 'customer_id', 'id');
+    }
+
+    public function visitPurpose()
+    {
+        return $this->belongsTo(Purpose::class, 'visit_purpose_id', 'id');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id', 'id');
+    }
 }
 
