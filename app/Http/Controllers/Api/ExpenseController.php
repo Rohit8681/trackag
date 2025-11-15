@@ -50,7 +50,7 @@ class ExpenseController extends Controller
 
     public function index(Request $request)
     {
-        $userId = Auth::id() ?? $request->user_id;
+        $userId = Auth::user()->id ?? $request->user_id;
 
         $expenses = Expense::with(['travelMode'])      
             ->where('user_id', $userId)
