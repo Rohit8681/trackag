@@ -16,46 +16,71 @@ class PartyController extends BaseController
             ->get();
         return $this->sendResponse($visits, 'Party visits fetch successfully');
     }
+    // public function partyVisitsStore(Request $request)
+    // {
+    //     $validated = $request->validate([
+    //         'type' => 'required|in:daily,monthly',
+    //         'user_id' => 'required',
+    //     ]);
+
+    //     if ($request->type === 'daily') {
+    //         $validated += $request->validate([
+    //             'visited_date' => 'required|date',
+    //             'employee_name' => 'required|string',
+    //             'agro_name' => 'required|string',
+    //             'check_in_out_duration' => 'nullable|string',
+    //             'visit_purpose' => 'nullable|string',
+    //             'followup_date' => 'nullable|date',
+    //             'remarks' => 'nullable|string',
+    //             'agro_visit_image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+    //         ]);
+
+    //         if ($request->hasFile('agro_visit_image')) {
+    //             $path = $request->file('agro_visit_image')->store('party_visits', 'public');
+    //             $validated['agro_visit_image'] = $path;
+    //         }
+    //     } 
+    //     else {
+    //         $validated += $request->validate([
+    //             'employee_name' => 'required|string',
+    //             'shop_name' => 'required|string',
+    //             'visit_count' => 'nullable|integer',
+    //             'last_visit_date' => 'nullable|string',
+    //             'visit_purpose_count' => 'nullable|array',
+    //         ]);
+    //     }
+
+    //     $partyVisit = PartyVisit::create($validated);
+
+    //     return $this->sendResponse($partyVisit, "Party visit saved successfully!");
+
+    // }
+
     public function partyVisitsStore(Request $request)
     {
         $validated = $request->validate([
-            'type' => 'required|in:daily,monthly',
             'user_id' => 'required',
+            'visited_date' => 'required|date',
+            'employee_name' => 'required|string',
+            'agro_name' => 'required|string',
+            'check_in_out_duration' => 'nullable|string',
+            'visit_purpose' => 'nullable|string',
+            'followup_date' => 'nullable|date',
+            'remarks' => 'nullable|string',
+            'agro_visit_image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
-        if ($request->type === 'daily') {
-            $validated += $request->validate([
-                'visited_date' => 'required|date',
-                'employee_name' => 'required|string',
-                'agro_name' => 'required|string',
-                'check_in_out_duration' => 'nullable|string',
-                'visit_purpose' => 'nullable|string',
-                'followup_date' => 'nullable|date',
-                'remarks' => 'nullable|string',
-                'agro_visit_image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-            ]);
+        if ($request->hasFile('agro_visit_image')) {
+            $path = $request->file('agro_visit_image')->store('party_visits', 'public');
+            $validated['agro_visit_image'] = $path;
 
-            if ($request->hasFile('agro_visit_image')) {
-                $path = $request->file('agro_visit_image')->store('party_visits', 'public');
-                $validated['agro_visit_image'] = $path;
-            }
-        } 
-        else {
-            $validated += $request->validate([
-                'employee_name' => 'required|string',
-                'shop_name' => 'required|string',
-                'visit_count' => 'nullable|integer',
-                'last_visit_date' => 'nullable|string',
-                'visit_purpose_count' => 'nullable|array',
-            ]);
+
         }
-
         $partyVisit = PartyVisit::create($validated);
 
         return $this->sendResponse($partyVisit, "Party visit saved successfully!");
-
-    }
-
+    } 
+        
     public function newPartyStore(Request $request)
     {
 

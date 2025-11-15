@@ -15,17 +15,14 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->date('bill_date');
-            
-            // Bill type (Petrol, Food, Accommodation, etc.)
+            $table->string('bill_title')->nullable();
             $table->json('bill_type')->nullable();
-            
             $table->text('bill_details_description')->nullable();
             $table->unsignedBigInteger('travel_mode_id')->nullable();
             $table->decimal('amount', 10, 2)->default(0);
             $table->string('image')->nullable();
-
             $table->timestamps();
-            $table->softDeletes(); // for deleted_at
+            $table->softDeletes(); 
         });
     }
 

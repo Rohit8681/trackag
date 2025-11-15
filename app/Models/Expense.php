@@ -13,6 +13,7 @@ class Expense extends Model
     protected $fillable = [
         'user_id',
         'bill_date',
+        'bill_title',
         'bill_type',
         'bill_details_description',
         'travel_mode_id',
@@ -22,14 +23,9 @@ class Expense extends Model
 
     protected $casts = [
         'bill_date' => 'date',
-        'bill_type' => 'array', // store multiple bill types as JSON
+        'bill_type' => 'array', 
     ];
 
-    /**
-     * Relationships
-     */
-
-    // Each expense belongs to one user
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -41,9 +37,6 @@ class Expense extends Model
         return $this->belongsTo(TravelMode::class);
     }
 
-    /**
-     * Accessor to show image path
-     */
     public function getImageUrlAttribute()
     {
         if ($this->image) {
