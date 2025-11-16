@@ -41,7 +41,7 @@ class ExpenseController extends Controller
             $expense = Expense::create($data);
 
             return response()->json(['status' => true,'message' => 'Expense saved successfully','data' => $expense,
-            ], 201);
+            ], 200);
 
         } catch (\Exception $e) {
             return response()->json(['status' => false,'message' => 'Something went wrong','error' => $e->getMessage(),
