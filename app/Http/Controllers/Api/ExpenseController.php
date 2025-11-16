@@ -31,7 +31,7 @@ class ExpenseController extends Controller
         try {
             $data = $validator->validated();
             $data['user_id'] = Auth::id() ?? $request->user_id; 
-
+            dd($data['user_id']);
             if ($request->hasFile('image')) {
                 $path = $request->file('image')->store('expenses', 'public');
                 $data['image'] = basename($path);
