@@ -13,6 +13,7 @@ class ExpenseController extends Controller
 {
     public function store(Request $request)
     {
+        $user = Auth::user(); 
         $validator = Validator::make($request->all(), [
             'bill_date' => 'required|date',
             'bill_type' => 'required|array', 
@@ -30,7 +31,7 @@ class ExpenseController extends Controller
 
         try {
             $data = $validator->validated();
-            $data['user_id'] = Auth::id() ?? $request->user_id; 
+            $data['user_id'] = $user->id ?? $request->user_id; 
             dd($data['user_id']);
             if ($request->hasFile('image')) {
                 $path = $request->file('image')->store('expenses', 'public');
