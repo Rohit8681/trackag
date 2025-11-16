@@ -99,9 +99,15 @@ class AdminController extends Controller
         if($companyCount == 1){
             $company = Company::first();
         }
+
+         $apk = DB::connection('mysql')   // ← FORCE MAIN DATABASE
+        ->table('apk_uploads')
+        ->orderByDesc('id')
+        ->first();
+        
                 
         
-        return view('admin.login',compact('company'));
+        return view('admin.login',compact('company','apk'));
     }
 
     public function store(LoginRequest $request)

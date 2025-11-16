@@ -127,11 +127,16 @@
 
                 <!-- NEW: APP DOWNLOAD BUTTON -->
                 <div class="download-section">
+                @if($apk)
+                    <a href="{{ asset('storage/' . $apk->file_path) }}" class="download-btn" download>
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/Google_Play_Store_badge_EN.svg/512px-Google_Play_Store_badge_EN.svg.png">
+                        Download App                     </a>
+                @else
                     <a href="#" class="download-btn">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/Google_Play_Store_badge_EN.svg/512px-Google_Play_Store_badge_EN.svg.png" alt="">
                         Download App
                     </a>
-                </div>
+                @endif
+            </div>
                 <!-- END NEW -->
 
             </div>
