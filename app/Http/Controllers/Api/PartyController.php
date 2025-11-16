@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Models\Customer;
 use App\Models\PartyVisit;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
+
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
@@ -54,7 +56,7 @@ class PartyController extends BaseController
         $validated = $request->validate([
             'user_id' => 'required|integer',
             'customer_id' => 'nullable|integer',
-            'visited_date' => 'required|date',
+            // 'visited_date' => 'required|date',
             'check_in_time' => 'nullable|date_format:Y-m-d H:i:s',
             'visit_purpose_id' => 'nullable|integer',
             'followup_date' => 'nullable|date',
@@ -66,6 +68,7 @@ class PartyController extends BaseController
             $path = $request->file('agro_visit_image')->store('party_visits', 'public');
             $validated['agro_visit_image'] = $path;
         }
+        $validated['visited_date'] = Carbon::now();
 
         $partyVisit = PartyVisit::create($validated);
 
