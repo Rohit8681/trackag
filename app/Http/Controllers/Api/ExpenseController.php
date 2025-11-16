@@ -31,7 +31,6 @@ class ExpenseController extends Controller
 
         try {
             $data = $validator->validated();
-            dd($user);
             $data['user_id'] = $user->id ?? $request->user_id; 
             
             if ($request->hasFile('image')) {
