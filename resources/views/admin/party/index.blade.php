@@ -277,7 +277,7 @@ $(document).ready(function () {
                 <td class="text-center">
                     ${
                         item.agro_visit_image
-                            ? `<a href="/storage/${item.agro_visit_image}" target="_blank" class="btn btn-sm btn-outline-primary">
+                            ? `<a href="${item.agro_visit_image}" target="_blank" class="btn btn-sm btn-outline-primary">
                                 <i class="fas fa-image"></i> View
                               </a>`
                             : '-'
