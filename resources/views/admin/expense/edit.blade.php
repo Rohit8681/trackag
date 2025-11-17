@@ -83,7 +83,7 @@
                             @if($expense->image)
                                 <img src="{{ asset('storage/expenses/'.$expense->image) }}"
                                     class="img-thumbnail mt-2"
-                                    width="120">
+                                    width="50" height="50">
                             @endif
                         </div>
 
