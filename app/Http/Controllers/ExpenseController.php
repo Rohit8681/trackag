@@ -63,15 +63,45 @@ class ExpenseController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $expense = Expense::findOrFail($id);
+        return view('admin.expense.edit', compact('expense'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, $id)
     {
-        //
+        $request->validate([
+            'bill_date' => 'required|date',
+            'bill_type' => 'required|array',
+            'bill_title' => 'nullable|string',
+            'bill_details_description' => 'nullable|string',
+            'travel_mode' => 'nullable',
+            'amount' => 'required|numeric',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+        ]);
+
+        $expense = Expense::findOrFail($id);
+
+        $expense->bill_date = $request->bill_date;
+        $expense->bill_type = $request->bill_type;
+        $expense->bill_title = $request->bill_title;
+        $expense->bill_details_description = $request->bill_details_description;
+        $expense->travel_mode = $request->travel_mode;
+        $expense->amount = $request->amount;
+
+        // IMAGE UPDATE
+        if ($request->hasFile('image')) {
+            if ($expense->image && file_exists(storage_path('app/public/'.$expense->image))) {
+                unlink(storage_path('app/public/'.$expense->image));
+            }
+            $expense->image = $request->file('image')->store('expenses', 'public');
+        }
+
+        $expense->save();
+
+        return redirect()->route('expense.index')->with('success', 'Expense Updated Successfully!');
     }
 
     /**
