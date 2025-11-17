@@ -17,7 +17,7 @@ class Expense extends Model
         'bill_title',
         'bill_type',
         'bill_details_description',
-        'travel_mode_id',
+        'travel_mode',
         'amount',
         'image',
         'approval_status'
