@@ -96,7 +96,9 @@ class ExpenseController extends Controller
             if ($expense->image && file_exists(storage_path('app/public/'.$expense->image))) {
                 unlink(storage_path('app/public/'.$expense->image));
             }
-            $expense->image = $request->file('image')->store('expenses', 'public');
+            $path = $request->file('image')->store('expenses', 'public');
+            // $expense->image = $request->file('image')->store('expenses', 'public');
+            $expense->image = basename($path);
         }
 
         $expense->save();
