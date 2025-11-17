@@ -56,18 +56,9 @@ class PartyController extends BaseController
         $validated = $request->validate([
             'user_id' => 'required|integer',
             'customer_id' => 'nullable|integer',
-            // 'visited_date' => 'required|date',
             'check_in_time' => 'nullable|date_format:Y-m-d H:i:s',
-            'visit_purpose_id' => 'nullable|integer',
-            'followup_date' => 'nullable|date',
-            'remarks' => 'nullable|string',
-            'agro_visit_image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
-        if ($request->hasFile('agro_visit_image')) {
-            $path = $request->file('agro_visit_image')->store('party_visits', 'public');
-            $validated['agro_visit_image'] = $path;
-        }
         $validated['visited_date'] = Carbon::now();
 
         $partyVisit = PartyVisit::create($validated);
@@ -84,9 +75,18 @@ class PartyController extends BaseController
         $validated = $request->validate([
             'id' => 'required|integer',
             'check_out_time' => 'nullable|date_format:Y-m-d H:i:s',
+            'visit_purpose_id' => 'nullable|integer',
+            'followup_date' => 'nullable|date',
+            'remarks' => 'nullable|string',
+            'agro_visit_image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
         $partyVisit = PartyVisit::find($validated['id']);
+
+        if ($request->hasFile('agro_visit_image')) {
+            $path = $request->file('agro_visit_image')->store('party_visits', 'public');
+            $validated['agro_visit_image'] = $path;
+        }
 
         if (!$partyVisit) {
             return response()->json([
@@ -96,6 +96,10 @@ class PartyController extends BaseController
         }
 
         $partyVisit->check_out_time = $validated['check_out_time'] ?? now();
+        $partyVisit->visit_purpose_id = $validated['visit_purpose_id'] ?? null;
+        $partyVisit->followup_date = $validated['followup_date'] ?? null;
+        $partyVisit->remarks = $validated['remarks'] ?? null;
+        $partyVisit->agro_visit_image = $validated['agro_visit_image'] ?? null;
         $partyVisit->save();
 
         return response()->json([
