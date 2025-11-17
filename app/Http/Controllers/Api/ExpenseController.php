@@ -19,7 +19,7 @@ class ExpenseController extends Controller
             'bill_type' => 'required|array', 
             'bill_title' => 'nullable|string|max:255',
             'bill_details_description' => 'nullable|string',
-            'travel_mode_id' => 'nullable|integer',
+            'travel_mode' => 'nullable|string',
             'amount' => 'required|numeric|min:0',
             'image' => 'nullable|file|mimes:jpg,jpeg,png|max:2048',
         ]);
