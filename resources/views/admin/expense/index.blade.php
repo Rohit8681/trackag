@@ -150,10 +150,10 @@
                                     <td>
                                         {{-- <a href="{{ route('expense.show', $expense->id) }}" class="text-info me-2" title="View">
                                             <i class="fas fa-eye"></i>
-                                        </a>
+                                        </a> --}}
                                         <a href="{{ route('expense.edit', $expense->id) }}" class="text-warning me-2" title="Edit">
                                             <i class="fas fa-edit"></i>
-                                        </a> --}}
+                                        </a>
                                         <form action="{{ route('expense.destroy', $expense->id) }}" method="POST" class="d-inline"
                                             onsubmit="return confirm('Are you sure you want to delete this expense?')">
                                             @csrf

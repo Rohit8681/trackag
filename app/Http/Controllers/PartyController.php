@@ -13,54 +13,8 @@ class PartyController extends Controller
     public function index()
     {
         return view('admin.party.index');
-        // return view('coming-soon');
 
     }
-
-    // public function getPartyVisits(Request $request)
-    // {
-    //     $type = $request->get('type', 'daily'); // default daily
-    //     $userId = $request->get('user_id');
-
-    //     $query = PartyVisit::query();
-
-    //     if ($userId) {
-    //         $query->where('user_id', $userId);
-    //     }
-
-    //     if ($type === 'daily') {
-    //         $data = $query->where('type', 'daily')
-    //             ->orderByDesc('visited_date')
-    //             ->get([
-    //                 'id',
-    //                 'visited_date',
-    //                 'employee_name',
-    //                 'agro_name',
-    //                 'check_in_out_duration',
-    //                 'visit_purpose',
-    //                 'followup_date',
-    //                 'agro_visit_image',
-    //                 'remarks',
-    //             ]);
-    //     } else {
-    //         $data = $query->where('type', 'monthly')
-    //             ->orderByDesc('last_visit_date')
-    //             ->get([
-    //                 'id',
-    //                 'shop_name',
-    //                 'employee_name',
-    //                 'visit_count',
-    //                 'last_visit_date',
-    //                 'visit_purpose_count',
-    //             ]);
-    //     }
-
-    //     return response()->json([
-    //         'success' => true,
-    //         'data' => $data
-    //     ]);
-    // }
-
     
     public function getPartyVisits(Request $request)
     {
@@ -71,9 +25,8 @@ class PartyController extends Controller
         $state = $request->get('state');
         $agroName = $request->get('agro_name');
 
-        $query = PartyVisit::query();
-
-        // 👤 Filter by employee (user)
+        $query = PartyVisit::with('customer','user','visitPurpose')->query();
+        dd($query->get());
         if ($userId) {
             $query->where('user_id', $userId);
         }
