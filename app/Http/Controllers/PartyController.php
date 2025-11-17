@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Customer;
 use App\Models\PartyVisit;
+use App\Models\State;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class PartyController extends Controller
@@ -12,7 +15,10 @@ class PartyController extends Controller
      */
     public function index()
     {
-        return view('admin.party.index');
+        $state = State::where('status',1)->get();
+        $employee = User::where('status','Active')->get();
+        $customer = Customer::where('status',1)->get();
+        return view('admin.party.index',compact('states','employees','customers'));
 
     }
     

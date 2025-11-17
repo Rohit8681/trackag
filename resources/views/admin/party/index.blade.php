@@ -45,25 +45,29 @@
                         <div class="col-md-2">
                             <label class="form-label fw-semibold">State</label>
                             <select id="stateSelect" class="form-select">
-                                <option value="">All</option>
-                                <option value="Gujarat">Gujarat</option>
-                                <option value="Maharashtra">Maharashtra</option>
+                                
+                                @foreach ($state as $s)
+                                    <option value="{{ $s->id }}">{{ $s->name }}</option>
+                                @endforeach
                             </select>
                         </div>
                         <div class="col-md-2">
                             <label class="form-label fw-semibold">Employee Name</label>
                             <select id="employeeSelect" class="form-select">
                                 <option value="">All</option>
-                                {{-- <option value="Rohit Panchal">Rohit Panchal</option>
-                                <option value="Vivek Patel">Vivek Patel</option> --}}
+                                @foreach ($employee as $e)
+                                    <option value="{{ $e->id }}">{{ $e->name }}</option>
+                                @endforeach
                             </select>
                         </div>
                         <div class="col-md-2">
                             <label class="form-label fw-semibold">Agro Name</label>
                             <select id="agroSelect" class="form-select">
                                 <option value="">All</option>
-                                {{-- <option value="ABC Agro">ABC Agro</option>
-                                <option value="XYZ Agro">XYZ Agro</option> --}}
+                                
+                                @foreach ($customer as $c)
+                                    <option value="{{ $c->id }}">{{ $c->agro_name }}</option>
+                                @endforeach
                             </select>
                         </div>
                     </form>
