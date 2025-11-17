@@ -136,7 +136,8 @@
                                     </td>
                                     <td>{{ $expense->bill_title ?? '-' }}</td>
                                     <td>{{ $expense->bill_details_description ?? '-' }}</td>
-                                    <td>{{ optional($expense->travelMode)->name ?? '-' }}</td>
+                                    {{-- <td>{{ optional($expense->travelMode)->name ?? '-' }}</td> --}}
+                                    <td>{{ $expense->travel_mode ?? '-' }}</td>
                                     <td>₹{{ number_format($expense->amount, 2) }}</td>
                                     <td>
                                         <span class="badge 
