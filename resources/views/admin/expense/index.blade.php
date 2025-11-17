@@ -151,6 +151,30 @@
                                         {{-- <a href="{{ route('expense.show', $expense->id) }}" class="text-info me-2" title="View">
                                             <i class="fas fa-eye"></i>
                                         </a> --}}
+                                         @if($expense->approval_status != 'Approved')
+        <form action="{{ route('expense.approve', $expense->id) }}" method="POST"
+              class="d-inline">
+            @csrf
+            @method('PATCH')
+            <button type="submit" class="btn btn-sm btn-success me-1"
+                    onclick="return confirm('Approve this expense?')">
+                <i class="fas fa-check"></i>
+            </button>
+        </form>
+    @endif
+
+    <!-- Reject -->
+    @if($expense->approval_status != 'Rejected')
+        <form action="{{ route('expense.reject', $expense->id) }}" method="POST"
+              class="d-inline">
+            @csrf
+            @method('PATCH')
+            <button type="submit" class="btn btn-sm btn-danger me-1"
+                    onclick="return confirm('Reject this expense?')">
+                <i class="fas fa-times"></i>
+            </button>
+        </form>
+    @endif
                                         <a href="{{ route('expense.edit', $expense->id) }}" class="text-warning me-2" title="Edit">
                                             <i class="fas fa-edit"></i>
                                         </a>

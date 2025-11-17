@@ -175,6 +175,8 @@ Route::middleware(['web'])->group(function () {
             Route::resource('stock', StockController::class);
             Route::resource('tracking', TrackingController::class);
             Route::resource('expense', ExpenseController::class);
+            Route::patch('expense/{id}/approve', [ExpenseController::class, 'approve'])->name('expense.approve');
+            Route::patch('expense/{id}/reject', [ExpenseController::class, 'reject'])->name('expense.reject');
             Route::resource('brochure', BrochureController::class);
             Route::resource('price', PriceController::class);
             Route::resource('products', ProductController::class);
