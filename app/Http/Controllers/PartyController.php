@@ -259,27 +259,34 @@ class PartyController extends Controller
     // MONTHLY API RESPONSE
     // -----------------------------------------------------
     $data = $query->get()
-        ->groupBy('customer_id')
-        ->map(function ($group) {
+    ->groupBy('customer_id')
+    ->map(function ($group) {
 
-            $lastVisit = $group->sortByDesc('visited_date')->first();
+        $lastVisit = $group->sortByDesc('visited_date')->first();
+
+        // Purpose Wise Count FIXED
+        $purposeDetails = $group->groupBy('visit_purpose_id')->map(function ($rows, $purposeId) {
+
+            // Get purpose name using relation
+            $purposeName = optional($rows->first()->visitPurpose)->name ?? '-';
 
             return [
-                'shop_name'           => $lastVisit->customer->agro_name ?? '-',
-                'employee_name'       => $lastVisit->user->name ?? '-',
-                'visit_count'         => $group->count(),
-                'last_visit_date'     => $lastVisit->visited_date ? $lastVisit->visited_date->format('d-m-Y') : '-',
-
-                // Purpose wise count
-                'purpose_details' => $group->groupBy('visit_purpose_id')->map(function ($p) {
-                    return [
-                        'name'  => $p->first()->visitPurpose->name ?? '-',
-                        'count' => $p->count()
-                    ];
-                })->values()
+                'purpose_id' => $purposeId,
+                'purpose_name' => $purposeName,
+                'count' => $rows->count(),
             ];
-        })
-        ->values();
+        })->values();
+
+        return [
+            'shop_name'         => $lastVisit->customer->agro_name ?? '-',
+            'employee_name'     => $lastVisit->user->name ?? '-',
+            'visit_count'       => $group->count(),
+            'last_visit_date'   => $lastVisit->visited_date ? $lastVisit->visited_date->format('d-m-Y') : '-',
+            'visit_purpose_count' => $purposeDetails,
+        ];
+    })
+    ->values();
+
 
     return response()->json([
         'success' => true,
