@@ -91,103 +91,202 @@ class PartyController extends Controller
     // }
 
     
+    // public function getPartyVisits(Request $request)
+    // {
+    //     $type      = $request->get('type', 'daily');
+    //     $userId    = $request->get('user_id');
+    //     $fromDate  = $request->get('from_date');
+    //     $toDate    = $request->get('to_date');
+    //     $state     = $request->get('state');
+    //     $agroName  = $request->get('agro_name');
+
+    //     $query = PartyVisit::with(['customer', 'user', 'visitPurpose']);
+
+    //     // Filter by employee
+    //     if ($userId) {
+    //         $query->where('user_id', $userId);
+    //     }
+
+    //     // Date filters
+    //     if ($fromDate && $toDate) {
+    //         $query->whereBetween('visited_date', [$fromDate, $toDate]);
+    //     } elseif ($fromDate) {
+    //         $query->whereDate('visited_date', '>=', $fromDate);
+    //     } elseif ($toDate) {
+    //         $query->whereDate('visited_date', '<=', $toDate);
+    //     }
+
+    //     // State filter (if in customer table)
+    //     // if ($state) {
+    //     //     $query->whereHas('customer', function ($q) use ($state) {
+    //     //         $q->where('state', $state);
+    //     //     });
+    //     // }
+
+    //     // Agro filter
+    //     if ($agroName) {
+    //         $query->whereHas('customer', function ($q) use ($agroName) {
+    //             $q->where('name', $agroName);
+    //         });
+    //     }
+
+    //     // -----------------------------
+    //     // DAILY RESPONSE
+    //     // -----------------------------
+    //     if ($type === 'daily') {
+    //         $data = $query->orderByDesc('visited_date')->get()->map(function ($v) {
+
+    //             // Duration
+    //             $duration = '-';
+    //             if ($v->check_in_time && $v->check_out_time) {
+    //                 $duration = \Carbon\Carbon::parse($v->check_in_time)
+    //                     ->diffInMinutes(\Carbon\Carbon::parse($v->check_out_time));
+
+    //                 $duration = floor($duration / 60) . "h " . ($duration % 60) . "m";
+    //             }
+
+    //             return [
+    //                 'id'                     => $v->id,
+    //                 'visited_date'           => $v->visited_date ? $v->visited_date->format('d-m-Y') : null,
+    //                 'employee_name'          => $v->user->name ?? '-',
+    //                 'agro_name'              => $v->customer->agro_name ?? '-',
+    //                 'check_in_out_duration'  => $duration,
+    //                 'visit_purpose'          => $v->visitPurpose->name ?? '-',
+    //                 'followup_date'          => $v->followup_date ? $v->followup_date->format('d-m-Y') : '-',
+    //                 'agro_visit_image'       => $v->agro_visit_image ? asset('storage/' . $v->agro_visit_image) : null,
+    //                 'remarks'                => $v->remarks ?? '-',
+    //             ];
+    //         });
+    //         // dd($data);
+    //         return response()->json([
+    //             'success' => true,
+    //             'data'    => $data
+    //         ]);
+    //     }
+
+    //     // -----------------------------
+    //     // MONTHLY RESPONSE
+    //     // -----------------------------
+    //     $data = $query->get()
+    //         ->groupBy('customer_id')
+    //         ->map(function ($group) {
+
+    //             $lastVisit = $group->sortByDesc('visited_date')->first();
+
+    //             return [
+    //                 'shop_name'         => $lastVisit->customer->agro_name ?? '-',
+    //                 'employee_name'     => $lastVisit->user->name ?? '-',
+    //                 'visit_count'       => $group->count(),
+    //                 'last_visit_date'   => $lastVisit->visited_date ? $lastVisit->visited_date->format('d-m-Y') : '-',
+    //                 'visit_purpose_count' => $group->groupBy('visit_purpose_id')->map->count()
+    //             ];
+    //         })
+    //         ->values();
+
+    //     return response()->json([
+    //         'success' => true,
+    //         'data'    => $data
+    //     ]);
+    // }
+
     public function getPartyVisits(Request $request)
-    {
-        $type      = $request->get('type', 'daily');
-        $userId    = $request->get('user_id');
-        $fromDate  = $request->get('from_date');
-        $toDate    = $request->get('to_date');
-        $state     = $request->get('state');
-        $agroName  = $request->get('agro_name');
+{
+    $type      = $request->get('type', 'daily'); // daily OR monthly
+    $userId    = $request->get('user_id');
+    $fromDate  = $request->get('from_date');
+    $toDate    = $request->get('to_date');
+    $agroName  = $request->get('agro_name');
 
-        $query = PartyVisit::with(['customer', 'user', 'visitPurpose']);
+    $query = PartyVisit::with(['customer', 'user', 'visitPurpose']);
 
-        // Filter by employee
-        if ($userId) {
-            $query->where('user_id', $userId);
-        }
+    // FILTER : Employee
+    if ($userId) {
+        $query->where('user_id', $userId);
+    }
 
-        // Date filters
-        if ($fromDate && $toDate) {
-            $query->whereBetween('visited_date', [$fromDate, $toDate]);
-        } elseif ($fromDate) {
-            $query->whereDate('visited_date', '>=', $fromDate);
-        } elseif ($toDate) {
-            $query->whereDate('visited_date', '<=', $toDate);
-        }
+    // FILTER : Date
+    if ($fromDate && $toDate) {
+        $query->whereBetween('visited_date', [$fromDate, $toDate]);
+    } elseif ($fromDate) {
+        $query->whereDate('visited_date', '>=', $fromDate);
+    } elseif ($toDate) {
+        $query->whereDate('visited_date', '<=', $toDate);
+    }
 
-        // State filter (if in customer table)
-        // if ($state) {
-        //     $query->whereHas('customer', function ($q) use ($state) {
-        //         $q->where('state', $state);
-        //     });
-        // }
+    // FILTER : Agro name
+    if ($agroName) {
+        $query->whereHas('customer', function ($q) use ($agroName) {
+            $q->where('agro_name', 'LIKE', "%$agroName%");
+        });
+    }
 
-        // Agro filter
-        if ($agroName) {
-            $query->whereHas('customer', function ($q) use ($agroName) {
-                $q->where('name', $agroName);
-            });
-        }
+    // -----------------------------------------------------
+    // DAILY API RESPONSE
+    // -----------------------------------------------------
+    if ($type === 'daily') {
 
-        // -----------------------------
-        // DAILY RESPONSE
-        // -----------------------------
-        if ($type === 'daily') {
-            $data = $query->orderByDesc('visited_date')->get()->map(function ($v) {
+        $data = $query->orderByDesc('visited_date')->get()->map(function ($v) {
 
-                // Duration
-                $duration = '-';
-                if ($v->check_in_time && $v->check_out_time) {
-                    $duration = \Carbon\Carbon::parse($v->check_in_time)
-                        ->diffInMinutes(\Carbon\Carbon::parse($v->check_out_time));
+            // Calculate duration
+            $duration = '-';
+            if ($v->check_in_time && $v->check_out_time) {
+                $d = \Carbon\Carbon::parse($v->check_in_time)
+                    ->diffInMinutes(\Carbon\Carbon::parse($v->check_out_time));
 
-                    $duration = floor($duration / 60) . "h " . ($duration % 60) . "m";
-                }
+                $duration = floor($d / 60) . "h " . ($d % 60) . "m";
+            }
 
-                return [
-                    'id'                     => $v->id,
-                    'visited_date'           => $v->visited_date ? $v->visited_date->format('d-m-Y') : null,
-                    'employee_name'          => $v->user->name ?? '-',
-                    'agro_name'              => $v->customer->agro_name ?? '-',
-                    'check_in_out_duration'  => $duration,
-                    'visit_purpose'          => $v->visitPurpose->name ?? '-',
-                    'followup_date'          => $v->followup_date ? $v->followup_date->format('d-m-Y') : '-',
-                    'agro_visit_image'       => $v->agro_visit_image ? asset('storage/' . $v->agro_visit_image) : null,
-                    'remarks'                => $v->remarks ?? '-',
-                ];
-            });
-            // dd($data);
-            return response()->json([
-                'success' => true,
-                'data'    => $data
-            ]);
-        }
-
-        // -----------------------------
-        // MONTHLY RESPONSE
-        // -----------------------------
-        $data = $query->get()
-            ->groupBy('customer_id')
-            ->map(function ($group) {
-
-                $lastVisit = $group->sortByDesc('visited_date')->first();
-
-                return [
-                    'shop_name'         => $lastVisit->customer->name ?? '-',
-                    'employee_name'     => $lastVisit->user->name ?? '-',
-                    'visit_count'       => $group->count(),
-                    'last_visit_date'   => $lastVisit->visited_date ? $lastVisit->visited_date->format('d-m-Y') : '-',
-                    'visit_purpose_count' => $group->groupBy('visit_purpose_id')->map->count()
-                ];
-            })
-            ->values();
+            return [
+                'id'                    => $v->id,
+                'visited_date'          => $v->visited_date ? $v->visited_date->format('d-m-Y') : null,
+                'employee_name'         => $v->user->name ?? '-',
+                'agro_name'             => $v->customer->agro_name ?? '-',
+                'check_in_out_duration' => $duration,
+                'visit_purpose'         => $v->visitPurpose->name ?? '-',
+                'followup_date'         => $v->followup_date ? $v->followup_date->format('d-m-Y') : '-',
+                'agro_visit_image'      => $v->agro_visit_image ? asset('storage/' . $v->agro_visit_image) : null,
+                'remarks'               => $v->remarks ?? '-',
+            ];
+        });
 
         return response()->json([
             'success' => true,
             'data'    => $data
         ]);
     }
+
+    // -----------------------------------------------------
+    // MONTHLY API RESPONSE
+    // -----------------------------------------------------
+    $data = $query->get()
+        ->groupBy('customer_id')
+        ->map(function ($group) {
+
+            $lastVisit = $group->sortByDesc('visited_date')->first();
+
+            return [
+                'shop_name'           => $lastVisit->customer->agro_name ?? '-',
+                'employee_name'       => $lastVisit->user->name ?? '-',
+                'visit_count'         => $group->count(),
+                'last_visit_date'     => $lastVisit->visited_date ? $lastVisit->visited_date->format('d-m-Y') : '-',
+
+                // Purpose wise count
+                'purpose_details' => $group->groupBy('visit_purpose_id')->map(function ($p) {
+                    return [
+                        'name'  => $p->first()->visitPurpose->name ?? '-',
+                        'count' => $p->count()
+                    ];
+                })->values()
+            ];
+        })
+        ->values();
+
+    return response()->json([
+        'success' => true,
+        'data'    => $data
+    ]);
+}
+
 
     
     public function newPartyList(){
