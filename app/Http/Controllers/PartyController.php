@@ -117,11 +117,11 @@ class PartyController extends Controller
         }
 
         // State filter (if in customer table)
-        if ($state) {
-            $query->whereHas('customer', function ($q) use ($state) {
-                $q->where('state', $state);
-            });
-        }
+        // if ($state) {
+        //     $query->whereHas('customer', function ($q) use ($state) {
+        //         $q->where('state', $state);
+        //     });
+        // }
 
         // Agro filter
         if ($agroName) {
