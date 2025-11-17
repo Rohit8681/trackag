@@ -79,6 +79,23 @@ class ExpenseController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        try {
+            $expense = Expense::find($id);
+
+            if (!$expense) {
+                return redirect()->back()->with('error', 'Expense not found.');
+            }
+
+            // Delete image if exists
+            // if ($expense->image && file_exists(public_path('storage/expenses/' . $expense->image))) {
+            //     unlink(public_path('storage/expenses/' . $expense->image));
+            // }
+
+            $expense->delete();
+
+            return redirect()->back()->with('success', 'Expense deleted successfully.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Something went wrong: ' . $e->getMessage());
+        }
     }
 }

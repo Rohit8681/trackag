@@ -12,8 +12,8 @@ class PartyController extends Controller
      */
     public function index()
     {
-        // return view('admin.party.index');
-        return view('coming-soon');
+        return view('admin.party.index');
+        // return view('coming-soon');
 
     }
 
