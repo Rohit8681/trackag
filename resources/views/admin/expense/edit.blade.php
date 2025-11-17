@@ -28,14 +28,16 @@
                         <div class="mb-3 col-md-4">
                             <label class="form-label">Bill Date</label>
                             <input type="date" name="bill_date" class="form-control"
-                                value="{{ old('bill_date', $expense->bill_date) }}" required>
+                                value="{{ old('bill_date', \Carbon\Carbon::parse($expense->bill_date)->format('Y-m-d')) }}" required>
                         </div>
 
                         {{-- Bill Type --}}
                         <div class="mb-3 col-md-4">
                             <label class="form-label">Bill Type</label>
                             <select name="bill_type[]" class="form-select select2" multiple required>
-                                @php $selected = $expense->bill_type ?? []; @endphp
+                                @php 
+                                $selected = is_array($expense->bill_type) ? $expense->bill_type : json_decode($expense->bill_type, true);
+                                @endphp
 
                                 @foreach(['Petrol','Food','Accommodation','Travel','Courier','Others'] as $type)
                                     <option value="{{ $type }}" 
