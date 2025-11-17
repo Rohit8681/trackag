@@ -46,7 +46,7 @@
                             <label class="form-label fw-semibold">State</label>
                             <select id="stateSelect" class="form-select">
                                 
-                                @foreach ($state as $s)
+                                @foreach ($states as $s)
                                     <option value="{{ $s->id }}">{{ $s->name }}</option>
                                 @endforeach
                             </select>
@@ -55,7 +55,7 @@
                             <label class="form-label fw-semibold">Employee Name</label>
                             <select id="employeeSelect" class="form-select">
                                 <option value="">All</option>
-                                @foreach ($employee as $e)
+                                @foreach ($employees as $e)
                                     <option value="{{ $e->id }}">{{ $e->name }}</option>
                                 @endforeach
                             </select>
@@ -65,7 +65,7 @@
                             <select id="agroSelect" class="form-select">
                                 <option value="">All</option>
                                 
-                                @foreach ($customer as $c)
+                                @foreach ($customers as $c)
                                     <option value="{{ $c->id }}">{{ $c->agro_name }}</option>
                                 @endforeach
                             </select>

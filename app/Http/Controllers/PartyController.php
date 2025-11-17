@@ -15,9 +15,9 @@ class PartyController extends Controller
      */
     public function index()
     {
-        $state = State::where('status',1)->get();
-        $employee = User::where('status','Active')->get();
-        $customer = Customer::where('status',1)->get();
+        $states = State::where('status',1)->get();
+        $employees = User::where('status','Active')->get();
+        $customers = Customer::where('status',1)->get();
         return view('admin.party.index',compact('states','employees','customers'));
 
     }
