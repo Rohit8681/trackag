@@ -143,7 +143,7 @@ class PartyController extends Controller
                     'id'                     => $v->id,
                     'visited_date'           => $v->visited_date ? $v->visited_date->format('d-m-Y') : null,
                     'employee_name'          => $v->user->name ?? '-',
-                    'agro_name'              => $v->customer->name ?? '-',
+                    'agro_name'              => $v->customer->agro_name ?? '-',
                     'check_in_out_duration'  => $duration,
                     'visit_purpose'          => $v->visitPurpose->name ?? '-',
                     'followup_date'          => $v->followup_date ? $v->followup_date->format('d-m-Y') : '-',
