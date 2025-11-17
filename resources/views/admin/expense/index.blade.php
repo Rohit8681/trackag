@@ -140,7 +140,7 @@
                                     {{-- <td>{{ optional($expense->travelMode)->name ?? '-' }}</td> --}}
                                     <td>{{ $expense->travel_mode ?? '-' }}</td>
                                     <td>₹{{ number_format($expense->amount, 2) }}</td>
-                                    <td><a href="{{ asset('storage/'.$expense->image) }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                    <td><a href="{{ asset('storage/expenses/'.$expense->image) }}" target="_blank" class="btn btn-sm btn-outline-primary">
                                 <i class="fas fa-image"></i> View
                               </a></td>
                                     <td>

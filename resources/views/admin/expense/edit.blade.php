@@ -79,7 +79,7 @@
                             <input type="file" name="image" class="form-control">
 
                             @if($expense->image)
-                                <img src="{{ asset('storage/'.$expense->image) }}"
+                                <img src="{{ asset('storage/expenses/'.$expense->image) }}"
                                     class="img-thumbnail mt-2"
                                     width="120">
                             @endif
