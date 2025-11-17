@@ -1,5 +1,54 @@
 @extends('admin.layout.layout')
+@push('styles')
+<style>
+/* ---------- TABLE DESIGN CLEAN ---------- */
 
+.table-custom {
+    border-collapse: separate !important;
+    border-spacing: 0 8px !important;
+    width: 100%;
+}
+
+.table-custom thead tr {
+    background: #f7f9fc;
+    color: #2a3f54;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+}
+
+.table-custom thead th {
+    padding: 12px;
+    text-align: center;
+    font-size: 13px;
+    border-bottom: 2px solid #dee2e6 !important;
+}
+
+.table-custom tbody tr {
+    background: #ffffff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    transition: 0.2s;
+}
+
+.table-custom tbody tr:hover {
+    transform: scale(1.01);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+
+.table-custom tbody td {
+    padding: 14px 12px;
+    vertical-align: middle !important;
+    font-size: 14px;
+    border-top: none !important;
+}
+
+.table-rounded {
+    border-radius: 10px !important;
+    overflow: hidden !important;
+    border: 1px solid #e3e3e3 !important;
+}
+</style>
+@endpush
 @section('content')
 <main class="app-main">
     {{-- 🔷 Header --}}
@@ -89,8 +138,8 @@
                         </h5>
                     </div>
                     <div class="card-body table-responsive">
-                        <table class="table table-bordered align-middle text-nowrap" id="dailyTableData">
-                            <thead class="table-primary text-center">
+                        <table class="table table-custom table-rounded" id="dailyTableData">
+                            <thead>
                                 <tr>
                                     <th>Sr. No.</th>
                                     <th>Visited Date</th>
@@ -99,7 +148,7 @@
                                     <th>Check In - Out (Duration)</th>
                                     <th>Visit Purpose</th>
                                     <th>Follow-up Date</th>
-                                    <th>Agro Visit Image</th>
+                                    <th>Image</th>
                                     <th>Remark</th>
                                 </tr>
                             </thead>
@@ -118,13 +167,13 @@
                         </h5>
                     </div>
                     <div class="card-body table-responsive">
-                        <table class="table table-bordered align-middle text-nowrap" id="monthlyTableData">
-                            <thead class="table-primary text-center">
+                        <table class="table table-custom table-rounded" id="monthlyTableData">
+                            <thead>
                                 <tr>
                                     <th>Sr. No.</th>
                                     <th>Shop Name</th>
                                     <th>Employee Name</th>
-                                    <th>Visit Count (Last Visit Date)</th>
+                                    <th>Visit Count</th>
                                     <th>Visit Purpose Count</th>
                                 </tr>
                             </thead>
