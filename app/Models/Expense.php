@@ -20,6 +20,7 @@ class Expense extends Model
         'travel_mode_id',
         'amount',
         'image',
+        'approval_status'
     ];
 
     protected $casts = [
