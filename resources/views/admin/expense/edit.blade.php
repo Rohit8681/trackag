@@ -34,7 +34,7 @@
                         {{-- Bill Type --}}
                         <div class="mb-3 col-md-4">
                             <label class="form-label">Bill Type</label>
-                            <select name="bill_type[]" class="form-select" multiple required>
+                            <select name="bill_type[]" class="form-select select2" multiple required>
                                 @php $selected = $expense->bill_type ?? []; @endphp
 
                                 @foreach(['Petrol','Food','Accommodation','Travel','Courier','Others'] as $type)
@@ -100,3 +100,13 @@
 
 </main>
 @endsection
+@push('scripts')
+<script>
+$(document).ready(function() {
+    $('.select2').select2({
+        placeholder: "Select Approved Bills",
+        width: '100%'
+    });
+});
+</script>
+@endpush

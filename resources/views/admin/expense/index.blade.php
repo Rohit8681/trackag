@@ -118,6 +118,7 @@
                                 <th>Bill Details</th>
                                 <th>Travel Mode</th>
                                 <th>Amount</th>
+                                <th>Image</th>
                                 <th>Status</th>
                                 <th>Action</th>
                             </tr>
@@ -139,6 +140,9 @@
                                     {{-- <td>{{ optional($expense->travelMode)->name ?? '-' }}</td> --}}
                                     <td>{{ $expense->travel_mode ?? '-' }}</td>
                                     <td>₹{{ number_format($expense->amount, 2) }}</td>
+                                    <td><a href="{{ asset('storage/'.$expense->image) }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-image"></i> View
+                              </a></td>
                                     <td>
                                         <span class="badge 
                                             @if($expense->approval_status == 'Approved') bg-success 
