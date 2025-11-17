@@ -151,7 +151,7 @@ class PartyController extends Controller
                     'remarks'                => $v->remarks ?? '-',
                 ];
             });
-
+            dd($data);
             return response()->json([
                 'success' => true,
                 'data'    => $data
