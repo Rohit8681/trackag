@@ -31,7 +31,8 @@ class ExpenseController extends Controller
 
         $expenses = $query->latest()->get();
         $states = State::where('status',1)->get();
-        $employees = User::where('status', 1)->get();
+        $employees = User::where('status','Active')->get();
+        
 
         return view('admin.expense.index', compact('expenses', 'states', 'employees'));
     }
