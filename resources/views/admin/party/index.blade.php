@@ -204,50 +204,50 @@ $(document).ready(function () {
 
     // 🧾 Render Daily Table
     function renderMonthly(data) {
-        let html = '';
-        const $table = $('#monthlyTableData');
+    let html = '';
+    const $table = $('#monthlyTableData');
 
-        // 🧹 Destroy if already initialized
-        if ($.fn.DataTable.isDataTable($table)) {
-            $table.DataTable().clear().destroy();
-        }
-
-        if (!data || data.length === 0) {
-            html = '<tr><td colspan="5" class="text-center text-muted">No monthly data found</td></tr>';
-            $('#monthlyTableData tbody').html(html);
-            return; // 🚫 Stop here - don’t init DataTable
-        }
-
-        // ✅ Otherwise render rows
-        data.forEach((item, index) => {
-            let purposes = '';
-            if (item.visit_purpose_count) {
-                Object.entries(item.visit_purpose_count).forEach(([key, val]) => {
-                    purposes += `<div>${key} - ${val}</div>`;
-                });
-            }
-
-            html += `
-                <tr>
-                    <td class="text-center">${index + 1}</td>
-                    <td>${item.shop_name ?? '-'}</td>
-                    <td>${item.employee_name ?? '-'}</td>
-                    <td>${item.visit_count ?? 0} (${item.last_visit_date ?? '-'})</td>
-                    <td>${purposes || '-'}</td>
-                </tr>`;
-        });
-
-        $('#monthlyTableData tbody').html(html);
-
-        // ✅ Initialize DataTable only when rows exist
-        $table.DataTable({
-            responsive: true,
-            autoWidth: false,
-            pageLength: 10,
-            lengthMenu: [5, 10, 25, 50],
-            order: [[3, 'desc']]
-        });
+    if ($.fn.DataTable.isDataTable($table)) {
+        $table.DataTable().clear().destroy();
     }
+
+    if (!data || data.length === 0) {
+        html = '<tr><td colspan="5" class="text-center text-muted">No monthly data found</td></tr>';
+        $('#monthlyTableData tbody').html(html);
+        return;
+    }
+
+    data.forEach((item, index) => {
+
+        // 🔥 FIXED PURPOSE DISPLAY
+        let purposes = '';
+        if (Array.isArray(item.visit_purpose_count)) {
+            item.visit_purpose_count.forEach(p => {
+                purposes += `<div>${p.purpose_name} - ${p.count}</div>`;
+            });
+        }
+
+        html += `
+            <tr>
+                <td class="text-center">${index + 1}</td>
+                <td>${item.shop_name ?? '-'}</td>
+                <td>${item.employee_name ?? '-'}</td>
+                <td>${item.visit_count ?? 0} (${item.last_visit_date ?? '-'})</td>
+                <td>${purposes || '-'}</td>
+            </tr>`;
+    });
+
+    $('#monthlyTableData tbody').html(html);
+
+    $table.DataTable({
+        responsive: true,
+        autoWidth: false,
+        pageLength: 10,
+        lengthMenu: [5, 10, 25, 50],
+        order: [[3, 'desc']]
+    });
+}
+
 
 
     // 🧾 Render Monthly Table
