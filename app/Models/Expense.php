@@ -25,7 +25,7 @@ class Expense extends Model
 
     protected $casts = [
         'bill_date' => 'date',
-        'bill_type' => 'array', 
+        // 'bill_type' => 'array', 
     ];
 
     public function user()

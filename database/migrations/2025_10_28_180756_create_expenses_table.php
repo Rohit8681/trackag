@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('bill_title')->nullable();
             $table->date('bill_date');
-            $table->json('bill_type')->nullable();
+            $table->string('bill_type')->nullable();
             $table->text('bill_details_description')->nullable();
             $table->string('travel_mode')->nullable();
             $table->decimal('amount', 10, 2)->default(0);

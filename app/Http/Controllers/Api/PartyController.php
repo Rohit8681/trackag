@@ -29,15 +29,14 @@ class PartyController extends BaseController
                     'id' => $visit->customer->id,
                     'name' => $visit->customer->name,
                 ] : null,
-                'visit_purpose' => $visit->visitPurpose ? [
-                    'id' => $visit->visitPurpose->id,
-                    'name' => $visit->visitPurpose->name,
-                ] : null,
+                'visit_purpose' => $visit->visit_purpose,
                 'visited_date' => $visit->visited_date ? $visit->visited_date : null,
                 'check_in_time' => $visit->check_in_time ? $visit->check_in_time : null,
                 'check_out_time' => $visit->check_out_time ? $visit->check_out_time : null,
                 'followup_date' => $visit->followup_date ? $visit->followup_date : null,
                 'remarks' => $visit->remarks,
+                'latitude' => $visit->latitude,
+                'longitude' => $visit->longitude,
                 'agro_visit_image' => $visit->agro_visit_image ? asset('storage/' . $visit->agro_visit_image) : null,
                 'created_at' => $visit->created_at,
                 'updated_at' => $visit->updated_at,
@@ -57,6 +56,8 @@ class PartyController extends BaseController
             'user_id' => 'required|integer',
             'customer_id' => 'nullable|integer',
             'check_in_time' => 'nullable|date_format:Y-m-d H:i:s',
+            'latitude' => 'nullable|numeric',
+            'longitude' => 'nullable|numeric',
         ]);
 
         $validated['visited_date'] = Carbon::now();
@@ -75,10 +76,10 @@ class PartyController extends BaseController
         $validated = $request->validate([
             'id' => 'required|integer',
             'check_out_time' => 'nullable|date_format:Y-m-d H:i:s',
-            'visit_purpose_id' => 'nullable|integer',
+            'visit_purpose' => 'nullable|string',
             'followup_date' => 'nullable|date',
             'remarks' => 'nullable|string',
-            'agro_visit_image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'agro_visit_image' => 'nullable|image|mimes:jpg,jpeg,png|max:10240',
         ]);
 
         $partyVisit = PartyVisit::find($validated['id']);

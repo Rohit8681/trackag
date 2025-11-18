@@ -17,10 +17,12 @@ class PartyVisit extends Model
         'visited_date',
         'check_in_time',
         'check_out_time',
-        'visit_purpose_id',
+        'visit_purpose',
         'followup_date',
         'agro_visit_image',
         'remarks',
+        'latitude',
+        'longitude',
     ];
 
     protected $casts = [

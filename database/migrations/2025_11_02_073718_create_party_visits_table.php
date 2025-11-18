@@ -15,10 +15,12 @@ return new class extends Migration
             $table->date('visited_date')->nullable();
             $table->dateTime('check_in_time')->nullable();
             $table->dateTime('check_out_time')->nullable();
-            $table->integer('visit_purpose_id')->nullable();
+            $table->string('visit_purpose')->nullable();
             $table->date('followup_date')->nullable();
             $table->string('agro_visit_image')->nullable();
             $table->text('remarks')->nullable();
+            $table->string('latitude')->nullable();
+            $table->string('longitude')->nullable();
             $table->timestamps();
         });
     }

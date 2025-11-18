@@ -16,12 +16,12 @@ class ExpenseController extends Controller
         $user = Auth::user(); 
         $validator = Validator::make($request->all(), [
             'bill_date' => 'required|date',
-            'bill_type' => 'required|array', 
+            'bill_type' => 'required|string|max:255', 
             'bill_title' => 'nullable|string|max:255',
             'bill_details_description' => 'nullable|string',
             'travel_mode' => 'nullable|string',
             'amount' => 'required|numeric|min:0',
-            'image' => 'nullable|file|mimes:jpg,jpeg,png|max:2048',
+            'image' => 'nullable|file|mimes:jpg,jpeg,png|max:10240',
         ]);
 
         if ($validator->fails()) {
@@ -68,6 +68,7 @@ class ExpenseController extends Controller
                     'travel_mode_name' => $item->travelMode->name ?? null,
                     'amount' => $item->amount,
                     'image_url' => $item->image ? asset('storage/expenses/' . $item->image) : null,
+                    'approval_status' => $item->approval_status,
                     'created_at' => $item->created_at,
                 ];
             });
