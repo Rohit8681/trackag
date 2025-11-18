@@ -79,204 +79,7 @@
     });
 </script>
 
-<!-- Google Maps Polyline and Markers -->
-
 {{-- <script>
-function initMap() {
-    const tripLogs = window.tripLogs || [];
-
-    // No logs
-    if (!tripLogs || tripLogs.length === 0) {
-        console.warn("No trip logs available.");
-        return;
-    }
-
-    // Convert logs to coordinates
-    const pathCoordinates = tripLogs.map(l => ({
-        lat: parseFloat(l.latitude),
-        lng: parseFloat(l.longitude),
-        recorded_at: l.recorded_at ?? ''
-    }));
-
-    // Initialize map centered at first point with zoom 13
-    const map = new google.maps.Map(document.getElementById("map"), {
-        zoom: 13,
-        center: pathCoordinates[0],
-        mapTypeId: google.maps.MapTypeId.ROADMAP,
-    });
-
-    // Draw route if multiple points
-    if (pathCoordinates.length > 1) {
-        const tripPath = new google.maps.Polyline({
-            path: pathCoordinates,
-            geodesic: true,
-            strokeColor: "#007bff",
-            strokeOpacity: 1,
-            strokeWeight: 4
-        });
-        tripPath.setMap(map);
-    }
-
-    // Add markers
-    pathCoordinates.forEach((coord, index) => {
-        new google.maps.Marker({
-            position: coord,
-            map,
-            label: {
-                text: `${index + 1}`,
-                color: '#FFFFFF',
-                fontSize: '12px'
-            },
-            title: coord.recorded_at ?? '',
-            icon: {
-                url: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png"
-            }
-        });
-    });
-
-    // If more than 2 points, adjust map bounds slightly (but don’t over-zoom)
-    if (pathCoordinates.length > 2) {
-        const bounds = new google.maps.LatLngBounds();
-        pathCoordinates.forEach(c => bounds.extend(c));
-        map.fitBounds(bounds);
-
-        // After fitting bounds, keep zoom around 13–15 range
-        const listener = google.maps.event.addListenerOnce(map, 'bounds_changed', function() {
-            if (map.getZoom() > 15) map.setZoom(15);
-            if (map.getZoom() < 13) map.setZoom(13);
-        });
-    }
-
-    // Calculate distance
-    let distance = 0;
-    for (let i = 1; i < pathCoordinates.length; i++) {
-        distance += haversineDistance(pathCoordinates[i - 1], pathCoordinates[i]);
-    }
-    const distanceDisplay = document.getElementById("distance-display");
-    if (distanceDisplay) distanceDisplay.innerText = distance.toFixed(2) + " km";
-}
-
-// Utility functions
-function toRad(v) {
-    return v * Math.PI / 180;
-}
-
-function haversineDistance(c1, c2) {
-    const R = 6371;
-    const dLat = toRad(c2.lat - c1.lat);
-    const dLon = toRad(c2.lng - c1.lng);
-    const lat1 = toRad(c1.lat);
-    const lat2 = toRad(c2.lat);
-    const a = Math.sin(dLat / 2) ** 2 + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) ** 2;
-    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-}
-
-document.addEventListener("DOMContentLoaded", initMap);
-</script> --}}
-
-
-{{-- <script>
-function initMap() {
-    const tripLogs = window.tripLogs || [];
-    const tripEnded = window.tripEnded;
-
-    if (!tripLogs.length) {
-        console.warn("No trip logs available.");
-        return;
-    }
-
-    const pathCoordinates = tripLogs.map(l => ({
-        lat: parseFloat(l.latitude),
-        lng: parseFloat(l.longitude),
-        recorded_at: l.recorded_at ?? ''
-    }));
-
-    const map = new google.maps.Map(document.getElementById("map"), {
-        zoom: 13,
-        center: pathCoordinates[0],
-        mapTypeId: google.maps.MapTypeId.ROADMAP,
-    });
-
-    // 🟦 Draw route line
-    if (pathCoordinates.length > 1) {
-        const tripPath = new google.maps.Polyline({
-            path: pathCoordinates,
-            geodesic: true,
-            strokeColor: "#007bff",
-            strokeOpacity: 1,
-            strokeWeight: 4,
-        });
-        tripPath.setMap(map);
-    }
-
-    // 🟢 START MARKER (Green - Large)
-    const startMarker = new google.maps.Marker({
-        position: pathCoordinates[0],
-        map,
-        title: "Start Point: " + (pathCoordinates[0].recorded_at || ''),
-        icon: {
-            url: "http://maps.google.com/mapfiles/ms/icons/green-dot.png",
-            scaledSize: new google.maps.Size(60, 60)
-        },
-        label: {
-            text: "Start",
-            color: "#fff",
-            fontSize: "12px",
-            fontWeight: "bold"
-        }
-    });
-
-    // 🔵 MIDDLE MARKERS (Blue)
-    for (let i = 1; i <= pathCoordinates.length - 2; i++) {
-        new google.maps.Marker({
-            position: pathCoordinates[i],
-            map,
-            title: pathCoordinates[i].recorded_at,
-            icon: {
-                url: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png",
-                scaledSize: new google.maps.Size(30, 30)
-            }
-        });
-    }
-
-    // 🔴 END MARKER (Red - Large)
-    if (pathCoordinates.length > 1) {
-        const last = pathCoordinates[pathCoordinates.length - 1];
-        const endMarker = new google.maps.Marker({
-            position: last,
-            map,
-            title: "End Point: " + (last.recorded_at || ''),
-            icon: {
-                url: "http://maps.google.com/mapfiles/ms/icons/red-dot.png",
-                scaledSize: new google.maps.Size(60, 60)
-            },
-            label: {
-                text: "End",
-                color: "#fff",
-                fontSize: "12px",
-                fontWeight: "bold"
-            }
-        });
-    }
-
-    // 🗺️ Auto-fit zoom to include all points
-    if (pathCoordinates.length > 1) {
-        const bounds = new google.maps.LatLngBounds();
-        pathCoordinates.forEach(c => bounds.extend(c));
-        map.fitBounds(bounds);
-
-        google.maps.event.addListenerOnce(map, 'bounds_changed', function() {
-            const currentZoom = map.getZoom();
-            if (currentZoom > 16) map.setZoom(16);
-            if (currentZoom < 12) map.setZoom(12);
-        });
-    }
-}
-
-document.addEventListener("DOMContentLoaded", initMap);
-</script> --}}
-
-<script>
 function initMap() {
     const tripLogs = window.tripLogs || [];
     const tripEnded = window.tripEnded;
@@ -380,6 +183,105 @@ function initMap() {
         });
     }
 }
+
+document.addEventListener("DOMContentLoaded", initMap);
+</script> --}}
+
+<script>
+
+function initMap() {
+    const tripLogs = window.tripLogs || [];
+    const tripEnded = window.tripEnded;
+
+    if (!tripLogs.length) {
+        console.warn("No trip logs available.");
+        return;
+    }
+
+    const pathCoordinates = tripLogs.map(l => ({
+        lat: parseFloat(l.latitude),
+        lng: parseFloat(l.longitude),
+        recorded_at: l.recorded_at ?? ''
+    }));
+
+    const map = new google.maps.Map(document.getElementById("map"), {
+        zoom: 13,
+        center: pathCoordinates[0],
+    });
+
+    // Draw Polyline
+    if (pathCoordinates.length > 1) {
+        const tripPath = new google.maps.Polyline({
+            path: pathCoordinates,
+            geodesic: true,
+            strokeColor: "#007bff",
+            strokeWeight: 4,
+        });
+        tripPath.setMap(map);
+    }
+
+    // Icons
+    const startIcon = {
+        url: "{{ asset('img/start-green.png') }}",
+        scaledSize: new google.maps.Size(60, 60)
+    };
+    const middleIcon = {
+        url: "{{ asset('img/mid-blue.png') }}",
+        scaledSize: new google.maps.Size(30, 30)
+    };
+    const endIcon = {
+        url: "{{ asset('img/end-red.png') }}",
+        scaledSize: new google.maps.Size(60, 60)
+    };
+
+    // START MARKER (always)
+    new google.maps.Marker({
+        position: pathCoordinates[0],
+        map,
+        title: "Start: " + (pathCoordinates[0].recorded_at || ''),
+        icon: startIcon,
+        label: {
+            text: "Start",
+            color: "#fff",
+            fontSize: "12px",
+            fontWeight: "bold"
+        }
+    });
+
+    // MIDDLE MARKERS
+    for (let i = 1; i < pathCoordinates.length - 1; i++) {
+        new google.maps.Marker({
+            position: pathCoordinates[i],
+            map,
+            icon: middleIcon,
+            title: pathCoordinates[i].recorded_at,
+        });
+    }
+
+    // END MARKER ONLY IF TRIP ENDED
+    if (tripEnded && pathCoordinates.length > 1) {
+        const last = pathCoordinates[pathCoordinates.length - 1];
+
+        new google.maps.Marker({
+            position: last,
+            map,
+            title: "End: " + (last.recorded_at || ''),
+            icon: endIcon,
+            label: {
+                text: "End",
+                color: "#fff",
+                fontSize: "12px",
+                fontWeight: "bold"
+            }
+        });
+    }
+
+    // Auto-fit zoom
+    const bounds = new google.maps.LatLngBounds();
+    pathCoordinates.forEach(p => bounds.extend(p));
+    map.fitBounds(bounds);
+}
+
 
 document.addEventListener("DOMContentLoaded", initMap);
 </script>
