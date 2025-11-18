@@ -23,7 +23,7 @@ class ExpenseController extends Controller
             $query->where('user_id', $request->user_id);
         }
         if ($request->filled('bill_type')) {
-            $query->whereJsonContains('bill_type', $request->bill_type);
+            $query->where('bill_type', $request->bill_type);
         }
         if ($request->filled('approval_status')) {
             $query->where('approval_status', $request->approval_status);
@@ -75,12 +75,12 @@ class ExpenseController extends Controller
     {
         $request->validate([
             'bill_date' => 'required|date',
-            'bill_type' => 'required|array',
+            'bill_type' => 'required|string',
             'bill_title' => 'nullable|string',
             'bill_details_description' => 'nullable|string',
             'travel_mode' => 'nullable',
             'amount' => 'required|numeric',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:10240',
         ]);
 
         $expense = Expense::findOrFail($id);

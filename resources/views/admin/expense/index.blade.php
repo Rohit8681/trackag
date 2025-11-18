@@ -130,11 +130,12 @@
                                     <td>{{ optional($expense->user)->name ?? '-' }}</td>
                                     <td>{{ optional($expense->user)->mobile ?? '-' }}</td>
                                     <td>{{ \Carbon\Carbon::parse($expense->bill_date)->format('d M Y') }}</td>
-                                    <td>
+                                    <td>{{ $expense->bill_type }}</td>
+                                    {{-- <td>
                                         @foreach((array) $expense->bill_type as $type)
                                             <span class="badge bg-info text-dark">{{ $type }}</span>
                                         @endforeach
-                                    </td>
+                                    </td> --}}
                                     <td>{{ $expense->bill_title ?? '-' }}</td>
                                     <td>{{ $expense->bill_details_description ?? '-' }}</td>
                                     {{-- <td>{{ optional($expense->travelMode)->name ?? '-' }}</td> --}}

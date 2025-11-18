@@ -32,7 +32,7 @@
                         </div>
 
                         {{-- Bill Type --}}
-                        <div class="mb-3 col-md-4">
+                        {{-- <div class="mb-3 col-md-4">
                             <label class="form-label">Bill Type</label>
                             <select name="bill_type[]" class="form-select select2" multiple required>
                                 @php 
@@ -47,6 +47,21 @@
                                 @endforeach
                             </select>
                             <small class="text-muted">You can select multiple types</small>
+                        </div> --}}
+                        <div class="mb-3 col-md-4">
+                            <label class="form-label">Bill Type</label>
+                            <select name="bill_type" class="form-control" required>
+                                {{-- @php 
+                                $selected = is_array($expense->bill_type) ? $expense->bill_type : json_decode($expense->bill_type, true);
+                                @endphp --}}
+
+                                @foreach(['Petrol','Food','Accommodation','Travel','Courier','Others'] as $type)
+                                    <option value="{{ $type }}" 
+                                        {{ $expense->bill_type == $type ? 'selected' : '' }}>
+                                        {{ $type }}
+                                    </option>
+                                @endforeach
+                            </select>
                         </div>
 
                         {{-- Bill Title --}}
@@ -104,11 +119,11 @@
 @endsection
 @push('scripts')
 <script>
-$(document).ready(function() {
-    $('.select2').select2({
-        placeholder: "Select Approved Bills",
-        width: '100%'
-    });
-});
+// $(document).ready(function() {
+//     $('.select2').select2({
+//         placeholder: "Select Approved Bills",
+//         width: '100%'
+//     });
+// });
 </script>
 @endpush
