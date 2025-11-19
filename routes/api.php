@@ -43,4 +43,10 @@ Route::middleware([TenantAuthenticate::class])->group(function () {
     //new party api
     Route::get('/party-list', [PartyController::class, 'getPartyList']);
     Route::post('/new-party-store', [PartyController::class, 'newPartyStore']);
+
+    Route::get('/states', [LocationApiController::class, 'getStates']);
+    Route::get('/districts/{state_id}', [LocationApiController::class, 'getDistricts']);
+    Route::get('/tehsils/{district_id}', [LocationApiController::class, 'getTehsils']);
+
+
 });
