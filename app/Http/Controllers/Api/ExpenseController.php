@@ -142,8 +142,8 @@ class ExpenseController extends Controller
                     'bill_date' => $item->bill_date, // format for app
                     'bill_type' => $item->bill_type,
                     'bill_details_description' => $item->bill_details_description,
-                    'travel_mode_id' => $item->travel_mode_id,
-                    'travel_mode_name' => $item->travelMode->name ?? null,
+                    // 'travel_mode_id' => $item->travel_mode_id,
+                    'travel_mode_name' => $item->travel_mode ?? null,
                     'amount' => $item->amount,
                     'image_url' => $item->image ? asset('storage/expenses/' . $item->image) : null,
                     'approval_status' => $item->approval_status,

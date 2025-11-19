@@ -10,15 +10,9 @@ return new class extends Migration
     {
         Schema::create('customers', function (Blueprint $table) {
             $table->id();
-
-            // Source type
             $table->enum('type', ['web', 'mobile'])->default('web');
-
-            // Mobile fields
             $table->date('visit_date')->nullable();
             $table->string('sales_person_name')->nullable();
-
-            // Common fields
             $table->string('agro_name')->nullable();
             $table->string('contact_person_name')->nullable();
             $table->string('party_code')->nullable();
