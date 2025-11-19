@@ -32,7 +32,7 @@ class PartyController extends Controller
         $toDate    = $request->get('to_date');
         $agroName  = $request->get('agro_name');
 
-        $query = PartyVisit::with(['customer', 'user', 'visitPurpose']);
+        $query = PartyVisit::with(['customer', 'user']);
 
         // FILTER : Employee
         if ($userId) {
