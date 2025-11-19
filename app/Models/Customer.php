@@ -33,6 +33,9 @@ class Customer extends Model
         'party_documents',
         'status',
         'remarks',
+        'city',
+        'mobil_no_2',
+        'visit_card_image',
     ];
 
     protected $casts = [

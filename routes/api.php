@@ -42,5 +42,6 @@ Route::middleware([TenantAuthenticate::class])->group(function () {
     Route::post('/party-visit-checkout', [PartyController::class, 'partyVisitCheckout']);
 
     //new party api
+    Route::get('/party-list', [PartyController::class, 'getPartyList']);
     Route::post('/new-party-store', [PartyController::class, 'newPartyStore']);
 });

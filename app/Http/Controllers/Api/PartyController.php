@@ -109,37 +109,124 @@ class PartyController extends BaseController
             'data' => $partyVisit
         ]);
     }
-        
+
     public function newPartyStore(Request $request)
     {
-
         $validated = $request->validate([
-            'visit_date' => 'required|date',
-            'sales_person_name' => 'required|string',
-            'agro_name' => 'required|string',
-            'phone' => 'required|string|max:20',
-            'address' => 'required|string',
-            'contact_person_name' => 'nullable|string',
-            'working_with' => 'nullable|string',
-            'party_documents.*' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-            'status' => 'nullable|in:pending,approved,rejected,hold',
-            'remarks' => 'nullable|string',
-            'user_id' => 'nullable|exists:users,id',
+            'agro_name'             => 'required|string',
+            'contact_person_name'   => 'nullable|string',
+            'phone'                 => 'required|string|max:20',
+            'mobil_no_2'            => 'required|string|max:20',
+            'state_id'              => 'required|integer',
+            'district_id'           => 'required|integer',
+            'tehsil_id'             => 'required|integer',
+            'city'                  => 'required|integer',
+            'address'               => 'required|string',
+            'gst_no'                => 'required|string',
+            'working_with'          => 'nullable|string',
+            'visit_card_image'      => 'nullable|image|mimes:jpg,jpeg,png|max:10240',
+            'party_documents.*'     => 'nullable|image|mimes:jpg,jpeg,png|max:10240',
+            'user_id'               => 'nullable|integer',
         ]);
 
-        $paths = [];
+        if ($request->hasFile('visit_card_image')) {
+            $visitCardPath = $request->file('visit_card_image')->store('visit_cards', 'public');
+            $validated['visit_card_image'] = $visitCardPath;
+        }
+
+        $documentPaths = [];
         if ($request->hasFile('party_documents')) {
             foreach ($request->file('party_documents') as $file) {
-                $paths[] = $file->store('party_documents', 'public');
+                $documentPaths[] = $file->store('party_documents', 'public');
             }
         }
 
-        $validated['party_documents'] = $paths;
+        $validated['party_documents'] = $documentPaths;
+
+        $validated['visit_date'] = Carbon::now();
         $validated['type'] = "mobile";
 
         $customer = Customer::create($validated);
 
         return $this->sendResponse($customer, "Customer saved successfully!");
     }
+
+    public function getPartyList(Request $request)
+    {
+        $user = Auth::user();
+        $customers = Customer::orderBy('id', 'desc')->where('type','mobile')->where('user_id',$user->id)->get()
+            ->map(function ($customer) {
+
+                return [
+                    'id' => $customer->id,
+                    'type' => $customer->type,
+                    'visit_date' => $customer->visit_date,
+                    'agro_name' => $customer->agro_name,
+                    'contact_person_name' => $customer->contact_person_name,
+                    'phone' => $customer->phone,
+                    'mobil_no_2' => $customer->mobil_no_2,
+                    'state_id' => $customer->state_id,
+                    'district_id' => $customer->district_id,
+                    'tehsil_id' => $customer->tehsil_id,
+                    'city' => $customer->city,
+                    'address' => $customer->address,
+                    'gst_no' => $customer->gst_no,
+                    'working_with' => $customer->working_with,
+                    'user_id' => $customer->user_id,
+
+                    // 👇 Single Image URL
+                    'visit_card_image_url' => $customer->visit_card_image
+                        ? asset('storage/' . $customer->visit_card_image)
+                        : null,
+
+                    'party_documents_urls' => $customer->party_documents
+                        ? collect($customer->party_documents)->map(function ($path) {
+                            return asset('storage/' . $path);
+                        })
+                        : [],
+
+                    'created_at' => $customer->created_at,
+                ];
+            });
+
+        return $this->sendResponse($customers, "Party list fetched successfully!");
+    }
+
+        
+    // public function newPartyStore(Request $request)
+    // {
+
+    //     $validated = $request->validate([
+    //         'agro_name' => 'required|string',
+    //         'contact_person_name' => 'nullable|string',
+    //         'phone' => 'required|string|max:20',
+    //         'mobil_no_2' => 'required|string|max:20',
+    //         'state_id' => 'required|integer',
+    //         'district_id' => 'required|integer',
+    //         'tehsil_id' => 'required|integer',
+    //         'city' => 'required|integer',
+    //         'address' => 'required|string',
+    //         'gst_no' => 'required|string',
+    //         'working_with' => 'nullable|string',
+    //         'visit_card_image' => 'nullable|image|mimes:jpg,jpeg,png|max:10240',
+    //         'party_documents.*' => 'nullable|image|mimes:jpg,jpeg,png|max:10240',
+    //         'user_id' => 'nullable|integer',
+    //     ]);
+
+    //     $paths = [];
+    //     if ($request->hasFile('party_documents')) {
+    //         foreach ($request->file('party_documents') as $file) {
+    //             $paths[] = $file->store('party_documents', 'public');
+    //         }
+    //     }
+
+    //     $validated['party_documents'] = $paths;
+    //     $validated['visit_date'] = Carbon::now();
+    //     $validated['type'] = "mobile";
+
+    //     $customer = Customer::create($validated);
+
+    //     return $this->sendResponse($customer, "Customer saved successfully!");
+    // }
 }
 
