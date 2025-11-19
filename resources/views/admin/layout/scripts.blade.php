@@ -227,7 +227,7 @@ function initMap() {
     };
     const middleIcon = {
         url: "{{ asset('img/mid-blue.png') }}",
-        scaledSize: new google.maps.Size(30, 30)
+        scaledSize: new google.maps.Size(18, 18)
     };
     const endIcon = {
         url: "{{ asset('img/end-red.png') }}",
