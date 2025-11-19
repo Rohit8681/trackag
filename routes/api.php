@@ -16,7 +16,6 @@ Route::post('/failedJobs', [FailedJobController::class, 'store']);
 Route::get('/apk-list', [ApiAuthController::class, 'getApklist']);
 
 Route::middleware([TenantAuthenticate::class])->group(function () {
-    // return response()->json(['ok' => true]);
     Route::post('/logout', [ApiAuthController::class, 'logout']);
     Route::post('/profile', [ApiAuthController::class, 'profile']);
     Route::post('/change-password', [ApiAuthController::class, 'changePassword']);
