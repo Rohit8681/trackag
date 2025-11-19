@@ -16,7 +16,7 @@ class PartyController extends BaseController
     {
         $user = Auth::user();
 
-        $visits = PartyVisit::with(['customer', 'visitPurpose'])
+        $visits = PartyVisit::with(['customer'])
             ->where('user_id', $user->id)
             ->orderByDesc('id')
             ->get();

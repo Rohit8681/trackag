@@ -211,7 +211,7 @@
                                             <td>
                                                 @forelse ($trip->customers as $customer)
                                                     <span class="badge bg-light text-dark border mb-1">
-                                                        <i class="fas fa-user me-1"></i>{{ $customer->name }}
+                                                        <i class="fas fa-user me-1"></i>{{ $customer->agro_name ?? '-'}}
                                                     </span><br>
                                                 @empty
                                                     <span class="text-muted">-</span>
