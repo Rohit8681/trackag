@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Carbon;
+
 
 class ExpenseController extends Controller
 {
@@ -139,7 +141,7 @@ class ExpenseController extends Controller
                 return [
                     'id' => $item->id,
                     'bill_title' => $item->bill_title,
-                    'bill_date' => $item->bill_date, // format for app
+                    'bill_date' => Carbon::parse($item->bill_date)->format('Y-m-d'),
                     'bill_type' => $item->bill_type,
                     'bill_details_description' => $item->bill_details_description,
                     // 'travel_mode_id' => $item->travel_mode_id,
