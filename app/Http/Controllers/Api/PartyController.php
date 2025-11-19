@@ -27,7 +27,7 @@ class PartyController extends BaseController
                 'user_id' => $visit->user_id,
                 'customer' => $visit->customer ? [
                     'id' => $visit->customer->id,
-                    'name' => $visit->customer->name,
+                    'name' => $visit->customer->agro_name,
                 ] : null,
                 'visit_purpose' => $visit->visit_purpose,
                 'visited_date' => $visit->visited_date ? $visit->visited_date : null,
