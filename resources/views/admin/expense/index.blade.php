@@ -131,14 +131,8 @@
                                     <td>{{ optional($expense->user)->mobile ?? '-' }}</td>
                                     <td>{{ \Carbon\Carbon::parse($expense->bill_date)->format('d M Y') }}</td>
                                     <td>{{ $expense->bill_type }}</td>
-                                    {{-- <td>
-                                        @foreach((array) $expense->bill_type as $type)
-                                            <span class="badge bg-info text-dark">{{ $type }}</span>
-                                        @endforeach
-                                    </td> --}}
                                     <td>{{ $expense->bill_title ?? '-' }}</td>
                                     <td>{{ $expense->bill_details_description ?? '-' }}</td>
-                                    {{-- <td>{{ optional($expense->travelMode)->name ?? '-' }}</td> --}}
                                     <td>{{ $expense->travel_mode ?? '-' }}</td>
                                     <td>₹{{ number_format($expense->amount, 2) }}</td>
                                     <td><a href="{{ asset('storage/expenses/'.$expense->image) }}" target="_blank" class="btn btn-sm btn-outline-primary">
@@ -154,9 +148,17 @@
                                         </span>
                                     </td>
                                     <td>
-                                        {{-- <a href="{{ route('expense.show', $expense->id) }}" class="text-info me-2" title="View">
-                                            <i class="fas fa-eye"></i>
-                                        </a> --}}
+                                        <a href="{{ route('expense.edit', $expense->id) }}" class="text-warning me-2" title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <form action="{{ route('expense.destroy', $expense->id) }}" method="POST" class="d-inline"
+                                            onsubmit="return confirm('Are you sure you want to delete this expense?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-link p-0 text-danger" title="Delete">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
                                          @if($expense->approval_status != 'Approved')
                                             <form action="{{ route('expense.approve', $expense->id) }}" method="POST"
                                                 class="d-inline">
@@ -181,17 +183,7 @@
                                                 </button>
                                             </form>
                                         @endif
-                                        <a href="{{ route('expense.edit', $expense->id) }}" class="text-warning me-2" title="Edit">
-                                            <i class="fas fa-edit"></i>
-                                        </a>
-                                        <form action="{{ route('expense.destroy', $expense->id) }}" method="POST" class="d-inline"
-                                            onsubmit="return confirm('Are you sure you want to delete this expense?')">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-link p-0 text-danger" title="Delete">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </form>
+                                        
                                     </td>
                                 </tr>
                             @empty
