@@ -37,10 +37,10 @@ class PartyVisit extends Model
         return $this->belongsTo(Customer::class, 'customer_id', 'id');
     }
 
-    public function visitPurpose()
-    {
-        return $this->belongsTo(Purpose::class, 'visit_purpose_id', 'id');
-    }
+    // public function visitPurpose()
+    // {
+    //     return $this->belongsTo(Purpose::class, 'visit_purpose_id', 'id');
+    // }
 
     public function user()
     {

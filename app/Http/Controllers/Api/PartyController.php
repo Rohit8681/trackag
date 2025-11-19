@@ -97,7 +97,7 @@ class PartyController extends BaseController
         }
 
         $partyVisit->check_out_time = $validated['check_out_time'] ?? now();
-        $partyVisit->visit_purpose_id = $validated['visit_purpose_id'] ?? null;
+        $partyVisit->visit_purpose = $validated['visit_purpose'] ?? null;
         $partyVisit->followup_date = $validated['followup_date'] ?? null;
         $partyVisit->remarks = $validated['remarks'] ?? null;
         $partyVisit->agro_visit_image = $validated['agro_visit_image'] ?? null;
