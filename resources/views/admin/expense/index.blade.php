@@ -153,7 +153,7 @@
                                             <i class="fas fa-edit"></i>
                                         </a>
                                         @endif
-                                        
+
                                         <form action="{{ route('expense.destroy', $expense->id) }}" method="POST" class="d-inline"
                                             onsubmit="return confirm('Are you sure you want to delete this expense?')">
                                             @csrf
@@ -208,14 +208,24 @@
     .action-buttons {
         display: flex;
         align-items: center;
-        gap: 6px;
+        gap: 5px;
         white-space: nowrap;
     }
-    .action-buttons form,
-    .action-buttons a,
-    .action-buttons button {
-        display: inline-flex;
-        align-items: center;
+
+    /* Make approve/reject buttons smaller */
+    .action-buttons .btn-sm {
+        padding: 2px 6px;
+        font-size: 11px;
+    }
+
+    /* Delete button icon align fix */
+    .action-buttons .btn-link i {
+        font-size: 14px;
+    }
+
+    /* Edit icon fix */
+    .action-buttons .text-warning i {
+        font-size: 14px;
     }
 </style>
 @endpush
