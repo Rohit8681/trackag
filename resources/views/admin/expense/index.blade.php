@@ -1,6 +1,20 @@
 @extends('admin.layout.layout')
 @section('title', 'Expense List | Trackag')
+@push('styles')
+<style>
+    .action-buttons {
+        display: flex;
+        gap: 5px;
+        align-items: center;
+        white-space: nowrap;
+    }
 
+    .action-buttons .btn-sm {
+        padding: 2px 6px;
+        font-size: 11px;
+    }
+</style>
+@endpush
 @section('content')
 <main class="app-main">
 
@@ -203,32 +217,7 @@
     </div> <!-- /.app-content -->
 </main>
 @endsection
-@push('styles')
-<style>
-    .action-buttons {
-        display: flex;
-        align-items: center;
-        gap: 5px;
-        white-space: nowrap;
-    }
 
-    /* Make approve/reject buttons smaller */
-    .action-buttons .btn-sm {
-        padding: 2px 6px;
-        font-size: 11px;
-    }
-
-    /* Delete button icon align fix */
-    .action-buttons .btn-link i {
-        font-size: 14px;
-    }
-
-    /* Edit icon fix */
-    .action-buttons .text-warning i {
-        font-size: 14px;
-    }
-</style>
-@endpush
 
 @push('scripts')
 <script>
