@@ -17,6 +17,7 @@
     <!--end::Primary Meta Tags-->
     <!--begin::Fonts-->
     @include('admin.layout.styles')
+    @stack('styles')
 </head>
 <!--end::Head-->
 <!--begin::Body-->
