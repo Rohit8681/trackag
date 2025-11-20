@@ -320,7 +320,7 @@ class TripController extends Controller
         $calculatedDistance = $this->calculateDistanceFromLogs($trip->id);
 
         // NaN or negative check
-        if (!is_numeric($calculatedDistance) || $calculatedDistance < 0) {
+        if (!is_finite($calculatedDistance) || $calculatedDistance < 0) {
             $calculatedDistance = 0;
         }
 
@@ -405,14 +405,29 @@ class TripController extends Controller
     }
 
 
+    // private function calculateDistance($lat1, $lon1, $lat2, $lon2)
+    // {
+    //     $theta = $lon1 - $lon2;
+    //     $dist = sin(deg2rad($lat1)) * sin(deg2rad($lat2)) +
+    //         cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * cos(deg2rad($theta));
+    //     $dist = acos($dist);
+    //     $dist = rad2deg($dist);
+    //     $km   = $dist * 111.13384;
+    //     return round($km, 2);
+    // }
     private function calculateDistance($lat1, $lon1, $lat2, $lon2)
     {
         $theta = $lon1 - $lon2;
         $dist = sin(deg2rad($lat1)) * sin(deg2rad($lat2)) +
-            cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * cos(deg2rad($theta));
+                cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * cos(deg2rad($theta));
+
+        // Clamp value to valid range for acos()
+        $dist = max(-1, min(1, $dist));
+
         $dist = acos($dist);
         $dist = rad2deg($dist);
         $km   = $dist * 111.13384;
+
         return round($km, 2);
     }
 
