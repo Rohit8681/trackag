@@ -147,10 +147,13 @@
                                             {{ $expense->approval_status ?? 'Pending' }}
                                         </span>
                                     </td>
-                                    <td>
+                                    <td calss="action-buttons">
+                                        @if($expense->approval_status != 'Approved' && $expense->approval_status != 'Rejected')
                                         <a href="{{ route('expense.edit', $expense->id) }}" class="text-warning me-2" title="Edit">
                                             <i class="fas fa-edit"></i>
                                         </a>
+                                        @endif
+                                        
                                         <form action="{{ route('expense.destroy', $expense->id) }}" method="POST" class="d-inline"
                                             onsubmit="return confirm('Are you sure you want to delete this expense?')">
                                             @csrf
@@ -200,6 +203,22 @@
     </div> <!-- /.app-content -->
 </main>
 @endsection
+@push('styles')
+<style>
+    .action-buttons {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        white-space: nowrap;
+    }
+    .action-buttons form,
+    .action-buttons a,
+    .action-buttons button {
+        display: inline-flex;
+        align-items: center;
+    }
+</style>
+@endpush
 
 @push('scripts')
 <script>
