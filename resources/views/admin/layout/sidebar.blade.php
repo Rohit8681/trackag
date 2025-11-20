@@ -285,7 +285,7 @@
                     </ul>
                     <ul class="nav nav-treeview">
                         <li class="nav-item">
-                            <a href="{{ url('admin/expense') }}" class="nav-link {{ request()->is('admin/expense*') ? 'active' : '' }}">
+                            <a href="{{ route('coming-soon') }}" class="nav-link {{ request()->is('admin/expense*') ? 'active' : '' }}">
                                 <i class="bi bi-cash-stack me-2"></i>
                                 <p>Generate monthly Expense</p>
                             </a>
@@ -293,7 +293,7 @@
                     </ul>
                     <ul class="nav nav-treeview">
                         <li class="nav-item">
-                            <a href="{{ url('admin/expense') }}" class="nav-link {{ request()->is('admin/expense*') ? 'active' : '' }}">
+                            <a href="{{ route('coming-soon') }}" class="nav-link {{ request()->is('admin/expense*') ? 'active' : '' }}">
                                 <i class="bi bi-cash-stack me-2"></i>
                                 <p>TA-DA Report</p>
                             </a>
@@ -313,7 +313,7 @@
 
                 <ul class="nav nav-treeview" style="{{ request()->is('admin/expense*') ? 'display: block;' : '' }}">
                     <li class="nav-item">
-                        <a href="{{ url('admin/expense') }}" 
+                        <a href="{{ route('coming-soon') }}" 
                         class="nav-link {{ request()->is('admin/expense') ? 'active' : '' }}">
                             <i class="bi bi-cash-stack me-2"></i>
                             <p>Daily Farm Demo</p>
@@ -321,7 +321,8 @@
                     </li>
 
                     <li class="nav-item">
-                        <a href="{{ url('admin/expense/monthly-report') }}" 
+                        {{-- <a href="{{ url('admin/expense/monthly-report') }}"  --}}
+                        <a href="{{ route('coming-soon') }}" 
                         class="nav-link {{ request()->is('admin/expense/monthly-report*') ? 'active' : '' }}">
                             <i class="bi bi-cash-stack me-2"></i>
                             <p>Monthly Farm Demo Report</p>

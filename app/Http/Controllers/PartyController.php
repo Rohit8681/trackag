@@ -128,8 +128,8 @@ class PartyController extends Controller
 
     
     public function newPartyList(){
-        // return view('admin.new-party.index');
-        return view('coming-soon');
+        return view('admin.new-party.index');
+        // return view('coming-soon');
     }
 
     /**
