@@ -181,7 +181,7 @@
                                                 class="d-inline">
                                                 @csrf
                                                 @method('PATCH')
-                                                <button type="submit" class="btn btn-sm btn-success me-1"
+                                                <button type="submit" class="btn btn-sm btn-success me-1  btn-sm"
                                                         onclick="return confirm('Approve this expense?')">
                                                     <i class="fas fa-check"></i>
                                                 </button>
@@ -194,7 +194,7 @@
                                                 class="d-inline">
                                                 @csrf
                                                 @method('PATCH')
-                                                <button type="submit" class="btn btn-sm btn-danger me-1"
+                                                <button type="submit" class="btn btn-sm btn-danger me-1  btn-sm"
                                                         onclick="return confirm('Reject this expense?')">
                                                     <i class="fas fa-times"></i>
                                                 </button>
