@@ -113,7 +113,7 @@
                         </li>
 
                         <li class="nav-item">
-                            <a href="{{ url('admin/new-party') }}" 
+                            <a href="{{ route('coming-soon') }}" 
                             class="nav-link {{ request()->is('admin/new-party*') ? 'active' : '' }}">
                                 <i class="bi bi-people-fill me-2"></i>
                                 <p>Party Payment</p>
@@ -121,7 +121,7 @@
                         </li>
 
                         <li class="nav-item">
-                            <a href="{{ url('admin/new-party') }}" 
+                            <a href="{{ route('coming-soon') }}" 
                             class="nav-link {{ request()->is('admin/new-party*') ? 'active' : '' }}">
                                 <i class="bi bi-people-fill me-2"></i>
                                 <p>Party Performance</p>
@@ -129,7 +129,7 @@
                         </li>
 
                         <li class="nav-item">
-                            <a href="{{ url('admin/new-party') }}" 
+                            <a href="{{ route('coming-soon') }}" 
                             class="nav-link {{ request()->is('admin/new-party*') ? 'active' : '' }}">
                                 <i class="bi bi-people-fill me-2"></i>
                                 <p>Party Ledger</p>

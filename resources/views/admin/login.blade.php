@@ -16,13 +16,20 @@
     <link rel="stylesheet" href="{{ asset('admin/css/adminlte.css') }}" />
 
     <style>
-        .login-logo img {
+        /* .login-logo img {
             width: 50px;
             height: 50px;
             object-fit: cover;
             border-radius: 50%;
             box-shadow: 0 3px 12px rgba(0,0,0,0.25);
-        }
+        } */
+         .login-logo img {
+    width: 180px; /* tamari requirement pramane vadhaaro */
+    height: auto;
+    object-fit: contain;
+    border-radius: 0; /* circle hataavi do */
+    box-shadow: none; /* shadow joiye to add karo */
+}
 
         /* NEW: Download Button Stylish */
         .download-section {
