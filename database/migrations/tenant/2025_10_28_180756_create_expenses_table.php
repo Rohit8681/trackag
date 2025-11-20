@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('travel_mode')->nullable();
             $table->decimal('amount', 10, 2)->default(0);
             $table->string('image')->nullable();
-            $table->string('approval_status')->default('Pending')->after('amount');
+            $table->string('approval_status')->default('Pending');
             $table->timestamps();
             $table->softDeletes(); 
         });
