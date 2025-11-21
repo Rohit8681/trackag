@@ -247,6 +247,7 @@ class ApiTripController extends BaseController
     // Create a new trip via API
     public function storeTrip(Request $request)
     {
+        Log::info('STORE TRIP RAW REQUEST', $request->all());
         $validated = $request->validate([
             'trip_date'      => 'nullable|date',
             'start_time'     => 'nullable',
@@ -264,9 +265,10 @@ class ApiTripController extends BaseController
             'customer_ids'   => 'nullable|array',
             // 'customer_ids.*' => 'exists:customers,id'
         ]);
+         Log::info('VALIDATED TRIP DATA', $validated);
 
         $user = Auth::user();
-
+         Log::info('AUTH USER', ['user_id' => $user->id]);
         // Handle photo uploads
         $startKmPhoto = null;
         if ($request->hasFile('start_km_photo')) {
@@ -302,6 +304,7 @@ class ApiTripController extends BaseController
                 $validated['end_lat'],
                 $validated['end_lng']
             );
+            Log::info('DISTANCE CALCULATED', ['km' => $distance]);
         }
 
         $trip = Trip::create([
@@ -326,10 +329,17 @@ class ApiTripController extends BaseController
             'status'            => 'pending',
             'approval_status'   => 'pending',
         ]);
+        Log::info('TRIP CREATED SUCCESSFULLY', [
+        'trip_id' => $trip->id,
+        'user_id' => $user->id,
+    ]);
 
         // Attach customers if provided
         if (!empty($validated['customer_ids'])) {
             $trip->customers()->attach($validated['customer_ids']);
+            Log::info('CUSTOMERS ATTACHED', ['customer_ids' => $validated['customer_ids']]);
+        }else{
+            Log::info('NO CUSTOMER IDS PROVIDED');
         }
         return $this->sendResponse($trip->load(["purpose", "tourType", "travelMode", "company", "approvedByUser", "user"]), "Day logs created successfully");
     }
