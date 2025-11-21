@@ -277,9 +277,11 @@ function initMap() {
     }
 
     // Auto-fit zoom
-    const bounds = new google.maps.LatLngBounds();
-    pathCoordinates.forEach(p => bounds.extend(p));
-    map.fitBounds(bounds);
+    // const bounds = new google.maps.LatLngBounds();
+    // pathCoordinates.forEach(p => bounds.extend(p));
+    // map.fitBounds(bounds);
+    map.setZoom(13);
+map.setCenter(pathCoordinates[0]);
 }
 
 
