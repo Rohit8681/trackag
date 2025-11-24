@@ -127,9 +127,49 @@ class PartyController extends Controller
 
 
     
-    public function newPartyList(){
-        return view('admin.new-party.index');
-        // return view('coming-soon');
+    public function newPartyList(Request $request)
+    {
+        $users = User::where('is_active', 1)->get();
+        $states = State::where('status', 1)->get();
+
+        // MAIN QUERY
+        $query = Customer::where('status', 1)
+            ->where('type', 'mobile');
+
+        // ==========================
+        // APPLY FILTERS
+        // ==========================
+
+        if ($request->financial_year) {
+            $dates = explode('-', $request->financial_year);
+            $query->whereYear('visit_date', '>=', $dates[0])
+                ->whereYear('visit_date', '<=', $dates[1]);
+        }
+
+        if ($request->from_date) {
+            $query->whereDate('visit_date', '>=', $request->from_date);
+        }
+
+        if ($request->to_date) {
+            $query->whereDate('visit_date', '<=', $request->to_date);
+        }
+
+        if ($request->state_id) {
+            $query->where('state_id', $request->state_id);
+        }
+
+        if ($request->user_id) {
+            $query->where('user_id', $request->user_id);
+        }
+
+        if ($request->agro_name) {
+            $query->where('agro_name', 'LIKE', '%' . $request->agro_name . '%');
+        }
+
+        // final get()
+        $customer = $query->orderBy('visit_date', 'desc')->get();
+
+        return view('admin.new-party.index', compact('customer', 'users', 'states'));
     }
 
     /**

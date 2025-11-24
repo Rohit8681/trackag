@@ -173,6 +173,7 @@ class PartyController extends BaseController
                     'gst_no' => $customer->gst_no,
                     'working_with' => $customer->working_with,
                     'user_id' => $customer->user_id,
+                    'status' => $customer->status,
 
                     // 👇 Single Image URL
                     'visit_card_image_url' => $customer->visit_card_image

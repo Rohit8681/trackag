@@ -25,44 +25,69 @@
             {{-- 🔶 Filter Section (Yellow Header Style) --}}
             <div class="card shadow-sm border-0 mb-4">
                 <div class="card-body p-3 bg-warning bg-opacity-25 rounded-3">
-                    <form class="row g-3 align-items-end">
-                        <div class="col-md-2">
-                            <label class="form-label fw-semibold text-dark">Financial Year</label>
-                            <select class="form-select">
-                                <option selected>2024-2025</option>
-                                <option>2023-2024</option>
-                            </select>
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label fw-semibold text-dark">From Date</label>
-                            <input type="date" class="form-control">
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label fw-semibold text-dark">To Date</label>
-                            <input type="date" class="form-control">
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label fw-semibold text-dark">State</label>
-                            <select class="form-select">
-                                <option>Gujarat</option>
-                                <option>Maharashtra</option>
-                            </select>
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label fw-semibold text-dark">Employee Name</label>
-                            <select class="form-select">
-                                {{-- <option>Rohit Panchal</option>
-                                <option>Vivek Patel</option> --}}
-                            </select>
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label fw-semibold text-dark">Agro Name</label>
-                            <select class="form-select">
-                                {{-- <option>ABC Agro</option>
-                                <option>XYZ Agro</option> --}}
-                            </select>
-                        </div>
-                    </form>
+                    <form class="row g-3 align-items-end" method="GET" action="{{ url('admin/new-party') }}">
+
+                    <div class="col-md-2">
+                        <label class="form-label fw-semibold text-dark">Financial Year</label>
+                        <select class="form-select" name="financial_year">
+                            <option value="">Select</option>
+                            <option value="2024-2025" {{ request('financial_year')=='2024-2025'?'selected':'' }}>2024-2025</option>
+                            <option value="2023-2024" {{ request('financial_year')=='2023-2024'?'selected':'' }}>2023-2024</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-2">
+                        <label class="form-label fw-semibold text-dark">From Date</label>
+                        <input type="date" class="form-control" name="from_date" value="{{ request('from_date') }}">
+                    </div>
+
+                    <div class="col-md-2">
+                        <label class="form-label fw-semibold text-dark">To Date</label>
+                        <input type="date" class="form-control" name="to_date" value="{{ request('to_date') }}">
+                    </div>
+
+                    <div class="col-md-2">
+                        <label class="form-label fw-semibold text-dark">State</label>
+                        <select class="form-select" name="state_id">
+                            <option value="">Select State</option>
+                            @foreach ($states as $state)
+                                <option value="{{ $state->id }}" {{ request('state_id')==$state->id?'selected':'' }}>
+                                    {{ $state->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="col-md-2">
+                        <label class="form-label fw-semibold text-dark">Employee Name</label>
+                        <select class="form-select" name="user_id">
+                            <option value="">Select Employee</option>
+                            @foreach ($users as $user)
+                                <option value="{{ $user->id }}" {{ request('user_id')==$user->id?'selected':'' }}>
+                                    {{ $user->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="col-md-2">
+                        <label class="form-label fw-semibold text-dark">Agro Name</label>
+                        <input type="text" name="agro_name" class="form-control" value="{{ request('agro_name') }}">
+                    </div>
+
+                    <div class="col-md-2 mt-3">
+                        <button class="btn btn-primary w-100">
+                            <i class="fas fa-search"></i> Filter
+                        </button>
+                    </div>
+
+                    <div class="col-md-2 mt-3">
+                        <a href="{{ url('admin/new-party') }}" class="btn btn-secondary w-100">
+                            <i class="fas fa-undo"></i> Reset
+                        </a>
+                    </div>
+
+                </form>
                 </div>
             </div>
 
@@ -71,6 +96,7 @@
                 <div class="card-body table-responsive">
                     <table class="table table-bordered align-middle text-nowrap">
                         <thead class="text-center align-middle" style="background-color: #FFD966;">
+                            
                             <tr>
                                 <th rowspan="2">Sr. No.</th>
                                 <th rowspan="2">Date</th>
@@ -82,23 +108,44 @@
                                 <th rowspan="2">Working With</th>
                                 <th rowspan="2">Party Document</th>
                                 <th colspan="2">Status</th>
-                                <th colspan="2">Approved</th>
-                            </tr>
-                            <tr>
-                                <th>Reject</th>
-                                <th>Hold</th>
-                                <th>With Remarks</th>
-                                <th>With Remarks</th>
                             </tr>
                         </thead>
                         <tbody>
+                            @forelse ($customer as $key => $item)
                             <tr>
-                                <td colspan="13" class="text-center text-muted py-4">
-                                        <i class="fas fa-exclamation-circle me-2 text-warning"></i>
-                                        <strong>No data found</strong>
-                                    </td>
-                                </tr>
-                            
+                                <td>{{ $key + 1 }}</td>
+                                <td>{{ $item->visit_date?->format('d-m-Y') }}</td>
+                                <td>{{ $item->user?->name }}</td>
+                                <td>{{ $item->agro_name }}</td>
+                                <td>{{ $item->phone }}</td>
+                                <td>{{ $item->address }}</td>
+                                <td>{{ $item->contact_person_name }}</td>
+                                <td>{{ $item->working_with }}</td>
+
+                                <td>
+                                    @if ($item->party_documents)
+                                        @foreach ($item->party_documents as $doc)
+                                            <a href="{{ $doc }}" target="_blank" class="badge bg-info text-dark d-block my-1">
+                                                View Document
+                                            </a>
+                                        @endforeach
+                                    @else
+                                        <span class="text-muted">No Documents</span>
+                                    @endif
+                                </td>
+
+                                <td>
+                                    <span class="badge bg-success">Pending</span>
+                                </td>
+                            </tr>
+                            @empty
+                            <tr>
+                                <td colspan="10" class="text-center text-muted py-4">
+                                    <i class="fas fa-exclamation-circle me-2 text-warning"></i>
+                                    <strong>No data found</strong>
+                                </td>
+                            </tr>
+                            @endforelse
                         </tbody>
                     </table>
                 </div>
