@@ -198,7 +198,7 @@
 
     <div class="modal fade" id="statusModal" tabindex="-1">
     <div class="modal-dialog">
-        <form method="POST" action="{{ url('admin/new-party/status-update') }}">
+        <form method="POST" action="{{ url('new-party/status-update') }}">
             @csrf
             <input type="hidden" name="customer_id" id="customerId">
             <input type="hidden" name="status" id="statusType">
