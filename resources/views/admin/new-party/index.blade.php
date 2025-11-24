@@ -107,7 +107,7 @@
                                 <th rowspan="2">Contact Person</th>
                                 <th rowspan="2">Working With</th>
                                 <th rowspan="2">Party Document</th>
-                                <th colspan="2">Status</th>
+                                <th rowspan="2">Status</th>
                                 <th rowspan="2">Action</th>
                             </tr>
                         </thead>
