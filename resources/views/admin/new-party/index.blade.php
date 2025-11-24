@@ -126,9 +126,9 @@
                                 <td>
                                     @if ($item->party_documents)
                                         @foreach ($item->party_documents as $doc)
-                                            <a href="{{ $doc }}" target="_blank" class="badge bg-info text-dark d-block my-1">
-                                                View Document
-                                            </a>
+                                            <a href="{{ asset('storage/' . $doc) }}" target="_blank" class="badge bg-info text-dark d-block my-1">
+    View Document
+</a>
                                         @endforeach
                                     @else
                                         <span class="text-muted">No Documents</span>
