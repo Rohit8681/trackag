@@ -120,7 +120,7 @@ class PartyController extends BaseController
             'state_id'              => 'required|integer',
             'district_id'           => 'required|integer',
             'tehsil_id'             => 'required|integer',
-            'city'                  => 'required|integer',
+            'city'                  => 'required|string',
             'address'               => 'required|string',
             'gst_no'                => 'required|string',
             'working_with'          => 'nullable|string',
