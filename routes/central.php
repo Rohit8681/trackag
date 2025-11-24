@@ -169,7 +169,7 @@ Route::middleware(['web'])->group(function () {
             Route::resource('party', PartyController::class);
             Route::get('/admin/get-party-visits', [PartyController::class, 'getPartyVisits'])->name('admin.get-party-visits');
             Route::get('new-party', [PartyController::class, 'newPartyList'])->name('new-party.list');
-            Route::post('new-party/status-update', [PartyController::class, 'updateStatus']);
+            Route::post('new-party/status-update', [PartyController::class, 'updateStatus'])->name('new-party.update-status');
 
             
             Route::resource('order', OrderController::class);
