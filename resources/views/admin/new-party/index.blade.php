@@ -108,6 +108,7 @@
                                 <th rowspan="2">Working With</th>
                                 <th rowspan="2">Party Document</th>
                                 <th colspan="2">Status</th>
+                                <th rowspan="2">Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -135,7 +136,48 @@
                                 </td>
 
                                 <td>
-                                    <span class="badge bg-success">Pending</span>
+                                    @if($item->status == 'approved')
+                                        <span class="badge bg-success">Approved</span>
+
+                                    @elseif($item->status == 'rejected')
+                                        <span class="badge bg-danger">Rejected</span>
+
+                                    @elseif($item->status == 'hold')
+                                        <span class="badge bg-warning text-dark">Hold</span>
+
+                                    @else
+                                        <span class="badge bg-secondary">Pending</span>
+                                    @endif
+                                </td>
+                                <td>
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-primary dropdown-toggle" data-bs-toggle="dropdown">
+                                            Action
+                                        </button>
+
+                                        <ul class="dropdown-menu">
+                                            <li>
+                                                <a href="#" class="dropdown-item" 
+                                                onclick="openStatusModal({{ $item->id }}, 'approved')">
+                                                    Approve
+                                                </a>
+                                            </li>
+
+                                            <li>
+                                                <a href="#" class="dropdown-item" 
+                                                onclick="openStatusModal({{ $item->id }}, 'rejected')">
+                                                    Reject
+                                                </a>
+                                            </li>
+
+                                            <li>
+                                                <a href="#" class="dropdown-item" 
+                                                onclick="openStatusModal({{ $item->id }}, 'hold')">
+                                                    Hold
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
                                 </td>
                             </tr>
                             @empty
@@ -153,5 +195,43 @@
 
         </div>
     </div>
+
+    <div class="modal fade" id="statusModal" tabindex="-1">
+    <div class="modal-dialog">
+        <form method="POST" action="{{ url('admin/new-party/status-update') }}">
+            @csrf
+            <input type="hidden" name="customer_id" id="customerId">
+            <input type="hidden" name="status" id="statusType">
+
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">Update Status</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    <label class="form-label">Remark <span class="text-danger">*</span></label>
+                    <textarea class="form-control" name="remark" rows="3" required></textarea>
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button class="btn btn-success">Save</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
 </main>
 @endsection
+@push('scripts')
+<script>
+function openStatusModal(id, status) {
+    document.getElementById('customerId').value = id;
+    document.getElementById('statusType').value = status;
+
+    var modal = new bootstrap.Modal(document.getElementById('statusModal'));
+    modal.show();
+}
+</script>
+@endpush

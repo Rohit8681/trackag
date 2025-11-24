@@ -133,7 +133,7 @@ class PartyController extends Controller
         $states = State::where('status', 1)->get();
 
         // MAIN QUERY
-        $query = Customer::where('status', 1)
+        $query = Customer::where('is_active', 1)
             ->where('type', 'mobile');
 
         // ==========================
@@ -170,6 +170,23 @@ class PartyController extends Controller
         $customer = $query->orderBy('visit_date', 'desc')->get();
 
         return view('admin.new-party.index', compact('customer', 'users', 'states'));
+    }
+
+    public function updateStatus(Request $request)
+    {
+        $request->validate([
+            'customer_id' => 'required|integer',
+            'status' => 'required|string',
+            'remark' => 'required|string',
+        ]);
+
+        $customer = Customer::findOrFail($request->customer_id);
+
+        $customer->status = $request->status;
+        $customer->remark = $request->remark;
+        $customer->save();
+
+        return back()->with('success', 'Status updated successfully!');
     }
 
     /**

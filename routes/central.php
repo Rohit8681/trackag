@@ -169,6 +169,7 @@ Route::middleware(['web'])->group(function () {
             Route::resource('party', PartyController::class);
             Route::get('/admin/get-party-visits', [PartyController::class, 'getPartyVisits'])->name('admin.get-party-visits');
             Route::get('new-party', [PartyController::class, 'newPartyList'])->name('new-party.list');
+            Route::post('admin/new-party/status-update', [PartyController::class, 'updateStatus']);
 
             
             Route::resource('order', OrderController::class);
@@ -182,6 +183,8 @@ Route::middleware(['web'])->group(function () {
             Route::resource('products', ProductController::class);
 
              Route::resource('customers', CustomerController::class);
+             
+
             Route::patch('/customers/{id}/toggle', [CustomerController::class, 'toggleStatus'])->name('customers.toggle');
             Route::post('/customers/import', [CustomerController::class, 'import'])->name('customers.import');
             
