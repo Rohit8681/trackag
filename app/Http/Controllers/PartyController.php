@@ -183,7 +183,7 @@ class PartyController extends Controller
         $customer = Customer::findOrFail($request->customer_id);
 
         $customer->status = $request->status;
-        $customer->remark = $request->remark;
+        $customer->remarks = $request->remark;
         $customer->save();
 
         return back()->with('success', 'Status updated successfully!');
