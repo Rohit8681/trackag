@@ -118,7 +118,7 @@ class ExpenseController extends Controller
     public function expenseReport(){
         $query = Trip::with(['user', 'company', 'approvedByUser', 'tripLogs', 'customers', 'travelMode', 'tourType'])->where('approval_status','approved');
         $data = $query->latest()->get();
-        dd($data);
+        // dd($data);
         return view('admin.expense.report', compact('data'));
     }
 }
