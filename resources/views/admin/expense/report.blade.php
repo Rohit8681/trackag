@@ -155,7 +155,7 @@
                                     <td>{{ $report->end_km ?? "-" }}</td>
                                     <td>{{ $report->end_km - $report->starting_km }}</td>
                                     <td>{{ $report->total_distance_km ?? "-" }}</td>
-                                    <td></td>
+                                    <td>{{ $report->end_km - $report->starting_km }}</td>
                                     <td></td>
                                     <td></td>
                                     <td></td>
