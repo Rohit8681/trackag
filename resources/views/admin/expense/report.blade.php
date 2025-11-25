@@ -125,7 +125,7 @@
                             <tr>
                                 <th>Sr. No.</th>
                                 <th>Date</th>
-                                <th>Tour Type/th>
+                                <th>Tour Type</th>
                                 <th>Start Time</th>
                                 <th>End Time</th>
                                 <th>Visit Places</th>
