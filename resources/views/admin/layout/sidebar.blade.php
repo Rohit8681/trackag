@@ -285,7 +285,7 @@
                     </ul>
                     <ul class="nav nav-treeview">
                         <li class="nav-item">
-                            <a href="{{ route('coming-soon') }}" class="nav-link {{ request()->is('admin/expense*') ? 'active' : '' }}">
+                            <a href="{{ route('expense.report') }}" class="nav-link {{ request()->is('expense.report*') ? 'active' : '' }}">
                                 <i class="bi bi-cash-stack me-2"></i>
                                 <p>Generate monthly Expense</p>
                             </a>

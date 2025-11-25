@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Expense;
 use App\Models\State;
+use App\Models\Trip;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -36,41 +37,13 @@ class ExpenseController extends Controller
 
         return view('admin.expense.index', compact('expenses', 'states', 'employees'));
     }
-
-
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
+    
     public function edit(string $id)
     {
         $expense = Expense::findOrFail($id);
         return view('admin.expense.edit', compact('expense'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, $id)
     {
         $request->validate([
@@ -107,9 +80,6 @@ class ExpenseController extends Controller
         return redirect()->route('expense.index')->with('success', 'Expense Updated Successfully!');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(string $id)
     {
         try {
@@ -118,11 +88,6 @@ class ExpenseController extends Controller
             if (!$expense) {
                 return redirect()->back()->with('error', 'Expense not found.');
             }
-
-            // Delete image if exists
-            // if ($expense->image && file_exists(public_path('storage/expenses/' . $expense->image))) {
-            //     unlink(public_path('storage/expenses/' . $expense->image));
-            // }
 
             $expense->delete();
 
@@ -148,5 +113,12 @@ class ExpenseController extends Controller
         $expense->save();
 
         return redirect()->back()->with('error', 'Expense rejected.');
+    }
+
+    public function expenseReport(){
+        $query = Trip::with(['user', 'company', 'approvedByUser', 'tripLogs', 'customers', 'travelMode', 'tourType']);
+        $data = $query->latest()->get();
+        dd($data);
+        return view('admin.expense.report', compact('data'));
     }
 }
