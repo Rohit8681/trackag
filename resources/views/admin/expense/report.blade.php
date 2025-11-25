@@ -120,7 +120,7 @@
                     <!-- 🔍 End Filter Form -->
 
                     <!-- 📋 Expense Table -->
-                    <table id="expenses-table" class="table table-bordered table-striped align-middle">
+                    <table id="expenses-report-table" class="table table-bordered table-striped align-middle">
                         <thead class="table-light">
                             <tr>
                                 <th>Sr. No.</th>
@@ -182,9 +182,9 @@
 @push('scripts')
 <script>
 $(document).ready(function() {
-    var expenses = @json($expenses->count());
-    if (expenses > 0) {
-        $('#expenses-table').DataTable({
+    var data = @json($data->count());
+    if (data > 0) {
+        $('#expenses-report-table').DataTable({
             responsive: true,
             autoWidth: false,
             pageLength: 10,
