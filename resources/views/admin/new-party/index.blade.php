@@ -209,7 +209,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
 
-                <div class="modal-body">
+                <div class="modal-body" id="remarkWrapper">
                     <label class="form-label">Remark <span class="text-danger">*</span></label>
                     <textarea class="form-control" name="remark" rows="3" required></textarea>
                 </div>
