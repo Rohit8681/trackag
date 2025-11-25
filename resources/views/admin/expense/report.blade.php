@@ -142,70 +142,26 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @forelse($expenses as $key => $expense)
+                            @forelse($data as $key => $report)
                                 <tr>
                                     <td>{{ $key + 1 }}</td>
-                                    <td>{{ optional($expense->user)->name ?? '-' }}</td>
-                                    <td>{{ optional($expense->user)->mobile ?? '-' }}</td>
-                                    <td>{{ \Carbon\Carbon::parse($expense->bill_date)->format('d M Y') }}</td>
-                                    <td>{{ $expense->bill_type }}</td>
-                                    <td>{{ $expense->bill_title ?? '-' }}</td>
-                                    <td>{{ $expense->bill_details_description ?? '-' }}</td>
-                                    <td>{{ $expense->travel_mode ?? '-' }}</td>
-                                    <td>₹{{ number_format($expense->amount, 2) }}</td>
-                                    <td><a href="{{ asset('storage/expenses/'.$expense->image) }}" target="_blank" class="btn btn-sm btn-outline-primary">
-                                <i class="fas fa-image"></i> View
-                              </a></td>
-                                    <td>
-                                        <span class="badge 
-                                            @if($expense->approval_status == 'Approved') bg-success 
-                                            @elseif($expense->approval_status == 'Rejected') bg-danger 
-                                            @else bg-warning text-dark 
-                                            @endif">
-                                            {{ $expense->approval_status ?? 'Pending' }}
-                                        </span>
-                                    </td>
-                                    <td calss="action-buttons">
-                                        @if($expense->approval_status != 'Approved' && $expense->approval_status != 'Rejected')
-                                        <a href="{{ route('expense.edit', $expense->id) }}" class="text-warning me-2" title="Edit">
-                                            <i class="fas fa-edit"></i>
-                                        </a>
-                                        @endif
+                                    <td>{{ \Carbon\Carbon::parse($report->trip_date)->format('d M Y') }}</td>
+                                    <td>{{ $report->tourType->name ?? "-" }}</td>
+                                    <td>{{ $report->start_time ?? "-" }}</td>
+                                    <td>{{ $report->end_time ?? "-" }}</td>
+                                    <td>{{ $report->place_to_visit ?? "-" }}</td>
+                                    <td>{{ $report->travelMode->name ?? "-" }}</td>
+                                    <td>{{ $report->starting_km ?? "-" }}</td>
+                                    <td>{{ $report->end_km ?? "-" }}</td>
+                                    <td>{{ $report->end_km - $report->starting_km }}</td>
+                                    <td>{{ $report->total_distance_km ?? "-" }}</td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
 
-                                        <form action="{{ route('expense.destroy', $expense->id) }}" method="POST" class="d-inline"
-                                            onsubmit="return confirm('Are you sure you want to delete this expense?')">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-link p-0 text-danger" title="Delete">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </form>
-                                         @if($expense->approval_status != 'Approved')
-                                            <form action="{{ route('expense.approve', $expense->id) }}" method="POST"
-                                                class="d-inline">
-                                                @csrf
-                                                @method('PATCH')
-                                                <button type="submit" class="btn btn-sm btn-success me-1  btn-sm"
-                                                        onclick="return confirm('Approve this expense?')">
-                                                    <i class="fas fa-check"></i>
-                                                </button>
-                                            </form>
-                                        @endif
-
-                                        <!-- Reject -->
-                                        @if($expense->approval_status != 'Rejected')
-                                            <form action="{{ route('expense.reject', $expense->id) }}" method="POST"
-                                                class="d-inline">
-                                                @csrf
-                                                @method('PATCH')
-                                                <button type="submit" class="btn btn-sm btn-danger me-1  btn-sm"
-                                                        onclick="return confirm('Reject this expense?')">
-                                                    <i class="fas fa-times"></i>
-                                                </button>
-                                            </form>
-                                        @endif
-                                        
-                                    </td>
+                               
                                 </tr>
                             @empty
                                 <tr>
