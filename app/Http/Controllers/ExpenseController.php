@@ -141,7 +141,7 @@ class ExpenseController extends Controller
         $data = $query->latest()->get();
 
         // Get dropdown data
-        $states = State::where('status',1)->all();
+        $states = State::where('status',1)->get();
         $employees = User::where('is_active',1)->get();
 
         return view('admin.expense.report', compact('data', 'states', 'employees'));
