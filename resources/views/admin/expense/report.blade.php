@@ -49,16 +49,20 @@
                 <!-- Card Body -->
                 <div class="card-body table-responsive">
 
-                    <!-- 🔍 Filter Form -->
-                    {{-- <form action="{{ route('expense.index') }}" method="GET" class="row g-3 mb-3">
+                    <form action="{{ route('expense.report') }}" method="GET" class="row g-3 mb-3">
+
                         <div class="col-md-2">
                             <label class="form-label">From Date</label>
-                            <input type="date" name="from_date" value="{{ request('from_date') }}" class="form-control form-control-sm">
+                            <input type="date" name="from_date"
+                                value="{{ request('from_date') }}"
+                                class="form-control form-control-sm">
                         </div>
 
                         <div class="col-md-2">
                             <label class="form-label">To Date</label>
-                            <input type="date" name="to_date" value="{{ request('to_date') }}" class="form-control form-control-sm">
+                            <input type="date" name="to_date"
+                                value="{{ request('to_date') }}"
+                                class="form-control form-control-sm">
                         </div>
 
                         <div class="col-md-2">
@@ -66,7 +70,8 @@
                             <select name="state_id" class="form-select form-select-sm">
                                 <option value="">All</option>
                                 @foreach($states as $state)
-                                    <option value="{{ $state->id }}" {{ request('state_id') == $state->id ? 'selected' : '' }}>
+                                    <option value="{{ $state->id }}"
+                                        {{ request('state_id') == $state->id ? 'selected' : '' }}>
                                         {{ $state->name }}
                                     </option>
                                 @endforeach
@@ -74,50 +79,31 @@
                         </div>
 
                         <div class="col-md-2">
-                            <label class="form-label">Employee Name</label>
+                            <label class="form-label">Employee</label>
                             <select name="user_id" class="form-select form-select-sm">
                                 <option value="">All</option>
                                 @foreach($employees as $user)
-                                    <option value="{{ $user->id }}" {{ request('user_id') == $user->id ? 'selected' : '' }}>
+                                    <option value="{{ $user->id }}"
+                                        {{ request('user_id') == $user->id ? 'selected' : '' }}>
                                         {{ $user->name }}
                                     </option>
                                 @endforeach
                             </select>
                         </div>
 
-                        <div class="col-md-2">
-                            <label class="form-label">Bill Type</label>
-                            <select name="bill_type" class="form-select form-select-sm">
-                                <option value="">All</option>
-                                <option value="Petrol" {{ request('bill_type')=='Petrol'?'selected':'' }}>Petrol</option>
-                                <option value="Food" {{ request('bill_type')=='Food'?'selected':'' }}>Food</option>
-                                <option value="Accommodation" {{ request('bill_type')=='Accommodation'?'selected':'' }}>Accommodation</option>
-                                <option value="Travel" {{ request('bill_type')=='Travel'?'selected':'' }}>Travel</option>
-                                <option value="Courier" {{ request('bill_type')=='Courier'?'selected':'' }}>Courier</option>
-                                <option value="Others" {{ request('bill_type')=='Others'?'selected':'' }}>Others</option>
-                            </select>
-                        </div>
-
-                        <div class="col-md-2">
-                            <label class="form-label">Approval Status</label>
-                            <select name="approval_status" class="form-select form-select-sm">
-                                <option value="">All</option>
-                                <option value="Pending" {{ request('approval_status')=='Pending'?'selected':'' }}>Pending</option>
-                                <option value="Approved" {{ request('approval_status')=='Approved'?'selected':'' }}>Approved</option>
-                                <option value="Rejected" {{ request('approval_status')=='Rejected'?'selected':'' }}>Rejected</option>
-                            </select>
-                        </div>
-
-                        <div class="col-12 d-flex justify-content-end mt-2">
-                            <button type="submit" class="btn btn-sm btn-primary me-2">
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button type="submit" class="btn btn-sm btn-primary w-100">
                                 <i class="fas fa-filter"></i> Filter
                             </button>
-                            <a href="{{ route('expense.index') }}" class="btn btn-sm btn-secondary">
+                        </div>
+
+                        <div class="col-md-2 d-flex align-items-end">
+                            <a href="{{ route('expense.report') }}" class="btn btn-sm btn-secondary w-100">
                                 <i class="fas fa-sync"></i> Reset
                             </a>
                         </div>
-                    </form> --}}
-                    <!-- 🔍 End Filter Form -->
+
+                    </form>
 
                     <!-- 📋 Expense Table -->
                     <table id="expenses-report-table" class="table table-bordered table-striped align-middle">
