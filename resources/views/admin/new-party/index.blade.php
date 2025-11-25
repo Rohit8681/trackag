@@ -231,6 +231,13 @@ function openStatusModal(id, status) {
     document.getElementById('statusType').value = status;
 
     let remarkWrapper = document.getElementById('remarkWrapper'); // div around textarea
+    let remarkField = document.querySelector("textarea[name='remark']");
+
+    if (status === 'approved') {
+        remarkField.removeAttribute("required");
+    } else {
+        remarkField.setAttribute("required", "required");
+    }
 
     if (status === 'approved') {
         remarkWrapper.style.display = 'none';   // hide field
