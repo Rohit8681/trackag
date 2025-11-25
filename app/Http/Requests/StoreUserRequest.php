@@ -29,7 +29,7 @@ class StoreUserRequest extends FormRequest
             'postal_address' => 'nullable|string',
             'latitude' => 'nullable|string',
             'longitude' => 'nullable|string',
-            'user_code' => 'required|string',
+            'user_code' => 'required|string|unique:users,user_code',
             'designation_id' => 'required|exists:designations,id',
             'reporting_to' => 'nullable|string',
             'headquarter' => 'required|string',

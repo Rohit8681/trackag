@@ -24,7 +24,7 @@ class UpdateUserRequest extends FormRequest
             'password' => 'nullable|same:password_confirmation',
             'image' => 'nullable|image|max:5120',
             'cancel_cheque_photos.*' => 'nullable|image|max:5120',
-            'user_code' => 'required|string|max:100',
+            'user_code' => 'required|string|unique:users,user_code,' . $this->id,
             'designation_id' => 'required',
             'reporting_to' => 'required',
             'headquarter' => 'required|string|max:255',
