@@ -177,7 +177,7 @@ class PartyController extends Controller
         $request->validate([
             'customer_id' => 'required|integer',
             'status' => 'required|string',
-            'remark' => 'required|string',
+            'remark' => $request->status == 'approved' ? 'nullable|string' : 'required|string',
         ]);
 
         $customer = Customer::findOrFail($request->customer_id);

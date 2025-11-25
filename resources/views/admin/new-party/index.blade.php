@@ -230,6 +230,14 @@ function openStatusModal(id, status) {
     document.getElementById('customerId').value = id;
     document.getElementById('statusType').value = status;
 
+    let remarkWrapper = document.getElementById('remarkWrapper'); // div around textarea
+
+    if (status === 'approved') {
+        remarkWrapper.style.display = 'none';   // hide field
+    } else {
+        remarkWrapper.style.display = 'block';  // show field
+    }
+
     var modal = new bootstrap.Modal(document.getElementById('statusModal'));
     modal.show();
 }
