@@ -30,6 +30,7 @@ Route::middleware([TenantAuthenticate::class])->group(function () {
     Route::get('/trip/active', [ApiTripController::class, 'lastActive']);
     Route::get('/trip/{tripId}/detail', [ApiTripController::class, 'showTrip']);
     Route::post('/trip/close', [ApiTripController::class, 'close']);
+    Route::post('/trip/gps-store', [ApiTripController::class, 'gpsStore']);
     //expense api
     Route::get('/get-expenses', [ExpenseController::class, 'index']);
     Route::post('/expenses-store', [ExpenseController::class, 'storeOrUpdate']);
@@ -47,6 +48,8 @@ Route::middleware([TenantAuthenticate::class])->group(function () {
     Route::get('/states', [LocationApiController::class, 'getStates']);
     Route::get('/districts/{state_id}', [LocationApiController::class, 'getDistricts']);
     Route::get('/tehsils/{district_id}', [LocationApiController::class, 'getTehsils']);
+
+
 
 
 });

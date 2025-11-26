@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
+use App\Models\GpsLog;
 use App\Models\Purpose;
 use App\Models\TourType;
 use App\Models\TravelMode;
@@ -496,5 +497,25 @@ class ApiTripController extends BaseController
         $user = Auth::user();
         $trip = Trip::findOrFail($id);
         return $this->sendResponse($trip->load(["purpose", "tourType", "travelMode", "company", "approvedByUser", "user"]), "Trip fetched successfully");
+    }
+
+    public function gpsStore(Request $request)
+    {
+        $request->validate([
+            'user_id' => 'required|integer',
+            'gps_flag' => 'required|in:0,1',
+        ]);
+
+        // Save record
+        $log = GpsLog::create([
+            'user_id' => $request->user_id,
+            'gps_flag' => $request->gps_flag,
+        ]);
+
+        return response()->json([
+            "status" => true,
+            "message" => "GPS Log Saved Successfully",
+            "data" => $log
+        ], 200);
     }
 }
