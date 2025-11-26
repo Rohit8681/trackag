@@ -518,4 +518,54 @@ class ApiTripController extends BaseController
             "data" => $log
         ], 200);
     }
+
+   public function getMyTrips(Request $request)
+    {
+        $user = $request->user();
+
+        $trips = Trip::with([
+                'tourType',
+                'travelMode'
+            ])
+            ->where('user_id', $user->id)
+            ->latest()
+            ->get()
+            ->map(function ($data) {
+
+                return [
+                    'id' => $data->id,
+                    'trip_date' => $data->trip_date,
+
+                    // Null-safe relation calls
+                    'tour_type' => optional($data->tourType)->name,
+                    'travel_mode' => optional($data->travelMode)->name,
+
+                    'start_time' => $data->start_time,
+                    'end_time' => $data->end_time,
+                    'visit_place' => $data->place_to_visit,
+
+                    'starting_km' => $data->starting_km,
+                    'end_km' => $data->end_km,
+
+                    // Prevent negative value or null condition
+                    'travel_km' => ($data->end_km && $data->starting_km)
+                        ? ($data->end_km - $data->starting_km)
+                        : 0,
+
+                    'gps_km' => $data->total_distance_km ?? 0,
+
+                    // km difference same as travel_km
+                    'km_diff' => ($data->end_km && $data->starting_km)
+                        ? ($data->end_km - $data->starting_km)
+                        : 0,
+
+                    'ta_exp' => "",
+                    'da_exp' => "",
+                    'other_exp' => "",
+                    'total' => "",
+                ];
+            });
+
+        return $this->sendResponse($trips, "Trips fetched successfully");
+    }
 }
