@@ -154,7 +154,7 @@ class PartyController extends BaseController
     public function getPartyList(Request $request)
     {
         $user = Auth::user();
-        $customers = Customer::orderBy('id', 'desc')->where('type','mobile')->where('user_id',$user->id)->get()
+        $customers = Customer::with('state','district','tehsil')->orderBy('id', 'desc')->where('type','mobile')->where('user_id',$user->id)->get()
             ->map(function ($customer) {
 
                 return [
@@ -166,8 +166,11 @@ class PartyController extends BaseController
                     'phone' => $customer->phone,
                     'mobil_no_2' => $customer->mobil_no_2,
                     'state_id' => $customer->state_id,
+                    'state_name' => $customer->state->name ?? "",
                     'district_id' => $customer->district_id,
+                    'district_name' => $customer->district->name ?? "",
                     'tehsil_id' => $customer->tehsil_id,
+                    'tehsil_name' => $customer->tehsil->name ?? "",
                     'city' => $customer->city,
                     'address' => $customer->address,
                     'gst_no' => $customer->gst_no,
