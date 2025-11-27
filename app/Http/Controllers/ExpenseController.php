@@ -271,7 +271,7 @@ class ExpenseController extends Controller
 
             // Prevent null crash
             $da_amount_per_km = $da_amount->da_amount ?? 0;
-            $ta_amount_per_km = $ta_amount->ta_amount ?? 0;
+            $ta_amount_per_km = $ta_amount->travelling_allow_per_km ?? 0;
 
             $item->ta_exp = $ta_amount_per_km * $total_km;
             $item->da_exp = $da_amount_per_km;
