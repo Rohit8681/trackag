@@ -168,7 +168,24 @@ class ExpenseController extends Controller
         }
 
         $data = $query->latest()->get();
-        dd($data);
+
+        if(!empty($data)){
+            foreach ($data as $item) {
+
+                // $expense = Expense::where('trip_id', $item->id)->first();
+
+                // $item->ta_exp = $expense->ta_amount ?? 0;
+                // $item->da_exp = $expense->da_amount ?? 0;
+                // $item->other_exp = $expense->other_amount ?? 0;
+
+                // $item->total_exp = 
+                //     ($expense->ta_amount ?? 0) +
+                //     ($expense->da_amount ?? 0) +
+                //     ($expense->other_amount ?? 0);
+            }
+        }
+        
+        
         $states = State::where('status', 1)->get();
         $employees = User::where('is_active', 1)->get();
 
