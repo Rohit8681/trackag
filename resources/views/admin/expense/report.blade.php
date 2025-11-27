@@ -54,15 +54,16 @@
                         <div class="col-md-2">
                             <label class="form-label">From Date</label>
                             <input type="date" name="from_date"
-                                value="{{ request('from_date') }}"
-                                class="form-control form-control-sm">
+       value="{{ request('from_date', $from_date) }}"
+       class="form-control form-control-sm">
                         </div>
 
                         <div class="col-md-2">
                             <label class="form-label">To Date</label>
                             <input type="date" name="to_date"
-                                value="{{ request('to_date') }}"
-                                class="form-control form-control-sm">
+       value="{{ request('to_date', $to_date) }}"
+       class="form-control form-control-sm">
+
                         </div>
 
                         <div class="col-md-2">
