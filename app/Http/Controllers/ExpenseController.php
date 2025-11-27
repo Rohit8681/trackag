@@ -171,6 +171,7 @@ class ExpenseController extends Controller
 
         if(!empty($data)){
             foreach ($data as $item) {
+                dd($item);
 
                 // $expense = Expense::where('trip_id', $item->id)->first();
 
