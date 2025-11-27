@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Expense;
 use App\Models\State;
+use App\Models\TaDaTourSlab;
 use App\Models\TaDaVehicleSlab;
 use App\Models\Trip;
 use App\Models\User;
@@ -241,7 +242,7 @@ class ExpenseController extends Controller
 
             // Slab wise
             if ($slabType == "Slab Wise") {
-                $da_amount = TaDaVehicleSlab::where('tour_type_id', $item->tour_type)
+                $da_amount = TaDaTourSlab::where('tour_type_id', $item->tour_type)
                     ->whereNull('user_id')
                     ->where('designation_id', $item->user->slab_designation_id)
                     ->first();
@@ -254,7 +255,7 @@ class ExpenseController extends Controller
 
             // Individual Slab
             if ($slabType == "Individual") {
-                $da_amount = TaDaVehicleSlab::where('tour_type_id', $item->tour_type)
+                $da_amount = TaDaTourSlab::where('tour_type_id', $item->tour_type)
                     ->where('user_id', $item->user->id)
                     ->first();
 
