@@ -73,6 +73,7 @@ return new class extends Migration
             $table->string('latitude')->nullable();
             $table->string('longitude')->nullable();
             $table->string('pincode')->nullable();
+            $table->bigInteger('slab_designation_id')->nullable();
             // $table->foreignId('pincode_id')->nullable()->constrained('pincodes')->onDelete('set null');
 
             $table->foreignId('company_id')->nullable()->constrained('companies')->onDelete('cascade');

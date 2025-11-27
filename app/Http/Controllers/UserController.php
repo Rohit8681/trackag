@@ -321,6 +321,9 @@ class UserController extends Controller
         ]);
         $user = User::findOrFail($request->user_id);
         $user->slab = $request->slab;
+        if($request->slab == "Slab Wise"){
+            $user->slab_designation_id = $request->designation_id;
+        }
         $user->save();
 
         if ($request->slab === "Individual") {

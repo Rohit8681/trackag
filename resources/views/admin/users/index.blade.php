@@ -654,7 +654,7 @@ $(document).ready(function() {
                 if (isSlabWise) {
                     $('#individualFields').hide();
                     $('#approved_bills_in_da_slab_wise').show();
-                    $('#saveSlabBtn').hide();
+                    // $('#saveSlabBtn').hide();
                     $('#designation_id_modal').prop('disabled', false);
                     $('.vehicle-amount, .tour-amount').prop('readonly', true);
                     if (res.ta_da_slab.approved_bills_in_da_slab_wise) {

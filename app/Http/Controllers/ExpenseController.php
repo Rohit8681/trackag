@@ -148,26 +148,26 @@ class ExpenseController extends Controller
     // }
 
     public function expenseReport(Request $request)
-{
-    $from = $request->from_date ?? now()->startOfMonth()->format('Y-m-d');
-    $to   = $request->to_date ?? now()->endOfMonth()->format('Y-m-d');
+    {
+        $from = $request->from_date ?? now()->startOfMonth()->format('Y-m-d');
+        $to   = $request->to_date ?? now()->endOfMonth()->format('Y-m-d');
 
-    $query = Trip::with(['user', 'company', 'approvedByUser', 'tripLogs', 'customers', 'travelMode', 'tourType'])
-        ->where('approval_status', 'approved')
-        ->whereDate('trip_date', '>=', $from)
-        ->whereDate('trip_date', '<=', $to);
+        $query = Trip::with(['user', 'company', 'approvedByUser', 'tripLogs', 'customers', 'travelMode', 'tourType'])
+            ->where('approval_status', 'approved')
+            ->whereDate('trip_date', '>=', $from)
+            ->whereDate('trip_date', '<=', $to);
 
-    if ($request->filled('state_id')) {
-        $query->whereHas('user', function ($q) use ($request) {
-            $q->where('state_id', $request->state_id);
-        });
-    }
+        if ($request->filled('state_id')) {
+            $query->whereHas('user', function ($q) use ($request) {
+                $q->where('state_id', $request->state_id);
+            });
+        }
 
-    if ($request->filled('user_id')) {
-        $query->where('user_id', $request->user_id);
-    }
+        if ($request->filled('user_id')) {
+            $query->where('user_id', $request->user_id);
+        }
 
-    $data = $query->latest()->get();
+        $data = $query->latest()->get();
 
         $states = State::where('status', 1)->get();
         $employees = User::where('is_active', 1)->get();
