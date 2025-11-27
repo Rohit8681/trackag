@@ -168,7 +168,7 @@ class ExpenseController extends Controller
         }
 
         $data = $query->latest()->get();
-
+        dd($data);
         $states = State::where('status', 1)->get();
         $employees = User::where('is_active', 1)->get();
 
