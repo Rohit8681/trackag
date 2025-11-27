@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Expense;
 use App\Models\State;
+use App\Models\TaDaVehicleSlab;
 use App\Models\Trip;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -171,7 +172,19 @@ class ExpenseController extends Controller
 
         if(!empty($data)){
             foreach ($data as $item) {
-                dd($item);
+                $slabType = "";
+                if(isset($item->user->slab)){
+                    $slabType = $item->user->slab;
+                }
+
+                if(!empty($slabType)){
+                    if($slabType == "Slab Wise"){
+                      $da_amount = TaDaVehicleSlab::where('tour_type_id',$item->tour_type)->whereNull('user_id')->where('designation_id',$item->user->slab_designation_id)->first();
+                    }else if($slabType == "Individual"){
+
+                    }
+
+                }
 
                 // $expense = Expense::where('trip_id', $item->id)->first();
 
