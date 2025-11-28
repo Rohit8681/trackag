@@ -150,10 +150,10 @@ class TaDaSlabController extends Controller
         $slab->save();
 
         // Clear existing slab-wise records
-        TaDaVehicleSlab::where('type', 'slab_wise')->delete();
-        TaDaTourSlab::where('type', 'slab_wise')->delete();
-        TaDaVehicleSlab::where('type', 'individual')->delete();
-        TaDaTourSlab::where('type', 'individual')->delete();
+        TaDaVehicleSlab::where('type', 'slab_wise')->whereNull('user_id')->delete();
+        TaDaTourSlab::where('type', 'slab_wise')->whereNull('user_id')->delete();
+        TaDaVehicleSlab::where('type', 'individual')->whereNull('user_id')->delete();
+        TaDaTourSlab::where('type', 'individual')->whereNull('user_id')->delete();
         
         // --- Individual Slabs ---
         foreach ($request->travel_mode_id as $i => $tmId) {
@@ -191,29 +191,17 @@ class TaDaSlabController extends Controller
                     }
                 }
 
-                // Tour Types
-                // foreach ($request->slab_tour_type[$designationId] ?? [] as $i => $ttId) {
-                //     if(!empty($request->slab_travel_amount[$designationId][$i])){
-                //         TaDaTourSlab::create([
-                //             'ta_da_slab_id' => $slab->id,
-                //             'tour_type_id' => $ttId,
-                //             'da_amount' => $request->slab_tour_amount[$designationId][$i] ?? null,
-                //             'type' => 'slab_wise',
-                //             'designation_id' => $designationId,
-                //         ]);
-                //     }
-                // }
                 foreach ($request->slab_tour_type[$designationId] ?? [] as $i => $ttId) {
-    if(!empty($request->slab_tour_amount[$designationId][$i])){   // <-- FIXED
-        TaDaTourSlab::create([
-            'ta_da_slab_id' => $slab->id,
-            'tour_type_id' => $ttId,
-            'da_amount' => $request->slab_tour_amount[$designationId][$i] ?? null,
-            'type' => 'slab_wise',
-            'designation_id' => $designationId,
-        ]);
-    }
-}
+                    if(!empty($request->slab_tour_amount[$designationId][$i])){   // <-- FIXED
+                        TaDaTourSlab::create([
+                            'ta_da_slab_id' => $slab->id,
+                            'tour_type_id' => $ttId,
+                            'da_amount' => $request->slab_tour_amount[$designationId][$i] ?? null,
+                            'type' => 'slab_wise',
+                            'designation_id' => $designationId,
+                        ]);
+                    }
+                }
             }
         }
 
