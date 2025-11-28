@@ -574,6 +574,9 @@ function openSlabModal(userId) {
                         ? res.ta_da_slab.approved_bills_in_da_slab_wise
                         : JSON.parse(res.ta_da_slab.approved_bills_in_da_slab_wise);
                     $('#approvedSlabBills').val(billsNew).trigger('change');
+                    if(res.slab_designation_id){
+                    $('#designation_id_modal').val(res.slab_designation_id).trigger('change.select2');
+                }
                 }
                     
 
