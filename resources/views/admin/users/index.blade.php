@@ -597,14 +597,13 @@ $(document).ready(function() {
         let userId = $('#user_id').val();
         let slab = $('#slabSelect').val();
         let designationId = $('#designation_id_modal').val();
-        alert(designationId);
 
         $.ajax({
             url: "{{ route('admin.get-user-slab') }}",
             method: "GET",
             data: { user_id: userId, slab: slab, designation_id: designationId },
             success: function (res) {
-
+                console.log(res);
                 // 🔹 Reset Designations
                 $('#designation_id_modal').empty();
             $.each(res.designations, function (i, d) {
