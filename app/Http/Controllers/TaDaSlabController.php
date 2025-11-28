@@ -136,6 +136,7 @@ class TaDaSlabController extends Controller
      */
     public function save(Request $request)
     {
+        dd($request->all());
         $data = $request->validate([
             'max_monthly_travel' => 'nullable|in:yes,no',
             'km' => 'nullable|numeric',
