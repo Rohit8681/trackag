@@ -117,101 +117,6 @@ class ExpenseController extends Controller
         return redirect()->back()->with('error', 'Expense rejected.');
     }
 
-    // public function expenseReport(Request $request)
-    // {
-    //     $query = Trip::with(['user', 'company', 'approvedByUser', 'tripLogs', 'customers', 'travelMode', 'tourType'])
-    //         ->where('approval_status', 'approved');
-
-    //     if ($request->filled('from_date')) {
-    //         $query->whereDate('trip_date', '>=', $request->from_date);
-    //     }
-
-    //     if ($request->filled('to_date')) {
-    //         $query->whereDate('trip_date', '<=', $request->to_date);
-    //     }
-
-    //     if ($request->filled('state_id')) {
-    //         $query->whereHas('user', function ($q) use ($request) {
-    //             $q->where('state_id', $request->state_id);
-    //         });
-    //     }
-
-    //     if ($request->filled('user_id')) {
-    //         $query->where('user_id', $request->user_id);
-    //     }
-
-    //     $data = $query->latest()->get();
-
-    //     // Get dropdown data
-    //     $states = State::where('status',1)->get();
-    //     $employees = User::where('is_active',1)->get();
-
-    //     return view('admin.expense.report', compact('data', 'states', 'employees'));
-    // }
-
-    // public function expenseReport(Request $request)
-    // {
-    //     $from = $request->from_date ?? now()->startOfMonth()->format('Y-m-d');
-    //     $to   = $request->to_date ?? now()->endOfMonth()->format('Y-m-d');
-
-    //     $query = Trip::with(['user', 'company', 'approvedByUser', 'tripLogs', 'customers', 'travelMode', 'tourType'])
-    //         ->where('approval_status', 'approved')
-    //         ->whereDate('trip_date', '>=', $from)
-    //         ->whereDate('trip_date', '<=', $to);
-
-    //     if ($request->filled('state_id')) {
-    //         $query->whereHas('user', function ($q) use ($request) {
-    //             $q->where('state_id', $request->state_id);
-    //         });
-    //     }
-
-    //     if ($request->filled('user_id')) {
-    //         $query->where('user_id', $request->user_id);
-    //     }
-
-    //     $data = $query->latest()->get();
-
-    //     if(!empty($data)){
-    //         foreach ($data as $item) {
-    //             $slabType = "";
-    //             if(isset($item->user->slab)){
-    //                 $slabType = $item->user->slab;
-    //             }
-
-    //             if(!empty($slabType)){
-    //                 if($slabType == "Slab Wise"){
-    //                   $da_amount = TaDaVehicleSlab::where('tour_type_id',$item->tour_type)->whereNull('user_id')->where('designation_id',$item->user->slab_designation_id)->first();
-    //                   $ta_amount = TaDaVehicleSlab::where('travel_mode_id',$item->travel_mode)->whereNull('user_id')->where('designation_id',$item->user->slab_designation_id)->first();
-
-    //                 }else if($slabType == "Individual"){
-    //                   $da_amount = TaDaVehicleSlab::where('tour_type_id',$item->tour_type)->where('user_id',$item->user->id)->first();
-    //                   $ta_amount = TaDaVehicleSlab::where('travel_mode_id',$item->travel_mode)->where('user_id',$item->user->id)->first();
-    //                 }
-
-    //             }
-
-    //             // $expense = Expense::where('trip_id', $item->id)->first();
-    //             $total_km = $item->end_km - $item->starting_km;
-
-    //             $item->ta_exp = $da_amount->da_amount * $total_km ?? 0;
-    //             $item->da_exp = $expense->travelling_allow_per_km ?? 0;
-    //             $item->other_exp = 0;//$expense->other_amount ?? 0;
-
-    //             $item->total_exp = 
-    //                 ($item->ta_exp ?? 0) +
-    //                 ($item->da_exp ?? 0) +
-    //                 ($item->other_exp ?? 0);
-    //         }
-    //     }
-        
-        
-    //     $states = State::where('status', 1)->get();
-    //     $employees = User::where('is_active', 1)->get();
-
-    //     return view('admin.expense.report', compact('data', 'states', 'employees'))
-    //         ->with(['from_date' => $from, 'to_date' => $to]);
-    // }
-
     public function expenseReport(Request $request)
     {
         $from = $request->from_date ?? now()->startOfMonth()->format('Y-m-d');
@@ -266,7 +171,7 @@ class ExpenseController extends Controller
 
             // Expense table
             $expense = Expense::where('user_id', $item->user_id)
-    ->whereDate('bill_date', $item->trip_date)
+    ->whereDate('bill_date', $item->trip_date)->where('approval_status','Approved')
     ->first();
 
             $total_km = ($item->end_km - $item->starting_km);
@@ -288,7 +193,19 @@ class ExpenseController extends Controller
         $states = State::where('status', 1)->get();
         $employees = User::where('is_active', 1)->get();
 
-        return view('admin.expense.report', compact('data', 'states', 'employees'))
-            ->with(['from_date' => $from, 'to_date' => $to]);
+        $total_ta = $data->sum('ta_exp');
+        $total_da = $data->sum('da_exp');
+        $total_other = $data->sum('other_exp');
+        $total_total = $data->sum('total_exp');
+
+        return view('admin.expense.report', compact(
+'data', 
+'states', 
+            'employees',
+            'total_ta',
+            'total_da',
+            'total_other',
+            'total_total'
+            ))->with(['from_date' => $from, 'to_date' => $to]);
     }
 }

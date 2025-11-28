@@ -189,7 +189,7 @@
                                         @endif
 
                                         <!-- Reject -->
-                                        @if($expense->approval_status != 'Rejected')
+                                        @if($expense->approval_status != 'Approved' && $expense->approval_status != 'Rejected')
                                             <form action="{{ route('expense.reject', $expense->id) }}" method="POST"
                                                 class="d-inline">
                                                 @csrf

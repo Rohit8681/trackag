@@ -152,10 +152,19 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="11" class="text-center">No expenses found.</td>
+                                    <td colspan="16" class="text-center">No expenses found.</td>
                                 </tr>
                             @endforelse
                         </tbody>
+                        <tfoot class="table-light">
+                            <tr>
+                                <th colspan="12" class="text-end">TOTAL :</th>
+                                <th>{{ number_format($total_ta, 2) }}</th>
+                                <th>{{ number_format($total_da, 2) }}</th>
+                                <th>{{ number_format($total_other, 2) }}</th>
+                                <th>{{ number_format($total_total, 2) }}</th>
+                            </tr>
+                        </tfoot>
                     </table>
 
                 </div> <!-- /.card-body -->
@@ -168,19 +177,19 @@
 
 @push('scripts')
 <script>
-$(document).ready(function() {
-    var data = @json($data->count());
-    if (data > 0) {
-        $('#expenses-report-table').DataTable({
-            responsive: true,
-            autoWidth: false,
-            pageLength: 10,
-            lengthMenu: [5, 10, 25, 50],
-            columnDefs: [
-                { orderable: false, targets: -1 } // Action column not sortable
-            ]
-        });
-    }
-});
+// $(document).ready(function() {
+//     var data = @json($data->count());
+//     if (data > 0) {
+//         $('#expenses-report-table').DataTable({
+//             responsive: true,
+//             autoWidth: false,
+//             pageLength: 10,
+//             lengthMenu: [5, 10, 25, 50],
+//             columnDefs: [
+//                 { orderable: false, targets: -1 } // Action column not sortable
+//             ]
+//         });
+//     }
+// });
 </script>
 @endpush
