@@ -558,6 +558,7 @@ class ApiTripController extends BaseController
                     'km_diff' => ($data->end_km && $data->starting_km)
                         ? ($data->end_km - $data->starting_km)
                         : 0,
+                    'approval_status' => $data->approval_status,
 
                     'ta_exp' => "",
                     'da_exp' => "",
