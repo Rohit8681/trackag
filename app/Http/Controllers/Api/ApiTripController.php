@@ -525,7 +525,8 @@ class ApiTripController extends BaseController
 
         $trips = Trip::with([
                 'tourType',
-                'travelMode'
+                'travelMode',
+                'purpose',
             ])
             ->where('user_id', $user->id)
             ->latest()
@@ -535,11 +536,9 @@ class ApiTripController extends BaseController
                 return [
                     'id' => $data->id,
                     'trip_date' => $data->trip_date,
-
-                    // Null-safe relation calls
                     'tour_type' => optional($data->tourType)->name,
                     'travel_mode' => optional($data->travelMode)->name,
-
+                    'tour_purpose' => optional($data->purpose)->name,
                     'start_time' => $data->start_time,
                     'end_time' => $data->end_time,
                     'visit_place' => $data->place_to_visit,
@@ -547,7 +546,6 @@ class ApiTripController extends BaseController
                     'starting_km' => $data->starting_km,
                     'end_km' => $data->end_km,
 
-                    // Prevent negative value or null condition
                     'travel_km' => ($data->end_km && $data->starting_km)
                         ? ($data->end_km - $data->starting_km)
                         : 0,
