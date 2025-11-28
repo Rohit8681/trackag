@@ -38,8 +38,7 @@ class TaDaSlabController extends Controller
 
     public function form()
     {
-        $slab = TaDaSlab::first() ?? new TaDaSlab();
-        dd($slab);
+        $slab = TaDaSlab::whereNull('user_id')->first() ?? new TaDaSlab();
         $travelModes = TravelMode::get();
         $tourTypes = TourType::all();
         $designations = Designation::all();
