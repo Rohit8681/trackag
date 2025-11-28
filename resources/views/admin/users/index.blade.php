@@ -611,7 +611,6 @@ $(document).ready(function() {
                 $('#designation_id_modal').append(`<option value="${d.id}" ${selected}>${d.name}</option>`);
             });
                 if(res.slab_designation_id){
-                    alert('hello');
                     $('#designation_id_modal').val(res.slab_designation_id).trigger('change.select2');
                 }
                 
