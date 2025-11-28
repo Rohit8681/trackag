@@ -310,6 +310,7 @@ class UserController extends Controller
             'ta_da_slab' => $taDaSlab,
             'user_slab' => $user->slab,
             'approved_bills_in_da_slab_wise' => $taDaSlab->approved_bills_in_da_slab_wise ?? [],
+            'slab_designation_id' => $user->slab_designation_id ?? [],
         ]);
     }
 

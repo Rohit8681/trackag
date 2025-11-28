@@ -597,6 +597,7 @@ $(document).ready(function() {
         let userId = $('#user_id').val();
         let slab = $('#slabSelect').val();
         let designationId = $('#designation_id_modal').val();
+        alert(designationId);
 
         $.ajax({
             url: "{{ route('admin.get-user-slab') }}",
