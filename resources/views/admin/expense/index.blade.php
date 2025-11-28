@@ -191,7 +191,7 @@
 
                                         <!-- Reject -->
                                         @if($expense->approval_status != 'Rejected' )
-                                            <form action="{{ route('expense.reject', $expense->id) }}" method="POST"
+                                            {{-- <form action="{{ route('expense.reject', $expense->id) }}" method="POST"
                                                 class="d-inline">
                                                 @csrf
                                                 @method('PATCH')
@@ -199,11 +199,42 @@
                                                         onclick="return confirm('Reject this expense?')">
                                                     <i class="fas fa-times"></i>
                                                 </button>
-                                            </form>
+                                            </form> --}}
+                                            <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#rejectModal{{ $expense->id }}">
+                                                <i class="fas fa-times"></i>
+                                            </button>
                                         @endif
                                         
                                     </td>
                                 </tr>
+                                <div class="modal fade" id="rejectModal{{ $expense->id }}" tabindex="-1">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+
+                                            <form action="{{ route('expense.reject', $expense->id) }}" method="POST">
+                                                @csrf
+                                                @method('PATCH')
+
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title">Reject Expense</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                </div>
+
+                                                <div class="modal-body">
+                                                    <label>Rejection Reason *</label>
+                                                    <textarea name="reject_reason" class="form-control" required></textarea>
+                                                </div>
+
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                                                    <button type="submit" class="btn btn-danger btn-sm">Reject</button>
+                                                </div>
+
+                                            </form>
+
+                                        </div>
+                                    </div>
+                                </div>
                             @empty
                                 <tr>
                                     <td colspan="11" class="text-center">No expenses found.</td>

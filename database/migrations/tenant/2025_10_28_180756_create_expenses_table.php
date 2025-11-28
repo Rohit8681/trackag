@@ -22,6 +22,8 @@ return new class extends Migration
             $table->decimal('amount', 10, 2)->default(0);
             $table->string('image')->nullable();
             $table->string('approval_status')->default('Pending');
+            $table->text('reject_reason')->nullable();
+
             $table->timestamps();
             $table->softDeletes(); 
         });
