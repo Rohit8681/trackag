@@ -167,7 +167,7 @@
                                             <i class="fas fa-edit"></i>
                                         </a>
                                         @endif
-
+                                        @if($expense->approval_status != 'Approved')
                                         <form action="{{ route('expense.destroy', $expense->id) }}" method="POST" class="d-inline"
                                             onsubmit="return confirm('Are you sure you want to delete this expense?')">
                                             @csrf
@@ -176,6 +176,7 @@
                                                 <i class="fas fa-trash"></i>
                                             </button>
                                         </form>
+                                        @endif
                                          @if($expense->approval_status != 'Approved')
                                             <form action="{{ route('expense.approve', $expense->id) }}" method="POST"
                                                 class="d-inline">
@@ -189,7 +190,7 @@
                                         @endif
 
                                         <!-- Reject -->
-                                        @if($expense->approval_status != 'Approved' && $expense->approval_status != 'Rejected')
+                                        @if($expense->approval_status != 'Rejected' )
                                             <form action="{{ route('expense.reject', $expense->id) }}" method="POST"
                                                 class="d-inline">
                                                 @csrf
