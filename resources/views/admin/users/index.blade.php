@@ -606,10 +606,11 @@ $(document).ready(function() {
                 console.log(res);
                 // 🔹 Reset Designations
                 $('#designation_id_modal').empty();
-            $.each(res.designations, function (i, d) {
-                let selected = (parseInt(d.id) === parseInt(designationId)) ? 'selected' : '';
-                $('#designation_id_modal').append(`<option value="${d.id}" ${selected}>${d.name}</option>`);
-            });
+                $.each(res.designations, function (i, d) {
+                    let selected = (parseInt(d.id) === parseInt(designationId)) ? 'selected' : '';
+                    $('#designation_id_modal').append(`<option value="${d.id}" ${selected}>${d.name}</option>`);
+                });
+                $('#designation_id_modal').select2();
                 if(res.slab_designation_id){
                     $('#designation_id_modal').val(res.slab_designation_id).trigger('change.select2');
                 }
