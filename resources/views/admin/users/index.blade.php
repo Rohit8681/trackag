@@ -603,7 +603,7 @@ $(document).ready(function() {
             method: "GET",
             data: { user_id: userId, slab: slab, designation_id: designationId },
             success: function (res) {
-                console.log(res.slab_designation_id);
+                console.log(res);
                 // 🔹 Reset Designations
                 $('#designation_id_modal').empty();
             $.each(res.designations, function (i, d) {
