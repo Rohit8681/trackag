@@ -603,15 +603,18 @@ $(document).ready(function() {
             method: "GET",
             data: { user_id: userId, slab: slab, designation_id: designationId },
             success: function (res) {
-                console.log(res);
+                console.log(res.slab_designation_id);
                 // 🔹 Reset Designations
                 $('#designation_id_modal').empty();
             $.each(res.designations, function (i, d) {
                 let selected = (parseInt(d.id) === parseInt(designationId)) ? 'selected' : '';
                 $('#designation_id_modal').append(`<option value="${d.id}" ${selected}>${d.name}</option>`);
             });
-
-                $('#designation_id_modal').val(designationId).trigger('change.select2');
+                if(res.slab_designation_id){
+                    alert('hello');
+                    $('#designation_id_modal').val(res.slab_designation_id).trigger('change.select2');
+                }
+                
 
 
                 // 🔹 Slab Type logic
