@@ -48,14 +48,19 @@
 
                 <!-- Card Body -->
                 <div class="card-body table-responsive">
+                    <div class="mb-2" id="bulkApproveBox" style="display:none;">
+    <button type="button" class="btn btn-success btn-sm" id="approveSelected">
+        Approve Selected
+    </button>
+</div>
 
                     <form action="{{ route('expense.report') }}" method="GET" class="row g-3 mb-3">
 
                         <div class="col-md-2">
                             <label class="form-label">From Date</label>
                             <input type="date" name="from_date"
-       value="{{ request('from_date', $from_date) }}"
-       class="form-control form-control-sm">
+                            value="{{ request('from_date', $from_date) }}"
+                                    class="form-control form-control-sm">
                         </div>
 
                         <div class="col-md-2">
@@ -110,7 +115,7 @@
                     <table id="expenses-report-table" class="table table-bordered table-striped align-middle">
                         <thead class="table-light">
                             <tr>
-                                <th>Sr. No.</th>
+                                <th><input type="checkbox" id="selectAll"></th>
                                 <th>Date</th>
                                 <th>Tour Type</th>
                                 <th>Start Time</th>
@@ -131,7 +136,7 @@
                         <tbody>
                             @forelse($data as $key => $report)
                                 <tr>
-                                    <td>{{ $key + 1 }}</td>
+                                    <td>{{ $key + 1 }}&nbsp;<input type="checkbox" class="rowCheckbox" name="trip_ids[]" value="{{ $report->id }}"></td>
                                     <td>{{ \Carbon\Carbon::parse($report->trip_date)->format('d M Y') }}</td>
                                     <td>{{ $report->tourType->name ?? "-" }}</td>
                                     <td>{{ $report->start_time ?? "-" }}</td>
@@ -177,19 +182,50 @@
 
 @push('scripts')
 <script>
-// $(document).ready(function() {
-//     var data = @json($data->count());
-//     if (data > 0) {
-//         $('#expenses-report-table').DataTable({
-//             responsive: true,
-//             autoWidth: false,
-//             pageLength: 10,
-//             lengthMenu: [5, 10, 25, 50],
-//             columnDefs: [
-//                 { orderable: false, targets: -1 } // Action column not sortable
-//             ]
-//         });
-//     }
-// });
+$(document).ready(function() {
+
+    // Toggle All Checkboxes
+    $("#selectAll").on("change", function() {
+        $(".rowCheckbox").prop("checked", this.checked);
+        toggleApproveButton();
+    });
+
+    // Single row checkbox click
+    $(document).on("change", ".rowCheckbox", function () {
+        if ($(".rowCheckbox:checked").length === $(".rowCheckbox").length) {
+            $("#selectAll").prop("checked", true);
+        } else {
+            $("#selectAll").prop("checked", false);
+        }
+        toggleApproveButton();
+    });
+
+    // Show/hide Approve button
+    function toggleApproveButton() {
+        if ($(".rowCheckbox:checked").length > 0) {
+            $("#bulkApproveBox").show();
+        } else {
+            $("#bulkApproveBox").hide();
+        }
+    }
+
+    // Approve Selected Button Click
+    $("#approveSelected").on("click", function () {
+        let selected = $(".rowCheckbox:checked").length;
+
+        if (selected == 0) {
+            alert("Please select at least one record!");
+            return;
+        }
+
+        if (!confirm("Approve " + selected + " trips?")) {
+            return;
+        }
+
+        // Submit form
+        $("#bulkApproveForm").submit();
+    });
+
+});
 </script>
 @endpush
