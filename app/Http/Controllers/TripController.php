@@ -13,54 +13,6 @@ use App\Models\User;
 
 class TripController extends Controller
 {
-    // public function index(Request $request)
-    // {
-    //     $user = Auth::user();
-    //     $query = Trip::with(['user', 'company', 'approvedByUser', 'tripLogs', 'customers', 'travelMode', 'tourType']);
-
-    //     // 🔹 Role-based access
-    //     if (!($user->hasRole('master_admin') || $user->hasRole('sub_admin'))) {
-    //         $query->where(function ($q) use ($user) {
-    //             $q->where('user_id', $user->id);
-    //             $subordinateIds = \App\Models\User::where('reporting_to', $user->id)->pluck('id');
-    //             if ($subordinateIds->isNotEmpty()) {
-    //                 $q->orWhere(function ($inner) use ($subordinateIds) {
-    //                     $inner->whereIn('user_id', $subordinateIds)
-    //                         ->where('approval_status', 'pending');
-    //                 });
-    //             }
-    //         });
-    //     }
-
-    //     // 🔹 Apply Filters
-    //     if ($request->filled('from_date')) {
-    //         $query->whereDate('trip_date', '>=', $request->from_date);
-    //     }
-
-    //     if ($request->filled('to_date')) {
-    //         $query->whereDate('trip_date', '<=', $request->to_date);
-    //     }
-    //     if ($request->filled('state')) {
-    //         $query->where('state_id', $request->state);
-    //     }
-    //     if ($request->filled('employee')) {
-    //         $query->where('user_id', $request->employee);
-    //     }
-    //     if ($request->filled('approval_status')) {
-    //         $query->where('approval_status', $request->approval_status);
-    //     }
-
-    //     $trips = $query->latest()->get();
-
-    //     // Data for dropdowns
-    //     $states = State::all(['id', 'name']);
-    //     $employees = User::select('id', 'name')->get();
-
-    //     return view('admin.trips.index_new', compact('trips', 'states', 'employees'));
-    // }
-
-    
-    
     public function index(Request $request)
     {
         $user = Auth::user();
@@ -308,6 +260,12 @@ class TripController extends Controller
         $status = $request->input('status', 'approved');
         $reason = $request->input('reason');
         $tripType = $request->input('trip_type'); // full or half
+
+        if ($status === 'approved') {
+            if (empty($trip->starting_km) || empty($trip->ending_km)) {
+                return back()->with('error', 'Please fill both Starting KM and Ending KM before approving.');
+            }
+        }
 
         if ($status === 'denied') {
             $request->validate(['reason' => 'required|string|max:255']);
