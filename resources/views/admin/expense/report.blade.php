@@ -215,21 +215,21 @@ $(document).ready(function() {
     }
 
     // Approve Selected Button Click
-    $("#approveSelected").on("click", function () {
-        let selected = $(".rowCheckbox:checked").length;
+    // $("#approveSelected").on("click", function () {
+    //     let selected = $(".rowCheckbox:checked").length;
 
-        if (selected == 0) {
-            alert("Please select at least one record!");
-            return;
-        }
+    //     if (selected == 0) {
+    //         alert("Please select at least one record!");
+    //         return;
+    //     }
 
-        if (!confirm("Approve " + selected + " trips?")) {
-            return;
-        }
+    //     if (!confirm("Approve " + selected + " trips?")) {
+    //         return;
+    //     }
 
-        // Submit form
-        $("#bulkApproveForm").submit();
-    });
+    //     // Submit form
+    //     $("#bulkApproveForm").submit();
+    // });
 
 });
 
@@ -251,7 +251,7 @@ $("#approveSelected").on("click", function () {
         ids.push($(this).val());
     });
 
-    // Pass to hidden input
+    // Put IDs in hidden input
     $("#trip_ids_input").val(JSON.stringify(ids));
 
     // Submit form
