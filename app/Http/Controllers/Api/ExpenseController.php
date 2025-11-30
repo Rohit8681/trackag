@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Expense;
+use App\Models\Trip;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
@@ -76,6 +77,17 @@ class ExpenseController extends Controller
             $user = Auth::user();
             $data = $validator->validated();
             $data['user_id'] = $user->id ?? $request->user_id;
+
+            $tripExists = Trip::where('user_id', $data['user_id'])
+                ->where('trip_date', $data['bill_date'])
+                ->exists();
+
+            if (!$tripExists) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'No trip found for this user on the given bill date.'
+                ], 422);
+            }
 
             if (!empty($request->main_id)) {
 
