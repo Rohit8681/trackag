@@ -122,6 +122,7 @@
                         <thead class="table-light">
                             <tr>
                                 <th><input type="checkbox" id="selectAll"></th>
+                                <th>Name</th>
                                 <th>Date</th>
                                 <th>Tour Type</th>
                                 <th>Start Time</th>
@@ -143,6 +144,7 @@
                             @forelse($data as $key => $report)
                                 <tr>
                                     <td>{{ $key + 1 }}&nbsp;<input type="checkbox" class="rowCheckbox" name="trip_ids[]" value="{{ $report->id }}"></td>
+                                    <td>{{ $report->user->name ?? "" }}</td>
                                     <td>{{ \Carbon\Carbon::parse($report->trip_date)->format('d M Y') }}</td>
                                     <td>{{ $report->tourType->name ?? "-" }}</td>
                                     <td>{{ $report->start_time ?? "-" }}</td>
