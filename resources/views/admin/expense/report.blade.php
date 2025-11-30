@@ -188,7 +188,7 @@
 @push('scripts')
 <script>
 $(document).ready(function() {
-
+    alert('hello');
     // Toggle All Checkboxes
     $("#selectAll").on("change", function() {
         $(".rowCheckbox").prop("checked", this.checked);
