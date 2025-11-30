@@ -77,6 +77,7 @@
                             class="form-control form-control-sm">
 
                         </div> --}}
+                        <div class="col-md-2">
                         <label for="month" class="form-label">Select Month</label>
                         <select name="month" id="month" class="form-control" onchange="this.form.submit()">
 
@@ -92,6 +93,7 @@
                             @endfor
 
                         </select>
+                        </div>
 
                         <div class="col-md-2">
                             <label class="form-label">State</label>
