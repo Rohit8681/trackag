@@ -63,7 +63,7 @@
 
                     <form action="{{ route('expense.report') }}" method="GET" class="row g-3 mb-3">
 
-                        <div class="col-md-2">
+                        {{-- <div class="col-md-2">
                             <label class="form-label">From Date</label>
                             <input type="date" name="from_date"
                             value="{{ request('from_date', $from_date) }}"
@@ -76,7 +76,22 @@
                             value="{{ request('to_date', $to_date) }}"
                             class="form-control form-control-sm">
 
-                        </div>
+                        </div> --}}
+                        <label for="month" class="form-label">Select Month</label>
+                        <select name="month" id="month" class="form-control" onchange="this.form.submit()">
+
+                            @for ($i = 1; $i <= 12; $i++)
+                                @php
+                                    $value = now()->format('Y') . '-' . str_pad($i, 2, '0', STR_PAD_LEFT);
+                                    $monthName = DateTime::createFromFormat('!m', $i)->format('F');
+                                @endphp
+
+                                <option value="{{ $value }}" {{ $month == $value ? 'selected' : '' }}>
+                                    {{ $monthName }} {{ now()->format('Y') }}
+                                </option>
+                            @endfor
+
+                        </select>
 
                         <div class="col-md-2">
                             <label class="form-label">State</label>
@@ -123,6 +138,7 @@
                         <thead class="table-light">
                             <tr>
                                 <th><input type="checkbox" id="selectAll"></th>
+                                <th>Name</th>
                                 <th>Date</th>
                                 <th>Tour Type</th>
                                 <th>Start Time</th>
@@ -144,6 +160,7 @@
                             @forelse($data as $key => $report)
                                 <tr>
                                     <td>{{ $key + 1 }}&nbsp;<input type="checkbox" class="rowCheckbox" name="trip_ids[]" value="{{ $report->id }}"></td>
+                                    <td>{{ $report->user->name ?? "" }}"></td>
                                     <td>{{ \Carbon\Carbon::parse($report->trip_date)->format('d M Y') }}</td>
                                     <td>{{ $report->tourType->name ?? "-" }}</td>
                                     <td>{{ $report->start_time ?? "-" }}</td>
@@ -164,13 +181,13 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="16" class="text-center">No expenses found.</td>
+                                    <td colspan="17" class="text-center">No expenses found.</td>
                                 </tr>
                             @endforelse
                         </tbody>
                         <tfoot class="table-light">
                             <tr>
-                                <th colspan="12" class="text-end">TOTAL :</th>
+                                <th colspan="13" class="text-end">TOTAL :</th>
                                 <th>{{ number_format($total_ta, 2) }}</th>
                                 <th>{{ number_format($total_da, 2) }}</th>
                                 <th>{{ number_format($total_other, 2) }}</th>

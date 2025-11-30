@@ -9,6 +9,7 @@ use App\Models\TaDaTourSlab;
 use App\Models\TaDaVehicleSlab;
 use App\Models\Trip;
 use App\Models\User;
+use Carbon\Carbon; 
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 
@@ -134,8 +135,11 @@ class ExpenseController extends Controller
 
     public function expenseReport(Request $request)
     {
-        $from = $request->from_date ?? now()->startOfMonth()->format('Y-m-d');
-        $to   = $request->to_date ?? now()->endOfMonth()->format('Y-m-d');
+        // $from = $request->from_date ?? now()->startOfMonth()->format('Y-m-d');
+        // $to   = $request->to_date ?? now()->endOfMonth()->format('Y-m-d');
+        $month = $request->month ?? now()->format('Y-m');
+        $from = Carbon::parse($month . '-01')->startOfMonth()->format('Y-m-d');
+        $to   = Carbon::parse($month . '-01')->endOfMonth()->format('Y-m-d');
 
         $query = Trip::with(['user', 'company', 'approvedByUser', 'tripLogs', 'customers', 'travelMode', 'tourType'])
             ->where('approval_status', 'approved')
@@ -220,35 +224,10 @@ class ExpenseController extends Controller
             'total_ta',
             'total_da',
             'total_other',
-            'total_total'
+            'total_total',
+            'month'
             ))->with(['from_date' => $from, 'to_date' => $to]);
     }
-
-    // public function bulkApprove(Request $request)
-    // {
-    //     $ids = json_decode($request->trip_ids, true);
-
-    //     if (empty($ids)) {
-    //         return back()->with('error', 'No trips selected!');
-    //     }
-
-    //     // Update Status
-    //     // Trip::whereIn('id', $ids)->update([
-    //     //     'final_approval_status' => 'Approved',
-    //     //     'approved_by' => auth()->id(),
-    //     //     'approved_at' => now(),
-    //     // ]);
-
-    //     // Fetch approved trips for PDF
-    //     $trips = Trip::whereIn('id', $ids)->
-    //         with(['user', 'company', 'approvedByUser', 'tripLogs', 'customers', 'travelMode', 'tourType'])
-    //         ->get();
-
-    //     // Generate PDF
-    //     $pdf = Pdf::loadView('admin.expense.pdf.report', compact('trips'));
-
-    //     return $pdf->download('Expense_Report.pdf');
-    // }
 
     public function bulkApprove(Request $request)
     {
