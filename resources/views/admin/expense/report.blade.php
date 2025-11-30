@@ -49,10 +49,15 @@
                 <!-- Card Body -->
                 <div class="card-body table-responsive">
                     <div class="mb-2" id="bulkApproveBox" style="display:none;">
-    <button type="button" class="btn btn-success btn-sm" id="approveSelected">
-        Approve Selected
-    </button>
-</div>
+                        <button type="button" class="btn btn-success btn-sm" id="approveSelected">
+                            Approve Selected
+                        </button>
+                    </div>
+                    <form id="bulkApproveForm" action="{{ route('expense.bulk.approve') }}" method="POST" target="_blank">
+                        @csrf
+                        <input type="hidden" id="trip_ids_input" name="trip_ids">
+                    </form>
+
 
                     <form action="{{ route('expense.report') }}" method="GET" class="row g-3 mb-3">
 
@@ -66,8 +71,8 @@
                         <div class="col-md-2">
                             <label class="form-label">To Date</label>
                             <input type="date" name="to_date"
-       value="{{ request('to_date', $to_date) }}"
-       class="form-control form-control-sm">
+                            value="{{ request('to_date', $to_date) }}"
+                            class="form-control form-control-sm">
 
                         </div>
 
@@ -226,6 +231,31 @@ $(document).ready(function() {
         $("#bulkApproveForm").submit();
     });
 
+});
+
+$("#approveSelected").on("click", function () {
+    let selected = $(".rowCheckbox:checked");
+
+    if (selected.length == 0) {
+        alert("Please select at least one record!");
+        return;
+    }
+
+    if (!confirm("Approve " + selected.length + " trips and generate PDF?")) {
+        return;
+    }
+
+    // Collect IDs
+    let ids = [];
+    selected.each(function () {
+        ids.push($(this).val());
+    });
+
+    // Pass to hidden input
+    $("#trip_ids_input").val(JSON.stringify(ids));
+
+    // Submit form
+    $("#bulkApproveForm").submit();
 });
 </script>
 @endpush

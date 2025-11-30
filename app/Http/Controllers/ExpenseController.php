@@ -9,6 +9,7 @@ use App\Models\TaDaVehicleSlab;
 use App\Models\Trip;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class ExpenseController extends Controller
 {
@@ -220,5 +221,31 @@ class ExpenseController extends Controller
             'total_other',
             'total_total'
             ))->with(['from_date' => $from, 'to_date' => $to]);
+    }
+
+    public function bulkApprove(Request $request)
+    {
+        $ids = json_decode($request->trip_ids, true);
+
+        if (empty($ids)) {
+            return back()->with('error', 'No trips selected!');
+        }
+
+        // Update Status
+        // Trip::whereIn('id', $ids)->update([
+        //     'final_approval_status' => 'Approved',
+        //     'approved_by' => auth()->id(),
+        //     'approved_at' => now(),
+        // ]);
+
+        // Fetch approved trips for PDF
+        $trips = Trip::whereIn('id', $ids)
+            ->with(['user', 'travelMode', 'tourType'])
+            ->get();
+
+        // Generate PDF
+        $pdf = Pdf::loadView('admin.expense.pdf.report', compact('trips'));
+
+        return $pdf->download('Expense_Report.pdf');
     }
 }
