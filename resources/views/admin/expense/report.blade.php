@@ -191,6 +191,7 @@ $(document).ready(function() {
     alert('hello');
     // Toggle All Checkboxes
     $("#selectAll").on("change", function() {
+        alert('hello change function');
         $(".rowCheckbox").prop("checked", this.checked);
         toggleApproveButton();
     });
