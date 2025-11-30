@@ -186,7 +186,7 @@
 @endsection
 
 
-{{-- @push('scripts')
+@push('scripts')
 <script>
 $(document).ready(function() {
     alert('hello');
@@ -261,4 +261,4 @@ $("#approveSelected").on("click", function () {
     $("#bulkApproveForm").submit();
 });
 </script>
-@endpush --}}
+@endpush
