@@ -79,7 +79,7 @@
                         </div> --}}
                         <div class="col-md-2">
                         <label for="month" class="form-label">Select Month</label>
-                        <select name="month" id="month" class="form-control" onchange="this.form.submit()">
+                        <select name="month" id="month" class="form-select form-select-sm">
 
                             @for ($i = 1; $i <= 12; $i++)
                                 @php
