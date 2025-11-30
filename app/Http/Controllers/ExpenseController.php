@@ -316,14 +316,13 @@ class ExpenseController extends Controller
         $total_total = $trips->sum('total_exp');
         $company = Company::first();
         $getUser = User::with('designation','reportingManager')->where('id',$selected_user_id)->first();
-        dd($getUser);
 
         $headerInfo = [
             'company_name' => $company ? $company->name : '-',
             'employee_name' => $getUser->name,
-            'designation' => auth()->user()->designation->name ?? '-',
-            'reporting_to' => auth()->user()->reporting_to ?? '-',
-            'hq' => auth()->user()->hq ?? '-',
+            'designation' => $getUser->designation->name ?? '-',
+            'reporting_to' => $getUser->reportingManager->name ?? '-',
+            'hq' => $getUser->headquarter ?? '-',
             'from_date' => $trips->min('trip_date'),
             'to_date' => $trips->max('trip_date')
         ];
