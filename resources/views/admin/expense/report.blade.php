@@ -165,13 +165,13 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="16" class="text-center">No expenses found.</td>
+                                    <td colspan="17" class="text-center">No expenses found.</td>
                                 </tr>
                             @endforelse
                         </tbody>
                         <tfoot class="table-light">
                             <tr>
-                                <th colspan="12" class="text-end">TOTAL :</th>
+                                <th colspan="13" class="text-end">TOTAL :</th>
                                 <th>{{ number_format($total_ta, 2) }}</th>
                                 <th>{{ number_format($total_da, 2) }}</th>
                                 <th>{{ number_format($total_other, 2) }}</th>
