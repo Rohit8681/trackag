@@ -234,6 +234,7 @@ $(document).ready(function() {
 });
 
 $("#approveSelected").on("click", function () {
+    alert('hello');
     let selected = $(".rowCheckbox:checked");
 
     if (selected.length == 0) {
@@ -250,7 +251,7 @@ $("#approveSelected").on("click", function () {
     selected.each(function () {
         ids.push($(this).val());
     });
-
+    console.log(ids);
     // Put IDs in hidden input
     $("#trip_ids_input").val(JSON.stringify(ids));
 
