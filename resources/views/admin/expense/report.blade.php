@@ -57,6 +57,7 @@
                     <form id="bulkApproveForm" action="{{ route('expense.bulk.approve') }}" method="POST" target="_blank">
                         @csrf
                         <input type="hidden" id="trip_ids_input" name="trip_ids">
+                        <input type="hidden" id="selected_user_id" name="selected_user_id">
                     </form>
 
 
@@ -92,7 +93,7 @@
 
                         <div class="col-md-2">
                             <label class="form-label">Employee</label>
-                            <select name="user_id" class="form-select form-select-sm">
+                            <select name="user_id" id="user_id" class="form-select form-select-sm">
                                 <option value="">All</option>
                                 @foreach($employees as $user)
                                     <option value="{{ $user->id }}"
@@ -234,8 +235,13 @@ $(document).ready(function() {
 });
 
 $("#approveSelected").on("click", function () {
-    alert('hello');
     let selected = $(".rowCheckbox:checked");
+    let selectedUserId = $("#user_id").val();
+
+    if(selectedUserId == ""){
+        alert("Please select Employee");
+        return;
+    }
 
     if (selected.length == 0) {
         alert("Please select at least one record!");
@@ -254,6 +260,7 @@ $("#approveSelected").on("click", function () {
     console.log(ids);
     // Put IDs in hidden input
     $("#trip_ids_input").val(JSON.stringify(ids));
+    $('#selected_user_id').val(selectedUserId);
 
     // Submit form
     $("#bulkApproveForm").submit();

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Company;
 use App\Models\Expense;
 use App\Models\State;
 use App\Models\TaDaTourSlab;
@@ -252,6 +253,7 @@ class ExpenseController extends Controller
     public function bulkApprove(Request $request)
     {
         $ids = json_decode($request->trip_ids, true);
+        $selected_user_id = $request->selected_user_id;
 
         if (empty($ids)) {
             return back()->with('error', 'No trips selected!');
@@ -312,10 +314,13 @@ class ExpenseController extends Controller
         $total_da = $trips->sum('da_exp');
         $total_other = $trips->sum('other_exp');
         $total_total = $trips->sum('total_exp');
+        $company = Company::first();
+        $getUser = User::with('designation','reportingManager')->where('id',$selected_user_id)->first();
+        dd($getUser);
 
         $headerInfo = [
-            'company_name' => $trips->first()->company->name ?? '-',
-            'employee_name' => auth()->user()->name,
+            'company_name' => $company ? $company->name : '-',
+            'employee_name' => $getUser->name,
             'designation' => auth()->user()->designation->name ?? '-',
             'reporting_to' => auth()->user()->reporting_to ?? '-',
             'hq' => auth()->user()->hq ?? '-',

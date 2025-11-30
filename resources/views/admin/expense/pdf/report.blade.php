@@ -2,21 +2,72 @@
 <html>
 <head>
     <title>Expense Report PDF</title>
+
     <style>
-        body { font-family: Arial, sans-serif; font-size:12px; }
-        table { width: 100%; border-collapse: collapse; margin-top:10px; }
-        th, td { border:1px solid #000; padding:5px; text-align:left; font-size:11px; }
-        th { background:#f2f2f2; }
-        .header-table td { border:none; padding:3px 5px; }
-        .header-table tr td:first-child { width:150px; font-weight:bold; }
-        h3 { margin-bottom:5px; }
+        body { 
+            font-family: Arial, sans-serif; 
+            font-size:10px; 
+            padding: 10px; 
+        }
+
+        h3 { margin: 0 0 5px 0; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed; /* VERY IMPORTANT */
+        }
+
+        th, td {
+            border:1px solid #000;
+            padding: 3px;
+            font-size:9px;
+            word-wrap: break-word;
+        }
+
+        th {
+            background:#f1f1f1;
+        }
+
+        /* Header Info Table */
+        .header-table td {
+            border:none;
+            padding: 2px 4px;
+            font-size:10px;
+        }
+
+        .header-table tr td:first-child {
+            width: 130px;
+            font-weight: bold;
+        }
+
+        /* FIX EXTRA-WIDE COLUMNS */
+        th:nth-child(1), td:nth-child(1) { width: 20px; }  /* Sr */
+        th:nth-child(2), td:nth-child(2) { width: 70px; }  /* Name */
+        th:nth-child(3), td:nth-child(3) { width: 45px; }  /* Date */
+        th:nth-child(4), td:nth-child(4) { width: 70px; }  /* Tour Type */
+        th:nth-child(5), td:nth-child(5) { width: 45px; }  /* Start Time */
+        th:nth-child(6), td:nth-child(6) { width: 45px; }  /* End Time */
+        th:nth-child(7), td:nth-child(7) { width: 70px; }  /* Visit Places */
+        th:nth-child(8), td:nth-child(8) { width: 70px; }  /* Travel Mode */
+        th:nth-child(9), td:nth-child(9) { width: 40px; }  /* Start KM */
+        th:nth-child(10), td:nth-child(10) { width: 40px; } /* End KM */
+        th:nth-child(11), td:nth-child(11) { width: 40px; } /* Travel KM */
+        th:nth-child(12), td:nth-child(12) { width: 40px; } /* GPS KM */
+        th:nth-child(13), td:nth-child(13) { width: 40px; } /* KM diff */
+        th:nth-child(14), td:nth-child(14),
+        th:nth-child(15), td:nth-child(15),
+        th:nth-child(16), td:nth-child(16),
+        th:nth-child(17), td:nth-child(17) { width: 55px; } /* EXP Columns */
+
     </style>
 </head>
+
 <body>
 
 <h3>Approved Expense Report</h3>
 
-<!-- Header Info -->
+<!-- HEADER INFO -->
 <table class="header-table">
     <tr>
         <td>Company Name:</td>
@@ -38,7 +89,7 @@
     </tr>
 </table>
 
-<!-- Trips Table -->
+<!-- TRIPS TABLE -->
 <table>
     <thead>
         <tr>
@@ -61,6 +112,7 @@
             <th>Total</th>
         </tr>
     </thead>
+
     <tbody>
         @foreach ($trips as $k => $t)
         <tr>
@@ -83,12 +135,14 @@
             <td>{{ number_format($t->total_exp ?? 0, 2) }}</td>
         </tr>
         @endforeach
+
         @if($trips->isEmpty())
         <tr>
             <td colspan="17" style="text-align:center;">No trips found.</td>
         </tr>
         @endif
     </tbody>
+
     <tfoot>
         <tr>
             <th colspan="13" style="text-align:right;">TOTAL :</th>
