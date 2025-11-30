@@ -223,6 +223,32 @@ class ExpenseController extends Controller
             ))->with(['from_date' => $from, 'to_date' => $to]);
     }
 
+    // public function bulkApprove(Request $request)
+    // {
+    //     $ids = json_decode($request->trip_ids, true);
+
+    //     if (empty($ids)) {
+    //         return back()->with('error', 'No trips selected!');
+    //     }
+
+    //     // Update Status
+    //     // Trip::whereIn('id', $ids)->update([
+    //     //     'final_approval_status' => 'Approved',
+    //     //     'approved_by' => auth()->id(),
+    //     //     'approved_at' => now(),
+    //     // ]);
+
+    //     // Fetch approved trips for PDF
+    //     $trips = Trip::whereIn('id', $ids)->
+    //         with(['user', 'company', 'approvedByUser', 'tripLogs', 'customers', 'travelMode', 'tourType'])
+    //         ->get();
+
+    //     // Generate PDF
+    //     $pdf = Pdf::loadView('admin.expense.pdf.report', compact('trips'));
+
+    //     return $pdf->download('Expense_Report.pdf');
+    // }
+
     public function bulkApprove(Request $request)
     {
         $ids = json_decode($request->trip_ids, true);
@@ -231,21 +257,75 @@ class ExpenseController extends Controller
             return back()->with('error', 'No trips selected!');
         }
 
-        // Update Status
-        // Trip::whereIn('id', $ids)->update([
-        //     'final_approval_status' => 'Approved',
-        //     'approved_by' => auth()->id(),
-        //     'approved_at' => now(),
-        // ]);
-
         // Fetch approved trips for PDF
         $trips = Trip::whereIn('id', $ids)
-            ->with(['user', 'travelMode', 'tourType'])
+            ->with(['user', 'company', 'approvedByUser', 'tripLogs', 'customers', 'travelMode', 'tourType'])
             ->get();
 
-        // Generate PDF
-        $pdf = Pdf::loadView('admin.expense.pdf.report', compact('trips'));
+        // Compute TA, DA, Other, Total for PDF
+        foreach ($trips as $item) {
+
+            $slabType = $item->user->slab ?? "";
+
+            $da_amount = null;
+            $ta_amount = null;
+
+            if ($slabType == "Slab Wise") {
+                $da_amount = TaDaTourSlab::where('tour_type_id', $item->tour_type)
+                    ->whereNull('user_id')
+                    ->where('designation_id', $item->user->slab_designation_id)
+                    ->first();
+
+                $ta_amount = TaDaVehicleSlab::where('travel_mode_id', $item->travel_mode)
+                    ->whereNull('user_id')
+                    ->where('designation_id', $item->user->slab_designation_id)
+                    ->first();
+            }
+
+            if ($slabType == "Individual") {
+                $da_amount = TaDaTourSlab::where('tour_type_id', $item->tour_type)
+                    ->where('user_id', $item->user->id)
+                    ->first();
+
+                $ta_amount = TaDaVehicleSlab::where('travel_mode_id', $item->travel_mode)
+                    ->where('user_id', $item->user->id)
+                    ->first();
+            }
+
+            $expense = Expense::where('user_id', $item->user_id)
+                ->whereDate('bill_date', $item->trip_date)
+                ->where('approval_status', 'Approved')
+                ->first();
+
+            $total_km = ($item->end_km - $item->starting_km);
+
+            $da_amount_per_km = $da_amount->da_amount ?? 0;
+            $ta_amount_per_km = $ta_amount->travelling_allow_per_km ?? 0;
+
+            $item->ta_exp = $ta_amount_per_km * $total_km;
+            $item->da_exp = $da_amount_per_km;
+            $item->other_exp = $expense->amount ?? 0;
+            $item->total_exp = $item->ta_exp + $item->da_exp + $item->other_exp;
+        }
+
+        $total_ta = $trips->sum('ta_exp');
+        $total_da = $trips->sum('da_exp');
+        $total_other = $trips->sum('other_exp');
+        $total_total = $trips->sum('total_exp');
+
+        $headerInfo = [
+            'company_name' => $trips->first()->company->name ?? '-',
+            'employee_name' => auth()->user()->name,
+            'designation' => auth()->user()->designation->name ?? '-',
+            'reporting_to' => auth()->user()->reporting_to ?? '-',
+            'hq' => auth()->user()->hq ?? '-',
+            'from_date' => $trips->min('trip_date'),
+            'to_date' => $trips->max('trip_date')
+        ];
+
+        $pdf = Pdf::loadView('admin.expense.pdf.report', compact('trips','total_ta','total_da','total_other','total_total','headerInfo'));
 
         return $pdf->download('Expense_Report.pdf');
     }
+
 }
