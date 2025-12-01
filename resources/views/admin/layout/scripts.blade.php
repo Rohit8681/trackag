@@ -289,7 +289,7 @@ map.setCenter(pathCoordinates[0]);
 }
 
 
-document.addEventListener("DOMContentLoaded", initMap);
+// document.addEventListener("DOMContentLoaded", initMap);
 </script>
 
 
