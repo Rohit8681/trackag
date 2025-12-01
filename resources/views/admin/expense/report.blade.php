@@ -44,6 +44,17 @@
                 <!-- Card Header -->
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="card-title mb-0">Expenses Report List</h5>
+                    <div>
+                        <a href="{{ route('expense.report.pdf', request()->all()) }}" 
+                        class="btn btn-danger btn-sm" target="_blank">
+                            <i class="fas fa-file-pdf"></i> Export PDF
+                        </a>
+
+                        <a href="{{ route('expense.report.excel', request()->all()) }}" 
+                        class="btn btn-success btn-sm">
+                            <i class="fas fa-file-excel"></i> Export Excel
+                        </a>
+                    </div>
                     
                 </div>
 

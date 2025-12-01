@@ -110,15 +110,6 @@ class ExpenseController extends Controller
 
         return redirect()->back()->with('success', 'Expense approved successfully.');
     }
-
-    // public function reject($id)
-    // {
-    //     $expense = Expense::findOrFail($id);
-    //     $expense->approval_status = 'Rejected';
-    //     $expense->save();
-
-    //     return redirect()->back()->with('error', 'Expense rejected.');
-    // }
     public function reject(Request $request, $id)
     {
         $request->validate([

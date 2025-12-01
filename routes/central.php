@@ -180,7 +180,9 @@ Route::middleware(['web'])->group(function () {
             Route::patch('expense/{id}/reject', [ExpenseController::class, 'reject'])->name('expense.reject');
             Route::get('expense-report', [ExpenseController::class, 'expenseReport'])->name('expense.report');
             Route::post('expense/bulk-approve', [ExpenseController::class, 'bulkApprove'])
-    ->name('expense.bulk.approve');
+            ->name('expense.bulk.approve');
+            Route::get('/expense-report/pdf', [ExpenseController::class, 'exportPDF'])->name('expense.report.pdf');
+            Route::get('/expense-report/excel', [ExpenseController::class, 'exportExcel'])->name('expense.report.excel');
             Route::resource('brochure', BrochureController::class);
             Route::resource('price', PriceController::class);
             Route::resource('products', ProductController::class);
