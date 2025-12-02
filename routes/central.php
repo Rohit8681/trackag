@@ -89,8 +89,8 @@ Route::middleware(['web'])->group(function () {
         return redirect()->route('admin.login');
     });
     Route::get('/sample-download', function () {
-    return redirect('https://testing.trackag.in/sample-files/customers_sample.xlsx');
-});
+        return redirect('https://testing.trackag.in/sample-files/customers_sample.xlsx');
+    })->name('customers.sample-download');
 
 
     // Admin (central) routes
