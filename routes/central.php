@@ -91,11 +91,11 @@ Route::middleware(['web'])->group(function () {
 
     Route::get('/sample-download', function () {
         // $filePath = public_path('sample-files\customers_sample.xlsx');
-        $filePath = public_path('sample-files/customers_sample.xlsx');
-        dd($filePath);
-        if (!file_exists($filePath)) {
-            return abort(404, 'Sample file not found at: ' . $filePath);
-        }
+        $filePath = "https://testing.trackag.in/sample-files/customers_sample.xlsx";
+        
+        // if (!file_exists($filePath)) {
+        //     return abort(404, 'Sample file not found at: ' . $filePath);
+        // }
 
         return response()->download($filePath, 'customers_sample.xlsx', [
             'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
