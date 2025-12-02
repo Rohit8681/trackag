@@ -402,7 +402,7 @@
                                                     <td>{{ $log->longitude }}</td>
                                                     <td>{{ $log->battery_percentage ?? 'N/A' }}%</td>
                                                     <td>
-                                                        @if ($log->gps_status)
+                                                        @if ($log->gps_status == 1)
                                                             <span class="badge bg-success">On</span>
                                                         @else
                                                             <span class="badge bg-danger">Off</span>
