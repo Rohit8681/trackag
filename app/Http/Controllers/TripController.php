@@ -262,7 +262,6 @@ class TripController extends Controller
         $tripType = $request->input('trip_type'); // full or half
 
         if ($status === 'approved') {
-            dd($trip->starting_km,$trip->end_km);
             if (empty($trip->starting_km) || empty($trip->end_km)) {
                 return back()->with('error', 'Please fill both Starting KM and Ending KM before approving.');
             }
