@@ -88,19 +88,23 @@ Route::middleware(['web'])->group(function () {
     Route::get('/', function () {
         return redirect()->route('admin.login');
     });
-
     Route::get('/sample-download', function () {
-        // $filePath = public_path('sample-files\customers_sample.xlsx');
-        $filePath = "https://testing.trackag.in/sample-files/customers_sample.xlsx";
-        
-        // if (!file_exists($filePath)) {
-        //     return abort(404, 'Sample file not found at: ' . $filePath);
-        // }
+    return redirect('https://testing.trackag.in/sample-files/customers_sample.xlsx');
+});
 
-        return response()->download($filePath, 'customers_sample.xlsx', [
-            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        ]);
-    })->name('customers.sample-download');
+
+    // Route::get('/sample-download', function () {
+    //     // $filePath = public_path('sample-files\customers_sample.xlsx');
+    //     $filePath = "https://testing.trackag.in/sample-files/customers_sample.xlsx";
+        
+    //     // if (!file_exists($filePath)) {
+    //     //     return abort(404, 'Sample file not found at: ' . $filePath);
+    //     // }
+
+    //     return response()->download($filePath, 'customers_sample.xlsx', [
+    //         'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    //     ]);
+    // })->name('customers.sample-download');
 
     // Admin (central) routes
     Route::prefix('admin')->group(function () {
