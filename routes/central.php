@@ -91,6 +91,7 @@ Route::middleware(['web'])->group(function () {
 
     Route::get('/sample-download', function () {
         $filePath = public_path('sample-files\customers_sample.xlsx');
+        dd($filePath);
         if (!file_exists($filePath)) {
             return abort(404, 'Sample file not found at: ' . $filePath);
         }
