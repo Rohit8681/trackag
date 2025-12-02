@@ -286,14 +286,11 @@ class CompanyController extends Controller
 
     public function show(Company $company)
     {
-        //$this->authorizeCompanyAccess($company);
-
         return view('admin.companies.show', compact('company'));
     }
 
     public function edit(Company $company)
     {
-        // $this->authorizeCompanyAccess($company);
         $state = State::where('status', 1)->get();
         return view('admin.companies.edit', compact('company', 'state'));
     }
@@ -304,7 +301,6 @@ class CompanyController extends Controller
 
         $validated = $request->validated();
 
-        // Handle logo upload
         if ($request->hasFile('logo')) {
             $validated['logo'] = $request->file('logo')->store('logos', 'public');
         }

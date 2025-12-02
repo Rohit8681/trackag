@@ -10,15 +10,10 @@ use App\Models\Tenant;
 
 class EnsureTenantDatabase
 {
-    /**
-     * Handle an incoming request.
-     */
     public function handle(Request $request, Closure $next)
     {
-        // Get current domain
         $domain = $request->getHost();
 
-        // Central domains (skip tenancy)
         $centralDomains = ['127.0.0.1', 'localhost'];
         if (in_array($domain, $centralDomains)) {
             return $next($request);
@@ -32,10 +27,8 @@ class EnsureTenantDatabase
             $databaseName = (string) $tenant->tenancy_db_name;
 
             if ($databaseName) {
-                // Set tenant DB connection dynamically
                 Config::set("database.connections.tenant.database", $databaseName);
 
-                // Purge and reconnect to tenant
                 DB::purge('tenant');
                 DB::reconnect('tenant');
 
@@ -44,9 +37,9 @@ class EnsureTenantDatabase
 
                 try {
                     $currentDb = DB::connection()->getDatabaseName(); // now points to tenant
-                    \Log::info("✅ Tenant DB connected: {$currentDb} for domain: {$domain}");
+                    //\Log::info("✅ Tenant DB connected: {$currentDb} for domain: {$domain}");
                 } catch (\Exception $e) {
-                    \Log::error("❌ Tenant DB connection failed for {$databaseName}: " . $e->getMessage());
+                    //\Log::error("❌ Tenant DB connection failed for {$databaseName}: " . $e->getMessage());
 
                     return response()->json([
                         'error' => 'Database connection failed',
