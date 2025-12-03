@@ -504,19 +504,22 @@ class ApiTripController extends BaseController
         $request->validate([
             'user_id' => 'required|integer',
             'gps_flag' => 'required|in:0,1',
+            'trip_id' => 'required|integer'
         ]);
 
         // Save record
         $log = GpsLog::create([
             'user_id' => $request->user_id,
             'gps_flag' => $request->gps_flag,
+            'trip_id' => $request->trip_id
         ]);
 
-        return response()->json([
-            "status" => true,
-            "message" => "GPS Log Saved Successfully",
-            "data" => $log
-        ], 200);
+        // return response()->json([
+        //     "status" => true,
+        //     "message" => "GPS Log Saved Successfully",
+        //     "data" => $log
+        // ], 200);
+        return $this->sendResponse($log, "GPS Log Saved Successfully");
     }
 
    public function getMyTrips(Request $request)
