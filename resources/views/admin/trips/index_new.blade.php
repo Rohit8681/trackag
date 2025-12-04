@@ -175,8 +175,28 @@
                                                 <span class="fw-semibold text-dark">{{ $trip->user->name ?? 'N/A' }}</span><br>
                                                 {{-- <small class="text-muted">{{ $trip->company->name ?? '' }}</small> --}}
                                             </td>
-
                                             <td>
+                                                 <div>
+                                                    <strong>Start:</strong>
+                                                    @php $startTime = $trip->start_time; @endphp
+                                                    <span class="text-success">
+                                                        {{ $startTime ? \Carbon\Carbon::parse($startTime)->format('d-m-Y H:i a') : '-' }}
+                                                    </span>
+                                                </div>
+                                                <div>
+                                                    <strong>End:</strong>
+                                                    @if ($trip->status === 'completed')
+                                                        @php $endTime = $trip->end_time; @endphp
+                                                        <span class="text-danger">
+                                                            {{ $endTime ? \Carbon\Carbon::parse($endTime)->format('d-m-Y H:i a') : '-' }}
+                                                        </span>
+                                                    @else
+                                                        <span class="badge bg-warning text-dark">Running</span>
+                                                    @endif
+                                                </div>
+                                            </td>
+
+                                            {{-- <td>
                                                 <div>
                                                     <strong>Start:</strong>
                                                     @php $startTime = $trip->tripLogs->min('recorded_at'); @endphp
@@ -195,7 +215,8 @@
                                                         <span class="badge bg-warning text-dark">Running</span>
                                                     @endif
                                                 </div>
-                                            </td>
+                                            </td> --}}
+
 
                                             <td>
                                                 <span class="badge bg-info text-dark px-3 py-2">
@@ -245,7 +266,7 @@
                                             </td>
 
                                             <td class="text-center">
-                                                <a href="{{ route('trips.show', $trip) }}" class="text-primary small" title="view map">
+                                                <a href="{{ route('trips.show', $trip) }}" target="_blank" class="text-primary small" title="view map">
                                                     View Map
                                                 </a>
                                                 <br>
@@ -270,15 +291,6 @@
                                                             Pending
                                                         </button>
                                                         <ul class="dropdown-menu shadow-sm">
-                                                            {{-- <li>
-                                                                <form method="POST" action="{{ route('trips.approve', $trip->id) }}">
-                                                                    @csrf
-                                                                    <input type="hidden" name="status" value="approved">
-                                                                    <button type="submit" class="dropdown-item text-success">
-                                                                        <i class="fas fa-check me-1"></i> Approve
-                                                                    </button>
-                                                                </form>
-                                                            </li> --}}
                                                              <li>
                                                                 <a href="#" class="dropdown-item text-success" data-bs-toggle="modal"
                                                                 data-bs-target="#approveModal{{ $trip->id }}">
