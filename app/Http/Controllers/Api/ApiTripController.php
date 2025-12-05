@@ -254,23 +254,18 @@ class ApiTripController extends BaseController
             'start_time'     => 'nullable',
             'start_lat'      => 'required|numeric',
             'start_lng'      => 'required|numeric',
-            // 'travel_mode'    => 'required|exists:travel_modes,id',
             'travel_mode'    => 'required',
-            // 'purpose'        => 'required|exists:purposes,id',
             'purpose'        => 'required',
-            // 'tour_type'      => 'required|exists:tour_types,id',
             'tour_type'      => 'required',
             'place_to_visit' => 'nullable|string',
             'starting_km'    => 'nullable|string',
             'start_km_photo' => 'nullable|mimes:jpeg,jpg,png,bmp,gif,svg,webp,tiff,ico|max:5120',
             'customer_ids'   => 'nullable|array',
-            // 'customer_ids.*' => 'exists:customers,id'
         ]);
          Log::info('VALIDATED TRIP DATA', $validated);
 
         $user = Auth::user();
          Log::info('AUTH USER', ['user_id' => $user->id]);
-        // Handle photo uploads
         $startKmPhoto = null;
         if ($request->hasFile('start_km_photo')) {
             try {
@@ -330,10 +325,18 @@ class ApiTripController extends BaseController
             'status'            => 'pending',
             'approval_status'   => 'pending',
         ]);
-        Log::info('TRIP CREATED SUCCESSFULLY', [
-        'trip_id' => $trip->id,
-        'user_id' => $user->id,
-    ]);
+
+        if($trip){
+            TripLog::create([
+                'trip_id' => $trip->id,
+                'latitude' => $validated['start_lat'],
+                'longitude' => $validated['start_lng'],
+                'gps_status' => 1,
+                'battery_percentage' => 0,
+                'recorded_at' => $validated['start_time'],
+            ]);
+        }
+        Log::info('TRIP CREATED SUCCESSFULLY', ['trip_id' => $trip->id,'user_id' => $user->id,]);
 
         // Attach customers if provided
         if (!empty($validated['customer_ids'])) {
