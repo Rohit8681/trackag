@@ -333,7 +333,7 @@ class ApiTripController extends BaseController
                 'longitude' => $validated['start_lng'],
                 'gps_status' => 1,
                 'battery_percentage' => 0,
-                'recorded_at' => $validated['start_time'],
+                'recorded_at' => now()->toTimeString(),
             ]);
         }
         Log::info('TRIP CREATED SUCCESSFULLY', ['trip_id' => $trip->id,'user_id' => $user->id,]);
