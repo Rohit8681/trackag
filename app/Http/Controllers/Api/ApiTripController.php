@@ -99,56 +99,6 @@ class ApiTripController extends BaseController
         return $this->sendResponse($trips, "Trips fetched successfully");
     }
     
-
-    // public function logPoint(Request $request)
-    // {
-    //     // Validate incoming request
-    //     $validated = $request->validate([
-    //         'location' => 'required|array|min:1',
-    //         // 'location.*.tripId' => 'required|exists:trips,id',
-    //         'location.*.tripId' => 'required',
-    //         'location.*.latitude' => 'required|numeric',
-    //         'location.*.longitude' => 'required|numeric',
-    //         'location.*.gps_status' => 'nullable',
-    //         'location.*.battery_percentage' => 'nullable',
-    //         'location.*.recorded_at' => 'nullable|date',
-    //     ]);
-
-    //     $locations = $validated['location'];
-
-    //     // Check for completed trips
-    //     $tripIds = collect($locations)->pluck('trip_id');
-    //     $completedTrips = Trip::whereIn('id', $tripIds)
-    //         ->where('status', 'completed')
-    //         ->pluck('id')
-    //         ->toArray();
-
-    //     if (!empty($completedTrips)) {
-    //         return response()->json([
-    //             'success' => false,
-    //             'message' => "Cannot log points for completed trips: " . implode(', ', $completedTrips)
-    //         ], 403);
-    //     }
-
-    //     // Insert logs safely within a transaction
-    //     $logs = DB::transaction(function () use ($locations) {
-    //         return collect($locations)->map(function ($loc) {
-    //             return TripLog::create([
-    //                 'trip_id' => $loc['tripId'],
-    //                 'latitude' => $loc['latitude'],
-    //                 'longitude' => $loc['longitude'],
-    //                 'gps_status' => $loc['gps_status'] ?? null,
-    //                 'battery_percentage' => ($loc['battery_percentage'] === "null" || $loc['battery_percentage'] === null)
-    //                     ? null
-    //                     : $loc['battery_percentage'],
-    //                 'recorded_at' => $loc['recorded_at'],
-    //             ]);
-    //         });
-    //     });
-    //     return $this->sendResponse($logs, "Trip logs recorded successfully");
-    // }
-
-
     public function logPoint(Request $request)
     {
         // 🪵 Log the entire incoming request
