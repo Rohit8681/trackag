@@ -9,9 +9,13 @@ use Illuminate\Support\Facades\Session;
 
 class DesignationController extends Controller
 {
-    /**
-     * List all designations for the current user's company.
-     */
+    public function __construct()
+    {
+        $this->middleware('permission:view_designations')->only(['index','show']);
+        $this->middleware('permission:create_designations')->only(['create','store']);
+        $this->middleware('permission:edit_designations')->only(['edit','update']);
+        $this->middleware('permission:delete_designations')->only(['destroy']);
+    }
     public function index()
     {
         Session::put('page', 'designations');
@@ -63,11 +67,6 @@ class DesignationController extends Controller
 
         return redirect()->route('designations.index')->with('success', 'Designation created successfully.');
     }
-
-
-    /**
-     * Show a specific designation.
-     */
     public function show(Designation $designation)
     {
         $authUser = auth()->user();
@@ -78,10 +77,7 @@ class DesignationController extends Controller
 
         return view('admin.hr.show', compact('designation'));
     }
-
-    /**
-     * Show the form to edit a designation.
-     */
+    
     public function edit(Designation $designation)
     {
         return view('admin.hr.edit', compact('designation'));

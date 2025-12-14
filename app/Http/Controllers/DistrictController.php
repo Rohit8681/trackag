@@ -9,9 +9,13 @@ use Illuminate\Http\Request;
 
 class DistrictController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    public function __construct()
+    {
+        $this->middleware('permission:view_districts')->only(['index','show']);
+        $this->middleware('permission:create_districts')->only(['create','store']);
+        $this->middleware('permission:edit_districts')->only(['edit','update']);
+        $this->middleware('permission:delete_districts')->only(['destroy']);
+    }
    public function index(Request $request)
     {
         $query = District::with(['country', 'state']);

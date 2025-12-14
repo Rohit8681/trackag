@@ -8,7 +8,13 @@ use Illuminate\Http\Request;
 
 class VehicleController extends Controller
 {
-    // Display list of vehicles
+    public function __construct()
+    {
+        $this->middleware('permission:view_vehicle_master')->only(['index','show']);
+        $this->middleware('permission:create_vehicle_master')->only(['create','store']);
+        $this->middleware('permission:edit_vehicle_master')->only(['edit','update']);
+        $this->middleware('permission:delete_vehicle_master')->only(['destroy']);
+    }
     public function index()
     {
         $vehicles = Vehicle::with('assignedUser')->get();

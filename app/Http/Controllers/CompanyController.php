@@ -23,13 +23,19 @@ use App\Models\Tenant;
 
 class CompanyController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:view_companies')->only(['index','show']);
+        $this->middleware('permission:create_companies')->only(['create','store']);
+        $this->middleware('permission:edit_companies')->only(['edit','update']);
+        $this->middleware('permission:delete_companies')->only(['destroy']);
+    }
     public function index()
     {
         $user = Auth::user();
         $companies = Company::get();
         return view('admin.companies.index', compact('companies'));
     }
-
 
     public function create()
     {
@@ -64,8 +70,6 @@ class CompanyController extends Controller
             'state' => $state
         ]);
     }
-
-
 
     public function store(StoreCompanyRequest $request)
     {
@@ -280,9 +284,6 @@ class CompanyController extends Controller
                 ->withErrors(['error' => 'Onboarding failed: ' . $e->getMessage()]);
         }
     }
-
-
-
 
     public function show(Company $company)
     {

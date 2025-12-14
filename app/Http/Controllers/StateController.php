@@ -9,6 +9,13 @@ use Illuminate\Http\Request;
 
 class StateController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:view_states')->only(['index','show']);
+        $this->middleware('permission:create_states')->only(['create','store']);
+        $this->middleware('permission:edit_states')->only(['edit','update']);
+        $this->middleware('permission:delete_states')->only(['destroy']);
+    }
     public function index(Request $request)
     {
         $query = State::with('country');

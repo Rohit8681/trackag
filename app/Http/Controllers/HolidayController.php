@@ -10,6 +10,13 @@ use Illuminate\Validation\Rule;
 
 class HolidayController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:view_holiday_master')->only(['index','show']);
+        $this->middleware('permission:create_holiday_master')->only(['create','store']);
+        $this->middleware('permission:edit_holiday_master')->only(['edit','update']);
+        $this->middleware('permission:delete_holiday_master')->only(['destroy']);
+    }
     public function index()
     {
         $holidays = Holiday::with('state')->orderBy('holiday_date', 'desc')->get();

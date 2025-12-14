@@ -29,22 +29,15 @@
                     <div class="card card-primary card-outline">
                         <div class="card-header d-flex align-items-center">
                             <h3 class="card-title mb-0">Holiday List</h3>
+                            @can('create_holiday_master')
                             <a href="{{ route('holidays.create') }}" class="btn  btn-primary ms-auto">
                                 <i class="fas fa-plus me-1"></i> Add Holiday
                             </a>
+                            @endcan
                         </div>
 
                         <div class="card-body">
-                            {{-- ✅ Success Message --}}
-                            {{-- @if (session('success'))
-                                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                                    <strong>Success:</strong> {{ session('success') }}
-                                    <button type="button" class="btn-close" data-bs-dismiss="alert"
-                                        aria-label="Close"></button>
-                                </div>
-                            @endif --}}
-
-                            {{-- 📋 Holiday Table --}}
+                           
                             <div class="table-responsive" style="max-height: 600px;">
                                 <table id="holidays-table" class="table table-bordered table-hover table-striped align-middle table-sm">
                                     <thead class="table-light sticky-top">
@@ -92,10 +85,13 @@
                                                     </div>
                                                 </td>
                                                 <td>
+                                                    @can('edit_holiday_master')
                                                     <a href="{{ route('holidays.edit', $holiday->id) }}"
                                                        class="btn btn-sm btn-warning" title="Edit">
                                                         <i class="fas fa-edit"></i>
                                                     </a>
+                                                    @endcan
+                                                    @can('delete_holiday_master')
                                                     <form action="{{ route('holidays.destroy', $holiday->id) }}"
                                                           method="POST"
                                                           class="d-inline"
@@ -106,6 +102,7 @@
                                                             <i class="fas fa-trash"></i>
                                                         </button>
                                                     </form>
+                                                    @endcan
                                                 </td>
                                             </tr>
                                         @empty

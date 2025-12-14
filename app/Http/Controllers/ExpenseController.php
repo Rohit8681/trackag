@@ -15,6 +15,13 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class ExpenseController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:view_expense')->only(['index','show']);
+        // $this->middleware('permission:create_permissions')->only(['create','store']);
+        // $this->middleware('permission:edit_permissions')->only(['edit','update']);
+        // $this->middleware('permission:delete_permissions')->only(['destroy']);
+    }
     public function index(Request $request)
     {
         $query = Expense::with(['user', 'travelMode']);

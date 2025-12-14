@@ -9,6 +9,13 @@ use Illuminate\Http\Request;
 
 class TaDaBillMasterController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:view_ta_da_bill_master')->only(['index']);
+        // $this->middleware('permission:create_permissions')->only(['create','store']);
+        // $this->middleware('permission:edit_permissions')->only(['edit','update']);
+        // $this->middleware('permission:delete_permissions')->only(['destroy']);
+    }
     public function index()
     {
         $designations = Designation::with('taDaBillMaster')->orderBy('name')->get();

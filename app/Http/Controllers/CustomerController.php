@@ -17,6 +17,13 @@ use App\Imports\CustomersImport;
 
 class CustomerController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:view_customers')->only(['index','show']);
+        $this->middleware('permission:create_customers')->only(['create','store']);
+        $this->middleware('permission:edit_customers')->only(['edit','update']);
+        $this->middleware('permission:delete_customers')->only(['destroy']);
+    }
     public function index(Request $request)
     {
         $admin = Auth::user();
@@ -50,7 +57,6 @@ class CustomerController extends Controller
 
         return view('admin.customers.index', compact('customers', 'states', 'financialYears'));
     }
-
 
     public function create()
     {
@@ -155,9 +161,6 @@ class CustomerController extends Controller
         return redirect()->route('customers.index')->with('success', 'Customer deleted successfully.');
     }
 
-    /**
-     * AJAX: Get executives for selected company (used in frontend)
-     */
     public function getExecutives($companyId)
     {
         $executives = User::where('company_id', $companyId)
@@ -170,9 +173,6 @@ class CustomerController extends Controller
         return response()->json(['executives' => $executives]);
     }
 
-    /**
-     * Ensure the authenticated user has access to this customer
-     */
     private function authorizeCustomerAccess(Customer $customer)
     {
         $admin = Auth::user();
@@ -184,9 +184,6 @@ class CustomerController extends Controller
         }
     }
 
-    /**
-     * Toggle the active/inactive status of a customer
-     */
     public function toggleStatus(Customer $id)
     {
         $this->authorizeCustomerAccess($id);

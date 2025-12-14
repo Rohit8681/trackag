@@ -29,9 +29,11 @@
                         <div class="card card-primary card-outline">
                             <div class="card-header d-flex align-items-center">
                                 <h3 class="card-title mb-0">State List</h3>
+                                @can('create_states')
                                 <a href="{{ route('states.create') }}" class="btn btn-primary ms-auto">
                                     <i class="fas fa-plus me-1"></i> Add State
                                 </a>
+                                @endcan
                             </div>
 
                             <div class="card-body">
@@ -121,10 +123,13 @@
                                                         @endif
                                                     </td>
                                                     <td>
-                                                        <a href="{{ route('states.edit', $state->id) }}" 
+                                                        @can('edit_states')
+                                                           <a href="{{ route('states.edit', $state->id) }}" 
                                                            class="btn btn-sm btn-warning" title="Edit">
                                                             <i class="fas fa-edit"></i>
-                                                        </a>
+                                                        </a> 
+                                                        @endcan
+                                                        
                                                         {{-- Delete code (optional) --}}
                                                         {{-- <form action="{{ route('states.destroy', $state->id) }}" 
                                                               method="POST" 

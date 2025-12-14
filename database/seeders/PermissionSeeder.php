@@ -141,10 +141,6 @@ class PermissionSeeder extends Seeder
             'create_holiday_master',
             'edit_holiday_master',
             'delete_holiday_master',
-            'view_holiday_master',
-            'create_holiday_master',
-            'edit_holiday_master',
-            'delete_holiday_master',
             'view_leave_master',
             'create_leave_master',
             'edit_leave_master',
@@ -161,6 +157,7 @@ class PermissionSeeder extends Seeder
             'create_vehicle_master',
             'edit_vehicle_master',
             'delete_vehicle_master',
+            'view_new_party'
         ];
 
         foreach ($permissions as $permissionName) {

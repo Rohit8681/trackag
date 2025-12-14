@@ -9,6 +9,13 @@ use Illuminate\Support\Facades\Session;
 
 class TourTypeController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:view_trip_types')->only(['index','show']);
+        $this->middleware('permission:create_trip_types')->only(['create','store']);
+        $this->middleware('permission:edit_trip_types')->only(['edit','update']);
+        $this->middleware('permission:delete_trip_types')->only(['destroy']);
+    }
     public function index()
     {
         $tourtypes = tourtype::with('company')->latest()->get();

@@ -29,9 +29,11 @@
                     <div class="card card-primary card-outline">
                         <div class="card-header d-flex align-items-center">
                             <h3 class="card-title mb-0">Vehicle List</h3>
+                            @can('create_vehicle_master')
                             <a href="{{ route('vehicle.create') }}" class="btn btn-sm btn-primary ms-auto">
                                 <i class="fas fa-plus me-1"></i> Add Vehicle
                             </a>
+                            @endcan
                         </div>
                         
 
@@ -78,9 +80,12 @@
                                                     </div>
                                                 </td>
                                                 <td>
+                                                    @can('edit_vehicle_master')
                                                     <a href="{{ route('vehicle.edit', $vehicle->id) }}" class="btn btn-sm btn-warning" title="Edit">
                                                         <i class="fas fa-edit"></i>
                                                     </a>
+                                                    @endcan
+                                                    @can('delete_vehicle_master')
                                                     <form action="{{ route('vehicle.destroy', $vehicle->id) }}" method="POST" class="d-inline"
                                                           onsubmit="return confirm('Are you sure to delete this vehicle?')">
                                                         @csrf
@@ -89,6 +94,7 @@
                                                             <i class="fas fa-trash"></i>
                                                         </button>
                                                     </form>
+                                                    @endcan
                                                 </td>
                                             </tr>
                                         @empty
