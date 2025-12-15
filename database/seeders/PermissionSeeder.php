@@ -12,20 +12,20 @@ class PermissionSeeder extends Seeder
     public function run(): void
     {
         // Step 1: Disable foreign key checks
-        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        // DB::statement('SET FOREIGN_KEY_CHECKS=0;');
 
-        // Step 2: Truncate related pivot tables first
-        DB::table('model_has_permissions')->truncate();
-        DB::table('role_has_permissions')->truncate();
+        // // Step 2: Truncate related pivot tables first
+        // DB::table('model_has_permissions')->truncate();
+        // DB::table('role_has_permissions')->truncate();
 
-        // Step 3: Truncate permissions table
-        Permission::truncate();
+        // // Step 3: Truncate permissions table
+        // Permission::truncate();
 
-        // Step 4: Enable foreign key checks
-        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+        // // Step 4: Enable foreign key checks
+        // DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
-        // Step 5: Clear Spatie cache
-        app()[PermissionRegistrar::class]->forgetCachedPermissions();
+        // // Step 5: Clear Spatie cache
+        // app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
         // Step 6: Define and insert permissions
         $permissions = [
@@ -58,19 +58,32 @@ class PermissionSeeder extends Seeder
             'view_budget_plan',
             'create_budget_plan',
             'edit_budget_plan',
-            'delete_budget_plan',
+            // 'delete_budget_plan',
+            'approvals_budget_plan',
+            'reject_budget_plan',
+            'verify_budget_plan',
+            'remove_review_budget_plan',
             'view_monthly_plan',
             'create_monthly_plan',
             'edit_monthly_plan',
-            'delete_monthly_plan',
+            // 'delete_monthly_plan',
+            'approvals_monthly_plan',
+            'reject_monthly_plan',
+            'verify_monthly_plan',
+            'remove_review_monthly_plan',
             'view_plan_vs_achievement',
             'create_plan_vs_achievement',
             'edit_plan_vs_achievement',
-            'delete_plan_vs_achievement',
+            // 'delete_plan_vs_achievement',
+            'approvals_plan_vs_achievement',
+            'reject_plan_vs_achievement',
+            'verify_plan_vs_achievement',
+            'remove_review_plan_vs_achievement',
             'view_party_visit',
-            'create_party_visit',
-            'edit_party_visit',
-            'delete_party_visit',
+            'approvals_party_visit',
+            // 'create_party_visit',
+            // 'edit_party_visit',
+            // 'delete_party_visit',
             'view_order',
             'create_order',
             'edit_order',
