@@ -11,28 +11,12 @@ class PermissionSeeder extends Seeder
 {
     public function run(): void
     {
-        // Step 1: Disable foreign key checks
-        // DB::statement('SET FOREIGN_KEY_CHECKS=0;');
-
-        // // Step 2: Truncate related pivot tables first
-        // DB::table('model_has_permissions')->truncate();
-        // DB::table('role_has_permissions')->truncate();
-
-        // // Step 3: Truncate permissions table
-        // Permission::truncate();
-
-        // // Step 4: Enable foreign key checks
-        // DB::statement('SET FOREIGN_KEY_CHECKS=1;');
-
-        // // Step 5: Clear Spatie cache
-        // app()[PermissionRegistrar::class]->forgetCachedPermissions();
-
-        // Step 6: Define and insert permissions
+        
         $permissions = [
             'view_users',
             'create_users',
             'edit_users',
-            'delete_users',
+            // 'delete_users',
             'view_roles',
             'create_roles',
             'edit_roles',
@@ -85,9 +69,13 @@ class PermissionSeeder extends Seeder
             // 'edit_party_visit',
             // 'delete_party_visit',
             'view_order',
-            'create_order',
+            // 'create_order',
             'edit_order',
             'delete_order',
+            'approvals_order',
+            'reject_order',
+            'dispatch_order',
+            'view_order_report',
             'view_stock',
             'create_stock',
             'edit_stock',
@@ -173,6 +161,11 @@ class PermissionSeeder extends Seeder
             'view_new_party',
             'approvals_new_party',
             'reject_new_party',
+            'view_party_payment',
+            'reject_party_payment',
+            'approvals_party_payment',
+            'view_party_performance',
+            'view_party_ledger',
         ];
 
         foreach ($permissions as $permissionName) {

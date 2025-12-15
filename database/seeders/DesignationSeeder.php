@@ -24,7 +24,7 @@ class DesignationSeeder extends Seeder
 
         foreach ($designations as $designation) {
             Designation::create([
-                'company_id'  => $companyId,
+                // 'company_id'  => $companyId,
                 'name'        => $designation['name'],
                 'description' => $designation['description'],
             ]);
