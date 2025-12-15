@@ -170,7 +170,9 @@ class PermissionSeeder extends Seeder
             'create_vehicle_master',
             'edit_vehicle_master',
             'delete_vehicle_master',
-            'view_new_party'
+            'view_new_party',
+            'approvals_new_party',
+            'reject_new_party',
         ];
 
         foreach ($permissions as $permissionName) {

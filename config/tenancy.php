@@ -30,6 +30,7 @@ return [
         env('CENTRAL_DOMAIN', '127.0.0.1'),
         'localhost',
         '127.0.0.1',
+        '43.204.230.210'
     ],
 
 
