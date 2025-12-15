@@ -29,9 +29,11 @@
                     <div class="card card-primary card-outline">
                         <div class="card-header d-flex align-items-center">
                             <h3 class="card-title mb-0">Depo List</h3>
+                            @can('create_depo_master')
                             <a href="{{ route('depos.create') }}" class="btn  btn-primary ms-auto">
                                 <i class="fas fa-plus me-1"></i> Add Depo
                             </a>
+                            @endcan
                         </div>
 
                         <div class="card-body">
@@ -122,10 +124,13 @@
                                                     </div>
                                                 </td>
                                                 <td>
+                                                    @can('edit_depo_master')
                                                     <a href="{{ route('depos.edit', $depo->id) }}"
                                                        class="btn btn-sm btn-warning" title="Edit">
                                                         <i class="fas fa-edit"></i>
                                                     </a>
+                                                    @endcan
+                                                    @can('delete_depo_master')
                                                     <form action="{{ route('depos.destroy', $depo->id) }}"
                                                           method="POST"
                                                           class="d-inline"
@@ -136,6 +141,7 @@
                                                             <i class="fas fa-trash"></i>
                                                         </button>
                                                     </form>
+                                                    @endcan
                                                 </td>
                                             </tr>
                                         @empty

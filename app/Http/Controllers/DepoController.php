@@ -14,6 +14,13 @@ use Illuminate\Validation\Rule;
 
 class DepoController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:view_depo_master')->only(['index','show']);
+        $this->middleware('permission:create_depo_master')->only(['create','store']);
+        $this->middleware('permission:edit_depo_master')->only(['edit','update']);
+        $this->middleware('permission:delete_depo_master')->only(['destroy']);
+    }
     public function index()
     {
         

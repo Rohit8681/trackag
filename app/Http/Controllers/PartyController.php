@@ -10,9 +10,14 @@ use Illuminate\Http\Request;
 
 class PartyController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    public function __construct()
+    {
+        $this->middleware('permission:view_party_visit')->only(['index','show']);
+        $this->middleware('permission:view_new_party')->only(['newPartyList']);
+        // $this->middleware('permission:edit_party_visit')->only(['edit','update']);
+        // $this->middleware('permission:delete_party_visit')->only(['destroy']);
+    }
+
     public function index()
     {
         $states = State::where('status',1)->get();

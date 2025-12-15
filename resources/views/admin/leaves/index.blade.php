@@ -29,9 +29,11 @@
                     <div class="card card-primary card-outline">
                         <div class="card-header d-flex align-items-center">
                             <h3 class="card-title mb-0">Leave List</h3>
+                            @can('create_leave_master')
                             <a href="{{ route('leaves.create') }}" class="btn btn-sm btn-primary ms-auto">
                                 <i class="fas fa-plus me-1"></i> Add Leave
                             </a>
+                            @endcan
                         </div>
 
                         <div class="card-body">
@@ -72,10 +74,14 @@
                                                     </div>
                                                 </td>
                                                 <td>
+                                                    @can('edit_leave_master')
                                                     <a href="{{ route('leaves.edit', $leave->id) }}"
                                                        class="btn btn-sm btn-warning" title="Edit">
                                                         <i class="fas fa-edit"></i>
                                                     </a>
+                                                    @endcan
+
+                                                    @can('delete_leave_master')
                                                     <form action="{{ route('leaves.destroy', $leave->id) }}"
                                                           method="POST"
                                                           class="d-inline"
@@ -86,6 +92,7 @@
                                                             <i class="fas fa-trash"></i>
                                                         </button>
                                                     </form>
+                                                    @endcan
                                                 </td>
                                             </tr>
                                         @empty

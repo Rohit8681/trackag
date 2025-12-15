@@ -9,6 +9,13 @@ use Illuminate\Support\Facades\Session;
 
 class TravelModeController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:view_travel_modes')->only(['index','show']);
+        $this->middleware('permission:create_travel_modes')->only(['create','store']);
+        $this->middleware('permission:edit_travel_modes')->only(['edit','update']);
+        $this->middleware('permission:delete_travel_modes')->only(['destroy']);
+    }
     public function index()
     {
         $travelModes = TravelMode::with('company')->latest()->get();

@@ -26,8 +26,10 @@
                         <div class="card card-primary card-outline">
                             <div class="card-header d-flex justify-content-between align-items-center">
                                 <h3 class="card-title">Travel Modes</h3>
+                                {{-- @can('create_travel_modes') --}}
                                 {{-- <a href="{{ route('travelmode.create') }}" class="btn btn-sm btn-primary ms-auto">Add Travel
                                     Modes</a> --}}
+                                {{-- @endcan --}}
                             </div>
                             <div class="card-body table-responsive">
                                 <table id="trips-table" class="table table-bordered table-striped align-middle">
@@ -44,9 +46,12 @@
                                                 <td>{{ $key + 1 }}</td>
                                                 <td>{{ $mode->name }}</td>
                                                 <td>
+                                                    @can('edit_travel_modes')
                                                     <a href="{{ route('travelmode.edit', $mode->id) }}"
                                                         class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></a>
+                                                    @endcan
 
+                                                    @can('delete_travel_modes')
                                                     <form action="{{ route('travelmode.destroy', $mode->id) }}" method="POST"
                                                         class="d-inline">
                                                         @csrf
@@ -55,6 +60,7 @@
                                                             onclick="return confirm('Are you sure?')"><i
                                                                 class="fas fa-trash"></i></button>
                                                     </form>
+                                                    @endcan
                                                 </td>
                                             </tr>
                                         @empty

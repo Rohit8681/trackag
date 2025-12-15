@@ -13,6 +13,13 @@ use App\Models\User;
 
 class TripController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:view_all_trip')->only(['index','show']);
+        $this->middleware('permission:create_all_trip')->only(['create','store']);
+        $this->middleware('permission:edit_all_trip')->only(['edit','update']);
+        $this->middleware('permission:delete_all_trip')->only(['destroy']);
+    }
     public function index(Request $request)
     {
         $user = Auth::user();

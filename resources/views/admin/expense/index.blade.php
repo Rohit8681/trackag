@@ -191,15 +191,6 @@
 
                                         <!-- Reject -->
                                         @if($expense->approval_status != 'Rejected' )
-                                            {{-- <form action="{{ route('expense.reject', $expense->id) }}" method="POST"
-                                                class="d-inline">
-                                                @csrf
-                                                @method('PATCH')
-                                                <button type="submit" class="btn btn-sm btn-danger me-1  btn-sm"
-                                                        onclick="return confirm('Reject this expense?')">
-                                                    <i class="fas fa-times"></i>
-                                                </button>
-                                            </form> --}}
                                             <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#rejectModal{{ $expense->id }}">
                                                 <i class="fas fa-times"></i>
                                             </button>

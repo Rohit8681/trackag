@@ -9,6 +9,13 @@ use Illuminate\Validation\Rule;
 
 class LeaveController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:view_leave_master')->only(['index','show']);
+        $this->middleware('permission:create_leave_master')->only(['create','store']);
+        $this->middleware('permission:edit_leave_master')->only(['edit','update']);
+        $this->middleware('permission:delete_leave_master')->only(['destroy']);
+    }
     public function index()
     {
         $leaves = Leave::orderBy('created_at', 'desc')->get();

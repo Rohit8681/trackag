@@ -18,19 +18,6 @@
             </div>
         </div>
 
-        {{-- <div class="app-content-header">
-            <div class="container-fluid">
-                <div class="row">
-                    <div class="col-sm-6">
-                        <h3 class="mb-0">Designations</h3>
-                    </div>
-                    <div class="col-sm-6 text-end">
-                        <a href="{{ route('designations.create') }}" class="btn btn-primary">Add New Designation</a>
-                    </div>
-                </div>
-            </div>
-        </div> --}}
-
         <div class="app-content">
             <div class="container-fluid">
                 <div class="row">
@@ -44,7 +31,9 @@
                     <div class="card-header d-flex align-items-center">
                         
                         <h3 class="card-title mb-0">Designations</h3>
+                        @can('create_designations')
                         <a href="{{ route('designations.create') }}" class="btn btn-primary ms-auto">Add New Designation</a>
+                        @endcan
 
                     </div>
                     
@@ -74,12 +63,16 @@
                                             </div>
                                         </td>
                                         <td>
+                                            @can('edit_designations')
                                             <a href="{{ route('designations.edit', $designation->id) }}" class="btn btn-sm btn-primary">Edit</a>
+                                            @endcan
+                                            @can('delete_designations')
                                             <form action="{{ route('designations.destroy', $designation->id) }}" method="POST" class="d-inline">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</button>
                                             </form>
+                                            @endcan
                                         </td>
                                     </tr>
                                 @empty

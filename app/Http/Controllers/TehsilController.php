@@ -9,6 +9,13 @@ use Illuminate\Http\Request;
 
 class TehsilController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:view_talukas')->only(['index','show']);
+        $this->middleware('permission:create_talukas')->only(['create','store']);
+        $this->middleware('permission:edit_talukas')->only(['edit','update']);
+        $this->middleware('permission:delete_talukas')->only(['destroy']);
+    }
    public function index(Request $request)
     {
         $query = Tehsil::with(['country', 'state', 'district']);

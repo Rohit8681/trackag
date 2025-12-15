@@ -10,6 +10,13 @@ use Carbon\Carbon;
 
 class AttendanceController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:view_attendance')->only(['index','show']);
+        // $this->middleware('permission:view_new_party')->only(['newPartyList']);
+        // $this->middleware('permission:edit_party_visit')->only(['edit','update']);
+        // $this->middleware('permission:delete_party_visit')->only(['destroy']);
+    }
     public function index(Request $request)
     {
         $authUser = auth()->user();

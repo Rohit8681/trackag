@@ -95,6 +95,7 @@
                                             'Monthly Plan' => 'monthly_plan',
                                             'Plan Vs Achievement' => 'plan_vs_achievement',
                                             'Party Visit' => 'party_visit',
+                                            'New Party' => 'new_party',
                                             'Order' => 'order',
                                             'Stock' => 'stock',
                                             'Tracking' => 'tracking',

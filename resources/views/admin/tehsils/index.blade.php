@@ -25,9 +25,12 @@
         <div class="card card-primary card-outline">
             <div class="card-header d-flex align-items-center">
                 <h3 class="card-title mb-0">Tehsil List</h3>
+                @can('create_talukas')
                 <a href="{{ route('tehsils.create') }}" class="btn btn-sm btn-primary ms-auto">
                     <i class="fas fa-plus me-1"></i> Add Tehsil
                 </a>
+                @endcan
+
             </div>
 
             <div class="card-body">
@@ -138,9 +141,11 @@
                                 @endif
                             </td>
                             <td>
+                                @can('edit_talukas')
                                 <a href="{{ route('tehsils.edit', $tehsil->id) }}" class="btn btn-sm btn-warning">
                                     <i class="fas fa-edit"></i>
                                 </a>
+                                @endcan
                                 {{-- <form action="{{ route('tehsils.destroy', $tehsil->id) }}" method="POST" class="d-inline"
                                       onsubmit="return confirm('Are you sure to delete this tehsil?')">
                                     @csrf @method('DELETE')

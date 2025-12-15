@@ -13,29 +13,13 @@ use Illuminate\Http\Request;
 
 class TaDaSlabController extends Controller
 {
-    // public function form()
-    // {
-    //     // Fetch or create single main slab record
-    //     $slab = TaDaSlab::first() ?? new TaDaSlab();
-
-    //     // Load related slabs by type
-    //     $individualVehicleSlabs = TaDaVehicleSlab::where('type', 'individual')->get();
-    //     $slabWiseVehicleSlabs   = TaDaVehicleSlab::where('type', 'slab_wise')->get();
-
-    //     $individualTourSlabs = TaDaTourSlab::where('type', 'individual')->get();
-    //     $slabWiseTourSlabs   = TaDaTourSlab::where('type', 'slab_wise')->get();
-
-    //     // $vehicleTypes = VehicleType::where('is_deleted', 0)->get();
-    //     $vehicleTypes = TravelMode::get();
-    //     $tourTypes = TourType::all();
-    //     $designations = Designation::all();
-    //     return view('admin.ta_da_slab.form', compact(
-    //         'slab', 'vehicleTypes', 'tourTypes', 'designations',
-    //         'individualVehicleSlabs', 'slabWiseVehicleSlabs',
-    //         'individualTourSlabs', 'slabWiseTourSlabs'
-    //     ));
-    // }
-
+   public function __construct()
+    {
+        $this->middleware('permission:view_ta_da')->only(['form']);
+        // $this->middleware('permission:create_permissions')->only(['create','store']);
+        // $this->middleware('permission:edit_permissions')->only(['edit','update']);
+        // $this->middleware('permission:delete_permissions')->only(['destroy']);
+    }
     public function form()
     {
         $slab = TaDaSlab::whereNull('user_id')->first() ?? new TaDaSlab();

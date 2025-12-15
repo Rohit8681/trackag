@@ -9,6 +9,13 @@ use Illuminate\Support\Facades\Session;
 
 class PurposeController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:view_trip_purposes')->only(['index','show']);
+        $this->middleware('permission:create_trip_purposes')->only(['create','store']);
+        $this->middleware('permission:edit_trip_purposes')->only(['edit','update']);
+        $this->middleware('permission:delete_trip_purposes')->only(['destroy']);
+    }
     public function index()
     {
         $purposes = purpose::with('company')->latest()->get();
