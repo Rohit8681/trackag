@@ -247,13 +247,13 @@ class CompanyController extends Controller
                 $permissionModel = new \Spatie\Permission\Models\Permission();
                 $permissionModel->setConnection('tenant');
 
-                $role = $roleModel->firstOrCreate(['name' => 'sub_admin']);
+                $role = $roleModel->firstOrCreate(['name' => 'sub_admin','guard_name' => 'web']);
                 $permissions = $permissionModel->pluck('name')->toArray();
 
                 if (!empty($permissions)) {
                     $role->syncPermissions($permissions);
                 }
-
+                app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
                 $user->assignRole($role->name);
             }
 
