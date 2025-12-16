@@ -310,6 +310,7 @@
                                                     @endcan
 
                                                     @can('delete_users')
+                                                    @if(auth()->user()->hasRole('master_admin'))
                                                     <form action="{{ route('users.destroy', $user) }}" 
                                                         method="POST" class="d-inline" 
                                                         onsubmit="return confirm('Are you sure you want to delete this user?')">
@@ -321,6 +322,7 @@
                                                             <i class="fas fa-trash"></i>
                                                         </button>
                                                     </form>
+                                                    @endif
                                                     @endcan
                                                 @endif
                                             </td>
