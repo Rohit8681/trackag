@@ -43,8 +43,27 @@ class ExpenseController extends Controller
         }
 
         $expenses = $query->latest()->get();
-        $states = State::where('status',1)->get();
+        // $states = State::where('status',1)->get();
         $employees = User::where('status','Active')->get();
+        $companyCount = Company::count();
+        $company = null;
+
+        if ($companyCount == 1) {
+            $company = Company::first();
+
+            if ($company && !empty($company->state)) {
+                $companyStates = array_map('intval', explode(',', $company->state));
+
+                $states = State::where('status', 1)
+                    ->whereIn('id', $companyStates)
+                    ->get();
+            } else {
+                $states = State::where('status', 1)->get();
+            }
+        } else {
+            // ⬅️ Company 1 થી વધારે હોય તો બધાં states
+            $states = State::where('status', 1)->get();
+        }
         
 
         return view('admin.expense.index', compact('expenses', 'states', 'employees'));
@@ -207,7 +226,26 @@ class ExpenseController extends Controller
                 ($item->other_exp);
         }
 
-        $states = State::where('status', 1)->get();
+        // $states = State::where('status', 1)->get();
+        $companyCount = Company::count();
+        $company = null;
+
+        if ($companyCount == 1) {
+            $company = Company::first();
+
+            if ($company && !empty($company->state)) {
+                $companyStates = array_map('intval', explode(',', $company->state));
+
+                $states = State::where('status', 1)
+                    ->whereIn('id', $companyStates)
+                    ->get();
+            } else {
+                $states = State::where('status', 1)->get();
+            }
+        } else {
+            // ⬅️ Company 1 થી વધારે હોય તો બધાં states
+            $states = State::where('status', 1)->get();
+        }
         $employees = User::where('is_active', 1)->get();
 
         $total_ta = $data->sum('ta_exp');

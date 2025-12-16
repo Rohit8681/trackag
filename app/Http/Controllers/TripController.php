@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Company;
 use App\Models\Trip;
 use App\Models\TripLog;
 use Illuminate\Http\Request;
@@ -61,7 +62,26 @@ class TripController extends Controller
         $trips = $query->latest()->get();
 
         // Data for dropdowns
-        $states = State::all(['id', 'name']);
+        // $states = State::all(['id', 'name']);
+        $companyCount = Company::count();
+        $company = null;
+
+        if ($companyCount == 1) {
+            $company = Company::first();
+
+            if ($company && !empty($company->state)) {
+                $companyStates = array_map('intval', explode(',', $company->state));
+
+                $states = State::where('status', 1)
+                    ->whereIn('id', $companyStates)
+                    ->get();
+            } else {
+                $states = State::where('status', 1)->get();
+            }
+        } else {
+            // ⬅️ Company 1 થી વધારે હોય તો બધાં states
+            $states = State::where('status', 1)->get();
+        }
         $employees = User::select('id', 'name')->get();
         return view('admin.trips.index_new', compact('trips', 'states', 'employees'))
             ->with([

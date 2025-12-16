@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Company;
 use App\Models\Customer;
 use App\Models\PartyVisit;
 use App\Models\State;
@@ -20,10 +21,30 @@ class PartyController extends Controller
 
     public function index()
     {
-        $states = State::where('status',1)->get();
+        
         $employees = User::where('status','Active')->get();
         $customers = Customer::where('status',1)->get();
-        return view('admin.party.index',compact('states','employees','customers'));
+        $companyCount = Company::count();
+        $company = null;
+        $companyStates = [];
+
+        if ($companyCount == 1) {
+            $company = Company::first();
+
+            if ($company && !empty($company->state)) {
+                $companyStates = array_map('intval', explode(',', $company->state));
+
+                $states = State::where('status',1)
+                    ->whereIn('id', $companyStates)
+                    ->get();
+            } else {
+                $states = State::where('status',1)->get();
+            }
+
+        } else {
+            $states = State::where('status',1)->get();
+        }
+        return view('admin.party.index',compact('states','employees','customers','company'));
 
     }
     
@@ -132,18 +153,77 @@ class PartyController extends Controller
 
 
     
+    // public function newPartyList(Request $request)
+    // {
+    //     $users = User::where('is_active', 1)->get();
+    //     $states = State::where('status', 1)->get();
+
+    //     // MAIN QUERY
+    //     $query = Customer::where('is_active', 1)
+    //         ->where('type', 'mobile');
+
+
+    //     if ($request->financial_year) {
+    //         $dates = explode('-', $request->financial_year);
+    //         $query->whereYear('visit_date', '>=', $dates[0])
+    //             ->whereYear('visit_date', '<=', $dates[1]);
+    //     }
+
+    //     if ($request->from_date) {
+    //         $query->whereDate('visit_date', '>=', $request->from_date);
+    //     }
+
+    //     if ($request->to_date) {
+    //         $query->whereDate('visit_date', '<=', $request->to_date);
+    //     }
+
+    //     if ($request->state_id) {
+    //         $query->where('state_id', $request->state_id);
+    //     }
+
+    //     if ($request->user_id) {
+    //         $query->where('user_id', $request->user_id);
+    //     }
+
+    //     if ($request->agro_name) {
+    //         $query->where('agro_name', 'LIKE', '%' . $request->agro_name . '%');
+    //     }
+
+    //     // final get()
+    //     $customer = $query->orderBy('visit_date', 'desc')->get();
+
+    //     return view('admin.new-party.index', compact('customer', 'users', 'states'));
+    // }
+
+    
     public function newPartyList(Request $request)
     {
         $users = User::where('is_active', 1)->get();
-        $states = State::where('status', 1)->get();
 
-        // MAIN QUERY
+        // ✅ COMPANY LOGIC
+        $companyCount = Company::count();
+        $company = null;
+
+        if ($companyCount == 1) {
+            $company = Company::first();
+
+            if ($company && !empty($company->state)) {
+                $companyStates = array_map('intval', explode(',', $company->state));
+
+                $states = State::where('status', 1)
+                    ->whereIn('id', $companyStates)
+                    ->get();
+            } else {
+                $states = State::where('status', 1)->get();
+            }
+        } else {
+            // ⬅️ Company 1 થી વધારે હોય તો બધાં states
+            $states = State::where('status', 1)->get();
+        }
+
+        // ✅ MAIN QUERY
         $query = Customer::where('is_active', 1)
             ->where('type', 'mobile');
-
-        // ==========================
-        // APPLY FILTERS
-        // ==========================
 
         if ($request->financial_year) {
             $dates = explode('-', $request->financial_year);
@@ -171,10 +251,9 @@ class PartyController extends Controller
             $query->where('agro_name', 'LIKE', '%' . $request->agro_name . '%');
         }
 
-        // final get()
         $customer = $query->orderBy('visit_date', 'desc')->get();
 
-        return view('admin.new-party.index', compact('customer', 'users', 'states'));
+        return view('admin.new-party.index', compact('customer', 'users', 'states', 'company'));
     }
 
     public function updateStatus(Request $request)

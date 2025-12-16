@@ -200,7 +200,7 @@
 
                                     <div class="col-md-4">
                                         <label class="form-label">USER ASSIGNED<span class="text-danger">*</span></label>
-                                        <input type="number" name="user_assigned" class="form-control @error('user_assigned') is-invalid @enderror">
+                                        <input type="number" name="user_assigned" value="{{ old('user_assigned') }}" class="form-control @error('user_assigned') is-invalid @enderror">
                                         @error('user_assigned')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
