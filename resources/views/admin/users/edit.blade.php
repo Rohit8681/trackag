@@ -228,21 +228,11 @@
                                         <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
                                     </div>
-                                    {{-- <div class="col-md-3">
-                                        <label class="form-label">User Type</label>
-                                        <input type="text" name="user_type" class="form-control" value="{{ old('user_type', $user->user_type) }}">
-                                    </div> --}}
                                     <div class="col-md-3">
                                         <label class="form-label">User Type</label>
-                                        <select name="user_type" id="userType" class="form-select">
-                                            <option value="">Select User Type</option>
-                                            <option value="sales_person" {{ old('user_type',$user->user_type) == 'sales_person' ? 'selected' : '' }}>
-                                                sales person</option>
-                                            <option value="other" {{ old('user_type',$user->user_type) == 'other' ? 'selected' : '' }}>
-                                                Other</option>
-                                        </select>
-
+                                        <input type="text" name="user_type" class="form-control" value="{{ old('user_type', $user->user_type) }}">
                                     </div>
+                                    
                                     <div class="col-md-3">
                                         <label class="form-label">Joining Date<span class="text-danger">*</span></label>
                                         <input type="date" name="joining_date" class="form-control @error('joining_date') is-invalid @enderror" max="{{ date('Y-m-d') }}"
@@ -425,7 +415,7 @@
                                 </div>
 
                                 {{-- Roles --}}
-                                {{-- <h5 class="mb-3">Assign Roles<span class="text-danger">*</span></h5>
+                                <h5 class="mb-3">Assign Roles<span class="text-danger">*</span></h5>
                                 <div class="row g-3 mb-3">
                                     @foreach ($roles as $role)
                                         <div class="col-md-2">
@@ -433,26 +423,6 @@
                                                 <input type="checkbox" name="roles[]" value="{{ $role->name }}"
                                                        class="form-check-input" id="role-{{ $role->name }}"
                                                        {{ in_array($role->name, old('roles', $user->getRoleNames()->toArray())) ? 'checked' : '' }}>
-                                                <label class="form-check-label" for="role-{{ $role->name }}">
-                                                    {{ ucfirst($role->name) }}
-                                                </label>
-                                            </div>
-                                        </div>
-                                    @endforeach
-                                </div> --}}
-                                <h5 class="mb-3">Assign Roles<span class="text-danger">*</span></h5>
-                                <div class="row g-3 mb-3">
-                                    @foreach ($roles as $role)
-                                        <div class="col-md-2">
-                                            <div class="form-check">
-                                                <input type="checkbox"
-                                                    name="roles[]"
-                                                    value="{{ $role->name }}"
-                                                    class="form-check-input role-checkbox"
-                                                    data-role="{{ $role->name }}"
-                                                    id="role-{{ $role->name }}"
-                                                    {{ in_array($role->name, old('roles', $user->getRoleNames()->toArray())) ? 'checked' : '' }}>
-
                                                 <label class="form-check-label" for="role-{{ $role->name }}">
                                                     {{ ucfirst($role->name) }}
                                                 </label>
@@ -507,36 +477,6 @@
         this.value = this.value.replace(/\D/g, '');
         if (this.value.length > 10) this.value = this.value.slice(0, 10);
     });
-    function handleRoles() {
-        let userType = $('#userType').val();
-
-        // 👉 Fresh create page (no user type selected)
-        // if (!userType) {
-        //     $('.role-checkbox').prop('disabled', false);
-        //     return;
-        // }
-
-        $('.role-checkbox').each(function () {
-            let role = $(this).data('role');
-
-            if (userType === 'sales_person' && role === 'sub_admin') {
-                $(this).prop('checked', false);
-                $(this).prop('disabled', true);
-            } else if(userType == ""){
-                $(this).prop('checked', false);
-                $(this).prop('disabled', true);
-            } else {
-                $(this).prop('disabled', false);
-            }
-        });
-    }
-
-    $('#userType').on('change', function () {
-        handleRoles();
-    });
-
-    // Page reload (old() case)
-    handleRoles();
 </script>
 <script>
 $(document).ready(function() {
