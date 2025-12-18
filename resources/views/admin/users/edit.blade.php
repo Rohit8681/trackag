@@ -234,7 +234,7 @@
                                     </div> --}}
                                     <div class="col-md-3">
                                         <label class="form-label">User Type</label>
-                                        <select name="user_type" class="form-select">
+                                        <select name="user_type" id="userType" class="form-select">
                                             <option value="">Select User Type</option>
                                             <option value="sales_person" {{ old('user_type',$user->user_type) == 'sales_person' ? 'selected' : '' }}>
                                                 sales person</option>
@@ -425,7 +425,7 @@
                                 </div>
 
                                 {{-- Roles --}}
-                                <h5 class="mb-3">Assign Roles<span class="text-danger">*</span></h5>
+                                {{-- <h5 class="mb-3">Assign Roles<span class="text-danger">*</span></h5>
                                 <div class="row g-3 mb-3">
                                     @foreach ($roles as $role)
                                         <div class="col-md-2">
@@ -433,6 +433,26 @@
                                                 <input type="checkbox" name="roles[]" value="{{ $role->name }}"
                                                        class="form-check-input" id="role-{{ $role->name }}"
                                                        {{ in_array($role->name, old('roles', $user->getRoleNames()->toArray())) ? 'checked' : '' }}>
+                                                <label class="form-check-label" for="role-{{ $role->name }}">
+                                                    {{ ucfirst($role->name) }}
+                                                </label>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div> --}}
+                                <h5 class="mb-3">Assign Roles<span class="text-danger">*</span></h5>
+                                <div class="row g-3 mb-3">
+                                    @foreach ($roles as $role)
+                                        <div class="col-md-2">
+                                            <div class="form-check">
+                                                <input type="checkbox"
+                                                    name="roles[]"
+                                                    value="{{ $role->name }}"
+                                                    class="form-check-input role-checkbox"
+                                                    data-role="{{ $role->name }}"
+                                                    id="role-{{ $role->name }}"
+                                                    {{ in_array($role->name, old('roles', $user->getRoleNames()->toArray())) ? 'checked' : '' }}>
+
                                                 <label class="form-check-label" for="role-{{ $role->name }}">
                                                     {{ ucfirst($role->name) }}
                                                 </label>
