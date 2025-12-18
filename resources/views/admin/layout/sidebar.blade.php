@@ -736,22 +736,22 @@
                                 <p>Expense Master<i class="bi bi-chevron-right ms-auto"></i></p>
                             </a>
                             <ul class="nav nav-treeview">
-                                @can('view_ta_da')
+                                {{-- @can('view_ta_da') --}}
                                 <li class="nav-item">
                                     <a href="{{ url('admin/ta-da-slab') }}" class="nav-link {{ request()->is('admin/ta-da-slab*') ? 'active' : '' }}">
                                         <i class="bi bi-circle me-2"></i>
                                         <p>TA-DA</p>
                                     </a>
                                 </li>
-                                @endcan
-                                @canany(['view_ta_da_bill_master123','create_ta_da_bill_master','edit_ta_da_bill_master','delete_ta_da_bill_master'])
+                                {{-- @endcan --}}
+                                {{-- @canany(['view_ta_da_bill_master123','create_ta_da_bill_master','edit_ta_da_bill_master','delete_ta_da_bill_master']) --}}
                                 <li class="nav-item">
                                     <a href="{{ url('admin/ta-da-bill-master') }}" class="nav-link {{ request()->is('admin/ta-da-bill-master*') ? 'active' : '' }}">
                                         <i class="bi bi-file-earmark-text me-2"></i>
                                         <p>TA-DA Bill Master</p>
                                     </a>
                                 </li>
-                                @endcan
+                                {{-- @endcan --}}
                             </ul>
                         </li>
 
