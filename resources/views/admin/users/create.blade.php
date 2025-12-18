@@ -642,7 +642,6 @@ $(document).ready(function () {
        ROLE HANDLING LOGIC
     ========================== */
     function handleRoles() {
-        alert('hello');
         let userType = $('#userType').val();
 
         // 👉 Fresh create page (no user type selected)

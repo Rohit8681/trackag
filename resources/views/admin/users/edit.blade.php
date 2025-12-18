@@ -487,6 +487,36 @@
         this.value = this.value.replace(/\D/g, '');
         if (this.value.length > 10) this.value = this.value.slice(0, 10);
     });
+    function handleRoles() {
+        let userType = $('#userType').val();
+
+        // 👉 Fresh create page (no user type selected)
+        // if (!userType) {
+        //     $('.role-checkbox').prop('disabled', false);
+        //     return;
+        // }
+
+        $('.role-checkbox').each(function () {
+            let role = $(this).data('role');
+
+            if (userType === 'sales_person' && role === 'sub_admin') {
+                $(this).prop('checked', false);
+                $(this).prop('disabled', true);
+            } else if(userType == ""){
+                $(this).prop('checked', false);
+                $(this).prop('disabled', true);
+            } else {
+                $(this).prop('disabled', false);
+            }
+        });
+    }
+
+    $('#userType').on('change', function () {
+        handleRoles();
+    });
+
+    // Page reload (old() case)
+    handleRoles();
 </script>
 <script>
 $(document).ready(function() {
