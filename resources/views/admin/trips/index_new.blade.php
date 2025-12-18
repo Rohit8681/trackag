@@ -180,7 +180,7 @@
                                                     <strong>Start:</strong>
                                                     @php $startTime = $trip->start_time; @endphp
                                                     <span class="text-success">
-                                                        {{ $startTime ? \Carbon\Carbon::parse($startTime)->format('d-m-Y H:i a') : '-' }}
+                                                        {{ $startTime ? \Carbon\Carbon::parse($startTime)->format('H:i a') : '-' }}
                                                     </span>
                                                 </div>
                                                 <div>

@@ -634,14 +634,14 @@
                                         <i class="bi bi-person-fill me-2"></i><p>Manage Users</p>
                                     </a>
                                 </li>
-                                @endcan
+                                @endcanany
                                 @canany('view_roles','create_roles','edit_roles','delete_roles')
                                 <li class="nav-item">
                                     <a href="{{ url('admin/roles') }}" class="nav-link {{ request()->is('admin/roles*') ? 'active' : '' }}">
                                     <i class="bi bi-shield-lock me-2"></i><p>Manage Roles</p>
                                     </a>
                                 </li>
-                                @endcan
+                                @endcanany
                                 {{-- @if(auth()->user() && auth()->user()->hasRole('master_admin')) --}}
                                 @canany('view_permissions','create_permissions','edit_permissions','delete_permissions')
                                 <li class="nav-item">
@@ -649,7 +649,7 @@
                                         <i class="bi bi-key me-2"></i><p>Manage Permissions</p>
                                     </a>
                                 </li>
-                                @endcan
+                                @endcanany
                                 {{-- @endif --}}
                             </ul>
                         </li>
