@@ -180,6 +180,7 @@
                                                     <strong>Start:</strong>
                                                     @php $startTime = $trip->start_time; @endphp
                                                     <span class="text-success">
+                                                        {{ $trip->trip_date ? \Carbon\Carbon::parse($trip->trip_date)->format('d-m-y') : '-' }}
                                                         {{ $startTime ? \Carbon\Carbon::parse($startTime)->format('H:i a') : '-' }}
                                                     </span>
                                                 </div>
@@ -188,7 +189,8 @@
                                                     @if ($trip->status === 'completed')
                                                         @php $endTime = $trip->end_time; @endphp
                                                         <span class="text-danger">
-                                                            {{ $endTime ? \Carbon\Carbon::parse($endTime)->format('d-m-Y H:i a') : '-' }}
+                                                            {{ $trip->trip_date ? \Carbon\Carbon::parse($trip->trip_date)->format('d-m-y') : '-' }}
+                                                            {{ $endTime ? \Carbon\Carbon::parse($endTime)->format('H:i a') : '-' }}
                                                         </span>
                                                     @else
                                                         <span class="badge bg-warning text-dark">Running</span>
