@@ -628,28 +628,28 @@
                                 <p>Sales Person<i class="bi bi-chevron-right ms-auto"></i></p>
                             </a>
                             <ul class="nav nav-treeview">
-                                @canany('view_users','create_users','edit_users','delete_users')
+                                {{-- @canany('view_users','create_users','edit_users','delete_users') --}}
                                 <li class="nav-item">
                                     <a href="{{ url('admin/users') }}" class="nav-link {{ request()->is('admin/users*') ? 'active' : '' }}">
                                         <i class="bi bi-person-fill me-2"></i><p>Manage Users</p>
                                     </a>
                                 </li>
-                                @endcanany
-                                @canany('view_roles','create_roles','edit_roles','delete_roles')
+                                {{-- @endcanany
+                                @canany('view_roles','create_roles','edit_roles','delete_roles') --}}
                                 <li class="nav-item">
                                     <a href="{{ url('admin/roles') }}" class="nav-link {{ request()->is('admin/roles*') ? 'active' : '' }}">
                                     <i class="bi bi-shield-lock me-2"></i><p>Manage Roles</p>
                                     </a>
                                 </li>
-                                @endcanany
-                                {{-- @if(auth()->user() && auth()->user()->hasRole('master_admin')) --}}
-                                @canany('view_permissions','create_permissions','edit_permissions','delete_permissions')
+                                {{-- @endcanany
+                                @if(auth()->user() && auth()->user()->hasRole('master_admin'))
+                                @canany('view_permissions','create_permissions','edit_permissions','delete_permissions') --}}
                                 <li class="nav-item">
                                     <a href="{{ url('admin/permissions') }}" class="nav-link {{ request()->is('admin/permissions*') ? 'active' : '' }}">
                                         <i class="bi bi-key me-2"></i><p>Manage Permissions</p>
                                     </a>
                                 </li>
-                                @endcanany
+                                {{-- @endcanany --}}
                                 {{-- @endif --}}
                             </ul>
                         </li>
