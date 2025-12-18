@@ -250,10 +250,21 @@
                                             <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
                                         </div>
-                                        <div class="col-md-3">
+                                        {{-- <div class="col-md-3">
                                             <label class="form-label">User Type</label>
                                             <input type="text" name="user_type" class="form-control"
                                                 value="{{ old('user_type') }}">
+                                        </div> --}}
+                                        <div class="col-md-3">
+                                            <label class="form-label">User Type</label>
+                                            <select name="user_type" id="userType" class="form-select">
+                                                <option value="">Select User Type</option>
+                                                <option value="sales_person" {{ old('user_type') == 'sales_person' ? 'selected' : '' }}>
+                                                    sales person</option>
+                                                <option value="other" {{ old('user_type') == 'other' ? 'selected' : '' }}>
+                                                    Other</option>
+                                            </select>
+
                                         </div>
                                         <div class="col-md-3">
                                             <label class="form-label">Joining Date<span class="text-danger">*</span></label>
@@ -433,7 +444,7 @@
 
                                     {{-- Roles --}}
                                     <h5 class="mb-3">Assign Roles<span class="text-danger">*</span></h5>
-                                    <div class="row g-3 mb-3">
+                                    {{-- <div class="row g-3 mb-3">
                                         @foreach ($roles as $role)
                                             <div class="col-md-2">
                                                 <div class="form-check">
@@ -444,6 +455,25 @@
                                                         {{ ucfirst($role->name) }}
                                                     </label>
                                                     
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div> --}}
+                                    <div class="row g-3 mb-3" id="rolesWrapper">
+                                        @foreach ($roles as $role)
+                                            <div class="col-md-2">
+                                                <div class="form-check">
+                                                    <input type="checkbox"
+                                                        name="roles[]"
+                                                        value="{{ $role->name }}"
+                                                        data-role="{{ $role->name }}"
+                                                        class="form-check-input role-checkbox"
+                                                        id="role-{{ $role->name }}"
+                                                        {{ is_array(old('roles')) && in_array($role->name, old('roles')) ? 'checked' : '' }}>
+
+                                                    <label class="form-check-label" for="role-{{ $role->name }}">
+                                                        {{ ucfirst($role->name) }}
+                                                    </label>
                                                 </div>
                                             </div>
                                         @endforeach
@@ -498,6 +528,32 @@
         if (this.value.length > 10) {
             this.value = this.value.slice(0, 10);
         }
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const userType = document.getElementById('userType');
+        const roleCheckboxes = document.querySelectorAll('.role-checkbox');
+
+        function handleRoles() {
+            if (userType.value === 'sales_person') {
+                roleCheckboxes.forEach(cb => {
+                    if (cb.dataset.role === 'sub_admin') {
+                        cb.checked = false;
+                        cb.disabled = true;   // ❌ sub_admin not allowed
+                    } else {
+                        cb.disabled = false; // ✅ others allowed
+                    }
+                });
+            } else {
+                // other OR empty
+                roleCheckboxes.forEach(cb => {
+                    cb.disabled = false; // ✅ all allowed
+                });
+            }
+        }
+
+        userType.addEventListener('change', handleRoles);
+        handleRoles(); // page load support
     });
 </script>
 <script>

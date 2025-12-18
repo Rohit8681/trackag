@@ -228,11 +228,21 @@
                                         <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
                                     </div>
-                                    <div class="col-md-3">
+                                    {{-- <div class="col-md-3">
                                         <label class="form-label">User Type</label>
                                         <input type="text" name="user_type" class="form-control" value="{{ old('user_type', $user->user_type) }}">
+                                    </div> --}}
+                                    <div class="col-md-3">
+                                        <label class="form-label">User Type</label>
+                                        <select name="user_type" class="form-select">
+                                            <option value="">Select User Type</option>
+                                            <option value="sales_person" {{ old('user_type',$user->user_type) == 'sales_person' ? 'selected' : '' }}>
+                                                sales person</option>
+                                            <option value="other" {{ old('user_type',$user->user_type) == 'other' ? 'selected' : '' }}>
+                                                Other</option>
+                                        </select>
+
                                     </div>
-                                    
                                     <div class="col-md-3">
                                         <label class="form-label">Joining Date<span class="text-danger">*</span></label>
                                         <input type="date" name="joining_date" class="form-control @error('joining_date') is-invalid @enderror" max="{{ date('Y-m-d') }}"
