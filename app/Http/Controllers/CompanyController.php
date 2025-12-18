@@ -369,6 +369,7 @@ class CompanyController extends Controller
                         ->table('users')
                         ->where('id', $adminUser->id)
                         ->update([
+                            'mobile' => $validated['contact_no'],
                             'password' => Hash::make($validated['user_password']),
                             'updated_at' => now(),
                         ]);
