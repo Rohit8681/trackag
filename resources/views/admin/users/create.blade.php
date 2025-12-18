@@ -656,7 +656,7 @@ $(document).ready(function () {
             if (userType === 'sales_person' && role === 'sub_admin') {
                 $(this).prop('checked', false);
                 $(this).prop('disabled', true);
-            } else if(userType == ""){
+            } else if(userType == "" && role === 'sub_admin'){
                 $(this).prop('checked', false);
                 $(this).prop('disabled', true);
             } else {
