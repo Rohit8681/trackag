@@ -642,18 +642,22 @@ $(document).ready(function () {
        ROLE HANDLING LOGIC
     ========================== */
     function handleRoles() {
+        alert('hello');
         let userType = $('#userType').val();
 
         // 👉 Fresh create page (no user type selected)
-        if (!userType) {
-            $('.role-checkbox').prop('disabled', false);
-            return;
-        }
+        // if (!userType) {
+        //     $('.role-checkbox').prop('disabled', false);
+        //     return;
+        // }
 
         $('.role-checkbox').each(function () {
             let role = $(this).data('role');
 
             if (userType === 'sales_person' && role === 'sub_admin') {
+                $(this).prop('checked', false);
+                $(this).prop('disabled', true);
+            } else if(userType == ""){
                 $(this).prop('checked', false);
                 $(this).prop('disabled', true);
             } else {
