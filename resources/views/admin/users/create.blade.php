@@ -631,9 +631,14 @@ $(document).ready(function() {
     });
 
     // ✅ GLOBAL function (NO auto call)
-    function handleRoles() {
+    function handleRoles(force = false) {
         const userType = document.getElementById('userType');
         const roleCheckboxes = document.querySelectorAll('.role-checkbox');
+
+        // 👉 Fresh create page (no old value) → do nothing
+        if (!userType.value && !force) {
+            return;
+        }
 
         if (userType.value === 'sales_person') {
             roleCheckboxes.forEach(cb => {
@@ -644,22 +649,24 @@ $(document).ready(function() {
                     cb.disabled = false;
                 }
             });
-        } else if (userType.value === 'other') {
+        } else {
             roleCheckboxes.forEach(cb => {
                 cb.disabled = false;
             });
         }
     }
 
-    // ✅ ONLY on change
+    // 🔹 change event
     document.getElementById('userType')
-        .addEventListener('change', handleRoles);
+        .addEventListener('change', function () {
+            handleRoles(true);
+        });
 </script>
 
 <script>
 $(document).ready(function () {
 
-    handleRoles()
+    handleRoles(true);
 
     $('#state_id').on('change', function () {
         var stateId = $(this).val();
