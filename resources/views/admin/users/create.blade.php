@@ -558,6 +558,7 @@
 </script>
 <script>
 $(document).ready(function() {
+    handleRoles();
     $('#state_id').on('change', function() {
         var stateId = $(this).val();
         $('#district_id').html('<option value="">Loading...</option>');
