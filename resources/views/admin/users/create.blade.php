@@ -601,7 +601,12 @@ $(document).ready(function() {
 
 @push('scripts')
 <script>
-    function togglePassword(id, btn) {
+$(document).ready(function () {
+
+    /* =========================
+       PASSWORD TOGGLE
+    ========================== */
+    window.togglePassword = function (id, btn) {
         const input = document.getElementById(id);
         const icon = btn.querySelector('i');
 
@@ -614,62 +619,66 @@ $(document).ready(function() {
             icon.classList.remove('fa-eye-slash');
             icon.classList.add('fa-eye');
         }
-    }
+    };
 
-    function validateChequePhotos(input) {
+    /* =========================
+       CHEQUE VALIDATION
+    ========================== */
+    window.validateChequePhotos = function (input) {
         if (input.files.length > 3) {
             alert("You can upload only up to 3 Cancel Cheque Photos.");
             input.value = "";
         }
-    }
+    };
 
+    /* =========================
+       MOBILE NUMBER ONLY
+    ========================== */
     $('.mobile_no').on('input', function () {
-        this.value = this.value.replace(/\D/g, '');
-        if (this.value.length > 10) {
-            this.value = this.value.slice(0, 10);
-        }
+        this.value = this.value.replace(/\D/g, '').slice(0, 10);
     });
 
-    // ✅ GLOBAL function (NO auto call)
-    function handleRoles(force = false) {
-        const userType = document.getElementById('userType');
-        const roleCheckboxes = document.querySelectorAll('.role-checkbox');
+    /* =========================
+       ROLE HANDLING LOGIC
+    ========================== */
+    function handleRoles() {
+        let userType = $('#userType').val();
 
-        // 👉 Fresh create page (no old value) → do nothing
-        if (!userType.value && !force) {
+        // 👉 Fresh create page (no user type selected)
+        if (!userType) {
+            $('.role-checkbox').prop('disabled', false);
             return;
         }
 
-        if (userType.value === 'sales_person') {
-            roleCheckboxes.forEach(cb => {
-                if (cb.dataset.role === 'sub_admin') {
-                    cb.checked = false;
-                    cb.disabled = true;
-                } else {
-                    cb.disabled = false;
-                }
-            });
-        } else {
-            roleCheckboxes.forEach(cb => {
-                cb.disabled = false;
-            });
-        }
+        $('.role-checkbox').each(function () {
+            let role = $(this).data('role');
+
+            if (userType === 'sales_person' && role === 'sub_admin') {
+                $(this).prop('checked', false);
+                $(this).prop('disabled', true);
+            } else {
+                $(this).prop('disabled', false);
+            }
+        });
     }
 
-    // 🔹 change event
-    document.getElementById('userType')
-        .addEventListener('change', function () {
-            handleRoles(true);
-        });
-</script>
+    /* =========================
+       EVENTS
+    ========================== */
 
-<script>
-$(document).ready(function () {
+    // User type change
+    $('#userType').on('change', function () {
+        handleRoles();
+    });
 
-    handleRoles(true);
+    // Page reload (old() case)
+    handleRoles();
 
+    /* =========================
+       STATE → DISTRICT → TEHSIL
+    ========================== */
     $('#state_id').on('change', function () {
-        var stateId = $(this).val();
+        let stateId = $(this).val();
         $('#district_id').html('<option value="">Loading...</option>');
         $('#tehsil_id').html('<option value="">-- Select Tehsil --</option>');
 
@@ -679,16 +688,16 @@ $(document).ready(function () {
         }
 
         $.get("{{ route('depos.get-districts') }}", { state_id: stateId }, function (data) {
-            var html = '<option value="">-- Select District --</option>';
+            let html = '<option value="">-- Select District --</option>';
             $.each(data, function (i, d) {
-                html += '<option value="' + d.id + '">' + d.name + '</option>';
+                html += `<option value="${d.id}">${d.name}</option>`;
             });
             $('#district_id').html(html);
         });
     });
 
     $('#district_id').on('change', function () {
-        var districtId = $(this).val();
+        let districtId = $(this).val();
         $('#tehsil_id').html('<option value="">Loading...</option>');
 
         if (!districtId) {
@@ -697,9 +706,9 @@ $(document).ready(function () {
         }
 
         $.get("{{ route('depos.get-tehsils') }}", { district_id: districtId }, function (data) {
-            var html = '<option value="">-- Select Tehsil --</option>';
+            let html = '<option value="">-- Select Tehsil --</option>';
             $.each(data, function (i, t) {
-                html += '<option value="' + t.id + '">' + t.name + '</option>';
+                html += `<option value="${t.id}">${t.name}</option>`;
             });
             $('#tehsil_id').html(html);
         });
@@ -708,5 +717,6 @@ $(document).ready(function () {
 });
 </script>
 @endpush
+
 
 
