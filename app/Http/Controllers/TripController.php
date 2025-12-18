@@ -174,8 +174,10 @@ class TripController extends Controller
     public function show(Trip $trip)
     {
         $tripLogs = TripLog::where('trip_id', $trip->id)
-            ->orderBy('recorded_at')
-            ->get(['latitude', 'longitude', 'recorded_at']);
+    ->where('latitude', '!=', 0)
+    ->where('longitude', '!=', 0)
+    ->orderBy('recorded_at')
+    ->get(['latitude', 'longitude', 'recorded_at']);
         
         return view('admin.trips.show_new', compact('trip', 'tripLogs'));
 

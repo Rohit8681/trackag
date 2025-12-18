@@ -146,7 +146,7 @@ class ApiTripController extends BaseController
         // Insert logs safely within a transaction
         $logs = DB::transaction(function () use ($locations) {
             return collect($locations)->map(function ($loc) {
-                if($loc['latitude'] != 0 && $loc['longitude'] != 0){
+                // if($loc['latitude'] != 0 && $loc['longitude'] != 0){
                     return TripLog::create([
                         'trip_id' => $loc['tripId'],
                         'latitude' => $loc['latitude'],
@@ -157,7 +157,7 @@ class ApiTripController extends BaseController
                             : $loc['battery_percentage'],
                         'recorded_at' => $loc['recorded_at'],
                     ]);
-                }
+                // }
                 
             });
         });
