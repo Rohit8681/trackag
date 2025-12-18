@@ -152,9 +152,9 @@ class UserController extends Controller
         $authUser = auth()->user();
         $roleName = $authUser->getRoleNames()->first();
         $roles = Role::all();
-        if($roleName == 'sub_admin'){
-            $roles = Role::where('name', '!=', 'sub_admin')->get();
-        }
+        // if($roleName == 'sub_admin'){
+        //     $roles = Role::where('name', '!=', 'sub_admin')->get();
+        // }
 
         $companies = Company::all();
         $users = User::where('id', '!=', $user->id)->get();
