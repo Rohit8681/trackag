@@ -659,7 +659,7 @@ $(document).ready(function() {
 <script>
 $(document).ready(function () {
 
-    // ❌ handleRoles();  <-- REMOVE THIS LINE
+    handleRoles()
 
     $('#state_id').on('change', function () {
         var stateId = $(this).val();
