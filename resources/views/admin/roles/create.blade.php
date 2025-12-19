@@ -112,12 +112,14 @@
                                             'ta_da',
                                             'ta_da_bill_master',
                                         ],
-                                        'User Management' => [
+                                        'User Management' => array_filter([
                                             'users',
                                             'roles',
-                                            'permissions',
+                                            auth()->user() && auth()->user()->hasRole('master_admin')
+                                                ? 'permissions'
+                                                : null,
                                             'companies',
-                                        ],
+                                        ]),
                                     ];
                                     @endphp
 
@@ -138,13 +140,35 @@
                                                     {{ ucwords(str_replace('_',' ', $subModule)) }}
                                                 </td>
 
-                                                @foreach ($actions as $actionKey => $label)
+                                                {{-- @foreach ($actions as $actionKey => $label)
                                                     @php
                                                         $permissionName = $actionKey.'_'.$subModule;
                                                         $permission = $permissions->firstWhere('name', $permissionName);
                                                     @endphp
                                                     <td>
                                                         @if ($permission)
+                                                            <input type="checkbox"
+                                                                class="form-check-input permission-checkbox"
+                                                                name="permissions[]"
+                                                                value="{{ $permissionName }}"
+                                                                data-action="{{ $actionKey }}">
+                                                        @else
+                                                            <span class="text-muted">—</span>
+                                                        @endif
+                                                    </td>
+                                                @endforeach --}}
+                                                @foreach ($actions as $actionKey => $label)
+                                                    @php
+                                                        $permissionName = $actionKey.'_'.$subModule;
+                                                        $permission = $permissions->firstWhere('name', $permissionName);
+
+                                                        // companies: only view allowed
+                                                        $isCompanies = ($subModule === 'companies');
+                                                        $allowThisAction = !$isCompanies || ($actionKey === 'view');
+                                                    @endphp
+
+                                                    <td>
+                                                        @if ($permission && $allowThisAction)
                                                             <input type="checkbox"
                                                                 class="form-check-input permission-checkbox"
                                                                 name="permissions[]"
