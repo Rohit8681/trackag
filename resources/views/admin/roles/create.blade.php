@@ -162,9 +162,14 @@
                                                         $permissionName = $actionKey.'_'.$subModule;
                                                         $permission = $permissions->firstWhere('name', $permissionName);
 
-                                                        // companies: only view allowed
-                                                        $isCompanies = ($subModule === 'companies');
-                                                        $allowThisAction = !$isCompanies || ($actionKey === 'view');
+                                                        $isMasterAdmin = auth()->user() && auth()->user()->hasRole('master_admin');
+                                                        $isCompanies   = ($subModule === 'companies');
+
+                                                        if ($isMasterAdmin) {
+                                                            $allowThisAction = true;
+                                                        } else {
+                                                            $allowThisAction = !$isCompanies || ($actionKey === 'view');
+                                                        }
                                                     @endphp
 
                                                     <td>
@@ -179,6 +184,7 @@
                                                         @endif
                                                     </td>
                                                 @endforeach
+
                                             </tr>
                                         @endforeach
 
