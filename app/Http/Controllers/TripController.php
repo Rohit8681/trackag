@@ -12,6 +12,7 @@ use App\Models\Customer;
 use App\Models\PartyVisit;
 use App\Models\State;
 use App\Models\User;
+use Carbon\Carbon;
 
 class TripController extends Controller
 {
@@ -180,9 +181,29 @@ class TripController extends Controller
         ->orderBy('recorded_at')
         ->get(['latitude', 'longitude', 'recorded_at']);
 
-        $partyVisits = PartyVisit::with('customer')->whereDate('visited_date', $trip->trip_date)
+        $partyVisits = PartyVisit::with('customer')
+        ->whereDate('visited_date', $trip->trip_date)
         ->where('user_id', $trip->user_id)
-        ->get();
+        ->whereNotNull('latitude')
+        ->whereNotNull('longitude')
+        ->get()
+        ->map(function ($visit) {
+            return [
+                'latitude' => $visit->latitude,
+                'longitude' => $visit->longitude,
+
+                // ✅ FIXED TIME (IST)
+                'check_in_time' => $visit->check_in_time
+                    ? Carbon::parse($visit->check_in_time)
+                        ->timezone('Asia/Kolkata')
+                        ->format('d-m-Y h:i A')
+                    : null,
+
+                'customer' => [
+                    'agro_name' => $visit->customer->agro_name ?? 'Customer'
+                ],
+            ];
+        });
 
         // dd($partyVisits);
         

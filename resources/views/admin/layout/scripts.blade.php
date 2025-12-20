@@ -314,7 +314,7 @@ function initMap() {
 
 }
 </script> --}}
-<script>
+{{-- <script>
 function initMap() {
 
     const tripLogs = window.tripLogs || [];
@@ -425,6 +425,7 @@ function initMap() {
 
         // ✅ customer agro name
         const agroName = party.customer?.agro_name ?? 'Customer';
+        Check-in Time: ${party.check_in_time ?? ''}
 
         const marker = new google.maps.Marker({
             position: {
@@ -455,7 +456,129 @@ function initMap() {
     });
 
 }
+</script> --}}
+<script>
+function initMap() {
+
+    const tripLogs = window.tripLogs || [];
+    const partyVisits = window.partyVisits || [];
+    const tripEnded = window.tripEnded;
+
+    if (!tripLogs.length) {
+        console.warn("No trip logs found");
+        return;
+    }
+
+    const pathCoordinates = tripLogs.map(l => ({
+        lat: parseFloat(l.latitude),
+        lng: parseFloat(l.longitude),
+        recorded_at: l.recorded_at
+    }));
+
+    const map = new google.maps.Map(document.getElementById("map"), {
+        zoom: 13,
+        center: pathCoordinates[0],
+    });
+
+    // ---------- POLYLINE ----------
+    if (pathCoordinates.length > 1) {
+        new google.maps.Polyline({
+            path: pathCoordinates,
+            geodesic: true,
+            strokeColor: "#007bff",
+            strokeWeight: 4,
+            map
+        });
+    }
+
+    // ---------- ICONS ----------
+    const startIcon = {
+        url: "{{ asset('img/start-green.png') }}",
+        scaledSize: new google.maps.Size(60, 60)
+    };
+
+    const middleIcon = {
+        url: "{{ asset('img/mid-blue.png') }}",
+        scaledSize: new google.maps.Size(15, 15)
+    };
+
+    const endIcon = {
+        url: "{{ asset('img/end-red.png') }}",
+        scaledSize: new google.maps.Size(60, 60)
+    };
+
+    const partyIcon = {
+        url: "{{ asset('img/end-red.png') }}",
+        scaledSize: new google.maps.Size(40, 40)
+    };
+
+    // ---------- START ----------
+    new google.maps.Marker({
+        position: pathCoordinates[0],
+        map,
+        icon: startIcon,
+        title: "Start: " + (pathCoordinates[0].recorded_at ?? '')
+    });
+
+    // ---------- MIDDLE ----------
+    for (let i = 1; i < pathCoordinates.length - 1; i++) {
+        new google.maps.Marker({
+            position: pathCoordinates[i],
+            map,
+            icon: middleIcon,
+            title: pathCoordinates[i].recorded_at
+        });
+    }
+
+    // ---------- END ----------
+    if (tripEnded && pathCoordinates.length > 1) {
+        const last = pathCoordinates[pathCoordinates.length - 1];
+
+        new google.maps.Marker({
+            position: last,
+            map,
+            icon: endIcon,
+            title: "End: " + (last.recorded_at ?? '')
+        });
+    }
+
+    // ---------- PARTY VISITS ----------
+    const infoWindow = new google.maps.InfoWindow();
+
+    partyVisits.forEach(party => {
+
+        if (!party.latitude || !party.longitude) return;
+
+        const agroName = party.customer?.agro_name ?? 'Customer';
+
+        const marker = new google.maps.Marker({
+            position: {
+                lat: parseFloat(party.latitude),
+                lng: parseFloat(party.longitude)
+            },
+            map,
+            icon: partyIcon,
+
+            // 👉 cursor hover tooltip
+            title: agroName
+        });
+
+        // 👉 hover popup
+        marker.addListener("mouseover", () => {
+            infoWindow.setContent(`
+                <strong>${agroName}</strong><br>
+                Check-in Time: ${party.check_in_time ?? ''}
+            `);
+            infoWindow.open(map, marker);
+        });
+
+        marker.addListener("mouseout", () => {
+            infoWindow.close();
+        });
+    });
+}
 </script>
+
 
 
 
