@@ -10,10 +10,40 @@ use App\Models\User;
 use App\Models\Depo;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
+use Maatwebsite\Excel\Concerns\WithValidation;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
 
-class CustomersImport implements ToModel, WithHeadingRow
+class CustomersImport implements ToModel, WithHeadingRow, WithValidation
 {
+    public function rules(): array
+    {
+        return [
+            'agro_name' => 'required|string',
+            'phone' => 'required',
+            'contact_person_name' => 'required|string',
+
+            // baaki optional
+            'party_code' => 'nullable',
+            'state' => 'nullable',
+            'district' => 'nullable',
+            'tehsil' => 'nullable',
+            'address' => 'nullable',
+            'gst_no' => 'nullable',
+            'depo' => 'nullable',
+            'credit_limit' => 'nullable|numeric',
+            'party_active_since' => 'nullable',
+            'status' => 'nullable',
+        ];
+    }
+
+    public function customValidationMessages()
+    {
+        return [
+            'agro_name.required' => 'Agro Name required che',
+            'phone.required' => 'Phone required che',
+            'contact_person_name.required' => 'Contact Person Name required che',
+        ];
+    }
     public function model(array $row)
     {
         
