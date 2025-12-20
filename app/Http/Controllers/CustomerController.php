@@ -217,7 +217,7 @@ class CustomerController extends Controller
             Excel::import(new CustomersImport, $request->file('file'));
             return redirect()->route('customers.index')->with('success', 'Customers imported successfully!');
         } catch (\Exception $e) {
-            dd($e->getMessage());
+            // dd($e->getMessage());
             return redirect()->back()->with('error', 'Import failed: ' . $e->getMessage());
         }
     }
