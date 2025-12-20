@@ -4,7 +4,6 @@ namespace App\Traits;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Config;
-use App\Models\Tenant;
 
 trait TenantConnectionTrait
 {
@@ -13,81 +12,58 @@ trait TenantConnectionTrait
      */
     public function getConnectionName()
     {
-        /**
-         * STEP 1:
-         * If tenancy already initialized, always use tenant connection
-         */
-        if (tenancy()->initialized) {
-            return 'tenant';
+        // If we're in a tenant context, use tenant connection
+        if (tenancy()->tenant) {
+            $tenant = tenancy()->tenant;
+            $databaseName = $tenant->getDatabaseName();
+            
+            if ($databaseName && $databaseName !== 'default_tenant_db') {
+                // Ensure the tenant database is set
+                Config::set("database.connections.tenant.database", $databaseName);
+                
+                // Purge and reconnect to ensure the new database is used
+                DB::purge('tenant');
+                DB::reconnect('tenant');
+                
+                return 'tenant';
+            }
         }
-
-        /**
-         * STEP 2:
-         * Detect domain
-         */
+        
+        // Check if we're on a tenant domain but tenancy is not initialized
         $domain = request()->getHost();
+        // $centralDomains = ['127.0.0.1', 'localhost'];
+        $centralDomains = ['127.0.0.1', 'localhost', 'trackag.in', 'www.trackag.in'];
 
-        /**
-         * STEP 3:
-         * Central domains (NO tenant here)
-         */
-        $centralDomains = [
-            '127.0.0.1',
-            'localhost',
-            'trackag.in',
-            'www.trackag.in',
-        ];
-
-        /**
-         * STEP 4:
-         * VERY IMPORTANT FIX 🔥
-         * If user already logged in → DO NOT auto switch tenant
-         */
-        if (
-            !in_array($domain, $centralDomains) &&
-            !auth()->check() // ⭐ MAIN FIX
-        ) {
-            /**
-             * STEP 5:
-             * Find tenant by domain
-             */
-            $tenant = Tenant::whereHas('domains', function ($query) use ($domain) {
+        if (!in_array($domain, $centralDomains)) {
+            // We're on a tenant domain, try to find and initialize tenant
+            $tenant = \App\Models\Tenant::whereHas('domains', function($query) use ($domain) {
                 $query->where('domain', $domain);
             })->first();
-
+            
             if ($tenant) {
                 $databaseName = $tenant->getDatabaseName();
-
                 if ($databaseName && $databaseName !== 'default_tenant_db') {
-                    /**
-                     * STEP 6:
-                     * Set tenant DB connection dynamically
-                     */
-                    Config::set('database.connections.tenant.database', $databaseName);
-
+                    // Set the database name in the tenant connection
+                    Config::set("database.connections.tenant.database", $databaseName);
+                    
+                    // Purge and reconnect to ensure the new database is used
                     DB::purge('tenant');
                     DB::reconnect('tenant');
-
-                    /**
-                     * STEP 7:
-                     * Initialize tenancy ONCE (guest only)
-                     */
+                    
+                    // Initialize tenancy context
                     tenancy()->initialize($tenant);
-
+                    
                     return 'tenant';
                 }
             }
         }
-
-        /**
-         * STEP 8:
-         * Fallback to default connection
-         */
+        
+        // Fallback to default connection
         return $this->connection ?? 'mysql';
     }
-
+    
     /**
-     * Override the connection dynamically
+     * Override the connection property dynamically
      */
     public function getConnection()
     {
