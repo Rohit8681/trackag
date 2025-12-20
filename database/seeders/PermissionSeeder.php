@@ -12,20 +12,20 @@ class PermissionSeeder extends Seeder
     public function run(): void
     {
         // Step 1: Disable foreign key checks
-        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        // DB::statement('SET FOREIGN_KEY_CHECKS=0;');
 
-        // Step 2: Truncate related pivot tables first
-        DB::table('model_has_permissions')->truncate();
-        DB::table('role_has_permissions')->truncate();
+        // // Step 2: Truncate related pivot tables first
+        // DB::table('model_has_permissions')->truncate();
+        // DB::table('role_has_permissions')->truncate();
 
-        // Step 3: Truncate permissions table
-        Permission::truncate();
+        // // Step 3: Truncate permissions table
+        // Permission::truncate();
 
-        // Step 4: Enable foreign key checks
-        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+        // // Step 4: Enable foreign key checks
+        // DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
-        // Step 5: Clear Spatie cache
-        app()[PermissionRegistrar::class]->forgetCachedPermissions();
+        // // Step 5: Clear Spatie cache
+        // app()[PermissionRegistrar::class]->forgetCachedPermissions();
         
         $permissions = [
             'view_users',
