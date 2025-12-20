@@ -41,6 +41,7 @@
     <script>
         window.tripLogs = @json($tripLogs);
         window.tripEnded = {{ $trip->end_time ? 'true' : 'false' }};
+         window.partyVisits = @json($partyVisits);
     </script>
 
     <!-- Enhanced CSS -->

@@ -82,7 +82,7 @@
         document.querySelectorAll('.connectedSortable .card-header').forEach(el => el.style.cursor = 'move');
     });
 </script>
-<script>
+{{-- <script>
 
 function initMap() {
     const tripLogs = window.tripLogs || [];
@@ -181,8 +181,139 @@ map.setCenter(pathCoordinates[0]);
 
 
 // document.addEventListener("DOMContentLoaded", initMap);
-</script>
+</script> --}}
 
+<script>
+function initMap() {
+
+    const tripLogs = window.tripLogs || [];
+    const partyVisits = window.partyVisits || [];
+    const tripEnded = window.tripEnded;
+
+    if (!tripLogs.length) {
+        console.warn("No trip logs found");
+        return;
+    }
+
+    // Convert trip logs to coordinates
+    const pathCoordinates = tripLogs.map(l => ({
+        lat: parseFloat(l.latitude),
+        lng: parseFloat(l.longitude),
+        recorded_at: l.recorded_at
+    }));
+
+    // Map init
+    const map = new google.maps.Map(document.getElementById("map"), {
+        zoom: 13,
+        center: pathCoordinates[0],
+    });
+
+    // ---------------- POLYLINE ----------------
+    if (pathCoordinates.length > 1) {
+        const tripPath = new google.maps.Polyline({
+            path: pathCoordinates,
+            geodesic: true,
+            strokeColor: "#007bff",
+            strokeOpacity: 1,
+            strokeWeight: 4,
+        });
+        tripPath.setMap(map);
+    }
+
+    // ---------------- ICONS ----------------
+    const startIcon = {
+        url: "{{ asset('img/start-green.png') }}",
+        scaledSize: new google.maps.Size(60, 60)
+    };
+
+    const middleIcon = {
+        url: "{{ asset('img/mid-blue.png') }}",
+        scaledSize: new google.maps.Size(15, 15)
+    };
+
+    const endIcon = {
+        url: "{{ asset('img/end-red.png') }}",
+        scaledSize: new google.maps.Size(60, 60)
+    };
+
+    const partyIcon = {
+        url: "{{ asset('img/party-yellow.png') }}",
+        scaledSize: new google.maps.Size(40, 40)
+    };
+
+    // ---------------- START MARKER ----------------
+    new google.maps.Marker({
+        position: pathCoordinates[0],
+        map,
+        icon: startIcon,
+        title: "Start: " + (pathCoordinates[0].recorded_at ?? ''),
+        label: {
+            text: "Start",
+            color: "#fff",
+            fontSize: "12px",
+            fontWeight: "bold"
+        }
+    });
+
+    // ---------------- MIDDLE MARKERS ----------------
+    for (let i = 1; i < pathCoordinates.length - 1; i++) {
+        new google.maps.Marker({
+            position: pathCoordinates[i],
+            map,
+            icon: middleIcon,
+            title: pathCoordinates[i].recorded_at,
+        });
+    }
+
+    // ---------------- END MARKER ----------------
+    if (tripEnded && pathCoordinates.length > 1) {
+        const last = pathCoordinates[pathCoordinates.length - 1];
+
+        new google.maps.Marker({
+            position: last,
+            map,
+            icon: endIcon,
+            title: "End: " + (last.recorded_at ?? ''),
+            label: {
+                text: "End",
+                color: "#fff",
+                fontSize: "12px",
+                fontWeight: "bold"
+            }
+        });
+    }
+
+    // ---------------- PARTY VISIT CHECK-IN MARKERS ----------------
+    partyVisits.forEach(party => {
+
+        if (!party.latitude || !party.longitude) return;
+
+        const marker = new google.maps.Marker({
+            position: {
+                lat: parseFloat(party.latitude),
+                lng: parseFloat(party.longitude)
+            },
+            map,
+            icon: partyIcon,
+            title: "Check-in: " + (party.check_in_time ?? '')
+        });
+
+        const infoWindow = new google.maps.InfoWindow({
+            content: `
+                <div style="font-size:14px">
+                    <strong>${party.party_name ?? 'Party Visit'}</strong><br>
+                    Check-in Time: ${party.check_in_time ?? ''}
+                </div>
+            `
+        });
+
+        marker.addListener("click", () => {
+            infoWindow.open(map, marker);
+        });
+    });
+
+}
+</script>
 
 
 

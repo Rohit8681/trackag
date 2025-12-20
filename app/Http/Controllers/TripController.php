@@ -183,7 +183,6 @@ class TripController extends Controller
         $partyVisits = PartyVisit::with('customer')->whereDate('visited_date', $trip->trip_date)
         ->where('user_id', $trip->user_id)
         ->get();
-        dd($partyVisits);
         
         return view('admin.trips.show_new', compact('trip', 'tripLogs','partyVisits'));
 
