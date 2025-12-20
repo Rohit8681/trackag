@@ -508,7 +508,7 @@ function initMap() {
     };
 
     const partyIcon = {
-        url: "{{ asset('img/end-red.png') }}",
+        url: "{{ asset('img/yellow.png') }}",
         scaledSize: new google.maps.Size(40, 40)
     };
 
