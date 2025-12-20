@@ -249,8 +249,10 @@ class CompanyController extends Controller
                 $permissionModel->setConnection('tenant');
 
                 $role = $roleModel->firstOrCreate(['name' => 'sub_admin','guard_name' => 'web']);
-                $permissions = $permissionModel->pluck('name')->toArray();
-                dd($permissions);
+                app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+                // app(PermissionRegistrar::class)->forgetCachedPermissions();
+                // $permissions = $permissionModel->pluck('name')->toArray();
+                $permissions = $permissionModel->get();
                 if (!empty($permissions)) {
                     $role->syncPermissions($permissions);
                 }
