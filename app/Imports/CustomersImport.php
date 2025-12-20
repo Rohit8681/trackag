@@ -49,9 +49,9 @@ class CustomersImport implements ToModel, WithHeadingRow, WithValidation
     public function rules(): array
     {
         return [
-            'agro_name' => 'required|string',
-            'phone' => 'required|string',
-            'contact_person_name' => 'required|string',
+            'agro_name' => 'required',
+            'phone' => 'required',
+            'contact_person_name' => 'required',
         ];
     }
 
