@@ -10,35 +10,60 @@ use App\Models\User;
 use App\Models\Depo;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
-use PhpOffice\PhpSpreadsheet\Shared\Date;
+use Maatwebsite\Excel\Concerns\WithValidation;
+use Maatwebsite\Excel\Helpers\Date;
 
-class CustomersImport implements ToModel, WithHeadingRow
+class CustomersImport implements ToModel, WithHeadingRow, WithValidation
 {
     public function model(array $row)
     {
-        
+        // Lookup related data
         $state = State::where('name', $row['state'] ?? '')->first();
         $district = District::where('name', $row['district'] ?? '')->first();
         $tehsil = Tehsil::where('name', $row['tehsil'] ?? '')->first();
-        $executive = User::where('name', $row['contact_person_name'] ?? '')->first();
+        $executive = User::where('name', $row['contact_person_name'])->first();
         $depo = Depo::where('depo_name', $row['depo'] ?? '')->first();
-        
+
         return new Customer([
             'agro_name' => $row['agro_name'],
-            'party_code' => $row['party_code'],
+            'party_code' => $row['party_code'] ?? null,
             'state_id' => $state?->id,
             'district_id' => $district?->id,
             'tehsil_id' => $tehsil?->id,
             'address' => $row['address'] ?? null,
             'phone' => $row['phone'],
-            'gst_no' => $row['gst_no'],
+            'gst_no' => $row['gst_no'] ?? null,
             'user_id' => $executive?->id,
             'depo_id' => $depo?->id,
             'credit_limit' => $row['credit_limit'] ?? 0,
-            'party_active_since' => isset($row['party_active_since']) 
-            ? Date::excelToDateTimeObject($row['party_active_since'])->format('Y-m-d') 
-            : now(),
-            'is_active' => ($row['status'] == 'active' ? 1 : 0),
+            'party_active_since' => isset($row['party_active_since'])
+                ? Date::excelToDateTimeObject($row['party_active_since'])->format('Y-m-d')
+                : now(),
+            'is_active' => (strtolower($row['status'] ?? '') === 'active' ? 1 : 0),
         ]);
+    }
+
+    /**
+     * Validation rules for each row
+     */
+    public function rules(): array
+    {
+        return [
+            'agro_name' => 'required|string',
+            'phone' => 'required|string',
+            'contact_person_name' => 'required|string',
+        ];
+    }
+
+    /**
+     * Optional: Custom validation messages
+     */
+    public function customValidationMessages()
+    {
+        return [
+            'agro_name.required' => 'Agro Name is required',
+            'phone.required' => 'Phone is required',
+            'contact_person_name.required' => 'Contact Person Name is required',
+        ];
     }
 }
