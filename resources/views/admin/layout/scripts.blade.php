@@ -509,7 +509,7 @@ function initMap() {
 
     const partyIcon = {
         url: "{{ asset('img/yellow.png') }}",
-        scaledSize: new google.maps.Size(40, 40)
+        scaledSize: new google.maps.Size(60, 60)
     };
 
     // ---------- START ----------
