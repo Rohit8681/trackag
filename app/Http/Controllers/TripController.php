@@ -185,7 +185,7 @@ class TripController extends Controller
         ->get();
         dd($partyVisits);
         
-        return view('admin.trips.show_new', compact('trip', 'tripLogs'));
+        return view('admin.trips.show_new', compact('trip', 'tripLogs','partyVisits'));
 
     }
 
