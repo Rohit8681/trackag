@@ -11,10 +11,15 @@ use App\Models\Depo;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithValidation;
+use Maatwebsite\Excel\Concerns\SkipsOnFailure;
+use Maatwebsite\Excel\Concerns\SkipsFailures;
+use Maatwebsite\Excel\Concerns\Importable;
 use Maatwebsite\Excel\Helpers\Date;
 
-class CustomersImport implements ToModel, WithHeadingRow, WithValidation
+class CustomersImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnFailure
 {
+    use Importable, SkipsFailures;
+
     public function model(array $row)
     {
         // Lookup related data
@@ -43,9 +48,7 @@ class CustomersImport implements ToModel, WithHeadingRow, WithValidation
         ]);
     }
 
-    /**
-     * Validation rules for each row
-     */
+    // Required field validation
     public function rules(): array
     {
         return [
@@ -55,9 +58,6 @@ class CustomersImport implements ToModel, WithHeadingRow, WithValidation
         ];
     }
 
-    /**
-     * Optional: Custom validation messages
-     */
     public function customValidationMessages()
     {
         return [

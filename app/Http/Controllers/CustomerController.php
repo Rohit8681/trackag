@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use Maatwebsite\Excel\Facades\Excel;
+use Maatwebsite\Excel\Validators\Failure;
 use App\Imports\CustomersImport;
 
 class CustomerController extends Controller
@@ -207,17 +208,47 @@ class CustomerController extends Controller
         return redirect()->route('customers.index')->with('success', 'Selected customers deleted successfully.');
     }
 
+    // public function import(Request $request)
+    // {
+    //     $request->validate([
+    //         'file' => 'required|mimes:xlsx,csv,xls|max:2048',
+    //     ]);
+
+    //     try {
+    //         Excel::import(new CustomersImport, $request->file('file'));
+    //         return redirect()->route('customers.index')->with('success', 'Customers imported successfully!');
+    //     } catch (\Exception $e) {
+    //         // dd($e->getMessage());
+    //         return redirect()->back()->with('error', 'Import failed: ' . $e->getMessage());
+    //     }
+    // }
     public function import(Request $request)
     {
         $request->validate([
             'file' => 'required|mimes:xlsx,csv,xls|max:2048',
         ]);
 
+        $import = new CustomersImport;
+
         try {
-            Excel::import(new CustomersImport, $request->file('file'));
-            return redirect()->route('customers.index')->with('success', 'Customers imported successfully!');
+            $import->import($request->file('file'));
+
+            $failures = $import->failures(); // get skipped rows
+            $errorMessage = '';
+            if (!empty($failures)) {
+                foreach ($failures as $failure) {
+                    $errorMessage .= 'Row '.$failure->row().': '.implode(', ', $failure->errors()).'<br>';
+                }
+            }
+
+            $message = 'Customers imported successfully!';
+            if ($errorMessage) {
+                $message .= '<br>However, some rows were skipped:<br>'.$errorMessage;
+            }
+
+            return redirect()->route('customers.index')->with('success', $message);
+
         } catch (\Exception $e) {
-            // dd($e->getMessage());
             return redirect()->back()->with('error', 'Import failed: ' . $e->getMessage());
         }
     }
