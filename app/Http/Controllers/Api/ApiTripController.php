@@ -102,12 +102,12 @@ class ApiTripController extends BaseController
     public function logPoint(Request $request)
     {
         // 🪵 Log the entire incoming request
-        Log::info('Received logPoint request:', [
-            'payload' => $request->all(),
-            'ip' => $request->ip(),
-            'user_agent' => $request->userAgent(),
-            'timestamp' => now()->toDateTimeString(),
-        ]);
+        // Log::info('Received logPoint request:', [
+        //     'payload' => $request->all(),
+        //     'ip' => $request->ip(),
+        //     'user_agent' => $request->userAgent(),
+        //     'timestamp' => now()->toDateTimeString(),
+        // ]);
 
         // Validate incoming request
         $validated = $request->validate([
@@ -123,7 +123,7 @@ class ApiTripController extends BaseController
         $locations = $validated['location'];
 
         // 🪵 Log validated data
-        Log::info('Validated logPoint data:', $locations);
+        // Log::info('Validated logPoint data:', $locations);
 
         // Check for completed trips
         $tripIds = collect($locations)->pluck('tripId'); // fixed typo (was trip_id)
@@ -133,9 +133,9 @@ class ApiTripController extends BaseController
             ->toArray();
 
         if (!empty($completedTrips)) {
-            Log::warning('Attempt to log points for completed trips', [
-                'trip_ids' => $completedTrips,
-            ]);
+            // Log::warning('Attempt to log points for completed trips', [
+            //     'trip_ids' => $completedTrips,
+            // ]);
 
             return response()->json([
                 'success' => false,
@@ -163,10 +163,10 @@ class ApiTripController extends BaseController
         });
 
         // 🪵 Log successful insertions
-        Log::info('Trip logs inserted successfully', [
-            'count' => count($logs),
-            'trip_ids' => collect($logs)->pluck('trip_id'),
-        ]);
+        // Log::info('Trip logs inserted successfully', [
+        //     'count' => count($logs),
+        //     'trip_ids' => collect($logs)->pluck('trip_id'),
+        // ]);
 
         return $this->sendResponse($logs, "Trip logs recorded successfully");
     }
