@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Models\Customer;
+use App\Models\PartyVisit;
 use App\Models\State;
 use App\Models\User;
 
@@ -174,10 +175,15 @@ class TripController extends Controller
     public function show(Trip $trip)
     {
         $tripLogs = TripLog::where('trip_id', $trip->id)
-    ->where('latitude', '!=', 0)
-    ->where('longitude', '!=', 0)
-    ->orderBy('recorded_at')
-    ->get(['latitude', 'longitude', 'recorded_at']);
+        ->where('latitude', '!=', 0)
+        ->where('longitude', '!=', 0)
+        ->orderBy('recorded_at')
+        ->get(['latitude', 'longitude', 'recorded_at']);
+
+        $partyVisits = PartyVisit::with('customer')->whereDate('visited_date', $trip->trip_date)
+        ->where('user_id', $trip->user_id)
+        ->get();
+        dd($partyVisits);
         
         return view('admin.trips.show_new', compact('trip', 'tripLogs'));
 
