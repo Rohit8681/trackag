@@ -566,7 +566,7 @@ function initMap() {
         // 👉 hover popup
         marker.addListener("mouseover", () => {
             infoWindow.setContent(`
-                <strong>${agroName}</strong><br>
+                <strong>${agroName}</strong>
                 Check-in Time: ${party.check_in_time ?? ''}
             `);
             infoWindow.open(map, marker);
