@@ -73,6 +73,7 @@ class CompanyController extends Controller
 
     public function store(StoreCompanyRequest $request)
     {
+        dd($request->all());
         $validated = $request->validated();
 
         // Handle logo upload
