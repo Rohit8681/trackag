@@ -250,7 +250,7 @@ class CompanyController extends Controller
 
                 $role = $roleModel->firstOrCreate(['name' => 'sub_admin','guard_name' => 'web']);
                 $permissions = $permissionModel->pluck('name')->toArray();
-
+                dd($permissions);
                 if (!empty($permissions)) {
                     $role->syncPermissions($permissions);
                 }
