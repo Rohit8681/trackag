@@ -86,6 +86,9 @@
         .fw-bold {
             font-weight: 600 !important;
         }
+        .gm-ui-hover-effect {
+            display: none !important;
+        }
     </style>
 </main>
 @endsection
