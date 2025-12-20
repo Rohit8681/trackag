@@ -18,6 +18,7 @@ class CustomersImport implements ToModel, WithHeadingRow, WithValidation
     public function model(array $row)
     {
         // Lookup related data
+        dd($row);
         $state = State::where('name', $row['state'] ?? '')->first();
         $district = District::where('name', $row['district'] ?? '')->first();
         $tehsil = Tehsil::where('name', $row['tehsil'] ?? '')->first();
