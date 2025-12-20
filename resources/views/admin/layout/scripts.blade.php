@@ -183,7 +183,7 @@ map.setCenter(pathCoordinates[0]);
 // document.addEventListener("DOMContentLoaded", initMap);
 </script> --}}
 
-<script>
+{{-- <script>
 function initMap() {
 
     const tripLogs = window.tripLogs || [];
@@ -313,7 +313,150 @@ function initMap() {
     });
 
 }
+</script> --}}
+<script>
+function initMap() {
+
+    const tripLogs = window.tripLogs || [];
+    const partyVisits = window.partyVisits || [];
+    const tripEnded = window.tripEnded;
+
+    if (!tripLogs.length) {
+        console.warn("No trip logs found");
+        return;
+    }
+
+    // Convert trip logs to coordinates
+    const pathCoordinates = tripLogs.map(l => ({
+        lat: parseFloat(l.latitude),
+        lng: parseFloat(l.longitude),
+        recorded_at: l.recorded_at
+    }));
+
+    // Map init
+    const map = new google.maps.Map(document.getElementById("map"), {
+        zoom: 13,
+        center: pathCoordinates[0],
+    });
+
+    // ---------------- POLYLINE ----------------
+    if (pathCoordinates.length > 1) {
+        const tripPath = new google.maps.Polyline({
+            path: pathCoordinates,
+            geodesic: true,
+            strokeColor: "#007bff",
+            strokeOpacity: 1,
+            strokeWeight: 4,
+        });
+        tripPath.setMap(map);
+    }
+
+    // ---------------- ICONS ----------------
+    const startIcon = {
+        url: "{{ asset('img/start-green.png') }}",
+        scaledSize: new google.maps.Size(60, 60)
+    };
+
+    const middleIcon = {
+        url: "{{ asset('img/mid-blue.png') }}",
+        scaledSize: new google.maps.Size(15, 15)
+    };
+
+    const endIcon = {
+        url: "{{ asset('img/end-red.png') }}",
+        scaledSize: new google.maps.Size(60, 60)
+    };
+
+    const partyIcon = {
+        url: "{{ asset('img/end-red.png') }}",
+        scaledSize: new google.maps.Size(40, 40)
+    };
+
+    // ---------------- START MARKER ----------------
+    new google.maps.Marker({
+        position: pathCoordinates[0],
+        map,
+        icon: startIcon,
+        title: "Start: " + (pathCoordinates[0].recorded_at ?? ''),
+        label: {
+            text: "Start",
+            color: "#fff",
+            fontSize: "12px",
+            fontWeight: "bold"
+        }
+    });
+
+    // ---------------- MIDDLE MARKERS ----------------
+    for (let i = 1; i < pathCoordinates.length - 1; i++) {
+        new google.maps.Marker({
+            position: pathCoordinates[i],
+            map,
+            icon: middleIcon,
+            title: pathCoordinates[i].recorded_at,
+        });
+    }
+
+    // ---------------- END MARKER ----------------
+    if (tripEnded && pathCoordinates.length > 1) {
+        const last = pathCoordinates[pathCoordinates.length - 1];
+
+        new google.maps.Marker({
+            position: last,
+            map,
+            icon: endIcon,
+            title: "End: " + (last.recorded_at ?? ''),
+            label: {
+                text: "End",
+                color: "#fff",
+                fontSize: "12px",
+                fontWeight: "bold"
+            }
+        });
+    }
+
+    // ---------------- PARTY VISIT CHECK-IN MARKERS ----------------
+
+    // 🔹 ONE reusable infoWindow (IMPORTANT)
+    const infoWindow = new google.maps.InfoWindow();
+
+    partyVisits.forEach(party => {
+
+        if (!party.latitude || !party.longitude) return;
+
+        // ✅ customer agro name
+        const agroName = party.customer?.agro_name ?? 'Customer';
+
+        const marker = new google.maps.Marker({
+            position: {
+                lat: parseFloat(party.latitude),
+                lng: parseFloat(party.longitude)
+            },
+            map,
+            icon: partyIcon,
+
+            // 🔹 SIMPLE tooltip on cursor hover
+            title: agroName
+        });
+
+        // 🔹 ON HOVER show agro_name + check-in time
+        marker.addListener("mouseover", () => {
+            infoWindow.setContent(`
+                <div style="font-size:14px">
+                    <strong>${agroName}</strong><br>
+                    Check-in Time: ${party.check_in_time ?? ''}
+                </div>
+            `);
+            infoWindow.open(map, marker);
+        });
+
+        marker.addListener("mouseout", () => {
+            infoWindow.close();
+        });
+    });
+
+}
 </script>
+
 
 
 
