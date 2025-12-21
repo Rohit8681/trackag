@@ -98,15 +98,32 @@
                                     <option value="0" {{ request('status') === '0' ? 'selected' : '' }}>Inactive</option>
                                 </select>
                             </div>
+                            <div class="col-md-2">
+                                <label class="form-label fw-semibold">Pending Party Mapping</label>
+                                <select name="pending_party_mapping" class="form-select form-select-sm">
+                                    <option value="">All</option>
+                                    <option value="1" {{ request('pending_party_mapping') == '1' ? 'selected' : '' }}>
+                                        Pending Party Mapping
+                                    </option>
+                                </select>
+                            </div>
 
-                            <div class="col-12 d-flex justify-content-end mt-2">
+                            {{-- <div class="col-10 d-flex justify-content-end mt-2">
                                 <button type="submit" class="btn btn-sm btn-primary me-2">
                                     <i class="fas fa-filter"></i> Filter
                                 </button>
                                 <a href="{{ route('customers.index') }}" class="btn btn-sm btn-secondary">
                                     <i class="fas fa-sync"></i> Reset
                                 </a>
-                            </div>
+                            </div> --}}
+                             <div class="col-md-2 d-flex gap-2 align-items-end">
+                                    <button type="submit" class="btn btn-sm btn-primary px-3 py-2">
+                                        <i class="fas fa-filter me-1"></i> Filter
+                                    </button>
+                                    <a href="{{ route('customers.index') }}" class="btn btn-sm btn-secondary px-3 py-2">
+                                        <i class="fas fa-sync me-1"></i> Reset
+                                    </a>
+                                </div>
                         </form>
                         <!-- 🔍 End Filter Form -->
 
@@ -139,7 +156,7 @@
                                         </td>
                                         <td>{{ $customer->phone }}</td>
                                         <td>{{ $customer->contact_person_name ?? '-' }}</td>
-                                        <td>{{ optional($customer->user)->name ?? 'Executive User' }}</td>
+                                        <td>{{ optional($customer->user)->name ?? '' }}</td>
 
                                         <td>
                                             <form action="{{ route('customers.toggle', $customer->id) }}" method="POST" style="display:inline;">
@@ -201,8 +218,11 @@
                 <input type="file" name="file" class="form-control" required accept=".xlsx,.xls,.csv">
             </div>
 
-            <p class="small text-muted">
+            {{-- <p class="small text-muted">
                 <b>Required Columns:</b> agro_name, party_code, state, district, tehsil, address, phone, gst_no, contact_person_name, depo, credit_limit, party_active_since, status
+            </p> --}}
+            <p class="small text-muted">
+                <b>Required Columns:</b> agro_name, phone,contact_person_name
             </p>
         </div>
         <div class="modal-footer d-flex justify-content-between">

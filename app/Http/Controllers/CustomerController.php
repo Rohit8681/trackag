@@ -51,8 +51,12 @@ class CustomerController extends Controller
         if ($request->filled('status')) {
             $query->where('is_active', $request->status);
         }
-        $customers = $query->latest()->get();
+        if ($request->filled('pending_party_mapping')) {
+            $query->whereNull('user_id');
+        }
 
+        $customers = $query->latest()->get();
+        // dd($customers);
         $states = State::where('status', 1)->orderBy('name')->get();
         $financialYears = range(2020, now()->year + 1); // Example range
 
@@ -222,34 +226,75 @@ class CustomerController extends Controller
     //         return redirect()->back()->with('error', 'Import failed: ' . $e->getMessage());
     //     }
     // }
+
+    // public function import(Request $request)
+    // {
+    //     $request->validate([
+    //         'file' => 'required|mimes:xlsx,csv,xls|max:2048',
+    //     ]);
+
+    //     $import = new CustomersImport;
+
+    //     try {
+    //         $import->import($request->file('file'));
+
+    //         $failures = $import->failures(); // get skipped rows
+    //         $errorMessage = '';
+    //         if (!empty($failures)) {
+    //             foreach ($failures as $failure) {
+    //                 $errorMessage .= 'Row '.$failure->row().': '.implode(', ', $failure->errors()).'<br>';
+    //             }
+    //         }
+
+    //         $message = 'Customers imported successfully!';
+    //         if ($errorMessage) {
+    //             $message .= '<br>However, some rows were skipped:<br>'.$errorMessage;
+    //         }
+
+    //         return redirect()->route('customers.index')->with('success', $message);
+
+    //     } catch (\Exception $e) {
+    //         return redirect()->back()->with('error', 'Import failed: ' . $e->getMessage());
+    //     }
+    // }
+
     public function import(Request $request)
     {
         $request->validate([
             'file' => 'required|mimes:xlsx,csv,xls|max:2048',
         ]);
 
-        $import = new CustomersImport;
+        $import = new CustomersImport();
 
         try {
             $import->import($request->file('file'));
 
-            $failures = $import->failures(); // get skipped rows
-            $errorMessage = '';
-            if (!empty($failures)) {
-                foreach ($failures as $failure) {
-                    $errorMessage .= 'Row '.$failure->row().': '.implode(', ', $failure->errors()).'<br>';
-                }
+            // 🔥 GROUP ERRORS BY ROW (IMPORTANT)
+            $rowErrors = [];
+
+            foreach ($import->failures() as $failure) {
+                $rowErrors[$failure->row()] = true; // ek row = ek error
             }
 
             $message = 'Customers imported successfully!';
-            if ($errorMessage) {
-                $message .= '<br>However, some rows were skipped:<br>'.$errorMessage;
+
+            if (!empty($rowErrors)) {
+                $message .= '<br><b>Some rows were skipped:</b><br>';
+
+                foreach (array_keys($rowErrors) as $row) {
+                    $message .= "Row {$row}: Agro Name, Phone, Contact Person Name required<br>";
+                }
             }
 
-            return redirect()->route('customers.index')->with('success', $message);
+            return redirect()
+                ->route('customers.index')
+                ->with('success', $message);
 
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Import failed: ' . $e->getMessage());
+            return redirect()
+                ->back()
+                ->with('error', 'Import failed: '.$e->getMessage());
         }
     }
+
 }

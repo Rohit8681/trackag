@@ -56,7 +56,7 @@
 <main class="app-main">
 
     {{-- Header Section --}}
-    <div class="app-content-header py-4 bg-light border-bottom">
+    {{-- <div class="app-content-header py-4 bg-light border-bottom">
         <div class="container-fluid px-4">
             <div class="d-flex flex-wrap align-items-center justify-content-between">
                 <div>
@@ -71,19 +71,34 @@
                 </ol>
             </div>
         </div>
+    </div> --}}
+    <div class="app-content-header">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-sm-6">
+                    <h3 class="mb-0">Trips</h3>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-end">
+                        <li class="breadcrumb-item"><a href="#" class="text-decoration-none">Trip Management</a></li>
+                        <li class="breadcrumb-item active">All Trips</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
     </div>
 
     {{-- Main Content --}}
-    <div class="app-content py-4">
-        <div class="container-fluid px-4">
+    <div class="app-content">
+        <div class="container-fluid">
             <div class="card shadow-sm border-0">
-                <div class="card-header bg-white d-flex align-items-center justify-content-between border-0 py-3">
+                {{-- <div class="card-header bg-white d-flex align-items-center justify-content-between border-0 py-3">
                     <h5 class="card-title mb-0 fw-semibold text-dark">
                         <i class="fas fa-list-ul me-2 text-primary"></i>Trip List
                     </h5>
-                    {{-- Uncomment if needed --}}
-                    {{-- <a href="{{ route('trips.create') }}" class="btn btn-primary btn-sm"><i class="fas fa-plus me-1"></i> Add Trip</a> --}}
-                </div>
+                    
+                    <a href="{{ route('trips.create') }}" class="btn btn-primary btn-sm"><i class="fas fa-plus me-1"></i> Add Trip</a>
+                </div> --}}
 
                 <div class="card-body">
                     {{-- 🔹 Filter Section --}}
@@ -91,17 +106,17 @@
                         <div class="row g-3 align-items-end">
                             <div class="col-md-2">
                                 <label class="form-label fw-semibold">From Date</label>
-                                <input type="date" name="from_date" value="{{ $from_date }}" class="form-control">
+                                <input type="date" name="from_date" value="{{ $from_date }}" class="form-control form-control-sm">
                             </div>
 
                             <div class="col-md-2">
                                 <label class="form-label fw-semibold">To Date</label>
-                                <input type="date" name="to_date" value="{{ $to_date }}" class="form-control">
+                                <input type="date" name="to_date" value="{{ $to_date }}" class="form-control form-control-sm">
                             </div>
 
                             <div class="col-md-2">
                                 <label class="form-label fw-semibold">State</label>
-                                <select name="state" class="form-select">
+                                <select name="state" class="form-select form-select-sm">
                                     <option value="">All</option>
                                     @foreach($states as $state)
                                         <option value="{{ $state->id }}" {{ request('state') == $state->id ? 'selected' : '' }}>
@@ -113,7 +128,7 @@
 
                             <div class="col-md-2">
                                 <label class="form-label fw-semibold">Employee Name</label>
-                                <select name="employee" class="form-select">
+                                <select name="employee" class="form-select form-select-sm">
                                     <option value="">All</option>
                                     @foreach($employees as $emp)
                                         <option value="{{ $emp->id }}" {{ request('employee') == $emp->id ? 'selected' : '' }}>
@@ -125,7 +140,7 @@
 
                             <div class="col-md-2">
                                 <label class="form-label fw-semibold">Approval Status</label>
-                                <select name="approval_status" class="form-select">
+                                <select name="approval_status" class="form-select form-select-sm">
                                     <option value="">All</option>
                                     <option value="approved" {{ request('approval_status') == 'approved' ? 'selected' : '' }}>Approved</option>
                                     <option value="pending" {{ request('approval_status') == 'pending' ? 'selected' : '' }}>Pending</option>

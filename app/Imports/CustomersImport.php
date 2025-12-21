@@ -38,7 +38,8 @@ class CustomersImport implements ToModel, WithHeadingRow, WithValidation, SkipsO
             'address' => $row['address'] ?? null,
             'phone' => $row['phone'],
             'gst_no' => $row['gst_no'] ?? null,
-            'user_id' => $executive?->id,
+            'contact_person_name' => $row['contact_person_name'] ?? null,
+            // 'user_id' => $executive?->id,
             'depo_id' => $depo?->id,
             'credit_limit' => $row['credit_limit'] ?? 0,
             'party_active_since' => isset($row['party_active_since'])

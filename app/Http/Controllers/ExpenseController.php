@@ -207,8 +207,8 @@ class ExpenseController extends Controller
 
             // Expense table
             $expense = Expense::where('user_id', $item->user_id)
-    ->whereDate('bill_date', $item->trip_date)->where('approval_status','Approved')
-    ->first();
+            ->whereDate('bill_date', $item->trip_date)->where('approval_status','Approved')
+            ->get();
 
             $total_km = ($item->end_km - $item->starting_km);
 
@@ -218,7 +218,7 @@ class ExpenseController extends Controller
 
             $item->ta_exp = $ta_amount_per_km * $total_km;
             $item->da_exp = $da_amount_per_km;
-            $item->other_exp =  $expense->amount ?? 0;
+            $item->other_exp =  $expense->sum('amount') ?? 0;
 
             $item->total_exp = 
                 ($item->ta_exp) +
