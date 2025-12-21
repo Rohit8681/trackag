@@ -51,9 +51,9 @@ class TripController extends Controller
             ->whereDate('trip_date', '<=', $toDate);
 
         // 🔹 Other Filters
-        if ($request->filled('state')) {
-            $query->where('state_id', $request->state);
-        }
+        // if ($request->filled('state')) {
+        //     $query->where('state_id', $request->state);
+        // }
         if ($request->filled('employee')) {
             $query->where('user_id', $request->employee);
         }
