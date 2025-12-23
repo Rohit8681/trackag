@@ -288,7 +288,7 @@
                                                 </a>
                                                 <br>
                                                 {{-- @can('view_trip_logs') --}}
-                                                    <span class="badge bg-info mt-2">{{ $trip->tripLogs->count() }} logs</span><br>
+                                                    <span class="badge bg-info mt-2" style="color:black;">{{ $trip->tripLogs->count() }} logs</span><br>
                                                     <a href="#" class="text-primary small" data-bs-toggle="modal" title="view log" data-bs-target="#logsModal{{ $trip->id }}">View Logs</a>
                                                 {{-- @endcan --}}
                                             </td>

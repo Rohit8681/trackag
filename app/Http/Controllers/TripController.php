@@ -50,10 +50,11 @@ class TripController extends Controller
         $query->whereDate('trip_date', '>=', $fromDate)
             ->whereDate('trip_date', '<=', $toDate);
 
-        // 🔹 Other Filters
-        // if ($request->filled('state')) {
-        //     $query->where('state_id', $request->state);
-        // }
+        if ($request->filled('state')) {
+            $query->whereHas('user', function ($q) use ($request) {
+                $q->where('state_id', $request->state);
+            });
+        }
         if ($request->filled('employee')) {
             $query->where('user_id', $request->employee);
         }
