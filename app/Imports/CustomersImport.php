@@ -46,6 +46,7 @@ class CustomersImport implements ToModel, WithHeadingRow, WithValidation, SkipsO
                 ? Date::excelToDateTimeObject($row['party_active_since'])->format('Y-m-d')
                 : now(),
             'is_active' => (strtolower($row['status'] ?? '') === 'active' ? 1 : 0),
+            'type' => 'web'
         ]);
     }
 

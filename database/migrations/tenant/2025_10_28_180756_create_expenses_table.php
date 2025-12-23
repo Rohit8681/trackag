@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('expenses', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->date('bill_date');
             $table->string('bill_title')->nullable();
+            $table->date('bill_date');
             $table->string('bill_type')->nullable();
             $table->text('bill_details_description')->nullable();
             $table->string('travel_mode')->nullable();
@@ -23,9 +23,9 @@ return new class extends Migration
             $table->string('image')->nullable();
             $table->string('approval_status')->default('Pending');
             $table->text('reject_reason')->nullable();
-
+            
             $table->timestamps();
-            $table->softDeletes(); 
+            $table->softDeletes();
         });
     }
 

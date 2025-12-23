@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\ExpenseController;
 use App\Http\Controllers\Api\FailedJobController;
 use App\Http\Controllers\Api\LocationApiController;
 use App\Http\Controllers\Api\PartyController;
+use App\Http\Controllers\Api\PartyPaymentController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\TenantAuthenticate;
 
@@ -49,6 +50,9 @@ Route::middleware([TenantAuthenticate::class])->group(function () {
     Route::get('/states', [LocationApiController::class, 'getStates']);
     Route::get('/districts/{state_id}', [LocationApiController::class, 'getDistricts']);
     Route::get('/tehsils/{district_id}', [LocationApiController::class, 'getTehsils']);
+
+    Route::get('/party-payment-list', [PartyPaymentController::class, 'index']);
+    Route::post('/party-payment-store', [PartyPaymentController::class, 'store']);
 
 
 

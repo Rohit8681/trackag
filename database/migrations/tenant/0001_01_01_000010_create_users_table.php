@@ -33,7 +33,7 @@ return new class extends Migration
             $table->string('role')->nullable(); // Already present
             $table->string('mobile', 20)->nullable(); // Already present
             $table->string('email')->nullable()->unique();
-            $table->timestamp('email_verified_at')->nullable(); 
+            $table->timestamp('email_verified_at')->nullable(); // Already present
             $table->string('password'); // Already present
             $table->boolean('is_active')->default(true); // Already present
             $table->string('image')->nullable(); // Already present
@@ -74,7 +74,6 @@ return new class extends Migration
             $table->string('longitude')->nullable();
             $table->string('pincode')->nullable();
             $table->bigInteger('slab_designation_id')->nullable();
-
             // $table->foreignId('pincode_id')->nullable()->constrained('pincodes')->onDelete('set null');
 
             $table->foreignId('company_id')->nullable()->constrained('companies')->onDelete('cascade');
