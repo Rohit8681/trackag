@@ -62,7 +62,7 @@ class TripController extends Controller
         }
 
         $trips = $query->latest()->get();
-
+        
         // Data for dropdowns
         // $states = State::all(['id', 'name']);
         $companyCount = Company::count();
