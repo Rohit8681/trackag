@@ -2,6 +2,7 @@
     <!-- Brand -->
     @php
         $company = DB::table('companies')->first();
+        dd($company);
         $user = auth()->user();
     @endphp
     <div class="sidebar-brand px-3 py-4 d-flex align-items-center">
