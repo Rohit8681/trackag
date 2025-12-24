@@ -113,8 +113,8 @@
                         </li>
 
                         <li class="nav-item">
-                            <a href="{{ route('coming-soon') }}" 
-                            class="nav-link {{ request()->is('admin/new-party*') ? 'active' : '' }}">
+                            <a href="{{ route('party-payment') }}" 
+                            class="nav-link {{ request()->is('party-payment*') ? 'active' : '' }}">
                                 <i class="bi bi-people-fill me-2"></i>
                                 <p>Party Payment</p>
                             </a>

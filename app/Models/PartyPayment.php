@@ -21,7 +21,8 @@ class PartyPayment extends Model
         'amount',
         'remark',
         'image',
-        'status'
+        'status',
+        'clear_return_date'
     ];
 
     public function customer()

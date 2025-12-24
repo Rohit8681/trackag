@@ -36,6 +36,7 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\StockController;
 use App\Http\Controllers\TrackingController;
 use App\Http\Controllers\ExpenseController;
+use App\Http\Controllers\PartyPaymentController;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\File;
@@ -184,6 +185,9 @@ Route::middleware(['web'])->group(function () {
             Route::get('new-party', [PartyController::class, 'newPartyList'])->name('new-party.list');
             Route::post('new-party/status-update', [PartyController::class, 'updateStatus'])->name('new-party.update-status');
 
+            Route::get('party-payment', [PartyPaymentController::class, 'index'])->name('party-payment');
+            Route::post('/party-payment/clear-return', [PartyPaymentController::class, 'clearReturn'])
+    ->name('party-payment.clear-return');
             
             Route::resource('order', OrderController::class);
             Route::resource('stock', StockController::class);

@@ -18,6 +18,8 @@ return new class extends Migration {
             $table->longText('remark')->nullable();
             $table->string('image')->nullable();
             $table->string('status')->default('pending');
+            $table->date('clear_return_date')->nullable();
+
             $table->timestamps();
         });
     }
