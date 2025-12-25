@@ -1,7 +1,8 @@
 <aside class="app-sidebar bg-body-secondary shadow" data-bs-theme="dark">
     <!-- Brand -->
     @php
-        $company = DB::table('companies')->first();
+        // $company = DB::table('companies')->first();
+        $company = \App\Models\Company::first();
         $user = auth()->user();
     @endphp
     <div class="sidebar-brand px-3 py-4 d-flex align-items-center">
