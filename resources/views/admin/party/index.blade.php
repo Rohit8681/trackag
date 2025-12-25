@@ -79,8 +79,7 @@
                         <div class="col-md-2">
                             <label class="form-label fw-semibold">Financial Year</label>
                             <select id="financialYear" class="form-select">
-                                <option value="2024-2025" selected>2024-2025</option>
-                                <option value="2023-2024">2023-2024</option>
+                                <option value="2024-2025" selected>2025-2026</option>
                             </select>
                         </div>
                         <div class="col-md-2">
