@@ -64,6 +64,11 @@ class PartyController extends Controller
         if ($userId) {
             $query->where('user_id', $userId);
         }
+        $today = now()->toDateString();
+        if(empty($fromDate) && empty($toDate) && $type == "daily"){
+            $fromDate = $today;
+            $toDate   = $today;
+        }
 
         // FILTER : Date
         if ($fromDate && $toDate) {
