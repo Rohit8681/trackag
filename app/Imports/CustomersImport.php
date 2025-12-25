@@ -14,7 +14,9 @@ use Maatwebsite\Excel\Concerns\WithValidation;
 use Maatwebsite\Excel\Concerns\SkipsOnFailure;
 use Maatwebsite\Excel\Concerns\SkipsFailures;
 use Maatwebsite\Excel\Concerns\Importable;
-use Maatwebsite\Excel\Helpers\Date;
+// use Maatwebsite\Excel\Helpers\Date;
+use PhpOffice\PhpSpreadsheet\Shared\Date;
+use Carbon\Carbon;
 
 class CustomersImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnFailure
 {
@@ -42,9 +44,15 @@ class CustomersImport implements ToModel, WithHeadingRow, WithValidation, SkipsO
             // 'user_id' => $executive?->id,
             'depo_id' => $depo?->id,
             'credit_limit' => $row['credit_limit'] ?? 0,
-            'party_active_since' => isset($row['party_active_since'])
-                ? Date::excelToDateTimeObject($row['party_active_since'])->format('Y-m-d')
-                : now(),
+            'party_active_since' => !empty($row['party_active_since'])
+                ? (
+                    is_numeric($row['party_active_since'])
+                        ? Carbon::instance(
+                            Date::excelToDateTimeObject($row['party_active_since'])
+                        )->format('Y-m-d')
+                        : Carbon::parse($row['party_active_since'])->format('Y-m-d')
+                )
+                : now()->format('Y-m-d'),
             'is_active' => (strtolower($row['status'] ?? '') === 'active' ? 1 : 0),
             'type' => 'web'
         ]);
