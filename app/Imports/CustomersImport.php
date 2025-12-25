@@ -25,6 +25,15 @@ class CustomersImport implements ToModel, WithHeadingRow, WithValidation, SkipsO
     public function model(array $row)
     {
         // Lookup related data
+        $exists = Customer::where('agro_name', $row['agro_name'] ?? '')
+            ->where('phone', $row['phone'] ?? '')
+            ->where('contact_person_name', $row['contact_person_name'] ?? '')
+            ->exists();
+
+        // 👉 If duplicate found → skip row
+        if ($exists) {
+            return null;
+        }
         $state = State::where('name', $row['state'] ?? '')->first();
         $district = District::where('name', $row['district'] ?? '')->first();
         $tehsil = Tehsil::where('name', $row['tehsil'] ?? '')->first();
