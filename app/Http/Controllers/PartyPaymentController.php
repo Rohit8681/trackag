@@ -13,7 +13,6 @@ class PartyPaymentController extends Controller
     public function index(Request $request){
         // $data = PartyPayment::with('customer','user')->get();
         $company = Company::first();
-        dd($company);
         $query = PartyPayment::with(['customer', 'user']);
         if ($request->filled('from_date')) {
             $query->whereDate('payment_date', '>=', $request->from_date);
