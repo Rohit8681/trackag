@@ -3,6 +3,7 @@
     @php
         $company = DB::table('companies')->first();
         $user = auth()->user();
+        dd($company,$user);
     @endphp
     <div class="sidebar-brand px-3 py-4 d-flex align-items-center">
         <a href="{{ url('admin/dashboard') }}" class="brand-link d-flex align-items-center gap-2">
