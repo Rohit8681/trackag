@@ -31,8 +31,7 @@
                         <label class="form-label fw-semibold text-dark">Financial Year</label>
                         <select class="form-select" name="financial_year">
                             <option value="">Select</option>
-                            <option value="2024-2025" {{ request('financial_year')=='2024-2025'?'selected':'' }}>2024-2025</option>
-                            <option value="2023-2024" {{ request('financial_year')=='2023-2024'?'selected':'' }}>2023-2024</option>
+                            <option value="2025-2026" {{ request('financial_year')=='2025-2026'?'selected':'' }}>2025-2026</option>
                         </select>
                     </div>
 

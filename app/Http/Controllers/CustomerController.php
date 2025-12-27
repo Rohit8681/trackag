@@ -58,7 +58,7 @@ class CustomerController extends Controller
         $customers = $query->latest()->get();
         // dd($customers);
         $states = State::where('status', 1)->orderBy('name')->get();
-        $financialYears = range(2020, now()->year + 1); // Example range
+        $financialYears = range(2025, now()->year + 1); // Example range
 
         return view('admin.customers.index', compact('customers', 'states', 'financialYears'));
     }
