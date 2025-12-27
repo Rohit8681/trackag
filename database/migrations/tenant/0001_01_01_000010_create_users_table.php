@@ -43,7 +43,7 @@ return new class extends Migration
 
             // Only missing fields from the first schema are added below:
             $table->string('user_type')->nullable();
-            $table->string('user_code')->unique()->nullable();
+            $table->string('user_code')->nullable();
             $table->string('headquarter')->nullable();
             $table->date('date_of_birth')->nullable();
             $table->date('joining_date')->nullable();
