@@ -9,9 +9,7 @@ class StateSeeder extends Seeder
 {
     public function run()
     {
-        $states = ['AndhraPradesh', 'Assam', 'Bihar', 'Chattisgarh', 'Goa','Gujarat','Haryana','HimachalPradesh','Jharkhand','Karnataka
-        ','Kerala','MadhyaPradesh','Maharashtra','Manipur','Meghalaya','Mizoram','Nagaland','Puducherry','Punjab','Rajasthan
-        ','TamilNadu','Telangana','Tripura','Uttarakhand','UttarPradesh','WestBengal'];
+        $states = ['AndhraPradesh', 'Assam', 'Bihar', 'Chattisgarh', 'Goa','Gujarat','Haryana','HimachalPradesh','Jharkhand','Karnataka','Kerala','MadhyaPradesh','Maharashtra','Manipur','Meghalaya','Mizoram','Nagaland','Puducherry','Punjab','Rajasthan','TamilNadu','Telangana','Tripura','Uttarakhand','UttarPradesh','WestBengal'];
 
         $stateCodes = [
             'AP', 'AS', 'BR', 'CG', 'GA',

@@ -38,6 +38,7 @@
             <ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" role="menu" data-accordion="false">
 
                 <!-- Planning -->
+                @canany(['view_budget_plan','create_budget_plan','edit_budget_plan','delete_budget_plan','view_monthly_plan','create_monthly_plan','edit_monthly_plan','delete_monthly_plan','view_plan_vs_achievement','create_plan_vs_achievement','edit_plan_vs_achievement','delete_plan_vs_achievement'])
                 <li class="nav-item {{ request()->is('admin/budget*') || request()->is('admin/monthly*') || request()->is('admin/achievement*') ? 'menu-open' : '' }}">
                     <a href="#" class="nav-link {{ request()->is('admin/budget*') || request()->is('admin/monthly*') || request()->is('admin/achievement*') ? 'active' : '' }}">
                         <i class="bi bi-people-fill me-2"></i>
@@ -74,7 +75,7 @@
                         @endcanany
                     </ul>
                 </li>
-
+                @endcanany
 
                 <!-- Party -->
                 @canany(['view_party_visit','create_party_visit','edit_party_visit','delete_party_visit'])
