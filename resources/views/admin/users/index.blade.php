@@ -645,7 +645,7 @@ $(document).ready(function() {
                             <td>${vt.name}</td>
                             <td>
                                 <input type="hidden" name="travel_mode_id[]" value="${vt.id}">
-                                <input type="number" class="form-control text-center vehicle-amount" name="travelling_allow_per_km[]" value="${amount}" ${readOnlyAttr}>
+                                <input step="0.01" type="number" class="form-control text-center vehicle-amount" name="travelling_allow_per_km[]" value="${amount}" ${readOnlyAttr}>
                             </td>
                         </tr>
                     `);
@@ -661,7 +661,7 @@ $(document).ready(function() {
                             <td>${tt.name}</td>
                             <td>
                                 <input type="hidden" name="tour_type_id[]" value="${tt.id}">
-                                <input type="number" class="form-control text-center tour-amount" name="da_amount[]" value="${da}" ${readOnlyAttr}>
+                                <input type="number" step="0.01" class="form-control text-center tour-amount" name="da_amount[]" value="${da}" ${readOnlyAttr}>
                             </td>
                         </tr>
                     `);
