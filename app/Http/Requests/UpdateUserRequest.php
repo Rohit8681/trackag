@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateUserRequest extends FormRequest
 {
@@ -24,7 +25,12 @@ class UpdateUserRequest extends FormRequest
             'password' => 'nullable|same:password_confirmation',
             'image' => 'nullable|image|max:5120',
             'cancel_cheque_photos.*' => 'nullable|image|max:5120',
-            'user_code' => 'required',
+            // 'user_code' => 'required|string|unique:users,user_code,' . $this->id,
+            'user_code' => [
+    'required',
+    'string',
+    Rule::unique('users', 'user_code')->ignore($this->route('user')->id),
+],
             'designation_id' => 'required',
             'reporting_to' => 'required',
             'headquarter' => 'required|string|max:255',
