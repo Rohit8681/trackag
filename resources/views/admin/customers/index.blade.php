@@ -52,11 +52,13 @@
                                 <label class="form-label">Financial Year</label>
                                 <select name="financial_year" class="form-select form-select-sm">
                                     <option value="">All</option>
-                                    @foreach($financialYears as $year)
+                                    {{-- @foreach($financialYears as $year)
                                         <option value="{{ $year }}" {{ request('financial_year') == $year ? 'selected' : '' }}>
                                             {{ $year }}
                                         </option>
-                                    @endforeach
+                                    @endforeach --}}
+                                    <option value="">Select</option>
+                                    <option value="2025-2026" {{ request('financial_year')=='2025-2026'?'selected':'' }}>2025-2026</option>
                                 </select>
                             </div>
 
