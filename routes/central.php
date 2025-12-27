@@ -120,6 +120,7 @@ Route::middleware(['web'])->group(function () {
             Route::post('save-user-slab', [UserController::class, 'saveSlab'])->name('admin.save.user.slab');
             Route::get('get-user-slab', [UserController::class, 'getUserSlab'])->name('admin.get-user-slab');
 
+            Route::get('update-state',[AdminController::class,'updateState']);
 
 
             Route::get('dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
