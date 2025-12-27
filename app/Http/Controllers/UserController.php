@@ -73,7 +73,8 @@ class UserController extends Controller
 
         $users = $query->get();
         
-        $currentUsers = $query->count();
+        // $currentUsers = $query->count();
+        $currentUsers = User::count();
 
         $states = State::where('status', 1)->get();
         $designations = Designation::where('status', 1)->get();
@@ -91,6 +92,20 @@ class UserController extends Controller
     {
         $authUser = auth()->user();
         $roleName = $authUser->getRoleNames()->first();
+        $currentUsers = User::count();
+        $maxUsers = 0;
+        if($roleName != 'master_admin'){
+            $getcompany = Company::find(1);
+            if(isset($getcompany->id)) {
+                $maxUsers = $getcompany->user_assigned;
+            }
+            if ($currentUsers >= $maxUsers) {
+                return redirect()
+                    ->route('users.index')
+                    ->with('error', 'User limit reached. You cannot create more users.');
+            }
+        }
+        
         $roles = Role::all();
         // if($roleName == 'sub_admin'){
         //     $roles = Role::where('name', '!=', 'sub_admin')->get();

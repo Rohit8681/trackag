@@ -40,9 +40,18 @@
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <h3 class="card-title">User Control Panel</h3>
                             @can('create_users')
+                            @php
+                                $canCreateUser = true;
+
+                                if(!auth()->user()->hasRole('master_admin')){
+                                    $canCreateUser = $currentUsers < $maxUsers;
+                                }
+                            @endphp
+                            @if($canCreateUser)
                             <a href="{{ route('users.create') }}" style="float: right;" class="btn  btn-primary ms-auto">
                                  Add New User
                             </a>
+                            @endif
                             @endcan
                         </div>
 
