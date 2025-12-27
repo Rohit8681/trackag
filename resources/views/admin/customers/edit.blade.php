@@ -126,7 +126,7 @@
 
                                 {{-- GST No --}}
                                 <div class="mb-3 col-md-4">
-                                    <label for="gst_no" class="form-label">GST No<span class="text-danger">*</span></label>
+                                    <label for="gst_no" class="form-label">GST No</label>
                                     <input type="text" name="gst_no" id="gst_no"
                                            class="form-control @error('gst_no') is-invalid @enderror"
                                            value="{{ old('gst_no', $customer->gst_no) }}">
@@ -150,7 +150,7 @@
 
                                 {{-- Credit Limit --}}
                                 <div class="mb-3 col-md-4">
-                                    <label for="credit_limit" class="form-label">Credit Limit<span class="text-danger">*</span></label>
+                                    <label for="credit_limit" class="form-label">Credit Limit</label>
                                     <input type="text" name="credit_limit" id="credit_limit"
                                            class="form-control @error('credit_limit') is-invalid @enderror"
                                            value="{{ old('credit_limit', $customer->credit_limit) }}">
