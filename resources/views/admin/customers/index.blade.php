@@ -57,7 +57,6 @@
                                             {{ $year }}
                                         </option>
                                     @endforeach --}}
-                                    <option value="">Select</option>
                                     <option value="2025-2026" {{ request('financial_year')=='2025-2026'?'selected':'' }}>2025-2026</option>
                                 </select>
                             </div>
