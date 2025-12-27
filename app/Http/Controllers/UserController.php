@@ -39,6 +39,8 @@ class UserController extends Controller
     public function index(Request $request)
     {
         Session::put('page', 'dashboard');
+        $user = auth()->user();
+        $roleName = $user->getRoleNames()->first();
         $query = User::with(['roles', 'permissions', 'state', 'district', 'tehsil', 'city', 'reportingManager', 'activeSessions', 'depos', 'designation'])->latest();
         // Filters
         if ($request->filled('state_id')) {
@@ -64,15 +66,19 @@ class UserController extends Controller
                 $maxUsers = $getcompany->user_assigned;
             }
         }
+        if (!in_array($roleName, ['master_admin', 'sub_admin'])) {
+            $query->where('reporting_to', $user->id);
+        }
+
 
         $users = $query->get();
-      
+        
         $currentUsers = $query->count();
 
         $states = State::where('status', 1)->get();
         $designations = Designation::where('status', 1)->get();
-        $user = auth()->user();
-        $roleName = $user->getRoleNames()->first();
+        
+        
         $stateAccesCompany = "";
         if($roleName != 'master_admin'){
             $stateAccesCompany = Company::value('state');
