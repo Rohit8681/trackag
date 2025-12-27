@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 
-class PartyPaymentController extends Controller
+class PartyPaymentController extends BaseController
 {
     public function index(Request $request)
     {
