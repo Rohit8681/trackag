@@ -145,7 +145,7 @@
                 </div>
 
                 {{-- Login & Logout History --}}
-                <div class="card card-warning card-outline mt-4">
+                {{-- <div class="card card-warning card-outline mt-4">
                     <div class="card-header">
                         <h3 class="card-title">User Login & Logout History</h3>
                     </div>
@@ -192,7 +192,7 @@
                             </tbody>
                         </table>
                     </div>
-                </div>
+                </div> --}}
 
                 {{-- Session History Modal --}}
                 <div class="modal fade" id="sessionHistoryModal" tabindex="-1" aria-hidden="true">
