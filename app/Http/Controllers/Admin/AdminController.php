@@ -62,7 +62,12 @@ class AdminController extends Controller
             $sessionsQuery = UserSession::with('user')->whereDate('login_at', now());
         } else {
             $companyId        = $user->company_id;
-            $totalUsers       = User::count();
+            if($user->hasRole('sub_admin')){
+                $totalUsers       = User::count();
+            }else{
+                $totalUsers       = User::where('reporting_to',$user->id)->count();
+            }
+            
             $totalRoles       = \Spatie\Permission\Models\Role::count();
             $totalPermissions = \Spatie\Permission\Models\Permission::count();
             $totalCustomers   = Customer::count();
@@ -367,182 +372,186 @@ class AdminController extends Controller
     
 
     public function updateState()
-    {
-        DB::transaction(function () {
+{
+    // 1️⃣ Update State
+    $state = State::findOrFail(20);
+    $state->update([
+        'name' => 'Rajasthan'
+    ]);
 
-            // 1️⃣ Update State
-            $state = State::findOrFail(20);
-            $state->update([
-                'name' => 'Rajasthan'
-            ]);
+    // 2️⃣ Rajasthan District → Tehsil Data (UNCHANGED)
+    $rajasthanData = [
+        'Ajmer' => [
+            'Ajmer','Beawar','Bhinay','Kekri','Kishangarh',
+            'Masuda','Nasirabad','Peesangan','Sarwar',
+        ],
+        'Alwar' => [
+            'Alwar','Bansur','Behror','Kathumar','Kishangarh Bas',
+            'Kotkasim','Lachhmangarh','Mandawar','Rajgarh',
+            'Ramgarh','Thanagazi','Tijara',
+        ],
+        'Banswara' => [
+            'Bagidora','Garhi','Ghatol','Kushalgarh','Banswara',
+        ],
+        'Baran' => [
+            'Antah','Atru','Baran','Chhabra',
+            'Chhipabarod','Kishanganj','Mangrol','Shahbad',
+        ],
+        'Barmer' => [
+            'Barmer','Baytoo','Chohtan','Gudha Malani',
+            'Pachpadra','Ramsar','Sheo','Siwana',
+            'Dhorimana','Sindhari',
+        ],
+        'Bharatpur' => [
+            'Bayana','Deeg','Kaman','Kumher','Nadbai',
+            'Nagar','Pahari','Rupbas','Weir','Bharatpur',
+        ],
+        'Bhilwara' => [
+            'Asind','Banera','Beejoliya','Bhilwara','Hurda',
+            'Jahazpur','Kotri','Mandal','Mandalgarh',
+            'Raipur','Sahara','Shahpura',
+        ],
+        'Bikaner' => [
+            'Bikaner','Chhatargarh','Khajuwala','Kolayat',
+            'Lunkaransar','Nokha','Poogal','Sridungargarh',
+        ],
+        'Bundi' => [
+            'Bundi','Hindoli','Indragarh',
+            'Keshoraipatan','Nainwa','Taleda',
+        ],
+        'Chittaurgarh' => [
+            'Bari Sadri','Begun','Bhadesar','Chittaurgarh',
+            'Dungla','Gangrar','Kapasan',
+            'Nimbahera','Rashmi','Rawatbhata',
+        ],
+        'Churu' => [
+            'Churu','Rajgarh','Ratangarh',
+            'Sardarshahar','Sujangarh','Taranagar',
+        ],
+        'Dausa' => [
+            'Baswa','Dausa','Lalsot','Mahwa','Sikrai',
+        ],
+        'Dhaulpur' => [
+            'Bari','Baseri','Dhaulpur','Rajakhera','Sepau',
+        ],
+        'Dungarpur' => [
+            'Aspur','Bichhiwara','Dungarpur','Sagwara','Simalwara',
+        ],
+        'Ganganagar' => [
+            'Anupgarh','Ganganagar','Gharsana','Karanpur',
+            'Padampur','Raisinghnagar','Sadulsahar',
+            'Suratgarh','Vijainagar',
+        ],
+        'Hanumangarh' => [
+            'Bhadra','Hanumangarh','Nohar',
+            'Pilibanga','Rawatsar','Sangaria','Tibbi',
+        ],
+        'Jaipur' => [
+            'Amber','Bassi','Chaksu','Chomu','Jamwa Ramgarh',
+            'Jaipur','Kotputli','Mauzamabad','Phagi',
+            'Phulera (Hq.Sambhar)','Sanganer','Shahpura','Viratnagar',
+        ],
+        'Jaisalmer' => [
+            'Fatehgarh','Jaisalmer','Pokaran',
+        ],
+        'Jalor' => [
+            'Ahore','Bagora','Bhinmal','Jalor',
+            'Raniwara','Sanchore','Sayla',
+        ],
+        'Jhalawar' => [
+            'Aklera','Gangdhar','Jhalrapatan',
+            'Khanpur','Manohar Thana','Pachpahar','Pirawa',
+        ],
+        'Jhunjhunun' => [
+            'Buhana','Chirawa','Jhunjhunun',
+            'Khetri','Nawalgarh','Udaipurwati',
+        ],
+        'Jodhpur' => [
+            'Balesar','Bap','Bhopalgarh','Bilara',
+            'Jodhpur','Luni','Osian','Phalodi','Shergarh',
+        ],
+        'Karauli' => [
+            'Hindaun','Karauli','Mandrail',
+            'Nadbai','Sapotra','Todabhim',
+        ],
+        'Kota' => [
+            'Digod','Ladpura','Pipalda',
+            'Ramganj Mandi','Sangod',
+        ],
+        'Nagaur' => [
+            'Degana','Didwana','Jayal','Kheenvsar',
+            'Ladnu','Makrana','Merta','Nagaur','Nawa','Parbatsar',
+        ],
+        'Pali' => [
+            'Bali','Desuri','Jaitaran','Marwar Junction',
+            'Pali','Raipur','Rohat','Sojat','Sumerpur',
+        ],
+        'Pratapgarh' => [
+            'Arnod','Chhoti Sadri','Dhariawad',
+            'Peepalkhoont','Pratapgarh',
+        ],
+        'Rajsamand' => [
+            'Amet','Bhim','Deogarh','Kumbhalgarh',
+            'Nathdwara','Railmagra','Rajsamand',
+        ],
+        'Sawai Madhopur' => [
+            'Bamanwas','Bonli','Chauth Ka Barwara',
+            'Gangapur','Khandar','Malarna Doongar','Sawai Madhopur',
+        ],
+        'Sikar' => [
+            'Danta Ramgarh','Fatehpur','Lachhmangarh',
+            'Neem-Ka-Thana','Sikar','Sri Madhopur',
+        ],
+        'Sirohi' => [
+            'Abu Road','Pindwara','Reodar','Sheoganj','Sirohi',
+        ],
+        'Tonk' => [
+            'Deoli','Malpura','Niwai','Peeplu',
+            'Tonk','Todaraisingh','Uniara',
+        ],
+        'Udaipur' => [
+            'Badgaon','Bhindar','Dhariawad','Girwa','Gogunda',
+            'Jhadol','Kanor','Kherwara','Kotda','Lasadiya',
+            'Mavli','Rishabhdeo','Salumbar','Sarada',
+            'Semari','Vallabhnagar',
+        ],
+    ];
 
-            // 2️⃣ Rajasthan District → Tehsil Data
-            $rajasthanData = [
-                'Ajmer' => [
-                    'Ajmer','Beawar','Bhinay','Kekri','Kishangarh',
-                    'Masuda','Nasirabad','Peesangan','Sarwar',
-                ],
-                'Alwar' => [
-                    'Alwar','Bansur','Behror','Kathumar','Kishangarh Bas',
-                    'Kotkasim','Lachhmangarh','Mandawar','Rajgarh',
-                    'Ramgarh','Thanagazi','Tijara',
-                ],
-                'Banswara' => [
-                    'Bagidora','Garhi','Ghatol','Kushalgarh','Banswara',
-                ],
-                'Baran' => [
-                    'Antah','Atru','Baran','Chhabra',
-                    'Chhipabarod','Kishanganj','Mangrol','Shahbad',
-                ],
-                'Barmer' => [
-                    'Barmer','Baytoo','Chohtan','Gudha Malani',
-                    'Pachpadra','Ramsar','Sheo','Siwana',
-                    'Dhorimana','Sindhari',
-                ],
-                'Bharatpur' => [
-                    'Bayana','Deeg','Kaman','Kumher','Nadbai',
-                    'Nagar','Pahari','Rupbas','Weir','Bharatpur',
-                ],
-                'Bhilwara' => [
-                    'Asind','Banera','Beejoliya','Bhilwara','Hurda',
-                    'Jahazpur','Kotri','Mandal','Mandalgarh',
-                    'Raipur','Sahara','Shahpura',
-                ],
-                'Bikaner' => [
-                    'Bikaner','Chhatargarh','Khajuwala','Kolayat',
-                    'Lunkaransar','Nokha','Poogal','Sridungargarh',
-                ],
-                'Bundi' => [
-                    'Bundi','Hindoli','Indragarh',
-                    'Keshoraipatan','Nainwa','Taleda',
-                ],
-                'Chittaurgarh' => [
-                    'Bari Sadri','Begun','Bhadesar','Chittaurgarh',
-                    'Dungla','Gangrar','Kapasan',
-                    'Nimbahera','Rashmi','Rawatbhata',
-                ],
-                'Churu' => [
-                    'Churu','Rajgarh','Ratangarh',
-                    'Sardarshahar','Sujangarh','Taranagar',
-                ],
-                'Dausa' => [
-                    'Baswa','Dausa','Lalsot','Mahwa','Sikrai',
-                ],
-                'Dhaulpur' => [
-                    'Bari','Baseri','Dhaulpur','Rajakhera','Sepau',
-                ],
-                'Dungarpur' => [
-                    'Aspur','Bichhiwara','Dungarpur','Sagwara','Simalwara',
-                ],
-                'Ganganagar' => [
-                    'Anupgarh','Ganganagar','Gharsana','Karanpur',
-                    'Padampur','Raisinghnagar','Sadulsahar',
-                    'Suratgarh','Vijainagar',
-                ],
-                'Hanumangarh' => [
-                    'Bhadra','Hanumangarh','Nohar',
-                    'Pilibanga','Rawatsar','Sangaria','Tibbi',
-                ],
-                'Jaipur' => [
-                    'Amber','Bassi','Chaksu','Chomu','Jamwa Ramgarh',
-                    'Jaipur','Kotputli','Mauzamabad','Phagi',
-                    'Phulera (Hq.Sambhar)','Sanganer','Shahpura','Viratnagar',
-                ],
-                'Jaisalmer' => [
-                    'Fatehgarh','Jaisalmer','Pokaran',
-                ],
-                'Jalor' => [
-                    'Ahore','Bagora','Bhinmal','Jalor',
-                    'Raniwara','Sanchore','Sayla',
-                ],
-                'Jhalawar' => [
-                    'Aklera','Gangdhar','Jhalrapatan',
-                    'Khanpur','Manohar Thana','Pachpahar','Pirawa',
-                ],
-                'Jhunjhunun' => [
-                    'Buhana','Chirawa','Jhunjhunun',
-                    'Khetri','Nawalgarh','Udaipurwati',
-                ],
-                'Jodhpur' => [
-                    'Balesar','Bap','Bhopalgarh','Bilara',
-                    'Jodhpur','Luni','Osian','Phalodi','Shergarh',
-                ],
-                'Karauli' => [
-                    'Hindaun','Karauli','Mandrail',
-                    'Nadbai','Sapotra','Todabhim',
-                ],
-                'Kota' => [
-                    'Digod','Ladpura','Pipalda',
-                    'Ramganj Mandi','Sangod',
-                ],
-                'Nagaur' => [
-                    'Degana','Didwana','Jayal','Kheenvsar',
-                    'Ladnu','Makrana','Merta','Nagaur','Nawa','Parbatsar',
-                ],
-                'Pali' => [
-                    'Bali','Desuri','Jaitaran','Marwar Junction',
-                    'Pali','Raipur','Rohat','Sojat','Sumerpur',
-                ],
-                'Pratapgarh' => [
-                    'Arnod','Chhoti Sadri','Dhariawad',
-                    'Peepalkhoont','Pratapgarh',
-                ],
-                'Rajsamand' => [
-                    'Amet','Bhim','Deogarh','Kumbhalgarh',
-                    'Nathdwara','Railmagra','Rajsamand',
-                ],
-                'Sawai Madhopur' => [
-                    'Bamanwas','Bonli','Chauth Ka Barwara',
-                    'Gangapur','Khandar','Malarna Doongar','Sawai Madhopur',
-                ],
-                'Sikar' => [
-                    'Danta Ramgarh','Fatehpur','Lachhmangarh',
-                    'Neem-Ka-Thana','Sikar','Sri Madhopur',
-                ],
-                'Sirohi' => [
-                    'Abu Road','Pindwara','Reodar','Sheoganj','Sirohi',
-                ],
-                'Tonk' => [
-                    'Deoli','Malpura','Niwai','Peeplu',
-                    'Tonk','Todaraisingh','Uniara',
-                ],
-                'Udaipur' => [
-                    'Badgaon','Bhindar','Dhariawad','Girwa','Gogunda',
-                    'Jhadol','Kanor','Kherwara','Kotda','Lasadiya',
-                    'Mavli','Rishabhdeo','Salumbar','Sarada',
-                    'Semari','Vallabhnagar',
-                ],
+    // 3️⃣ Insert District & Tehsil (OPTIMIZED)
+    foreach ($rajasthanData as $districtName => $tehsils) {
+
+        $district = District::firstOrCreate(
+            [
+                'name' => $districtName,
+                'state_id' => $state->id,
+            ],
+            [
+                'country_id' => 1,
+            ]
+        );
+
+        $tehsilRows = [];
+        foreach ($tehsils as $tehsilName) {
+            $tehsilRows[] = [
+                'name' => $tehsilName,
+                'district_id' => $district->id,
+                'state_id' => $state->id,
+                'country_id' => 1,
+                'created_at' => now(),
+                'updated_at' => now(),
             ];
+        }
 
-            // 3️⃣ Insert District & Tehsil
-            foreach ($rajasthanData as $districtName => $tehsils) {
-
-                $district = District::firstOrCreate(
-                    [
-                        'name' => $districtName,
-                        'state_id' => $state->id,
-                    ],
-                    [
-                        'country_id' => 1,
-                    ]
-                );
-
-                foreach ($tehsils as $tehsilName) {
-                    Tehsil::firstOrCreate([
-                        'name' => $tehsilName,
-                        'district_id' => $district->id,
-                        'state_id' => $state->id,
-                        'country_id' => 1,
-                    ]);
-                }
-            }
-        });
-
-        return response()->json([
-            'status' => true,
-            'message' => 'Rajasthan State, Districts & Tehsils inserted successfully'
-        ]);
+        // 🔥 ONE QUERY PER DISTRICT
+        Tehsil::insertOrIgnore($tehsilRows);
     }
+
+    return response()->json([
+        'status' => true,
+        'message' => 'Rajasthan State, Districts & Tehsils inserted successfully'
+    ]);
+}
+
  
 
 
