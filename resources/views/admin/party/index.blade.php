@@ -367,7 +367,7 @@ $('#stateSelect').on('change', function () {
         success: function (res) {
             let employeeSelect = $('#employeeSelect');
             employeeSelect.empty();
-            employeeSelect.append('<option value="">All</option>');
+            employeeSelect.append('<option value="all">All</option>');
 
             $.each(res, function (key, emp) {
                 employeeSelect.append(

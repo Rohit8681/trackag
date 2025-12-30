@@ -58,7 +58,7 @@ class PartyController extends Controller
         $toDate    = $request->get('to_date');
         $agroName  = $request->get('agro_name');
 
-        $query = PartyVisit::with(['customer', 'user']);
+        $query = PartyVisit::with(['customer', 'user'])->whereNotNull('check_in_time')->whereNotNull('check_out_time');
 
         // FILTER : Employee
         if ($userId) {
