@@ -374,7 +374,7 @@ class ApiTripController extends BaseController
                 'end_time'       => 'required|date_format:H:i:s',
                 'end_lat'        => 'required|numeric',
                 'end_lng'        => 'required|numeric',
-                'closenote'      => 'required|string',
+                'closenote'      => 'nullable|string',
                 'end_km'         => 'required|string',
                 'end_km_photo'   => 'required|mimes:jpeg,jpg,png,bmp,gif,svg,webp,tiff,ico|max:5120',
                 'status'         => 'in:completed',
