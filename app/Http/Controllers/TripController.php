@@ -35,8 +35,8 @@ class TripController extends Controller
                 $subordinateIds = \App\Models\User::where('reporting_to', $user->id)->pluck('id');
                 if ($subordinateIds->isNotEmpty()) {
                     $q->orWhere(function ($inner) use ($subordinateIds) {
-                        $inner->whereIn('user_id', $subordinateIds)
-                            ->where('approval_status', 'pending');
+                        $inner->whereIn('user_id', $subordinateIds);
+                            // ->where('approval_status', 'pending');
                     });
                 }
             });

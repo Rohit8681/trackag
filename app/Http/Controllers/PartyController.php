@@ -156,6 +156,20 @@ class PartyController extends Controller
         ]);
     }
 
+    public function getEmployeesByState(Request $request)
+    {
+        $stateId = $request->state_id;
+
+        $employees = User::where('status', 'Active')
+            ->when($stateId, function ($q) use ($stateId) {
+                $q->where('state_id', $stateId);
+            })
+            ->select('id', 'name')
+            ->get();
+
+        return response()->json($employees);
+    }
+
 
     
     // public function newPartyList(Request $request)

@@ -2,9 +2,9 @@
 @section('title', 'Edit Role | Trackag')
 
 @section('content')
-
 <main class="app-main">
-    {{-- Header --}}
+
+    {{-- HEADER --}}
     <div class="app-content-header">
         <div class="container-fluid">
             <div class="row">
@@ -13,7 +13,9 @@
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-end">
-                        <li class="breadcrumb-item"><a href="{{ route('roles.index') }}">Roles</a></li>
+                        <li class="breadcrumb-item">
+                            <a href="{{ route('roles.index') }}">Roles</a>
+                        </li>
                         <li class="breadcrumb-item active">Edit Role</li>
                     </ol>
                 </div>
@@ -21,167 +23,221 @@
         </div>
     </div>
 
+    {{-- CONTENT --}}
+    <div class="app-content">
+        <div class="container-fluid">
+            <div class="card card-primary card-outline">
+                <div class="card-body p-4">
 
-<div class="app-content">
-    <div class="container-fluid">
-        <div class="card card-primary card-outline">
-            <div class="card-body p-4">
+                    <form method="POST" action="{{ route('roles.update', $role->id) }}">
+                        @csrf
+                        @method('PUT')
 
-                {{-- Edit Role Form (SAME UI AS CREATE ROLE) --}}
-                <form method="POST" action="{{ route('roles.update', $role->id) }}">
-                    @csrf
-                    @method('PUT')
-
-                    {{-- Role Name --}}
-                    <div class="row mb-4">
-                        <div class="col-md-6">
-                            <label class="form-label fw-semibold">Role Name</label>
-                            <input type="text" name="name" value="{{ $role->name }}"
-                                   class="form-control form-control-lg" required>
+                        {{-- ROLE NAME --}}
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Role Name</label>
+                                <input type="text"
+                                       class="form-control form-control-lg"
+                                       name="name"
+                                       value="{{ $role->name }}"
+                                       required>
+                            </div>
                         </div>
-                    </div>
 
-                    {{-- Select All --}}
-                    <div class="mb-3">
-                        <input type="checkbox" id="select-all">
-                        <label for="select-all" class="fw-semibold text-primary ms-1">Select All Permissions</label>
-                    </div>
+                        {{-- SELECT ALL --}}
+                        <div class="mb-3">
+                            <input type="checkbox" id="select-all">
+                            <label for="select-all" class="fw-semibold text-primary ms-1">
+                                Select All Permissions
+                            </label>
+                        </div>
 
-                    {{-- Permission Table (Main → Sub → Permissions) --}}
-                    <div class="table-responsive">
-                        <table class="table table-bordered align-middle text-center">
-                            <thead class="table-primary">
-                            <tr>
-                                <th class="text-start">Module</th>
-                                <th>Create</th>
-                                <th>View</th>
-                                <th>Edit</th>
-                                <th>Delete</th>
-                                <th>Approve</th>
-                                <th>Reject</th>
-                                <th>Verify</th>
-                                <th>Dispatch</th>
-                                <th>Remove Review</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            @php
-                                $permissionTree = [
-                                    'Budget Plan' => [
-                                        'Budget Plan' => 'budget_plan',
-                                        'Monthly Plan' => 'monthly_plan',
-                                        'Plan Vs Achievement' => 'plan_vs_achievement',
-                                    ],
-                                    'Party (Customer)' => [
-                                        'Party Visit' => 'party_visit',
-                                        'New Party' => 'customers',
-                                        'Party Payment' => 'party_payment',
-                                        'Party Performance' => 'party_performance',
-                                        'Party Ledger' => 'party_ledger',
-                                    ],
-                                    'Order' => [
-                                        'Order List' => 'order',
-                                        'Order Report' => 'order_report',
-
-                                    ],
-                                    'Stock' => [
-                                        'Stock' => 'stock',
-                                    ],
-                                    'Tracking' => [
-                                        'Tracking' => 'tracking',
-                                    ],
-                                    'Attendance' => [
-                                        'Attendance' => 'attendance',
-                                    ],
-                                    'Expense' => [
-                                        'Expense' => 'expense',
-                                    ],
-                                    'User Management' => [
-                                        'Manage User' => 'users',
-                                        'Manage Role' => 'roles',
-                                    ],
-                                    'Trip Management' => [
-                                        'All Trips' => 'all_trip',
-                                        'Trip Types' => 'trip_types',
-                                        'Travel Modes' => 'travel_modes',
-                                        'Trip Purposes' => 'trip_purposes',
-                                    ],
-                                    'Masters' => [
-                                        'Designations' => 'designations',
-                                        'States' => 'states',
-                                        'Districts' => 'districts',
-                                        'Talukas' => 'talukas',
-                                        'Vehicle Types' => 'vehicle_types',
-                                        'Depo Master' => 'depo_master',
-                                        'Holiday Master' => 'holiday_master',
-                                        'Leave Master' => 'leave_master',
-                                    ],
-                                    'TA-DA' => [
-                                        'TA-DA' => 'ta_da',
-                                        'TA-DA Bill Master' => 'ta_da_bill_master',
-                                    ],
-                                ];
-
-                                if(auth()->user() && auth()->user()->hasRole('master_admin')){
-                                    $permissionTree['System'] = [
-                                        'Permissions' => 'permissions',
-                                        'Companies' => 'companies',
-                                    ];
-                                }
-
-                                $actions = ['create','view','edit','delete','approve','reject','verify','dispatch','remove_review'];
-                            @endphp
-
-                            @foreach($permissionTree as $mainModule => $subModules)
-                                <tr class="table-secondary">
-                                    <td colspan="10" class="text-start fw-bold">{{ $mainModule }}</td>
-                                </tr>
-
-                                @foreach($subModules as $subName => $key)
+                        {{-- PERMISSION TABLE --}}
+                        <div class="table-responsive">
+                            <table class="table permission-table table-bordered align-middle text-center">
+                                <thead class="table-primary">
                                     <tr>
-                                        <td class="text-start ps-4">{{ $subName }}</td>
-                                        @foreach($actions as $action)
-                                            @php
-                                                $permission = $permissions->firstWhere('name', $action.'_'.$key)
-                                                    ?? $permissions->firstWhere('name', $key.'_'.$action);
-                                            @endphp
-                                            <td>
-                                                @if($permission)
-                                                    <input type="checkbox"
-                                                           class="permission-checkbox"
-                                                           name="permissions[]"
-                                                           value="{{ $permission->name }}"
-                                                           {{ $role->hasPermissionTo($permission->name) ? 'checked' : '' }}>
-                                                @else
-                                                    <span class="text-muted">—</span>
-                                                @endif
-                                            </td>
-                                        @endforeach
+                                        <th>Module</th>
+                                        <th><input type="checkbox" class="column-select" data-column="create"> Create</th>
+                                        <th><input type="checkbox" class="column-select" data-column="view"> View</th>
+                                        <th><input type="checkbox" class="column-select" data-column="edit"> Edit</th>
+                                        <th><input type="checkbox" class="column-select" data-column="delete"> Delete</th>
+                                        <th><input type="checkbox" class="column-select" data-column="approvals"> Approve</th>
+                                        <th><input type="checkbox" class="column-select" data-column="reject"> Reject</th>
+                                        <th><input type="checkbox" class="column-select" data-column="verify"> Verify</th>
+                                        <th><input type="checkbox" class="column-select" data-column="dispatch"> Dispatch</th>
+                                        <th><input type="checkbox" class="column-select" data-column="remove_review"> Remove Review</th>
                                     </tr>
-                                @endforeach
-                            @endforeach
-                            </tbody>
-                        </table>
-                    </div>
+                                </thead>
 
-                    {{-- Buttons --}}
-                    <div class="text-end mt-4">
-                        <button type="submit" class="btn btn-primary px-4">Update Role</button>
-                        <a href="{{ route('roles.index') }}" class="btn btn-outline-secondary px-4">Cancel</a>
-                    </div>
-                </form>
+                                <tbody>
+                                    @php
+                                        $actions = [
+                                            'create' => 'Create',
+                                            'view' => 'View',
+                                            'edit' => 'Edit',
+                                            'delete' => 'Delete',
+                                            'approvals' => 'Approve',
+                                            'reject' => 'Reject',
+                                            'verify' => 'Verify',
+                                            'dispatch' => 'Dispatch',
+                                            'remove_review' => 'Remove Review',
+                                        ];
+
+                                        $matrix = [
+                                            'Budget Plan' => [
+                                                'budget_plan',
+                                                'monthly_plan',
+                                                'plan_vs_achievement',
+                                            ],
+                                            'Party (Customer)' => [
+                                                'party_visit',
+                                                'new_party',
+                                                'party_payment',
+                                                'party_performance',
+                                                'party_ledger',
+                                            ],
+                                            'Order' => ['order','order_report'],
+                                            'Stock' => ['stock','stock_ageing'],
+                                            'Tracking' => ['emp_on_map','daily_trip'],
+                                            'Attendance' => [
+                                                'attendance',
+                                                'monthly_attendance_report',
+                                                'leave_report'
+                                            ],
+                                            'Expense' => [
+                                                'expense',
+                                                'genrate_monthly_expense',
+                                                'ta_da_report'
+                                            ],
+                                            'Filed Demo' => [
+                                                'daily_farm_demo',
+                                                'monthly_farm_demo_report',
+                                            ],
+                                            'Trip Management' => [
+                                                'all_trip',
+                                            ],
+                                            'Masters' => [
+                                                'states',
+                                                'districts',
+                                                'talukas',
+                                                'trip_types',
+                                                'travel_modes',
+                                                'trip_purposes',
+                                                'designations',
+                                                'leave_master',
+                                                'holiday_master',
+                                                'vehicle_types',
+                                                'users',
+                                                'roles',
+                                                // 'party_master',
+                                                'customers',
+                                                'depo_master',
+                                                'ta_da',
+                                                'ta_da_bill_master',
+                                                'sales_product_master',
+                                                'technical_master',
+                                                'product_category',
+                                                'product_price',
+                                                'product_collection',
+                                                'price_list_master',
+                                                'list_of_all_price_list',
+                                                'upload_brochure'
+                                            ],
+                                            'User Management' => array_filter([
+                                                auth()->user() && auth()->user()->hasRole('master_admin')
+                                                    ? 'permissions'
+                                                    : null,
+                                                'companies',
+                                            ]),
+                                        ];
+                                    @endphp
+
+                                    @foreach ($matrix as $mainModule => $subModules)
+
+                                        {{-- MAIN MODULE --}}
+                                        <tr style="background:#ffe600;" class="table-secondary">
+                                            <td colspan="{{ count($actions) + 1 }}"
+                                                class="fw-bold text-start">
+                                                {{ $mainModule }}
+                                            </td>
+                                        </tr>
+
+                                        {{-- SUB MODULE --}}
+                                        @foreach ($subModules as $subModule)
+                                            <tr>
+                                                <td class="text-start ps-4 fw-semibold">
+                                                    {{ ucwords(str_replace('_',' ', $subModule)) }}
+                                                </td>
+
+                                                @foreach ($actions as $actionKey => $label)
+                                                    @php
+                                                        $permissionName = $actionKey.'_'.$subModule;
+                                                        $permission = $permissions->firstWhere('name', $permissionName);
+
+                                                        $isMasterAdmin = auth()->user() && auth()->user()->hasRole('master_admin');
+                                                        $isCompanies   = ($subModule === 'companies');
+
+                                                        if ($isMasterAdmin) {
+                                                            $allowThisAction = true;
+                                                        } else {
+                                                            $allowThisAction = !$isCompanies || ($actionKey === 'view');
+                                                        }
+                                                    @endphp
+
+                                                    <td>
+                                                        @if ($permission && $allowThisAction)
+                                                            <input type="checkbox"
+                                                                   class="form-check-input permission-checkbox"
+                                                                   name="permissions[]"
+                                                                   value="{{ $permissionName }}"
+                                                                   data-action="{{ $actionKey }}"
+                                                                   {{ $role->hasPermissionTo($permissionName) ? 'checked' : '' }}>
+                                                        @else
+                                                            <span class="text-muted">—</span>
+                                                        @endif
+                                                    </td>
+                                                @endforeach
+                                            </tr>
+                                        @endforeach
+
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+
+                        {{-- BUTTONS --}}
+                        <div class="text-end mt-4">
+                            <button type="submit" class="btn btn-primary px-4">
+                                Update Role
+                            </button>
+                            <a href="{{ route('roles.index') }}"
+                               class="btn btn-outline-secondary px-4">
+                                Cancel
+                            </a>
+                        </div>
+
+                    </form>
+
+                </div>
             </div>
         </div>
     </div>
-</div>
-
-
 </main>
 
+{{-- JS (SAME AS CREATE) --}}
 <script>
-    document.getElementById('select-all').addEventListener('change', function () {
-        document.querySelectorAll('.permission-checkbox').forEach(cb => cb.checked = this.checked);
-    });
-</script>
+document.getElementById('select-all').addEventListener('change', function () {
+    document.querySelectorAll('.permission-checkbox, .column-select')
+        .forEach(cb => cb.checked = this.checked);
+});
 
+document.querySelectorAll('.column-select').forEach(header => {
+    header.addEventListener('change', function () {
+        document.querySelectorAll(`.permission-checkbox[data-action="${this.dataset.column}"]`)
+            .forEach(cb => cb.checked = this.checked);
+    });
+});
+</script>
 @endsection

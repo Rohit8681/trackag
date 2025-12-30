@@ -93,7 +93,7 @@
                         <div class="col-md-2">
                             <label class="form-label fw-semibold">State</label>
                             <select id="stateSelect" class="form-select">
-                                
+                                <option value="all">All</option>
                                 @foreach ($states as $s)
                                     <option value="{{ $s->id }}">{{ $s->name }}</option>
                                 @endforeach
@@ -355,6 +355,27 @@ $(document).ready(function () {
     });
 }
 
+});
+
+$('#stateSelect').on('change', function () {
+    let stateId = $(this).val();
+
+    $.ajax({
+        url: "{{ route('admin.getEmployeesByState') }}",
+        type: "GET",
+        data: { state_id: stateId },
+        success: function (res) {
+            let employeeSelect = $('#employeeSelect');
+            employeeSelect.empty();
+            employeeSelect.append('<option value="">All</option>');
+
+            $.each(res, function (key, emp) {
+                employeeSelect.append(
+                    `<option value="${emp.id}">${emp.name}</option>`
+                );
+            });
+        }
+    });
 });
 </script>
 @endpush

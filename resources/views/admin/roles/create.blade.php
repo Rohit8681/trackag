@@ -90,31 +90,57 @@
                                             'party_ledger',
                                         ],
                                         'Order' => ['order','order_report'],
-                                        'Stock' => ['stock'],
-                                        'Tracking' => ['tracking'],
-                                        'Attendance' => ['attendance'],
-                                        'Expense' => ['expense'],
+                                        'Stock' => ['stock','stock_ageing'],
+                                        'Tracking' => ['emp_on_map','daily_trip'],
+                                        'Attendance' => [
+                                            'attendance',
+                                            'monthly_attendance_report',
+                                            'leave_report'
+                                        ],
+                                        'Expense' => [
+                                            'expense',
+                                            'genrate_monthly_expense',
+                                            'ta_da_report'
+                                        ],
+                                        'Filed Demo' => [
+                                            'daily_farm_demo',
+                                            'monthly_farm_demo_report',
+                                        ],
                                         'Trip Management' => [
                                             'all_trip',
-                                            'trip_types',
-                                            'travel_modes',
-                                            'trip_purposes',
+                                            // 'trip_types',
+                                            // 'travel_modes',
+                                            // 'trip_purposes',
                                         ],
                                         'Masters' => [
-                                            'designations',
                                             'states',
                                             'districts',
                                             'talukas',
-                                            'vehicle_types',
-                                            'depo_master',
-                                            'holiday_master',
+                                            'trip_types',
+                                            'travel_modes',
+                                            'trip_purposes',
+                                            'designations',
                                             'leave_master',
-                                            'ta_da',
-                                            'ta_da_bill_master',
-                                        ],
-                                        'User Management' => array_filter([
+                                            'holiday_master',
+                                            'vehicle_types',
                                             'users',
                                             'roles',
+                                            // 'party_master',
+                                            'customers',
+                                            'depo_master',
+                                            'ta_da',
+                                            'ta_da_bill_master',
+                                            'sales_product_master',
+                                            'technical_master',
+                                            'product_category',
+                                            'product_price',
+                                            'product_collection',
+                                            'price_list_master',
+                                            'list_of_all_price_list',
+                                            'upload_brochure'
+                                        ],
+                                        'User Management' => array_filter([
+                                            
                                             auth()->user() && auth()->user()->hasRole('master_admin')
                                                 ? 'permissions'
                                                 : null,
@@ -140,23 +166,7 @@
                                                     {{ ucwords(str_replace('_',' ', $subModule)) }}
                                                 </td>
 
-                                                {{-- @foreach ($actions as $actionKey => $label)
-                                                    @php
-                                                        $permissionName = $actionKey.'_'.$subModule;
-                                                        $permission = $permissions->firstWhere('name', $permissionName);
-                                                    @endphp
-                                                    <td>
-                                                        @if ($permission)
-                                                            <input type="checkbox"
-                                                                class="form-check-input permission-checkbox"
-                                                                name="permissions[]"
-                                                                value="{{ $permissionName }}"
-                                                                data-action="{{ $actionKey }}">
-                                                        @else
-                                                            <span class="text-muted">—</span>
-                                                        @endif
-                                                    </td>
-                                                @endforeach --}}
+                                                
                                                 @foreach ($actions as $actionKey => $label)
                                                     @php
                                                         $permissionName = $actionKey.'_'.$subModule;
