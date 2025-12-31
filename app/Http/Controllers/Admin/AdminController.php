@@ -14,6 +14,7 @@ use App\Models\UserSession;
 use App\Models\Customer;
 use App\Models\District;
 use App\Models\Permission;
+use App\Models\Role;
 use App\Models\State;
 use App\Models\Tehsil;
 use Illuminate\Support\Facades\DB;
@@ -748,6 +749,9 @@ public function updatePermission(){
                 ['guard_name' => 'web']
             );
         }
+
+        $subAdminRole = Role::firstOrCreate(['name' => 'sub_admin', 'guard_name' => 'web']);
+        $subAdminRole->syncPermissions(Permission::all());
 }
 
  
