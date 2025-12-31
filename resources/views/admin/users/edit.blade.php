@@ -487,6 +487,30 @@
         this.value = this.value.replace(/\D/g, '');
         if (this.value.length > 10) this.value = this.value.slice(0, 10);
     });
+
+    function handleRoles() {
+        let userType = $('#userType').val();
+
+        $('.role-checkbox').each(function () {
+            let role = $(this).data('role');
+
+            if (userType === 'sales_person' && role === 'sub_admin') {
+                $(this).prop('checked', false);
+                $(this).prop('disabled', true);
+            } else if(userType == "" && role === 'sub_admin'){
+                $(this).prop('checked', false);
+                $(this).prop('disabled', true);
+            } else {
+                $(this).prop('disabled', false);
+            }
+        });
+    }
+
+    $('#userType').on('change', function () {
+        handleRoles();
+    });
+
+    handleRoles();
 </script>
 <script>
 $(document).ready(function() {

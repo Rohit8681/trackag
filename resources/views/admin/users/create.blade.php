@@ -498,114 +498,10 @@
     </main>
 @endsection
 
-
-{{-- @push('scripts')
-<script>
-    function togglePassword(id, btn) {
-        const input = document.getElementById(id);
-        const icon = btn.querySelector('i');
-
-        if (input.type === "password") {
-            input.type = "text";
-            icon.classList.remove('fa-eye');
-            icon.classList.add('fa-eye-slash');
-        } else {
-            input.type = "password";
-            icon.classList.remove('fa-eye-slash');
-            icon.classList.add('fa-eye');
-        }
-    }
-    function validateChequePhotos(input) {
-        if (input.files.length > 3) {
-            alert("You can upload only up to 3 Cancel Cheque Photos.");
-            input.value = ""; // reset selection
-        }
-    }
-    $('.mobile_no').on('input', function() {
-        this.value = this.value.replace(/\D/g, '');
-        
-        // Limit to 10 digits
-        if (this.value.length > 10) {
-            this.value = this.value.slice(0, 10);
-        }
-    });
-
-    document.addEventListener('DOMContentLoaded', function () {
-        const userType = document.getElementById('userType');
-        const roleCheckboxes = document.querySelectorAll('.role-checkbox');
-
-        function handleRoles() {
-            if (userType.value === 'sales_person') {
-                roleCheckboxes.forEach(cb => {
-                    if (cb.dataset.role === 'sub_admin') {
-                        cb.checked = false;
-                        cb.disabled = true;   // ❌ sub_admin not allowed
-                    } else {
-                        cb.disabled = false; // ✅ others allowed
-                    }
-                });
-            } else {
-                // other OR empty
-                roleCheckboxes.forEach(cb => {
-                    cb.disabled = false; // ✅ all allowed
-                });
-            }
-        }
-
-        userType.addEventListener('change', handleRoles);
-        handleRoles(); // page load support
-    });
-</script>
-<script>
-$(document).ready(function() {
-    handleRoles();
-    $('#state_id').on('change', function() {
-        var stateId = $(this).val();
-        $('#district_id').html('<option value="">Loading...</option>');
-        $('#tehsil_id').html('<option value="">-- Select Tehsil --</option>');
-
-        if(!stateId) {
-            $('#district_id').html('<option value="">-- Select District --</option>');
-            return;
-        }
-
-        $.get("{{ route('depos.get-districts') }}", { state_id: stateId }, function(data){
-            var html = '<option value="">-- Select District --</option>';
-            $.each(data, function(i, d){
-                html += '<option value="'+ d.id +'">'+ d.name +'</option>';
-            });
-            $('#district_id').html(html);
-        });
-    });
-
-    $('#district_id').on('change', function() {
-        var districtId = $(this).val();
-        $('#tehsil_id').html('<option value="">Loading...</option>');
-
-        if(!districtId) {
-            $('#tehsil_id').html('<option value="">-- Select Tehsil --</option>');
-            return;
-        }
-
-        $.get("{{ route('depos.get-tehsils') }}", { district_id: districtId }, function(data){
-            var html = '<option value="">-- Select Tehsil --</option>';
-            $.each(data, function(i, t){
-                html += '<option value="'+ t.id +'">'+ t.name +'</option>';
-            });
-            $('#tehsil_id').html(html);
-        });
-    });
-});
-</script>
-@endpush --}}
-
 @push('scripts')
 <script>
 $(document).ready(function () {
 
-    /* =========================
-       PASSWORD TOGGLE
-    ========================== */
     window.togglePassword = function (id, btn) {
         const input = document.getElementById(id);
         const icon = btn.querySelector('i');
@@ -621,9 +517,6 @@ $(document).ready(function () {
         }
     };
 
-    /* =========================
-       CHEQUE VALIDATION
-    ========================== */
     window.validateChequePhotos = function (input) {
         if (input.files.length > 3) {
             alert("You can upload only up to 3 Cancel Cheque Photos.");
@@ -631,24 +524,13 @@ $(document).ready(function () {
         }
     };
 
-    /* =========================
-       MOBILE NUMBER ONLY
-    ========================== */
+    
     $('.mobile_no').on('input', function () {
         this.value = this.value.replace(/\D/g, '').slice(0, 10);
     });
 
-    /* =========================
-       ROLE HANDLING LOGIC
-    ========================== */
     function handleRoles() {
         let userType = $('#userType').val();
-
-        // 👉 Fresh create page (no user type selected)
-        // if (!userType) {
-        //     $('.role-checkbox').prop('disabled', false);
-        //     return;
-        // }
 
         $('.role-checkbox').each(function () {
             let role = $(this).data('role');
@@ -665,21 +547,12 @@ $(document).ready(function () {
         });
     }
 
-    /* =========================
-       EVENTS
-    ========================== */
-
-    // User type change
     $('#userType').on('change', function () {
         handleRoles();
     });
 
-    // Page reload (old() case)
     handleRoles();
 
-    /* =========================
-       STATE → DISTRICT → TEHSIL
-    ========================== */
     $('#state_id').on('change', function () {
         let stateId = $(this).val();
         $('#district_id').html('<option value="">Loading...</option>');
