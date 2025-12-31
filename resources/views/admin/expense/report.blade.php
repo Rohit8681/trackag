@@ -200,7 +200,10 @@
                         </tbody>
                         <tfoot class="table-light">
                             <tr>
-                                <th colspan="13" class="text-end">TOTAL :</th>
+                                <th colspan="10" class="text-end">TOTAL :</th>
+                                <th>{{ number_format($total_travel_km, 2) }}</th>
+                                <th>-</th>
+                                <th>-</th>
                                 <th>{{ number_format($total_ta, 2) }}</th>
                                 <th>{{ number_format($total_da, 2) }}</th>
                                 <th>{{ number_format($total_other, 2) }}</th>

@@ -247,6 +247,9 @@ class ExpenseController extends Controller
             $states = State::where('status', 1)->get();
         }
         $employees = User::where('is_active', 1)->get();
+        $total_travel_km = $data->sum(function ($item) {
+            return ($item->end_km - $item->starting_km);
+        });
 
         $total_ta = $data->sum('ta_exp');
         $total_da = $data->sum('da_exp');
@@ -261,7 +264,8 @@ class ExpenseController extends Controller
             'total_da',
             'total_other',
             'total_total',
-            'month'
+            'month',
+            'total_travel_km'
             ))->with(['from_date' => $from, 'to_date' => $to]);
     }
 
