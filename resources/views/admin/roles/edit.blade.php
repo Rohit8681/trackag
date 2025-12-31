@@ -193,7 +193,7 @@
                                                                    name="permissions[]"
                                                                    value="{{ $permissionName }}"
                                                                    data-action="{{ $actionKey }}"
-                                                                   {{ $role->hasPermissionTo($permissionName) ? 'checked' : '' }}>
+                                                                   {{ $permission && $role->hasPermissionTo($permissionName, 'web') ? 'checked' : '' }}>
                                                         @else
                                                             <span class="text-muted">—</span>
                                                         @endif
