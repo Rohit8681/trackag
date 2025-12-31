@@ -463,6 +463,12 @@
 
 @push('scripts')
 <script>
+    $(document).on('change', '.role-checkbox', function () {
+        if ($(this).is(':checked')) {
+            // badha bija role checkbox uncheck
+            $('.role-checkbox').not(this).prop('checked', false);
+        }
+    });
     function togglePassword(id, btn) {
         const input = document.getElementById(id);
         const icon = btn.querySelector('i');
