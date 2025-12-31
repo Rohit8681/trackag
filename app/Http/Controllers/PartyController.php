@@ -61,7 +61,7 @@ class PartyController extends Controller
         $query = PartyVisit::with(['customer', 'user'])->whereNotNull('check_in_time')->whereNotNull('check_out_time');
 
         // FILTER : Employee
-        if ($userId) {
+        if (!empty($userId)) {
             $query->where('user_id', $userId);
         }
         $today = now()->toDateString();
