@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
+use Spatie\Permission\PermissionRegistrar;
 
 use Session;
 
@@ -755,7 +756,7 @@ public function updatePermission(){
         //         ['guard_name' => 'web']
         //     );
         // }
-
+        app()[PermissionRegistrar::class]->forgetCachedPermissions();
         $subAdminRole = Role::firstOrCreate(['name' => 'sub_admin', 'guard_name' => 'web']);
         $allPermissions = Permission::all();
         // dd($allPermissions);
