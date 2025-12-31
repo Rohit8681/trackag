@@ -13,8 +13,8 @@ use App\Services\Admin\AdminService;
 use App\Models\UserSession;
 use App\Models\Customer;
 use App\Models\District;
-use App\Models\Permission;
-use App\Models\Role;
+// use App\Models\Permission;
+// use App\Models\Role;
 use App\Models\State;
 use App\Models\Tehsil;
 use Illuminate\Support\Facades\DB;
@@ -22,6 +22,8 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use Spatie\Permission\PermissionRegistrar;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
 
 use Session;
 
@@ -762,6 +764,7 @@ public function updatePermission(){
         // dd($allPermissions);
         $subAdminRole->syncPermissions($allPermissions);
         // $subAdminRole->syncPermissions(Permission::all());
+        dd($subAdminRole->permissions->pluck('name'));
 }
 
  
