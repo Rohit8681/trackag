@@ -147,7 +147,7 @@
                                     </td>
                                     <td>{{ $val->amount }}</td>
                                     <td>
-                                        <a href="{{ asset('storage/party-payments/'.$val->image) }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                        <a href="{{ asset('storage/'.$val->image) }}" target="_blank" class="btn btn-sm btn-outline-primary">
                                         <i class="fas fa-image"></i> View
                                         </a>
                                     </td>
