@@ -41,6 +41,11 @@ class ExpenseController extends Controller
         if ($request->filled('approval_status')) {
             $query->where('approval_status', $request->approval_status);
         }
+        if($request->filled('state_id')){
+            $query->whereHas('user', function ($q) use ($request) {
+                $q->where('state_id', $request->state_id);
+            });
+        }
 
         $expenses = $query->latest()->get();
         // $states = State::where('status',1)->get();
@@ -152,8 +157,6 @@ class ExpenseController extends Controller
 
     public function expenseReport(Request $request)
     {
-        // $from = $request->from_date ?? now()->startOfMonth()->format('Y-m-d');
-        // $to   = $request->to_date ?? now()->endOfMonth()->format('Y-m-d');
         $month = $request->month ?? now()->format('Y-m');
         $from = Carbon::parse($month . '-01')->startOfMonth()->format('Y-m-d');
         $to   = Carbon::parse($month . '-01')->endOfMonth()->format('Y-m-d');

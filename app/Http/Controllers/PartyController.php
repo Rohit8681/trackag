@@ -241,7 +241,7 @@ class PartyController extends Controller
         }
 
         // ✅ MAIN QUERY
-        $query = Customer::where('is_active', 1)
+        $query = Customer::with('user')->where('is_active', 1)
             ->where('type', 'mobile');
 
         if ($request->financial_year) {
@@ -259,7 +259,10 @@ class PartyController extends Controller
         }
 
         if ($request->state_id) {
-            $query->where('state_id', $request->state_id);
+            // $query->where('state_id', $request->state_id);
+            $query->whereHas('user', function ($q) use ($request) {
+                $q->where('state_id', $request->state_id);
+            });
         }
 
         if ($request->user_id) {
