@@ -121,6 +121,7 @@ Route::middleware(['web'])->group(function () {
             Route::get('get-user-slab', [UserController::class, 'getUserSlab'])->name('admin.get-user-slab');
 
             Route::get('update-state',[AdminController::class,'updateState']);
+            Route::get('update-permission',[AdminController::class,'updatePermission']);
 
 
             Route::get('dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
