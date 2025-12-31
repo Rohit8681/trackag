@@ -749,15 +749,15 @@ public function updatePermission(){
         //         ['guard_name' => 'web']
         //     );
         // }
-        foreach ($permissions as $permissionName) {
-            Permission::firstOrCreate(
-                ['name' => $permissionName],
-                ['guard_name' => 'web']
-            );
-        }
+        // foreach ($permissions as $permissionName) {
+        //     Permission::firstOrCreate(
+        //         ['name' => $permissionName],
+        //         ['guard_name' => 'web']
+        //     );
+        // }
 
-        // $subAdminRole = Role::firstOrCreate(['name' => 'sub_admin', 'guard_name' => 'web']);
-        // $subAdminRole->syncPermissions(Permission::all());
+        $subAdminRole = Role::firstOrCreate(['name' => 'sub_admin', 'guard_name' => 'web']);
+        $subAdminRole->syncPermissions(Permission::all());
 }
 
  
