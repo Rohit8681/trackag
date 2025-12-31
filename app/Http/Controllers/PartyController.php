@@ -161,7 +161,7 @@ class PartyController extends Controller
         $stateId = $request->state_id;
 
         $employees = User::where('status', 'Active')
-            ->when($stateId, function ($q) use ($stateId) {
+            ->when($stateId && $stateId !== 'all', function ($q) use ($stateId) {
                 $q->where('state_id', $stateId);
             })
             ->select('id', 'name')
