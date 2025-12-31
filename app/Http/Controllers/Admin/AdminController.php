@@ -758,7 +758,7 @@ public function updatePermission(){
 
         $subAdminRole = Role::firstOrCreate(['name' => 'sub_admin', 'guard_name' => 'web']);
         $allPermissions = Permission::all();
-        dd($allPermissions);
+        // dd($allPermissions);
         $subAdminRole->syncPermissions($allPermissions);
         // $subAdminRole->syncPermissions(Permission::all());
 }
