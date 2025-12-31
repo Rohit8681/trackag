@@ -145,7 +145,10 @@
 
     <tfoot>
         <tr>
-            <th colspan="13" style="text-align:right;">TOTAL :</th>
+            <th colspan="10" class="text-end">TOTAL :</th>
+            <th>{{ number_format($total_travel_km, 2) }}</th>
+            <th>-</th>
+            <th>-</th>
             <th>{{ number_format($total_ta ?? 0, 2) }}</th>
             <th>{{ number_format($total_da ?? 0, 2) }}</th>
             <th>{{ number_format($total_other ?? 0, 2) }}</th>
