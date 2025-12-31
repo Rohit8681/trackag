@@ -64,7 +64,7 @@ class RoleController extends Controller
     public function edit(string $id)
     {
         $role = Role::findOrFail($id);
-        
+        dd($role);
         $user = Auth::user();
         $originalRoleName = $role->name;
         
