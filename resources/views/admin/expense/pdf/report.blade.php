@@ -128,7 +128,8 @@
             <td>{{ $t->end_km ?? 0 }}</td>
             <td>{{ ($t->end_km ?? 0) - ($t->starting_km ?? 0) }}</td>
             <td>{{ $t->total_distance_km ?? 0 }}</td>
-            <td>{{ ($t->end_km ?? 0) - ($t->starting_km ?? 0) }}</td>
+            {{-- <td>{{ ($t->end_km ?? 0) - ($t->starting_km ?? 0) }}</td> --}}
+            <td>{{ (($t->end_km ?? 0) - ($t->starting_km ?? 0)) - ($t->total_distance_km ?? 0) }}</td>
             <td>{{ number_format($t->ta_exp ?? 0, 2) }}</td>
             <td>{{ number_format($t->da_exp ?? 0, 2) }}</td>
             <td>{{ number_format($t->other_exp ?? 0, 2) }}</td>
