@@ -768,7 +768,8 @@ public function updatePermission(){
         
         // dd($subAdminRole->permissions->pluck('name'));
         $user->assignRole('sub_admin');
-        dd($user->roles->pluck('name'));
+        $user->refresh();
+        // dd($user->roles->pluck('name'));
 }
 
  
