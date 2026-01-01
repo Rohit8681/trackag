@@ -50,8 +50,6 @@ class AdminController extends Controller
         // dd('test web admin');
         $user = Auth::user();
         $onlineTimeout = now()->subMinutes(10);
-        $permissions = $user->getAllPermissions(); 
-        dd($permissions);
         $isMasterAdmin = $user->hasRole('master_admin');
         if ($isMasterAdmin) {
             
