@@ -30,8 +30,22 @@ class CustomerController extends Controller
         $admin = Auth::user();
 
         $query = Customer::with(['user', 'company', 'state', 'district', 'tehsil'])->where('type','web');
+        // if (!($admin->hasRole('master_admin') || $admin->hasRole('sub_admin'))) {
+        //     $query->where('user_id', $admin->id);
+        // }
         if (!($admin->hasRole('master_admin') || $admin->hasRole('sub_admin'))) {
-            $query->where('user_id', $admin->id);
+
+            $subordinateIds = \App\Models\User::where('reporting_to', $admin->id)
+                ->pluck('id')
+                ->toArray();
+
+            $query->where(function ($q) use ($admin, $subordinateIds) {
+                $q->where('user_id', $admin->id);
+
+                if (!empty($subordinateIds)) {
+                    $q->orWhereIn('user_id', $subordinateIds);
+                }
+            });
         }
         if ($request->filled('financial_year')) {
             // $query->where('financial_year', $request->financial_year);
