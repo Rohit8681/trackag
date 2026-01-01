@@ -760,18 +760,35 @@ public function updatePermission(){
         // }
         
        
-        app()[PermissionRegistrar::class]->forgetCachedPermissions();
-        $subAdminRole = Role::firstOrCreate(['name' => 'sub_admin', 'guard_name' => 'web']);
-        $allPermissions = Permission::all();
-        // dd($subAdminRole->id,count($allPermissions));
-        // dd($allPermissions);
-        $subAdminRole->syncPermissions($allPermissions);
-        // $subAdminRole->syncPermissions(Permission::all());
-        $user = User::find(1);
+        // app()[PermissionRegistrar::class]->forgetCachedPermissions();
+        // $subAdminRole = Role::firstOrCreate(['name' => 'sub_admin', 'guard_name' => 'web']);
+        // $allPermissions = Permission::all();
+        // // dd($subAdminRole->id,count($allPermissions));
+        // // dd($allPermissions);
+        // $subAdminRole->syncPermissions($allPermissions);
+        // // $subAdminRole->syncPermissions(Permission::all());
+        // $user = User::find(1);
         
-        // dd($subAdminRole->permissions->pluck('name'));
-        $user->assignRole('sub_admin');
-        $user->refresh();
+        // // dd($subAdminRole->permissions->pluck('name'));
+        // $user->assignRole('sub_admin');
+        // $user->refresh();
+        app()[PermissionRegistrar::class]->forgetCachedPermissions();
+
+        DB::connection('tenant')->transaction(function () {
+            dd(DB::connection()->getDatabaseName());
+            $subAdminRole = Role::on('tenant')->firstOrCreate([
+                'name' => 'sub_admin',
+                'guard_name' => 'web'
+            ]);
+
+            $allPermissions = Permission::on('tenant')->get();
+
+            $subAdminRole->syncPermissions($allPermissions);
+
+            $user = User::on('tenant')->find(1);
+            $user->assignRole('sub_admin');
+        });
+
         // dd($user->roles->pluck('name'));
 }
 
