@@ -53,6 +53,7 @@ class AdminController extends Controller
 
         $isMasterAdmin = $user->hasRole('master_admin');
         if ($isMasterAdmin) {
+            dd('hello',$user);
             $totalUsers       = User::count();
             $totalRoles       = \Spatie\Permission\Models\Role::count();
             $totalPermissions = \Spatie\Permission\Models\Permission::count();
@@ -808,7 +809,6 @@ public function updatePermission()
 
     // ✅ Use tenant connection safely
     DB::connection('tenant')->transaction(function () {
-dd(DB::connection()->getDatabaseName());
         // 🔹 Clear Spatie permission cache
         app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
