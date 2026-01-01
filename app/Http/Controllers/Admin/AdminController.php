@@ -765,6 +765,7 @@ public function updatePermission(){
         $subAdminRole->syncPermissions($allPermissions);
         // $subAdminRole->syncPermissions(Permission::all());
         $user = User::find(1);
+        dd($user);
         // dd($subAdminRole->permissions->pluck('name'));
         $user->assignRole('sub_admin');
 }
