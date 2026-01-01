@@ -758,16 +758,7 @@ public function updatePermission(){
         //         ['guard_name' => 'web']
         //     );
         // }
-        DB::statement('SET FOREIGN_KEY_CHECKS=0');
-
-        DB::table('model_has_permissions')->truncate();
-        DB::table('model_has_roles')->truncate();
-        DB::table('role_has_permissions')->truncate();
-        // DB::table('permissions')->truncate();
-        DB::table('roles')->truncate();
-
-        DB::statement('SET FOREIGN_KEY_CHECKS=1');
-
+        
        
         app()[PermissionRegistrar::class]->forgetCachedPermissions();
         $subAdminRole = Role::firstOrCreate(['name' => 'sub_admin', 'guard_name' => 'web']);
