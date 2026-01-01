@@ -761,6 +761,7 @@ public function updatePermission(){
         app()[PermissionRegistrar::class]->forgetCachedPermissions();
         $subAdminRole = Role::firstOrCreate(['name' => 'sub_admin', 'guard_name' => 'web']);
         $allPermissions = Permission::all();
+        dd(count($allPermissions));
         // dd($allPermissions);
         $subAdminRole->syncPermissions($allPermissions);
         // $subAdminRole->syncPermissions(Permission::all());
