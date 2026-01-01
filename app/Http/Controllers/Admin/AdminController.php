@@ -795,41 +795,52 @@ class AdminController extends Controller
  
 public function updatePermission()
 {
-    // ✅ Use tenant_testing DB connection explicitly
-    DB::connection('tenant_testing')->transaction(function () {
+    $tenancyDbName = 'tenant_testing'; // Target DB
 
-        // 🔹 Clear permission cache
-        dd(DB::connection()->getDatabaseName());
+    // 🔹 Dynamically set tenant connection
+    $tenantConnection = config('database.connections.tenant');
+    $tenantConnection['database'] = $tenancyDbName;
+    config(['database.connections.tenant' => $tenantConnection]);
+
+    // 🔹 Purge & reconnect
+    DB::purge('tenant');
+    DB::reconnect('tenant');
+
+    // ✅ Use tenant connection safely
+    DB::connection('tenant')->transaction(function () {
+dd(DB::connection()->getDatabaseName());
+        // 🔹 Clear Spatie permission cache
         app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
         // 🔹 Optional: truncate role_has_permissions & model_has_roles
-        DB::connection('tenant_testing')->table('role_has_permissions')->truncate();
-        DB::connection('tenant_testing')->table('model_has_roles')->truncate();
+        DB::connection('tenant')->table('role_has_permissions')->truncate();
+        DB::connection('tenant')->table('model_has_roles')->truncate();
 
-        // 🔹 Create / get sub_admin role
-        $subAdminRole = Role::on('tenant_testing')->firstOrCreate([
+        // 🔹 Create or get sub_admin role
+        $subAdminRole = Role::on('tenant')->firstOrCreate([
             'name' => 'sub_admin',
-            'guard_name' => 'web'
+            'guard_name' => 'web',
         ]);
 
-        // 🔹 Get all permissions from tenant_testing DB
-        $allPermissions = Permission::on('tenant_testing')->get();
+        // 🔹 Get all permissions
+        $allPermissions = Permission::on('tenant')->get();
 
-        // 🔹 Assign all permissions to sub_admin role
+        // 🔹 Sync permissions to role
         $subAdminRole->syncPermissions($allPermissions);
 
         // 🔹 Assign role to user ID = 1
-        $user = User::on('tenant_testing')->find(1);
+        $user = User::on('tenant')->find(1);
         if ($user) {
             $user->assignRole('sub_admin');
         }
 
-        // 🔹 Return info for debug
+        // 🔹 Return debug info
         return response()->json([
             'role_id' => $subAdminRole->id,
             'role_name' => $subAdminRole->name,
             'permissions_count' => $subAdminRole->permissions()->count(),
-            'user_roles' => $user ? $user->roles->pluck('name') : null
+            'user_roles' => $user ? $user->roles->pluck('name') : null,
+            'connected_db' => DB::connection('tenant')->getDatabaseName(),
         ]);
     });
 }
