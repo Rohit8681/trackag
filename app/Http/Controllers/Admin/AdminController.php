@@ -50,7 +50,12 @@ class AdminController extends Controller
         // dd('test web admin');
         $user = Auth::user();
         $onlineTimeout = now()->subMinutes(10);
-        dd('hello',$user);
+        if ($user->hasRole(roles: 'sub_admin')) {
+    // User has the 'admin' role
+    echo "User is admin";
+} else {
+    echo "User is not admin";
+}
         $isMasterAdmin = $user->hasRole('master_admin');
         if ($isMasterAdmin) {
             
