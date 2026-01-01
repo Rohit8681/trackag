@@ -50,10 +50,10 @@ class AdminController extends Controller
         // dd('test web admin');
         $user = Auth::user();
         $onlineTimeout = now()->subMinutes(10);
-
+        dd('hello',$user);
         $isMasterAdmin = $user->hasRole('master_admin');
         if ($isMasterAdmin) {
-            dd('hello',$user);
+            
             $totalUsers       = User::count();
             $totalRoles       = \Spatie\Permission\Models\Role::count();
             $totalPermissions = \Spatie\Permission\Models\Permission::count();
