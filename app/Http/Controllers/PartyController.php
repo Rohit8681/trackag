@@ -25,7 +25,7 @@ class PartyController extends Controller
         $user = auth()->user();
         $roleName = $user->getRoleNames()->first();
         
-        $customers = Customer::where('status',1)->get();
+       
         $companyCount = Company::count();
         $company = null;
         $companyStates = [];
@@ -36,14 +36,17 @@ class PartyController extends Controller
         }
         if (in_array($roleName, ['master_admin', 'sub_admin'])) {
             $employees = User::where('status','Active')->get();
+             $customers = Customer::where('status',1)->get();
         }else{
             if (empty($stateIds)) {
                 $employees = collect();
+                $customers = Customer::where('status',1)->get();
             }else{
                 $employees = User::where('status', 'Active')
                 ->whereIn('state_id', $stateIds)
                 ->where('reporting_to', $user->id)
                 ->get();
+                $customers = Customer::whereIn('state_id', $stateIds)->where('user_id',$user->id)->where('status',1)->get();
             }
         }
 
