@@ -108,7 +108,7 @@
                                 @endforeach
                             </select>
                         </div>
-                        <div class="col-md-2">
+                        {{-- <div class="col-md-2">
                             <label class="form-label fw-semibold">Agro Name</label>
                             <select id="agroSelect" class="form-select">
                                 <option value="">All</option>
@@ -117,7 +117,7 @@
                                     <option value="{{ $c->id }}">{{ $c->agro_name }}</option>
                                 @endforeach
                             </select>
-                        </div>
+                        </div> --}}
                     </form>
                 </div>
             </div>
