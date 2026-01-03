@@ -44,6 +44,10 @@
                 <!-- Card Header -->
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="card-title mb-0">Expenses Report List</h5>
+                    <div class="ms-auto text-end text-danger" style="max-width: 520px; line-height:1.3;">
+        <strong>Notes:</strong> Please ensure that all data is reviewed before granting approval for the expense.
+        After approval, the data cannot be modified.
+    </div>
                     {{-- <div>
                         <a href="{{ route('expense.report.pdf', request()->all()) }}" 
                         class="btn btn-danger btn-sm" target="_blank">
