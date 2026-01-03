@@ -24,7 +24,7 @@ class PartyController extends Controller
     {
         $user = auth()->user();
         $roleName = $user->getRoleNames()->first();
-        $employees = User::where('status','Active')->get();
+        
         $customers = Customer::where('status',1)->get();
         $companyCount = Company::count();
         $company = null;
@@ -33,6 +33,18 @@ class PartyController extends Controller
         if ($userStateAccess && !empty($userStateAccess->state_ids)) {
             $stateIds = $userStateAccess->state_ids ?? [];
         
+        }
+        if (in_array($roleName, ['master_admin', 'sub_admin'])) {
+            $employees = User::where('status','Active')->get();
+        }else{
+            if (empty($stateIds)) {
+                $employees = collect();
+            }else{
+                $employees = User::where('status', 'Active')
+                ->whereIn('state_id', $stateIds)
+                ->where('reporting_to', $user->id)
+                ->get();
+            }
         }
 
         if ($companyCount == 1) {
@@ -64,6 +76,8 @@ class PartyController extends Controller
 
     public function getPartyVisits(Request $request)
     {
+        $user     = auth()->user();
+        $roleName = $user->getRoleNames()->first();
         $type      = $request->get('type', 'daily'); // daily OR monthly
         $userId    = $request->get('user_id');
         $fromDate  = $request->get('from_date');
@@ -72,6 +86,24 @@ class PartyController extends Controller
 
         $query = PartyVisit::with(['customer', 'user'])->whereNotNull('check_in_time')->whereNotNull('check_out_time');
 
+        if (!in_array($roleName, ['master_admin', 'sub_admin'])) {
+
+            $userStateAccess = UserStateAccess::where('user_id', $user->id)->first();
+            $stateIds = $userStateAccess->state_ids ?? [];
+
+            if (empty($stateIds)) {
+                return response()->json([
+                    'success' => true,
+                    'data' => []
+                ]);
+            }
+
+            // ✅ Filter via user relation
+            $query->whereHas('user', function ($q) use ($user, $stateIds) {
+                $q->whereIn('state_id', $stateIds)
+                ->where('reporting_to', $user->id);
+            });
+        }
         // FILTER : Employee
         if (!empty($userId)) {
             $query->where('user_id', $userId);
@@ -168,19 +200,38 @@ class PartyController extends Controller
         ]);
     }
 
-    public function getEmployeesByState(Request $request)
-    {
-        $stateId = $request->state_id;
+    // public function getEmployeesByState(Request $request)
+    // {
+    //     $user = auth()->user();
+    //     $roleName = $user->getRoleNames()->first();
+    //     $stateId = $request->state_id;
 
-        $employees = User::where('status', 'Active')
-            ->when($stateId && $stateId !== 'all', function ($q) use ($stateId) {
-                $q->where('state_id', $stateId);
-            })
-            ->select('id', 'name')
-            ->get();
+    //     $userStateAccess = UserStateAccess::where('user_id', $user->id)->first();
+    //     if ($userStateAccess && !empty($userStateAccess->state_ids)) {
+    //         $stateIds = $userStateAccess->state_ids ?? [];
+        
+    //     }
 
-        return response()->json($employees);
-    }
+    //     if (!in_array($roleName, ['master_admin', 'sub_admin'])) {
+    //         $employees = User::where('status', 'Active')
+    //         ->when($stateId && $stateId !== 'all', function ($q) use ($stateId) {
+    //             $q->where('state_id', $stateId);
+    //         })->whereIn('state_id', $stateIds)->where('reporting_to', $user->id)
+    //         ->select('id', 'name')
+    //         ->get();
+    //     }else{
+    //         $employees = User::where('status', 'Active')
+    //         ->when($stateId && $stateId !== 'all', function ($q) use ($stateId) {
+    //             $q->where('state_id', $stateId);
+    //         })
+    //         ->select('id', 'name')
+    //         ->get();
+    //     }
+
+        
+
+    //     return response()->json($employees);
+    // }
 
 
     
@@ -227,6 +278,44 @@ class PartyController extends Controller
     // }
 
     
+    public function getEmployeesByState(Request $request)
+    {
+        $user = auth()->user();
+        $roleName = $user->getRoleNames()->first();
+        $stateId = $request->state_id;
+
+        // ✅ Master / Sub admin → all employees
+        if (in_array($roleName, ['master_admin', 'sub_admin'])) {
+
+            $employees = User::where('status', 'Active')
+                ->when($stateId && $stateId !== 'all', function ($q) use ($stateId) {
+                    $q->where('state_id', $stateId);
+                })
+                ->select('id', 'name')
+                ->get();
+
+            return response()->json($employees);
+        }
+
+        $userStateAccess = UserStateAccess::where('user_id', $user->id)->first();
+        $stateIds = $userStateAccess->state_ids ?? [];
+
+        if (empty($stateIds)) {
+            return response()->json([]);
+        }
+
+        $employees = User::where('status', 'Active')
+            ->whereIn('state_id', $stateIds)
+            ->where('reporting_to', $user->id)
+            ->when($stateId && $stateId !== 'all', function ($q) use ($stateId) {
+                $q->where('state_id', $stateId);
+            })
+            ->select('id', 'name')
+            ->get();
+
+        return response()->json($employees);
+    }
+
     public function newPartyList(Request $request)
     {
         $users = User::where('is_active', 1)->get();
