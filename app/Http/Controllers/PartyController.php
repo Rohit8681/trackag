@@ -71,7 +71,7 @@ class PartyController extends Controller
         } else {
             $states = State::where('status',1)->get();
         }
-        return view('admin.party.index',compact('states','employees','customers','company'));
+        return view('admin.party.index',compact('states','employees','company'));
 
     }
     
