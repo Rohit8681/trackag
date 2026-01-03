@@ -12,6 +12,7 @@ use App\Models\Customer;
 use App\Models\PartyVisit;
 use App\Models\State;
 use App\Models\User;
+use App\Models\UserStateAccess;
 use Carbon\Carbon;
 
 class TripController extends Controller
@@ -23,30 +24,104 @@ class TripController extends Controller
         $this->middleware('permission:edit_all_trip')->only(['edit','update']);
         $this->middleware('permission:delete_all_trip')->only(['destroy']);
     }
+    // public function index(Request $request)
+    // {
+    //     $user = Auth::user();
+    //     $query = Trip::with(['user', 'company', 'approvedByUser', 'tripLogs', 'customers', 'travelMode', 'tourType']);
+
+    //     // 🔹 Role-based access
+    //     if (!($user->hasRole('master_admin') || $user->hasRole('sub_admin'))) {
+    //         $query->where(function ($q) use ($user) {
+    //             $q->where('user_id', $user->id);
+    //             $subordinateIds = \App\Models\User::where('reporting_to', $user->id)->pluck('id');
+    //             if ($subordinateIds->isNotEmpty()) {
+    //                 $q->orWhere(function ($inner) use ($subordinateIds) {
+    //                     $inner->whereIn('user_id', $subordinateIds);
+    //                         // ->where('approval_status', 'pending');
+    //                 });
+    //             }
+    //         });
+    //     }
+
+    //     // 🔹 Default date setup (if no filters applied)
+    //     $fromDate = $request->from_date ?? date('Y-m-d');
+    //     $toDate   = $request->to_date ?? date('Y-m-d');
+
+    //     // 🔹 Apply date filters
+    //     $query->whereDate('trip_date', '>=', $fromDate)
+    //         ->whereDate('trip_date', '<=', $toDate);
+
+    //     if ($request->filled('state')) {
+    //         $query->whereHas('user', function ($q) use ($request) {
+    //             $q->where('state_id', $request->state);
+    //         });
+    //     }
+    //     if ($request->filled('employee')) {
+    //         $query->where('user_id', $request->employee);
+    //     }
+    //     if ($request->filled('approval_status')) {
+    //         $query->where('approval_status', $request->approval_status);
+    //     }
+
+    //     $trips = $query->latest()->get();
+        
+    //     // Data for dropdowns
+    //     // $states = State::all(['id', 'name']);
+    //     $companyCount = Company::count();
+    //     $company = null;
+
+    //     if ($companyCount == 1) {
+    //         $company = Company::first();
+
+    //         if ($company && !empty($company->state)) {
+    //             $companyStates = array_map('intval', explode(',', $company->state));
+
+    //             $states = State::where('status', 1)
+    //                 ->whereIn('id', $companyStates)
+    //                 ->get();
+    //         } else {
+    //             $states = State::where('status', 1)->get();
+    //         }
+    //     } else {
+    //         // ⬅️ Company 1 થી વધારે હોય તો બધાં states
+    //         $states = State::where('status', 1)->get();
+    //     }
+    //     $employees = User::select('id', 'name')->get();
+    //     return view('admin.trips.index_new', compact('trips', 'states', 'employees'))
+    //         ->with([
+    //             'from_date' => $fromDate,
+    //             'to_date' => $toDate,
+    //         ]);
+    // }
+
+    
     public function index(Request $request)
     {
         $user = Auth::user();
-        $query = Trip::with(['user', 'company', 'approvedByUser', 'tripLogs', 'customers', 'travelMode', 'tourType']);
+        $roleName = $user->getRoleNames()->first();
 
-        // 🔹 Role-based access
-        if (!($user->hasRole('master_admin') || $user->hasRole('sub_admin'))) {
-            $query->where(function ($q) use ($user) {
-                $q->where('user_id', $user->id);
-                $subordinateIds = \App\Models\User::where('reporting_to', $user->id)->pluck('id');
-                if ($subordinateIds->isNotEmpty()) {
-                    $q->orWhere(function ($inner) use ($subordinateIds) {
-                        $inner->whereIn('user_id', $subordinateIds);
-                            // ->where('approval_status', 'pending');
-                    });
-                }
-            });
+        $stateIds = [];
+        $userStateAccess = UserStateAccess::where('user_id', $user->id)->first();
+        if ($userStateAccess && !empty($userStateAccess->state_ids)) {
+            $stateIds = $userStateAccess->state_ids;
         }
 
-        // 🔹 Default date setup (if no filters applied)
+        $query = Trip::with(['user', 'company', 'approvedByUser', 'tripLogs', 'customers', 'travelMode', 'tourType']);
+
+        if (!in_array($roleName, ['master_admin', 'sub_admin'])) {
+            if (empty($stateIds)) {
+                $query->whereRaw('1 = 0'); 
+            } else {
+                $query->whereHas('user', function ($q) use ($user, $stateIds) {
+                    $q->whereIn('state_id', $stateIds)
+                    ->where('reporting_to', $user->id);
+                });
+            }
+        }
+
         $fromDate = $request->from_date ?? date('Y-m-d');
         $toDate   = $request->to_date ?? date('Y-m-d');
 
-        // 🔹 Apply date filters
         $query->whereDate('trip_date', '>=', $fromDate)
             ->whereDate('trip_date', '<=', $toDate);
 
@@ -64,8 +139,6 @@ class TripController extends Controller
 
         $trips = $query->latest()->get();
         
-        // Data for dropdowns
-        // $states = State::all(['id', 'name']);
         $companyCount = Company::count();
         $company = null;
 
@@ -75,24 +148,48 @@ class TripController extends Controller
             if ($company && !empty($company->state)) {
                 $companyStates = array_map('intval', explode(',', $company->state));
 
-                $states = State::where('status', 1)
-                    ->whereIn('id', $companyStates)
-                    ->get();
+                if ($roleName === 'sub_admin') {
+                    $states = State::where('status', 1)
+                        ->whereIn('id', $companyStates)
+                        ->get();
+                } else {
+                    $states = empty($stateIds)
+                        ? collect()
+                        : State::where('status', 1)
+                            ->whereIn('id', $stateIds)
+                            ->get();
+                }
             } else {
-                $states = State::where('status', 1)->get();
+                $states = in_array($roleName, ['master_admin', 'sub_admin'])
+                    ? State::where('status', 1)->get()
+                    : (empty($stateIds)
+                        ? collect()
+                        : State::where('status', 1)->whereIn('id', $stateIds)->get());
             }
         } else {
-            // ⬅️ Company 1 થી વધારે હોય તો બધાં states
-            $states = State::where('status', 1)->get();
+            $states = in_array($roleName, ['master_admin', 'sub_admin'])
+                ? State::where('status', 1)->get()
+                : (empty($stateIds)
+                    ? collect()
+                    : State::where('status', 1)->whereIn('id', $stateIds)->get());
         }
-        $employees = User::select('id', 'name')->get();
+        // $employees = User::select('id', 'name')->get();
+        if (in_array($roleName, ['master_admin', 'sub_admin'])) {
+            $employees = User::where('status', 'Active')->get();
+        } else {
+            $employees = empty($stateIds)
+                ? collect()
+                : User::where('status', 'Active')
+                    ->whereIn('state_id', $stateIds)
+                    ->where('reporting_to', $user->id)
+                    ->get();
+        }
         return view('admin.trips.index_new', compact('trips', 'states', 'employees'))
             ->with([
                 'from_date' => $fromDate,
                 'to_date' => $toDate,
             ]);
     }
-
     public function create()
     {
         $customers = Customer::where('is_active', true)->get();

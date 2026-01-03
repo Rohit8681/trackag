@@ -29,6 +29,7 @@ class PartyController extends Controller
         $companyCount = Company::count();
         $company = null;
         $companyStates = [];
+        $stateIds = [];
         $userStateAccess = UserStateAccess::where('user_id', $user->id)->first();
         if ($userStateAccess && !empty($userStateAccess->state_ids)) {
             $stateIds = $userStateAccess->state_ids ?? [];
@@ -74,8 +75,6 @@ class PartyController extends Controller
         return view('admin.party.index',compact('states','employees','company'));
 
     }
-    
-   
 
     public function getPartyVisits(Request $request)
     {
@@ -202,84 +201,6 @@ class PartyController extends Controller
             'data'    => $data
         ]);
     }
-
-    // public function getEmployeesByState(Request $request)
-    // {
-    //     $user = auth()->user();
-    //     $roleName = $user->getRoleNames()->first();
-    //     $stateId = $request->state_id;
-
-    //     $userStateAccess = UserStateAccess::where('user_id', $user->id)->first();
-    //     if ($userStateAccess && !empty($userStateAccess->state_ids)) {
-    //         $stateIds = $userStateAccess->state_ids ?? [];
-        
-    //     }
-
-    //     if (!in_array($roleName, ['master_admin', 'sub_admin'])) {
-    //         $employees = User::where('status', 'Active')
-    //         ->when($stateId && $stateId !== 'all', function ($q) use ($stateId) {
-    //             $q->where('state_id', $stateId);
-    //         })->whereIn('state_id', $stateIds)->where('reporting_to', $user->id)
-    //         ->select('id', 'name')
-    //         ->get();
-    //     }else{
-    //         $employees = User::where('status', 'Active')
-    //         ->when($stateId && $stateId !== 'all', function ($q) use ($stateId) {
-    //             $q->where('state_id', $stateId);
-    //         })
-    //         ->select('id', 'name')
-    //         ->get();
-    //     }
-
-        
-
-    //     return response()->json($employees);
-    // }
-
-
-    
-    // public function newPartyList(Request $request)
-    // {
-    //     $users = User::where('is_active', 1)->get();
-    //     $states = State::where('status', 1)->get();
-
-    //     // MAIN QUERY
-    //     $query = Customer::where('is_active', 1)
-    //         ->where('type', 'mobile');
-
-
-    //     if ($request->financial_year) {
-    //         $dates = explode('-', $request->financial_year);
-    //         $query->whereYear('visit_date', '>=', $dates[0])
-    //             ->whereYear('visit_date', '<=', $dates[1]);
-    //     }
-
-    //     if ($request->from_date) {
-    //         $query->whereDate('visit_date', '>=', $request->from_date);
-    //     }
-
-    //     if ($request->to_date) {
-    //         $query->whereDate('visit_date', '<=', $request->to_date);
-    //     }
-
-    //     if ($request->state_id) {
-    //         $query->where('state_id', $request->state_id);
-    //     }
-
-    //     if ($request->user_id) {
-    //         $query->where('user_id', $request->user_id);
-    //     }
-
-    //     if ($request->agro_name) {
-    //         $query->where('agro_name', 'LIKE', '%' . $request->agro_name . '%');
-    //     }
-
-    //     // final get()
-    //     $customer = $query->orderBy('visit_date', 'desc')->get();
-
-    //     return view('admin.new-party.index', compact('customer', 'users', 'states'));
-    // }
-
     
     public function getEmployeesByState(Request $request)
     {
@@ -319,34 +240,176 @@ class PartyController extends Controller
         return response()->json($employees);
     }
 
+    // public function newPartyList(Request $request)
+    // {
+    //     $user = auth()->user();
+    //     $roleName = $user->getRoleNames()->first();
+    //     $userStateAccess = UserStateAccess::where('user_id', $user->id)->first();
+    //     $stateIds = [];
+    //     if ($userStateAccess && !empty($userStateAccess->state_ids)) {
+    //         $stateIds = $userStateAccess->state_ids ?? [];
+    //     }
+    //     if (in_array($roleName, ['master_admin', 'sub_admin'])) {
+    //         $users = User::where('status', 'Active')->get();
+    //     }else{
+    //         if (empty($stateIds)) {
+    //             $users = collect();
+    //         }else{
+    //             $users = User::where('status', 'Active')
+    //             ->whereIn('state_id', $stateIds)
+    //             ->where('reporting_to', $user->id)
+    //             ->get();
+    //         }
+    //     }
+
+    //     $companyCount = Company::count();
+    //     $company = null;
+
+    //     if ($companyCount == 1) {
+    //         $company = Company::first();
+    //         if ($company && !empty($company->state)) {
+    //             $companyStates = array_map('intval', explode(',', $company->state));
+    //             if (in_array($roleName, ['sub_admin'])) {
+    //                 $states = State::where('status',1)
+    //                 ->whereIn('id', $companyStates)
+    //                 ->get();
+    //             }else{
+    //                 $states = State::where('status',1)
+    //                 ->whereIn('id', $stateIds)
+    //                 ->get();
+    //             }
+    //         } else {
+    //             $states = State::where('status',1)->get();
+    //         }
+
+    //     } else {
+    //         $states = State::where('status',1)->get();
+    //     }
+
+    //     $query = Customer::with('user')->where('is_active', 1)
+    //         ->where('type', 'mobile');
+
+    //     if (!in_array($roleName, ['master_admin', 'sub_admin'])) {
+    //         if (empty($stateIds)) {
+    //             return response()->json([
+    //                 'success' => true,
+    //                 'data' => []
+    //             ]);
+    //         }
+
+    //         // ✅ Filter via user relation
+    //         $query->whereHas('user', function ($q) use ($user, $stateIds) {
+    //             $q->whereIn('state_id', $stateIds)
+    //             ->where('reporting_to', $user->id);
+    //         });
+    //     }
+
+    //     if ($request->financial_year) {
+    //         $dates = explode('-', $request->financial_year);
+    //         $query->whereYear('visit_date', '>=', $dates[0])
+    //             ->whereYear('visit_date', '<=', $dates[1]);
+    //     }
+
+    //     if ($request->from_date) {
+    //         $query->whereDate('visit_date', '>=', $request->from_date);
+    //     }
+
+    //     if ($request->to_date) {
+    //         $query->whereDate('visit_date', '<=', $request->to_date);
+    //     }
+
+    //     if ($request->state_id) {
+    //         // $query->where('state_id', $request->state_id);
+    //         $query->whereHas('user', function ($q) use ($request) {
+    //             $q->where('state_id', $request->state_id);
+    //         });
+    //     }
+
+    //     if ($request->user_id) {
+    //         $query->where('user_id', $request->user_id);
+    //     }
+
+    //     if ($request->agro_name) {
+    //         $query->where('agro_name', 'LIKE', '%' . $request->agro_name . '%');
+    //     }
+
+    //     $customer = $query->orderBy('visit_date', 'desc')->get();
+
+    //     return view('admin.new-party.index', compact('customer', 'users', 'states', 'company'));
+    // }
+
+    
     public function newPartyList(Request $request)
     {
-        $users = User::where('is_active', 1)->get();
+        $user = auth()->user();
+        $roleName = $user->getRoleNames()->first();
+        
+        $stateIds = [];
+        $userStateAccess = UserStateAccess::where('user_id', $user->id)->first();
+        if ($userStateAccess && !empty($userStateAccess->state_ids)) {
+            $stateIds = $userStateAccess->state_ids;
+        }
 
-        // ✅ COMPANY LOGIC
+        if (in_array($roleName, ['master_admin', 'sub_admin'])) {
+            $users = User::where('status', 'Active')->get();
+        } else {
+            $users = empty($stateIds)
+                ? collect()
+                : User::where('status', 'Active')
+                    ->whereIn('state_id', $stateIds)
+                    ->where('reporting_to', $user->id)
+                    ->get();
+        }
+
         $companyCount = Company::count();
         $company = null;
 
         if ($companyCount == 1) {
             $company = Company::first();
-
             if ($company && !empty($company->state)) {
                 $companyStates = array_map('intval', explode(',', $company->state));
 
-                $states = State::where('status', 1)
-                    ->whereIn('id', $companyStates)
-                    ->get();
+                if ($roleName === 'sub_admin') {
+                    $states = State::where('status', 1)
+                        ->whereIn('id', $companyStates)
+                        ->get();
+                } else {
+                    $states = empty($stateIds)
+                        ? collect()
+                        : State::where('status', 1)
+                            ->whereIn('id', $stateIds)
+                            ->get();
+                }
+
             } else {
-                $states = State::where('status', 1)->get();
+                $states = in_array($roleName, ['master_admin', 'sub_admin'])
+                    ? State::where('status', 1)->get()
+                    : (empty($stateIds) ? collect() : State::where('status', 1)->whereIn('id', $stateIds)->get());
             }
+
         } else {
-            // ⬅️ Company 1 થી વધારે હોય તો બધાં states
-            $states = State::where('status', 1)->get();
+            $states = in_array($roleName, ['master_admin', 'sub_admin'])
+                ? State::where('status', 1)->get()
+                : (empty($stateIds) ? collect() : State::where('status', 1)->whereIn('id', $stateIds)->get());
         }
 
-        // ✅ MAIN QUERY
-        $query = Customer::with('user')->where('is_active', 1)
+        $query = Customer::with('user')
+            ->where('is_active', 1)
             ->where('type', 'mobile');
+
+        if (!in_array($roleName, ['master_admin', 'sub_admin'])) {
+
+            if (empty($stateIds)) {
+                $customer = collect();
+
+                return view('admin.new-party.index', compact('customer', 'users', 'states', 'company'));
+            }
+
+            $query->whereHas('user', function ($q) use ($user, $stateIds) {
+                $q->whereIn('state_id', $stateIds)
+                ->where('reporting_to', $user->id);
+            });
+        }
 
         if ($request->financial_year) {
             $dates = explode('-', $request->financial_year);
@@ -363,7 +426,6 @@ class PartyController extends Controller
         }
 
         if ($request->state_id) {
-            // $query->where('state_id', $request->state_id);
             $query->whereHas('user', function ($q) use ($request) {
                 $q->where('state_id', $request->state_id);
             });
@@ -379,6 +441,9 @@ class PartyController extends Controller
 
         $customer = $query->orderBy('visit_date', 'desc')->get();
 
+        // ----------------------------
+        // RETURN VIEW
+        // ----------------------------
         return view('admin.new-party.index', compact('customer', 'users', 'states', 'company'));
     }
 

@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Session;
 use Maatwebsite\Excel\Facades\Excel;
 use Maatwebsite\Excel\Validators\Failure;
 use App\Imports\CustomersImport;
+use App\Models\UserStateAccess;
 
 class CustomerController extends Controller
 {
@@ -27,25 +28,40 @@ class CustomerController extends Controller
     }
     public function index(Request $request)
     {
-        $admin = Auth::user();
+        $user = Auth::user();
+        $roleName = $user->getRoleNames()->first();
+
+        $stateIds = [];
+        $userStateAccess = UserStateAccess::where('user_id', $user->id)->first();
+        if ($userStateAccess && !empty($userStateAccess->state_ids)) {
+            $stateIds = $userStateAccess->state_ids;
+        }
 
         $query = Customer::with(['user', 'company', 'state', 'district', 'tehsil'])->where('type','web');
+        
         // if (!($admin->hasRole('master_admin') || $admin->hasRole('sub_admin'))) {
-        //     $query->where('user_id', $admin->id);
+
+        //     $subordinateIds = \App\Models\User::where('reporting_to', $admin->id)
+        //         ->pluck('id')
+        //         ->toArray();
+
+        //     $query->where(function ($q) use ($admin, $subordinateIds) {
+        //         $q->where('user_id', $admin->id);
+
+        //         if (!empty($subordinateIds)) {
+        //             $q->orWhereIn('user_id', $subordinateIds);
+        //         }
+        //     });
         // }
-        if (!($admin->hasRole('master_admin') || $admin->hasRole('sub_admin'))) {
-
-            $subordinateIds = \App\Models\User::where('reporting_to', $admin->id)
-                ->pluck('id')
-                ->toArray();
-
-            $query->where(function ($q) use ($admin, $subordinateIds) {
-                $q->where('user_id', $admin->id);
-
-                if (!empty($subordinateIds)) {
-                    $q->orWhereIn('user_id', $subordinateIds);
-                }
-            });
+        if (!in_array($roleName, ['master_admin', 'sub_admin'])) {
+            if (empty($stateIds)) {
+                $query->whereRaw('1 = 0'); 
+            } else {
+                $query->whereHas('user', function ($q) use ($user, $stateIds) {
+                    $q->whereIn('state_id', $stateIds)
+                    ->where('reporting_to', $user->id);
+                });
+            }
         }
         if ($request->filled('financial_year')) {
             // $query->where('financial_year', $request->financial_year);
@@ -70,8 +86,42 @@ class CustomerController extends Controller
         }
 
         $customers = $query->latest()->get();
-        // dd($customers);
-        $states = State::where('status', 1)->orderBy('name')->get();
+        
+        // $states = State::where('status', 1)->orderBy('name')->get();
+        $companyCount = Company::count();
+        $company = null;
+
+        if ($companyCount == 1) {
+            $company = Company::first();
+
+            if ($company && !empty($company->state)) {
+                $companyStates = array_map('intval', explode(',', $company->state));
+
+                if ($roleName === 'sub_admin') {
+                    $states = State::where('status', 1)
+                        ->whereIn('id', $companyStates)
+                        ->get();
+                } else {
+                    $states = empty($stateIds)
+                        ? collect()
+                        : State::where('status', 1)
+                            ->whereIn('id', $stateIds)
+                            ->get();
+                }
+            } else {
+                $states = in_array($roleName, ['master_admin', 'sub_admin'])
+                    ? State::where('status', 1)->get()
+                    : (empty($stateIds)
+                        ? collect()
+                        : State::where('status', 1)->whereIn('id', $stateIds)->get());
+            }
+        } else {
+            $states = in_array($roleName, ['master_admin', 'sub_admin'])
+                ? State::where('status', 1)->get()
+                : (empty($stateIds)
+                    ? collect()
+                    : State::where('status', 1)->whereIn('id', $stateIds)->get());
+        }
         $financialYears = range(2025, now()->year + 1); // Example range
 
         return view('admin.customers.index', compact('customers', 'states', 'financialYears'));

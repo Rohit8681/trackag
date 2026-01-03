@@ -66,6 +66,7 @@ class UserController extends Controller
                 $maxUsers = $getcompany->user_assigned;
             }
         }
+        $stateIds = [];
         $userStateAccess = UserStateAccess::where('user_id', $user->id)->first();
         if ($userStateAccess && !empty($userStateAccess->state_ids)) {
             $stateIds = $userStateAccess->state_ids ?? [];
