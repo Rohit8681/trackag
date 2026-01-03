@@ -65,7 +65,7 @@
                             Approve Selected
                         </button>
                     </div>
-                    <form id="bulkApproveForm" action="{{ route('expense.bulk.approve') }}" method="POST" target="_blank">
+                    <form id="bulkApproveForm" action="{{ route('expense.bulk.approve') }}" method="POST">
                         @csrf
                         <input type="hidden" id="trip_ids_input" name="trip_ids">
                         <input type="hidden" id="selected_user_id" name="selected_user_id">
