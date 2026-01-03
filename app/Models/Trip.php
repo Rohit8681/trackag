@@ -35,7 +35,8 @@ class Trip extends Model
         'approved_at',
         'start_km_photo',
         'end_km_photo',
-        'trip_type'
+        'trip_type',
+        'pdf_status'
     ];
 
     // Relationships

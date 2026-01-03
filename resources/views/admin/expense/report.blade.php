@@ -143,6 +143,11 @@
                                 <i class="fas fa-sync"></i> Reset
                             </a>
                         </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <a href="{{ route('expense.pdf.list') }}" class="btn btn-sm btn-primary">
+                                Expense PDF List
+                            </a>
+                        </div>
 
                     </form>
 
@@ -172,7 +177,11 @@
                         <tbody>
                             @forelse($data as $key => $report)
                                 <tr>
-                                    <td>{{ $key + 1 }}&nbsp;<input type="checkbox" class="rowCheckbox" name="trip_ids[]" value="{{ $report->id }}"></td>
+                                    <td>{{ $key + 1 }}&nbsp;
+                                        @if($report->pdf_status == 0)
+                                        <input type="checkbox" class="rowCheckbox" name="trip_ids[]" value="{{ $report->id }}">
+                                        @endif
+                                    </td>
                                     <td>{{ $report->user->name ?? "" }}</td>
                                     <td>{{ \Carbon\Carbon::parse($report->trip_date)->format('d M Y') }}</td>
                                     <td>{{ $report->tourType->name ?? "-" }}</td>
@@ -248,24 +257,6 @@ $(document).ready(function() {
             $("#bulkApproveBox").hide();
         }
     }
-
-    // Approve Selected Button Click
-    // $("#approveSelected").on("click", function () {
-    //     let selected = $(".rowCheckbox:checked").length;
-
-    //     if (selected == 0) {
-    //         alert("Please select at least one record!");
-    //         return;
-    //     }
-
-    //     if (!confirm("Approve " + selected + " trips?")) {
-    //         return;
-    //     }
-
-    //     // Submit form
-    //     $("#bulkApproveForm").submit();
-    // });
-
 });
 
 $("#approveSelected").on("click", function () {

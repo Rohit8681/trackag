@@ -57,6 +57,7 @@ return new class extends Migration {
             $table->foreign('purpose')->references('id')->on('purposes')->nullOnDelete();
             $table->foreign('tour_type')->references('id')->on('tour_types')->nullOnDelete();
             $table->string('trip_type')->nullable();
+            $table->boolean('pdf_status')->default(0);
         });
     }
 
