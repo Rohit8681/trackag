@@ -564,7 +564,8 @@ class ExpenseController extends Controller
         'pdf_status' => 1
     ]);
 
-    return response()->download(storage_path('app/public/'.$path));
+    // return response()->download(storage_path('app/public/'.$path));
+    return back()->with('success', 'Expense PDF generated successfully.');
 }
 
 
