@@ -45,9 +45,9 @@
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="card-title mb-0">Expenses Report List</h5>
                     <div class="ms-auto text-end text-danger" style="max-width: 520px; line-height:1.3;">
-        <strong>Notes:</strong> Please ensure that all data is reviewed before granting approval for the expense.
-        After approval, the data cannot be modified.
-    </div>
+                        <strong>Notes:</strong> Please ensure that all data is reviewed before granting approval for the expense.
+                        After approval, the data cannot be modified.
+                    </div>
                     {{-- <div>
                         <a href="{{ route('expense.report.pdf', request()->all()) }}" 
                         class="btn btn-danger btn-sm" target="_blank">
@@ -78,20 +78,6 @@
 
                     <form action="{{ route('expense.report') }}" method="GET" class="row g-3 mb-3">
 
-                        {{-- <div class="col-md-2">
-                            <label class="form-label">From Date</label>
-                            <input type="date" name="from_date"
-                            value="{{ request('from_date', $from_date) }}"
-                                    class="form-control form-control-sm">
-                        </div>
-
-                        <div class="col-md-2">
-                            <label class="form-label">To Date</label>
-                            <input type="date" name="to_date"
-                            value="{{ request('to_date', $to_date) }}"
-                            class="form-control form-control-sm">
-
-                        </div> --}}
                         <div class="col-md-2">
                         <label for="month" class="form-label">Select Month</label>
                         {{-- <select name="month" id="month" class="form-select form-select-sm">
