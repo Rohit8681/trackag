@@ -90,7 +90,7 @@
                         </div> --}}
                         <div class="col-md-2">
                         <label for="month" class="form-label">Select Month</label>
-                        <select name="month" id="month" class="form-select form-select-sm">
+                        {{-- <select name="month" id="month" class="form-select form-select-sm">
 
                             @for ($i = 1; $i <= 12; $i++)
                                 @php
@@ -103,6 +103,25 @@
                                 </option>
                             @endfor
 
+                        </select> --}}
+                        <select name="month" id="month" class="form-select form-select-sm">
+                            @php
+                                $currentYear = now()->year;
+                                $years = [$currentYear, $currentYear - 1];
+                            @endphp
+
+                            @foreach ($years as $year)
+                                @for ($i = 1; $i <= 12; $i++)
+                                    @php
+                                        $value = $year . '-' . str_pad($i, 2, '0', STR_PAD_LEFT);
+                                        $monthName = DateTime::createFromFormat('!m', $i)->format('F');
+                                    @endphp
+
+                                    <option value="{{ $value }}" {{ $month == $value ? 'selected' : '' }}>
+                                        {{ $monthName }} {{ $year }}
+                                    </option>
+                                @endfor
+                            @endforeach
                         </select>
                         </div>
 
