@@ -66,8 +66,19 @@ class UserController extends Controller
                 $maxUsers = $getcompany->user_assigned;
             }
         }
+        $userStateAccess = UserStateAccess::where('user_id', $user->id)->first();
+        if ($userStateAccess && !empty($userStateAccess->state_ids)) {
+            $stateIds = $userStateAccess->state_ids ?? [];
+        
+        }
         if (!in_array($roleName, ['master_admin', 'sub_admin'])) {
-            $query->where('reporting_to', $user->id);
+            
+            if (!empty($stateIds)) {
+                $query->whereIn('state_id', $stateIds)->where('reporting_to', $user->id);
+            }else{
+                $query->whereRaw('1 = 0');
+            }
+            // $query->where('reporting_to', $user->id);
         }
 
 
@@ -75,8 +86,16 @@ class UserController extends Controller
         
         // $currentUsers = $query->count();
         $currentUsers = User::count();
-
-        $states = State::where('status', 1)->get();
+        if (in_array($roleName, ['master_admin', 'sub_admin'])) {
+            $states = State::where('status', 1)->get();
+        }else{
+            if($userStateAccess && !empty($userStateAccess->state_ids)) {
+                $states = State::where('status', 1)->whereIn('id', $stateIds)->get();
+            }else{
+                $states = collect();
+            }
+        }
+        
         $designations = Designation::where('status', 1)->get();
         
         

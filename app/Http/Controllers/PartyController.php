@@ -7,6 +7,7 @@ use App\Models\Customer;
 use App\Models\PartyVisit;
 use App\Models\State;
 use App\Models\User;
+use App\Models\UserStateAccess;
 use Illuminate\Http\Request;
 
 class PartyController extends Controller
@@ -21,22 +22,33 @@ class PartyController extends Controller
 
     public function index()
     {
-        
+        $user = auth()->user();
+        $roleName = $user->getRoleNames()->first();
         $employees = User::where('status','Active')->get();
         $customers = Customer::where('status',1)->get();
         $companyCount = Company::count();
         $company = null;
         $companyStates = [];
+        $userStateAccess = UserStateAccess::where('user_id', $user->id)->first();
+        if ($userStateAccess && !empty($userStateAccess->state_ids)) {
+            $stateIds = $userStateAccess->state_ids ?? [];
+        
+        }
 
         if ($companyCount == 1) {
             $company = Company::first();
 
             if ($company && !empty($company->state)) {
                 $companyStates = array_map('intval', explode(',', $company->state));
-
-                $states = State::where('status',1)
+                if (in_array($roleName, ['sub_admin'])) {
+                    $states = State::where('status',1)
                     ->whereIn('id', $companyStates)
                     ->get();
+                }else{
+                    $states = State::where('status',1)
+                    ->whereIn('id', $stateIds)
+                    ->get();
+                }
             } else {
                 $states = State::where('status',1)->get();
             }
