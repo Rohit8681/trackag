@@ -557,292 +557,267 @@ class AdminController extends Controller
     ]);
 }
 
-// public function updatePermission(){
-//     $permissions = [
-//             'view_users',
-//             'create_users',
-//             'edit_users',
-//             'view_roles',
-//             'create_roles',
-//             'edit_roles',
-//             'view_permissions',
-//             'create_permissions',
-//             'edit_permissions',
-//             'delete_permissions',
-//             'view_customers',
-//             'create_customers',
-//             'edit_customers',
-//             'delete_customers',
-//             'toggle_customers',
-//             'view_products',
-//             'create_products',
-//             'edit_products',
-//             'delete_products',
-//             'toggle_users',
-//             'view_companies',
-//             'create_companies',
-//             'edit_companies',
-//             'delete_companies',
-//             'view_budget_plan',
-//             'create_budget_plan',
-//             'edit_budget_plan',
-//             'approvals_budget_plan',
-//             'reject_budget_plan',
-//             'verify_budget_plan',
-//             'remove_review_budget_plan',
-//             'view_monthly_plan',
-//             'create_monthly_plan',
-//             'edit_monthly_plan',
-//             'approvals_monthly_plan',
-//             'reject_monthly_plan',
-//             'verify_monthly_plan',
-//             'remove_review_monthly_plan',
-//             'view_plan_vs_achievement',
-//             'create_plan_vs_achievement',
-//             'edit_plan_vs_achievement',
-//             'approvals_plan_vs_achievement',
-//             'reject_plan_vs_achievement',
-//             'verify_plan_vs_achievement',
-//             'remove_review_plan_vs_achievement',
-//             'view_party_visit',
-//             'view_order',
-//             'edit_order',
-//             'delete_order',
-//             'approvals_order',
-//             'reject_order',
-//             'dispatch_order',
-//             'view_order_report',
-//             'view_stock',
-//             'view_stock_ageing',
-//             'view_emp_on_map',
-//             'view_daily_trip',
-//             'edit_daily_trip',
-//             'delete_daily_trip',
-//             'approvals_daily_trip',
-//             'reject_daily_trip',
-//             'view_attendance',
-//             'create_monthly_attendance_report',
-//             'view_monthly_attendance_report',
-//             'approvals_monthly_attendance_report',
-//             'create_leave_report',
-//             'view_leave_report',
-//             'edit_leave_report',
-//             'view_expense',
-//             'edit_expense',
-//             'delete_expense',
-//             'approvals_expense',
-//             'reject_expense',
-//             'create_genrate_monthly_expense',
-//             'view_genrate_monthly_expense',
-//             'edit_genrate_monthly_expense',
-//             'delete_genrate_monthly_expense',
-//             'approvals_genrate_monthly_expense',
-//             'reject_genrate_monthly_expense',
-//             'view_ta_da_report',
-//             'view_daily_farm_demo',
-//             'edit_daily_farm_demo',
-//             'delete_daily_farm_demo',
-//             'view_monthly_farm_demo_report',
-//             'view_all_trip',
-//             // 'create_all_trip',
-//             'edit_all_trip',
-//             'delete_all_trip',
-//             'approvals_all_trip',
-//             'reject_all_trip',
-//             'logs_all_trip',
-//             'view_trip_types',
-//             'create_trip_types',
-//             'edit_trip_types',
-//             'view_travel_modes',
-//             'create_travel_modes',
-//             'edit_travel_modes',
-//             'view_trip_purposes',
-//             'create_trip_purposes',
-//             'edit_trip_purposes',
-//             'view_designations',
-//             'create_designations',
-//             'edit_designations',
-//             'delete_designations',
-//             'view_states',
-//             'create_states',
-//             'edit_states',
-//             'view_districts',
-//             'create_districts',
-//             'edit_districts',
-//             'view_talukas',
-//             'create_talukas',
-//             'edit_talukas',
-//             'view_vehicle_types',
-//             'create_vehicle_types',
-//             'edit_vehicle_types',
-//             'delete_vehicle_types',
-//             'view_depo_master',
-//             'create_depo_master',
-//             'edit_depo_master',
-//             'delete_depo_master',
-//             'view_party_master',
-//             'create_party_master',
-//             'edit_party_master',
-//             'delete_party_master',
-//             'view_holiday_master',
-//             'create_holiday_master',
-//             'edit_holiday_master',
-//             'delete_holiday_master',
-//             'view_leave_master',
-//             'create_leave_master',
-//             'edit_leave_master',
-//             'delete_leave_master',
-//             'view_ta_da',
-//             'create_ta_da',
-//             'edit_ta_da',
-//             'delete_ta_da',
-//             'view_ta_da_bill_master',
-//             'create_ta_da_bill_master',
-//             'edit_ta_da_bill_master',
-//             'delete_ta_da_bill_master',
-//             'view_sales_product_master',
-//             'create_sales_product_master',
-//             'edit_sales_product_master',
-//             'delete_sales_product_master',
-//             'view_technical_master',
-//             'create_technical_master',
-//             'edit_technical_master',
-//             'delete_technical_master',
-//             'view_product_category',
-//             'create_product_category',
-//             'edit_product_category',
-//             'delete_product_category',
-//             'view_product_price',
-//             'create_product_price',
-//             'edit_product_price',
-//             'delete_product_price',
-//             'view_product_collection',
-//             'create_product_collection',
-//             'edit_product_collection',
-//             'delete_product_collection',
-//             'view_price_list_master',
-//             'create_price_list_master',
-//             'edit_price_list_master',
-//             'delete_price_list_master',
-//             'view_list_of_all_price_list',
-//             'view_upload_brochure',
-//             'create_upload_brochure',
-//             'edit_upload_brochure',
-//             'delete_upload_brochure',
-//             'view_vehicle_master',
-//             'create_vehicle_master',
-//             'edit_vehicle_master',
-//             'delete_vehicle_master',
-//             'view_new_party',
-//             'approvals_new_party',
-//             'reject_new_party',
-//             'view_party_payment',
-//             'approvals_party_payment',
-//             'view_party_performance',
-//             'view_party_ledger',
-//             'view_sales_return',
-//             'edit_sales_return',
-//             'delete_sales_return',
-//             'approvals_sales_return'
-//         ];
+public function updatePermission(){
+    $permissions = [
+            // 'view_users',
+            // 'create_users',
+            // 'edit_users',
+            // 'view_roles',
+            // 'create_roles',
+            // 'edit_roles',
+            // 'view_permissions',
+            // 'create_permissions',
+            // 'edit_permissions',
+            // 'delete_permissions',
+            // 'view_customers',
+            // 'create_customers',
+            // 'edit_customers',
+            // 'delete_customers',
+            // 'toggle_customers',
+            // 'view_products',
+            // 'create_products',
+            // 'edit_products',
+            // 'delete_products',
+            // 'toggle_users',
+            // 'view_companies',
+            // 'create_companies',
+            // 'edit_companies',
+            // 'delete_companies',
+            // 'view_budget_plan',
+            // 'create_budget_plan',
+            // 'edit_budget_plan',
+            // 'approvals_budget_plan',
+            // 'reject_budget_plan',
+            // 'verify_budget_plan',
+            // 'remove_review_budget_plan',
+            // 'view_monthly_plan',
+            // 'create_monthly_plan',
+            // 'edit_monthly_plan',
+            // 'approvals_monthly_plan',
+            // 'reject_monthly_plan',
+            // 'verify_monthly_plan',
+            // 'remove_review_monthly_plan',
+            // 'view_plan_vs_achievement',
+            // 'create_plan_vs_achievement',
+            // 'edit_plan_vs_achievement',
+            // 'approvals_plan_vs_achievement',
+            // 'reject_plan_vs_achievement',
+            // 'verify_plan_vs_achievement',
+            // 'remove_review_plan_vs_achievement',
+            // 'view_party_visit',
+            // 'view_order',
+            // 'edit_order',
+            // 'delete_order',
+            // 'approvals_order',
+            // 'reject_order',
+            // 'dispatch_order',
+            // 'view_order_report',
+            // 'view_stock',
+            // 'view_stock_ageing',
+            // 'view_emp_on_map',
+            // 'view_daily_trip',
+            // 'edit_daily_trip',
+            // 'delete_daily_trip',
+            // 'approvals_daily_trip',
+            // 'reject_daily_trip',
+            // 'view_attendance',
+            // 'create_monthly_attendance_report',
+            // 'view_monthly_attendance_report',
+            // 'approvals_monthly_attendance_report',
+            // 'create_leave_report',
+            // 'view_leave_report',
+            // 'edit_leave_report',
+            // 'view_expense',
+            // 'edit_expense',
+            // 'delete_expense',
+            // 'approvals_expense',
+            // 'reject_expense',
+            // 'create_genrate_monthly_expense',
+            // 'view_genrate_monthly_expense',
+            // 'edit_genrate_monthly_expense',
+            // 'delete_genrate_monthly_expense',
+            // 'approvals_genrate_monthly_expense',
+            // 'reject_genrate_monthly_expense',
+            // 'view_ta_da_report',
+            // 'view_daily_farm_demo',
+            // 'edit_daily_farm_demo',
+            // 'delete_daily_farm_demo',
+            // 'view_monthly_farm_demo_report',
+            // 'view_all_trip',
+            // // 'create_all_trip',
+            // 'edit_all_trip',
+            // 'delete_all_trip',
+            // 'approvals_all_trip',
+            // 'reject_all_trip',
+            // 'logs_all_trip',
+            // 'view_trip_types',
+            // 'create_trip_types',
+            // 'edit_trip_types',
+            // 'view_travel_modes',
+            // 'create_travel_modes',
+            // 'edit_travel_modes',
+            // 'view_trip_purposes',
+            // 'create_trip_purposes',
+            // 'edit_trip_purposes',
+            // 'view_designations',
+            // 'create_designations',
+            // 'edit_designations',
+            // 'delete_designations',
+            // 'view_states',
+            // 'create_states',
+            // 'edit_states',
+            // 'view_districts',
+            // 'create_districts',
+            // 'edit_districts',
+            // 'view_talukas',
+            // 'create_talukas',
+            // 'edit_talukas',
+            // 'view_vehicle_types',
+            // 'create_vehicle_types',
+            // 'edit_vehicle_types',
+            // 'delete_vehicle_types',
+            // 'view_depo_master',
+            // 'create_depo_master',
+            // 'edit_depo_master',
+            // 'delete_depo_master',
+            // 'view_party_master',
+            // 'create_party_master',
+            // 'edit_party_master',
+            // 'delete_party_master',
+            // 'view_holiday_master',
+            // 'create_holiday_master',
+            // 'edit_holiday_master',
+            // 'delete_holiday_master',
+            // 'view_leave_master',
+            // 'create_leave_master',
+            // 'edit_leave_master',
+            // 'delete_leave_master',
+            // 'view_ta_da',
+            // 'create_ta_da',
+            // 'edit_ta_da',
+            // 'delete_ta_da',
+            // 'view_ta_da_bill_master',
+            // 'create_ta_da_bill_master',
+            // 'edit_ta_da_bill_master',
+            // 'delete_ta_da_bill_master',
+            // 'view_sales_product_master',
+            // 'create_sales_product_master',
+            // 'edit_sales_product_master',
+            // 'delete_sales_product_master',
+            // 'view_technical_master',
+            // 'create_technical_master',
+            // 'edit_technical_master',
+            // 'delete_technical_master',
+            // 'view_product_category',
+            // 'create_product_category',
+            // 'edit_product_category',
+            // 'delete_product_category',
+            // 'view_product_price',
+            // 'create_product_price',
+            // 'edit_product_price',
+            // 'delete_product_price',
+            // 'view_product_collection',
+            // 'create_product_collection',
+            // 'edit_product_collection',
+            // 'delete_product_collection',
+            // 'view_price_list_master',
+            // 'create_price_list_master',
+            // 'edit_price_list_master',
+            // 'delete_price_list_master',
+            // 'view_list_of_all_price_list',
+            // 'view_upload_brochure',
+            // 'create_upload_brochure',
+            // 'edit_upload_brochure',
+            // 'delete_upload_brochure',
+            // 'view_vehicle_master',
+            // 'create_vehicle_master',
+            // 'edit_vehicle_master',
+            // 'delete_vehicle_master',
+            // 'view_new_party',
+            // 'approvals_new_party',
+            // 'reject_new_party',
+            // 'view_party_payment',
+            // 'approvals_party_payment',
+            // 'view_party_performance',
+            // 'view_party_ledger',
+            // 'view_sales_return',
+            // 'edit_sales_return',
+            // 'delete_sales_return',
+            'approvals_sales_return'
+        ];
 
-//         // foreach ($permissions as $permissionName) {
-//         //     Permission::firstOrCreate(
-//         //         ['name' => $permissionName],
-//         //         ['guard_name' => 'web']
-//         //     );
-//         // }
-//         // foreach ($permissions as $permissionName) {
-//         //     Permission::firstOrCreate(
-//         //         ['name' => $permissionName],
-//         //         ['guard_name' => 'web']
-//         //     );
-//         // }
-        
+        foreach ($permissions as $permissionName) {
+            Permission::firstOrCreate(
+                ['name' => $permissionName],
+                ['guard_name' => 'web']
+            );
+        }
        
-//         // app()[PermissionRegistrar::class]->forgetCachedPermissions();
-//         // $subAdminRole = Role::firstOrCreate(['name' => 'sub_admin', 'guard_name' => 'web']);
-//         // $allPermissions = Permission::all();
-//         // // dd($subAdminRole->id,count($allPermissions));
-//         // // dd($allPermissions);
-//         // $subAdminRole->syncPermissions($allPermissions);
-//         // // $subAdminRole->syncPermissions(Permission::all());
-//         // $user = User::find(1);
+        // app()[PermissionRegistrar::class]->forgetCachedPermissions();
+        // $subAdminRole = Role::firstOrCreate(['name' => 'sub_admin', 'guard_name' => 'web']);
+        // $allPermissions = Permission::all();
+        // $subAdminRole->syncPermissions($allPermissions);
+        // $user = User::find(1);
         
-//         // // dd($subAdminRole->permissions->pluck('name'));
-//         // $user->assignRole('sub_admin');
-//         // $user->refresh();
-//         app()[PermissionRegistrar::class]->forgetCachedPermissions();
+        // // dd($subAdminRole->permissions->pluck('name'));
+        // $user->assignRole('sub_admin');
+        // $user->refresh();
+        
 
-//         DB::connection('tenant')->transaction(function () {
-//             dd(DB::connection()->getDatabaseName());
-//             $subAdminRole = Role::on('tenant')->firstOrCreate([
-//                 'name' => 'sub_admin',
-//                 'guard_name' => 'web'
-//             ]);
-
-//             $allPermissions = Permission::on('tenant')->get();
-
-//             $subAdminRole->syncPermissions($allPermissions);
-
-//             $user = User::on('tenant')->find(1);
-//             $user->assignRole('sub_admin');
-//         });
-
-//         // dd($user->roles->pluck('name'));
-// }
+        // dd($user->roles->pluck('name'));
+}
 
  
-public function updatePermission()
-{
-    $tenancyDbName = 'tenant_testing'; // Target DB
+// public function updatePermission()
+// {
+//     $tenancyDbName = 'tenant_testing'; // Target DB
 
-    // 🔹 Dynamically set tenant connection
-    $tenantConnection = config('database.connections.tenant');
-    $tenantConnection['database'] = $tenancyDbName;
-    config(['database.connections.tenant' => $tenantConnection]);
+//     // 🔹 Dynamically set tenant connection
+//     $tenantConnection = config('database.connections.tenant');
+//     $tenantConnection['database'] = $tenancyDbName;
+//     config(['database.connections.tenant' => $tenantConnection]);
 
-    // 🔹 Purge & reconnect
-    DB::purge('tenant');
-    DB::reconnect('tenant');
+//     // 🔹 Purge & reconnect
+//     DB::purge('tenant');
+//     DB::reconnect('tenant');
 
-    // ✅ Use tenant connection safely
-    DB::connection('tenant')->transaction(function () {
-        // 🔹 Clear Spatie permission cache
-        app()[PermissionRegistrar::class]->forgetCachedPermissions();
+//     // ✅ Use tenant connection safely
+//     DB::connection('tenant')->transaction(function () {
+//         // 🔹 Clear Spatie permission cache
+//         app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
-        // 🔹 Optional: truncate role_has_permissions & model_has_roles
-        DB::connection('tenant')->table('role_has_permissions')->truncate();
-        DB::connection('tenant')->table('model_has_roles')->truncate();
+//         // 🔹 Optional: truncate role_has_permissions & model_has_roles
+//         DB::connection('tenant')->table('role_has_permissions')->truncate();
+//         DB::connection('tenant')->table('model_has_roles')->truncate();
 
-        // 🔹 Create or get sub_admin role
-        $subAdminRole = Role::on('tenant')->firstOrCreate([
-            'name' => 'sub_admin',
-            'guard_name' => 'web',
-        ]);
+//         // 🔹 Create or get sub_admin role
+//         $subAdminRole = Role::on('tenant')->firstOrCreate([
+//             'name' => 'sub_admin',
+//             'guard_name' => 'web',
+//         ]);
 
-        // 🔹 Get all permissions
-        $allPermissions = Permission::on('tenant')->get();
+//         // 🔹 Get all permissions
+//         $allPermissions = Permission::on('tenant')->get();
 
-        // 🔹 Sync permissions to role
-        $subAdminRole->syncPermissions($allPermissions);
+//         // 🔹 Sync permissions to role
+//         $subAdminRole->syncPermissions($allPermissions);
 
-        // 🔹 Assign role to user ID = 1
-        $user = User::on('tenant')->find(1);
-        if ($user) {
-            $user->assignRole('sub_admin');
-        }
+//         // 🔹 Assign role to user ID = 1
+//         $user = User::on('tenant')->find(1);
+//         if ($user) {
+//             $user->assignRole('sub_admin');
+//         }
 
-        // 🔹 Return debug info
-        return response()->json([
-            'role_id' => $subAdminRole->id,
-            'role_name' => $subAdminRole->name,
-            'permissions_count' => $subAdminRole->permissions()->count(),
-            'user_roles' => $user ? $user->roles->pluck('name') : null,
-            'connected_db' => DB::connection('tenant')->getDatabaseName(),
-        ]);
-    });
-}
+//         // 🔹 Return debug info
+//         return response()->json([
+//             'role_id' => $subAdminRole->id,
+//             'role_name' => $subAdminRole->name,
+//             'permissions_count' => $subAdminRole->permissions()->count(),
+//             'user_roles' => $user ? $user->roles->pluck('name') : null,
+//             'connected_db' => DB::connection('tenant')->getDatabaseName(),
+//         ]);
+//     });
+// }
 
 
 

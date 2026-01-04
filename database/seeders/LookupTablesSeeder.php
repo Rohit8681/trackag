@@ -17,7 +17,8 @@ class LookupTablesSeeder extends Seeder
             ['name' => 'Four Wheeler Personal'],
             ['name' => 'Two Wheeler Company'],
             ['name' => 'Four Wheeler Company'],
-            ['name' => 'Other'],
+            ['name' => 'Travel Modes List'],
+            ['name' => 'Bus/Train/Other']
             // ['name' => 'Car',],
             // ['name' => 'Bike'],
             // ['name' => 'Walk'],

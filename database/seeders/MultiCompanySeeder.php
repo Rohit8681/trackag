@@ -119,7 +119,7 @@ class MultiCompanySeeder extends Seeder
             'view_all_trip',
             // 'create_all_trip',
             'edit_all_trip',
-            'delete_all_trip',
+            // 'delete_all_trip',
             'approvals_all_trip',
             'reject_all_trip',
             'logs_all_trip',
