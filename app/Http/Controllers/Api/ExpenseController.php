@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Expense;
+use App\Models\ExpensePdf;
 use App\Models\TaDaTourSlab;
 use App\Models\TaDaVehicleSlab;
 use App\Models\Trip;
@@ -235,6 +236,16 @@ class ExpenseController extends Controller
         $total_total = $data->sum('total_exp');
         $total_gps_travel_km = $data->sum(fn ($i) => $i->total_distance_km ?? 0);
 
+        $pdfMonth = Carbon::createFromDate($year, $month, 1)->format('Y-m');
+        $pdf = ExpensePdf::where('user_id', $userId)
+        ->where('month', $pdfMonth)
+        ->first();
+
+        $pdfPath = null;
+        if(!empty($pdf)){
+            $pdfPath = $pdf->pdf_path ?? null;
+        }
+
         return response()->json([
             'status' => true,
             'message' => 'TA-DA Report Summary',
@@ -245,6 +256,7 @@ class ExpenseController extends Controller
                 'da_allowance'      => $total_da,
                 'other_expense'     => $total_other,
                 'total'             => $total_total,
+                'pdf_path'          => $pdfPath, 
             ]
         ]);
     }
