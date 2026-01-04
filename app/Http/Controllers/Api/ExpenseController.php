@@ -222,7 +222,6 @@ class ExpenseController extends Controller
             $item->ta_exp = ($ta_amount->travelling_allow_per_km ?? 0) * $total_km;
             $item->da_exp = $da_amount->da_amount ?? 0;
             $item->other_exp = $expense->sum('amount') ?? 0;
-            $item->gps_travel_km =  0;
 
             $item->total_exp =
                 $item->ta_exp +
@@ -230,11 +229,11 @@ class ExpenseController extends Controller
                 $item->other_exp;
         }
         $total_travel_km = $data->sum(fn ($i) => $i->end_km - $i->starting_km);
-        $total_gps_travel_km = 0;
         $total_ta = $data->sum('ta_exp');
         $total_da = $data->sum('da_exp');
         $total_other = $data->sum('other_exp');
         $total_total = $data->sum('total_exp');
+        $total_gps_travel_km = $data->sum(fn ($i) => $i->total_distance_km ?? 0);
 
         return response()->json([
             'status' => true,
