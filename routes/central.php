@@ -157,6 +157,7 @@ Route::middleware(['web'])->group(function () {
             Route::post('/ta-da-bill-master/toggle-status', [TaDaBillMasterController::class, 'toggleStatus'])->name('ta-da-bill-master.toggle-status');
 
             Route::get('/hr/attendance', [AttendanceController::class, 'index'])->name('attendance.index');
+            Route::post('/hr/attendance/save', [AttendanceController::class,'save'])->name('attendance.save');
             Route::get('/get-districts/{state_id}', [UserController::class, 'getDistricts'])->name('get.districts');
             Route::get('/get-cities/{district_id}', [UserController::class, 'getCities'])->name('get.cities');
             Route::get('/get-tehsils/{city_id}', [UserController::class, 'getTehsils'])->name('get.tehsils');
