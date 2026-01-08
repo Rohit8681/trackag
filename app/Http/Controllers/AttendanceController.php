@@ -3,13 +3,19 @@
 namespace App\Http\Controllers;
 
 use App\Models\Attendance;
+use App\Models\Company;
 use App\Models\Holiday;
 use App\Models\Leave;
+use App\Models\State;
 use App\Models\Trip;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\UserSession;
+use App\Models\UserStateAccess;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
+use App\Exports\AttendanceExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class AttendanceController extends Controller
 {
@@ -172,86 +178,276 @@ class AttendanceController extends Controller
     //     ));
     // }
 
+    // public function index(Request $request)
+    // {
+    //     $user = Auth::user();
+    //     $roleName = $user->getRoleNames()->first();
+    //     $stateFilter = $request->state;
+    //     $userFilter  = $request->user_id;
+
+    //     $stateIds = [];
+    //     $userStateAccess = UserStateAccess::where('user_id', $user->id)->first();
+    //     if ($userStateAccess && !empty($userStateAccess->state_ids)) {
+    //         $stateIds = $userStateAccess->state_ids;
+    //     }
+
+    //     $companyCount = Company::count();
+    //     $company = null;
+
+    //     if ($companyCount == 1) {
+    //         $company = Company::first();
+
+    //         if ($company && !empty($company->state)) {
+    //             $companyStates = array_map('intval', explode(',', $company->state));
+
+    //             if ($roleName === 'sub_admin') {
+    //                 $states = State::where('status', 1)
+    //                     ->whereIn('id', $companyStates)
+    //                     ->get();
+    //             } else {
+    //                 $states = empty($stateIds)
+    //                     ? collect()
+    //                     : State::where('status', 1)
+    //                         ->whereIn('id', $stateIds)
+    //                         ->get();
+    //             }
+    //         } else {
+    //             $states = in_array($roleName, ['master_admin', 'sub_admin'])
+    //                 ? State::where('status', 1)->get()
+    //                 : (empty($stateIds)
+    //                     ? collect()
+    //                     : State::where('status', 1)->whereIn('id', $stateIds)->get());
+    //         }
+    //     } else {
+    //         $states = in_array($roleName, ['master_admin', 'sub_admin'])
+    //             ? State::where('status', 1)->get()
+    //             : (empty($stateIds)
+    //                 ? collect()
+    //                 : State::where('status', 1)->whereIn('id', $stateIds)->get());
+    //     }
+    //     if (in_array($roleName, ['master_admin', 'sub_admin'])) {
+    //         $employees = User::where('status', 'Active')->get();
+    //     } else {
+    //         $employees = empty($stateIds)
+    //             ? collect()
+    //             : User::where('status', 'Active')
+    //                 ->whereIn('state_id', $stateIds)
+    //                 ->where('reporting_to', $user->id)
+    //                 ->get();
+    //     }
+
+    //     $month = $request->input('month', now()->format('Y-m'));
+
+    //     $startDate = Carbon::parse($month . '-01')->startOfMonth();
+    //     $endDate   = Carbon::parse($month . '-01')->endOfMonth();
+    //     $today     = now()->format('Y-m-d');
+
+    //     if (!in_array($roleName, ['master_admin', 'sub_admin'])) {
+    //         if (empty($stateIds)) {
+    //             $users = User::whereRaw('1 = 0'); 
+    //         } else {
+    //             $users = User::whereIn('state_id', $stateIds)->where('reporting_to', $user->id)->orderBy('name')->get();
+    //         }
+    //     }else{
+    //         $users = User::orderBy('name')->get();
+    //     }
+
+        
+
+        
+    //     $trips = Trip::whereBetween('trip_date', [$startDate, $endDate])
+    //         ->get()
+    //         ->groupBy(fn($trip) =>
+    //             $trip->user_id.'_'.Carbon::parse($trip->trip_date)->format('Y-m-d')
+    //         );
+
+    //     // Leaves master
+    //     $leaves = Leave::where('status',1)->get(); // CL, SL etc
+
+    //     // Holidays
+    //     $holidays = Holiday::pluck('holiday_date')->toArray();
+
+    //     // Saved attendance (manual override)
+    //     $savedAttendance = Attendance::whereBetween(
+    //         'attendance_date', [$startDate, $endDate]
+    //     )->get()->keyBy(fn($a) =>
+    //         $a->user_id.'_'.$a->attendance_date->format('Y-m-d')
+    //     );
+    //     $attendance = [];
+
+    //     foreach ($users as $user) {
+    //         $currentDate = $startDate->copy();
+
+    //         while ($currentDate <= $endDate) {
+    //             $dateKey = $currentDate->format('Y-m-d');
+    //             $key = $user->id.'_'.$dateKey;
+    //             if (isset($savedAttendance[$key])) {
+    //                 $status = $savedAttendance[$key]->status;
+    //             }
+    //             elseif (in_array($dateKey, $holidays)) {
+    //                 $status = 'H';
+    //             }
+    //             elseif ($currentDate->isSunday()) {
+    //                 $status = 'WO';
+    //             }
+    //             else {
+    //                 if (isset($trips[$key])) {
+    //                     $trip = $trips[$key]->first();
+
+    //                     if ($trip->approval_status === 'approved') {
+    //                         $status = $trip->trip_type === 'full'
+    //                             ? 'P_FULL'
+    //                             : 'P_HALF';
+    //                     } else {
+    //                         $status = 'A';
+    //                     }
+    //                 }
+    //                 elseif ($dateKey > $today) {
+    //                     $status = 'NA';
+    //                 }
+    //                 else {
+    //                     $status = 'A';
+    //                 }
+    //             }
+
+    //             $attendance[$user->id][$dateKey] = $status;
+    //             $currentDate->addDay();
+    //         }
+    //     }
+    //     $selectedUserId = $request->input('user_id', $user->id);
+    //     return view('admin.hr.attendance.index_nnew', compact(
+    //         'users',
+    //         'attendance',
+    //         'startDate',
+    //         'endDate',
+    //         'month',
+    //         'leaves',
+    //         'employees',
+    //         'states',
+    //         'selectedUserId'
+    //     ));
+    // }
+
     public function index(Request $request)
     {
-        $month = $request->input('month', now()->format('Y-m'));
+        $loginUser = Auth::user();
+        $roleName  = $loginUser->getRoleNames()->first();
 
-        $startDate = Carbon::parse($month . '-01')->startOfMonth();
-        $endDate   = Carbon::parse($month . '-01')->endOfMonth();
+        $stateIds = [];
+        $userStateAccess = UserStateAccess::where('user_id', $loginUser->id)->first();
+        if ($userStateAccess && !empty($userStateAccess->state_ids)) {
+            $stateIds = $userStateAccess->state_ids;
+        }
+
+        if (in_array($roleName, ['master_admin', 'sub_admin'])) {
+            $states = State::where('status',1)->get();
+        } else {
+            $states = empty($stateIds)
+                ? collect()
+                : State::whereIn('id',$stateIds)->where('status',1)->get();
+        }
+
+        $stateFilter = $request->state;
+        $userFilter  = $request->user_id;
+
+        $usersQuery = User::where('status','Active');
+
+        if (!in_array($roleName,['master_admin','sub_admin'])) {
+            $usersQuery->where('reporting_to',$loginUser->id)
+                    ->whereIn('state_id',$stateIds);
+        }
+
+        if ($stateFilter) {
+            $usersQuery->where('state_id',$stateFilter);
+        }
+
+        if ($userFilter) {
+            $usersQuery->where('id',$userFilter);
+        }
+
+        $users = $usersQuery->orderBy('name')->get();
+
+        $month = $request->input('month', now()->format('Y-m'));
+        $startDate = Carbon::parse($month.'-01')->startOfMonth();
+        $endDate   = Carbon::parse($month.'-01')->endOfMonth();
         $today     = now()->format('Y-m-d');
 
-        $users = User::orderBy('name')->get();
-
-        // Trips
-        $trips = Trip::whereBetween('trip_date', [$startDate, $endDate])
+        $trips = Trip::whereBetween('trip_date',[$startDate,$endDate])
             ->get()
-            ->groupBy(fn($trip) =>
-                $trip->user_id.'_'.Carbon::parse($trip->trip_date)->format('Y-m-d')
-            );
+            ->groupBy(fn($t)=>$t->user_id.'_'.Carbon::parse($t->trip_date)->format('Y-m-d'));
 
-        // Leaves master
-        $leaves = Leave::where('status',1)->get(); // CL, SL etc
-
-        // Holidays
+        $leaves   = Leave::where('status',1)->get();
         $holidays = Holiday::pluck('holiday_date')->toArray();
 
-        // Saved attendance (manual override)
-        $savedAttendance = Attendance::whereBetween(
-            'attendance_date', [$startDate, $endDate]
-        )->get()->keyBy(fn($a) =>
-            $a->user_id.'_'.$a->attendance_date->format('Y-m-d')
-        );
+        $savedAttendance = Attendance::whereBetween('attendance_date',[$startDate,$endDate])
+            ->get()
+            ->keyBy(fn($a)=>$a->user_id.'_'.$a->attendance_date->format('Y-m-d'));
+
         $attendance = [];
 
         foreach ($users as $user) {
-            $currentDate = $startDate->copy();
+            $date = $startDate->copy();
 
-            while ($currentDate <= $endDate) {
-                $dateKey = $currentDate->format('Y-m-d');
+            while ($date <= $endDate) {
+                $dateKey = $date->format('Y-m-d');
                 $key = $user->id.'_'.$dateKey;
-                // 🔐 MANUAL OVERRIDE FIRST
+
                 if (isset($savedAttendance[$key])) {
                     $status = $savedAttendance[$key]->status;
                 }
-                elseif (in_array($dateKey, $holidays)) {
+                elseif (in_array($dateKey,$holidays)) {
                     $status = 'H';
                 }
-                elseif ($currentDate->isSunday()) {
+                elseif ($date->isSunday()) {
                     $status = 'WO';
                 }
+                elseif (isset($trips[$key])) {
+                    $trip = $trips[$key]->first();
+                    $status = $trip->approval_status === 'approved'
+                        ? ($trip->trip_type === 'full' ? 'P_FULL' : 'P_HALF')
+                        : 'A';
+                }
+                elseif ($dateKey > $today) {
+                    $status = 'NA';
+                }
                 else {
-                    if (isset($trips[$key])) {
-                        $trip = $trips[$key]->first();
-
-                        if ($trip->approval_status === 'approved') {
-                            $status = $trip->trip_type === 'full'
-                                ? 'P_FULL'
-                                : 'P_HALF';
-                        } else {
-                            $status = 'A';
-                        }
-                    }
-                    elseif ($dateKey > $today) {
-                        $status = 'NA';
-                    }
-                    else {
-                        $status = 'A';
-                    }
+                    $status = 'A';
                 }
 
                 $attendance[$user->id][$dateKey] = $status;
-                $currentDate->addDay();
+                $date->addDay();
             }
         }
-        return view('admin.hr.attendance.index_nnew', compact(
-            'users',
-            'attendance',
-            'startDate',
-            'endDate',
-            'month',
-            'leaves'
+
+        return view('admin.hr.attendance.index_nnew',compact(
+            'users','attendance','startDate','endDate','month',
+            'states','leaves','stateFilter','userFilter'
         ));
     }
+
+    public function export(Request $request)
+    {
+        $month = $request->input('month', now()->format('Y-m'));
+
+        // SAME FILTER LOGIC as index()
+        $usersQuery = User::where('status','Active');
+
+        if ($request->state) {
+            $usersQuery->where('state_id', $request->state);
+        }
+
+        if ($request->user_id) {
+            $usersQuery->where('id', $request->user_id);
+        }
+
+        $users = $usersQuery->orderBy('name')->get();
+
+        return Excel::download(
+            new AttendanceExport($month, $users),
+            'attendance_'.$month.'.xlsx'
+        );
+    }
+
 
     public function save(Request $request){
         Attendance::updateOrCreate(
