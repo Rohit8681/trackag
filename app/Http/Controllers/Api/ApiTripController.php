@@ -375,8 +375,8 @@ class ApiTripController extends BaseController
                 'end_lat'        => 'required|numeric',
                 'end_lng'        => 'required|numeric',
                 'closenote'      => 'nullable|string',
-                'end_km'         => 'required|string',
-                'end_km_photo'   => 'required|mimes:jpeg,jpg,png,bmp,gif,svg,webp,tiff,ico|max:5120',
+                'end_km'         => 'nullable|string',
+                'end_km_photo'   => 'nullable|mimes:jpeg,jpg,png,bmp,gif,svg,webp,tiff,ico|max:5120',
                 'status'         => 'in:completed',
             ]);
             Log::info('Validation passed successfully', ['validated_data' => $validated]);
