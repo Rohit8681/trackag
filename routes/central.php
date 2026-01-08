@@ -36,6 +36,7 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\StockController;
 use App\Http\Controllers\TrackingController;
 use App\Http\Controllers\ExpenseController;
+use App\Http\Controllers\MessageController;
 use App\Http\Controllers\PartyPaymentController;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Artisan;
@@ -213,6 +214,7 @@ Route::middleware(['web'])->group(function () {
             Route::resource('products', ProductController::class);
 
              Route::resource('customers', CustomerController::class);
+             Route::resource('messages', MessageController::class);
              
 
             Route::patch('/customers/{id}/toggle', [CustomerController::class, 'toggleStatus'])->name('customers.toggle');

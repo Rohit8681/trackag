@@ -731,6 +731,21 @@
                             </ul>
                         </li>
 
+                        <li class="nav-item {{ request()->is('admin/messages*') ? 'menu-open' : '' }}">
+                            <a href="#" class="nav-link {{ request()->is('admin/messages*') ? 'active' : '' }}">
+                                <i class="bi bi-journal me-2"></i>
+                                <p>Messages<i class="bi bi-chevron-right ms-auto"></i></p>
+                            </a>
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a href="{{ url('admin/messages') }}" class="nav-link {{ request()->is('admin/messages*') ? 'active' : '' }}">
+                                        <i class="bi bi-circle me-2"></i>
+                                        <p>Messages</p>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+
                         {{-- Expense Master --}}
                         <li class="nav-item {{ request()->is('admin/ta-da-slab*') || request()->is('admin/ta-da-bill-master*') ? 'menu-open' : '' }}">
                             <a href="#" class="nav-link {{ request()->is('admin/ta-da-slab*') || request()->is('admin/ta-da-bill-master*') ? 'active' : '' }}">
