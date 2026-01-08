@@ -214,6 +214,7 @@ class ApiTripController extends BaseController
             'starting_km'    => 'nullable|string',
             'start_km_photo' => 'nullable|mimes:jpeg,jpg,png,bmp,gif,svg,webp,tiff,ico|max:5120',
             'customer_ids'   => 'nullable|array',
+            'battery_percentage' => 'nullable',
         ]);
          Log::info('VALIDATED TRIP DATA', $validated);
 
@@ -285,7 +286,7 @@ class ApiTripController extends BaseController
                 'latitude' => $validated['start_lat'],
                 'longitude' => $validated['start_lng'],
                 'gps_status' => 1,
-                'battery_percentage' => 0,
+                'battery_percentage' => $validated['battery_percentage'] ?? 0,
                 'recorded_at' => now(),
             ]);
         }
