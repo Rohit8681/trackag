@@ -1,64 +1,47 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use App\Models\PriceList;
+use App\Models\State;
 use Illuminate\Http\Request;
 
 class PriceController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+     public function index()
     {
-        return view('admin.price.index');
+        $prices = PriceList::with('state')->latest()->get();
+        $states = State::orderBy('name')->get();
+
+        return view('admin.price.index', compact('prices', 'states'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        //
+        $states = State::orderBy('name')->get();
+        return view('admin.price.create', compact('states'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'state_id' => 'required|exists:states,id',
+            'pdf'      => 'required|mimes:pdf|max:5120',
+        ]);
+
+        $path = $request->file('pdf')->store('price_lists', 'public');
+
+        PriceList::create([
+            'state_id' => $request->state_id,
+            'pdf_path' => $path,
+        ]);
+
+        return redirect()
+            ->route('price.index')
+            ->with('success', 'Price list uploaded successfully');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function show(PriceList $price)
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        return redirect(asset('storage/' . $price->pdf_path));
     }
 }
