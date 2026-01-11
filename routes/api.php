@@ -1,6 +1,7 @@
 <?php
 use App\Http\Controllers\Api\ApiAuthController;
 use App\Http\Controllers\Api\ApiTripController;
+use App\Http\Controllers\Api\CommanController;
 use App\Http\Controllers\Api\ExpenseController;
 use App\Http\Controllers\Api\FailedJobController;
 use App\Http\Controllers\Api\LocationApiController;
@@ -54,6 +55,10 @@ Route::middleware([TenantAuthenticate::class])->group(function () {
 
     Route::get('/party-payment-list', [PartyPaymentController::class, 'index']);
     Route::post('/party-payment-store', [PartyPaymentController::class, 'store']);
+
+    Route::get('price-list', [CommanController::class, 'priceList']);
+    Route::get('brochures', [CommanController::class, 'brochures']);
+    Route::get('messages', [CommanController::class, 'messages']);
 
 
 
