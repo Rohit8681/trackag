@@ -59,6 +59,7 @@ Route::middleware([TenantAuthenticate::class])->group(function () {
     Route::get('price-list', [CommanController::class, 'priceList']);
     Route::get('brochures', [CommanController::class, 'brochures']);
     Route::get('messages', [CommanController::class, 'messages']);
+    Route::get('attendance', [CommanController::class, 'myAttendance']);
 
 
 
