@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Brochure;
+use App\Models\Company;
 use App\Models\State;
 use Illuminate\Http\Request;
 
@@ -14,13 +15,35 @@ class BrochureController extends Controller
     public function index()
     {
         $brochures = Brochure::with('state')->latest()->get();
-        $states = State::where('status', 1)->orderBy('name')->get();
+        // $states = State::where('status', 1)->orderBy('name')->get();
+        $companyCount = Company::count();
+        $company = null;
+        if ($companyCount == 1) {
+            $company = Company::first();
+            $companyStates = array_map('intval', explode(',', $company->state));
+            $states = State::where('status', 1)
+                        ->whereIn('id', $companyStates)
+                        ->get();
+        }else{
+            $states = State::where('status', 1)->get();
+        }
         return view('admin.brochure.index',compact('brochures','states'));
     }
 
     public function create()
     {
-        $states = State::where('status', 1)->orderBy('name')->get();
+        // $states = State::where('status', 1)->orderBy('name')->get();
+        $companyCount = Company::count();
+        $company = null;
+        if ($companyCount == 1) {
+            $company = Company::first();
+            $companyStates = array_map('intval', explode(',', $company->state));
+            $states = State::where('status', 1)
+                        ->whereIn('id', $companyStates)
+                        ->get();
+        }else{
+            $states = State::where('status', 1)->get();
+        }
         return view('admin.brochure.create', compact('states'));
     }
 

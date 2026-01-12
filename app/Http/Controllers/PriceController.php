@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Http\Controllers;
+
+use App\Models\Company;
 use App\Models\PriceList;
 use App\Models\State;
 use Illuminate\Http\Request;
@@ -10,14 +12,35 @@ class PriceController extends Controller
      public function index()
     {
         $prices = PriceList::with('state')->latest()->get();
-        $states = State::orderBy('name')->get();
-
+        // $states = State::orderBy('name')->get();
+        $companyCount = Company::count();
+        $company = null;
+        if ($companyCount == 1) {
+            $company = Company::first();
+            $companyStates = array_map('intval', explode(',', $company->state));
+            $states = State::where('status', 1)
+                        ->whereIn('id', $companyStates)
+                        ->get();
+        }else{
+            $states = State::where('status', 1)->get();
+        }
         return view('admin.price.index', compact('prices', 'states'));
     }
 
     public function create()
     {
-        $states = State::orderBy('name')->get();
+        // $states = State::orderBy('name')->get();
+        $companyCount = Company::count();
+        $company = null;
+        if ($companyCount == 1) {
+            $company = Company::first();
+            $companyStates = array_map('intval', explode(',', $company->state));
+            $states = State::where('status', 1)
+                        ->whereIn('id', $companyStates)
+                        ->get();
+        }else{
+            $states = State::where('status', 1)->get();
+        }
         return view('admin.price.create', compact('states'));
     }
 
