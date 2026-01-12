@@ -50,9 +50,9 @@ class MessageController extends Controller
     {
         $request->validate([
             'type'     => 'required|in:all,individual',
-            'state_id' => 'required|exists:states,id',
+            'state_id' => 'required',
             'message'  => 'required|string',
-            'user_id'  => 'nullable|exists:users,id',
+            'user_id'  => 'nullable',
         ]);
 
         if ($request->type === 'all') {
