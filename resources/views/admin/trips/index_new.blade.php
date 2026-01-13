@@ -116,7 +116,7 @@
 
                             <div class="col-md-2">
                                 <label class="form-label fw-semibold">State</label>
-                                <select name="state" class="form-select form-select-sm">
+                                <select id="stateSelect" name="state" class="form-select form-select-sm">
                                     <option value="">All</option>
                                     @foreach($states as $state)
                                         <option value="{{ $state->id }}" {{ request('state') == $state->id ? 'selected' : '' }}>
@@ -128,7 +128,7 @@
 
                             <div class="col-md-2">
                                 <label class="form-label fw-semibold">Employee Name</label>
-                                <select name="employee" class="form-select form-select-sm">
+                                <select id="employeeSelect" name="employee" class="form-select form-select-sm">
                                     <option value="">All</option>
                                     @foreach($employees as $emp)
                                         <option value="{{ $emp->id }}" {{ request('employee') == $emp->id ? 'selected' : '' }}>
@@ -623,5 +623,25 @@ $(document).ready(function () {
             ]
         });
     }
+});
+$('#stateSelect').on('change', function () {
+    let stateId = $(this).val();
+
+    $.ajax({
+        url: "{{ route('admin.getEmployeesByState') }}",
+        type: "GET",
+        data: { state_id: stateId },
+        success: function (res) {
+            let employeeSelect = $('#employeeSelect');
+            employeeSelect.empty();
+            employeeSelect.append('<option value="">All</option>');
+
+            $.each(res, function (key, emp) {
+                employeeSelect.append(
+                    `<option value="${emp.id}">${emp.name}</option>`
+                );
+            });
+        }
+    });
 });
 </script>
