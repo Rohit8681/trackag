@@ -48,17 +48,6 @@
                         <strong>Notes:</strong> Please ensure that all data is reviewed before granting approval for the expense.
                         After approval, the data cannot be modified.
                     </div>
-                    {{-- <div>
-                        <a href="{{ route('expense.report.pdf', request()->all()) }}" 
-                        class="btn btn-danger btn-sm" target="_blank">
-                            <i class="fas fa-file-pdf"></i> Export PDF
-                        </a>
-
-                        <a href="{{ route('expense.report.excel', request()->all()) }}" 
-                        class="btn btn-success btn-sm">
-                            <i class="fas fa-file-excel"></i> Export Excel
-                        </a>
-                    </div> --}}
                     
                 </div>
 
@@ -80,20 +69,6 @@
 
                         <div class="col-md-2">
                         <label for="month" class="form-label">Select Month</label>
-                        {{-- <select name="month" id="month" class="form-select form-select-sm">
-
-                            @for ($i = 1; $i <= 12; $i++)
-                                @php
-                                    $value = now()->format('Y') . '-' . str_pad($i, 2, '0', STR_PAD_LEFT);
-                                    $monthName = DateTime::createFromFormat('!m', $i)->format('F');
-                                @endphp
-
-                                <option value="{{ $value }}" {{ $month == $value ? 'selected' : '' }}>
-                                    {{ $monthName }} {{ now()->format('Y') }}
-                                </option>
-                            @endfor
-
-                        </select> --}}
                         <select name="month" id="month" class="form-select form-select-sm">
                             @php
                                 $currentYear = now()->year;
@@ -117,7 +92,7 @@
 
                         <div class="col-md-2">
                             <label class="form-label">State</label>
-                            <select name="state_id" class="form-select form-select-sm">
+                            <select id="stateSelect" name="state_id" class="form-select form-select-sm">
                                 <option value="">All</option>
                                 @foreach($states as $state)
                                     <option value="{{ $state->id }}"
@@ -299,5 +274,27 @@ $("#approveSelected").on("click", function () {
     // Submit form
     $("#bulkApproveForm").submit();
 });
+
+$('#stateSelect').on('change', function () {
+    let stateId = $(this).val();
+
+    $.ajax({
+        url: "{{ route('admin.getEmployeesByState') }}",
+        type: "GET",
+        data: { state_id: stateId },
+        success: function (res) {
+            let employeeSelect = $('#user_id');
+            employeeSelect.empty();
+            employeeSelect.append('<option value="">All</option>');
+
+            $.each(res, function (key, emp) {
+                employeeSelect.append(
+                    `<option value="${emp.id}">${emp.name}</option>`
+                );
+            });
+        }
+    });
+});
+
 </script>
 @endpush
