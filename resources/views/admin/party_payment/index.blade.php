@@ -63,7 +63,7 @@
 
                         <div class="col-md-2">
                             <label class="form-label">State</label>
-                            <select name="state_id" class="form-select form-select-sm">
+                            <select id="stateSelect" name="state_id" class="form-select form-select-sm">
                                 <option value="">All</option>
                                 @foreach($states as $state)
                                     <option value="{{ $state->id }}" {{ request('state_id') == $state->id ? 'selected' : '' }}>
@@ -75,7 +75,7 @@
 
                         <div class="col-md-2">
                             <label class="form-label">Employee Name</label>
-                            <select name="user_id" class="form-select form-select-sm">
+                            <select id="employeeSelect" name="user_id" class="form-select form-select-sm">
                                 <option value="">All</option>
                                 @foreach($employees as $user)
                                     <option value="{{ $user->id }}" {{ request('user_id') == $user->id ? 'selected' : '' }}>
@@ -94,14 +94,6 @@
                             </select>
                         </div>
 
-                        {{-- <div class="col-12 d-flex justify-content-end mt-2">
-                            <button type="submit" class="btn btn-sm btn-primary me-2">
-                                <i class="fas fa-filter"></i> Filter
-                            </button>
-                            <a href="{{ route('party-payment') }}" class="btn btn-sm btn-secondary">
-                                <i class="fas fa-sync"></i> Reset
-                            </a>
-                        </div> --}}
                         <div class="col-md-2 d-flex align-items-end gap-2">
                             <button type="submit" class="btn btn-sm btn-primary w-100">
                                 <i class="fas fa-filter"></i> Filter
@@ -237,6 +229,27 @@ $(document).ready(function() {
             ]
         });
     }
+});
+
+$('#stateSelect').on('change', function () {
+    let stateId = $(this).val();
+
+    $.ajax({
+        url: "{{ route('admin.getEmployeesByState') }}",
+        type: "GET",
+        data: { state_id: stateId },
+        success: function (res) {
+            let employeeSelect = $('#employeeSelect');
+            employeeSelect.empty();
+            employeeSelect.append('<option value="">All</option>');
+
+            $.each(res, function (key, emp) {
+                employeeSelect.append(
+                    `<option value="${emp.id}">${emp.name}</option>`
+                );
+            });
+        }
+    });
 });
 </script>
 @endpush
