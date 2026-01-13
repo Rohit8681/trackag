@@ -624,6 +624,7 @@ $(document).ready(function () {
         });
     }
 });
+
 $('#stateSelect').on('change', function () {
     let stateId = $(this).val();
 
@@ -645,3 +646,5 @@ $('#stateSelect').on('change', function () {
     });
 });
 </script>
+
+@endpush
