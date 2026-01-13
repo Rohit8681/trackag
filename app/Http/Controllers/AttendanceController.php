@@ -38,13 +38,6 @@ class AttendanceController extends Controller
             $stateIds = $userStateAccess->state_ids;
         }
 
-        // if (in_array($roleName, ['master_admin', 'sub_admin'])) {
-        //     $states = State::where('status',1)->get();
-        // } else {
-        //     $states = empty($stateIds)
-        //         ? collect()
-        //         : State::whereIn('id',$stateIds)->where('status',1)->get();
-        // }
         $companyCount = Company::count();
         $company = null;
 

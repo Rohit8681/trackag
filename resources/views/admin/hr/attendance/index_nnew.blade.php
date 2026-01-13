@@ -226,7 +226,7 @@ select[disabled] {
                 </div>
                 <div class="col-sm-6 text-end">
                     <form method="GET" action="{{ route('attendance.index') }}" class="d-inline-flex align-items-center">
-                        <select name="state" class="form-select me-2">
+                        <select id="stateSelect" name="state" class="form-select me-2">
                             <option value="">All States</option>
                             @foreach($states as $state)
                                 <option value="{{ $state->id }}" {{ $stateFilter==$state->id?'selected':'' }}>
@@ -234,7 +234,7 @@ select[disabled] {
                                 </option>
                             @endforeach
                         </select>
-                        <select name="user_id" class="form-select me-2">
+                        <select id="employeeSelect" name="user_id" class="form-select me-2">
                             <option value="">All Users</option>
                             @foreach($users as $u)
                                 <option value="{{ $u->id }}" {{ $userFilter==$u->id?'selected':'' }}>
@@ -350,6 +350,27 @@ document.querySelectorAll('.attendance-select').forEach(el => {
                 status: status
             })
         });
+    });
+});
+
+$('#stateSelect').on('change', function () {
+    let stateId = $(this).val();
+
+    $.ajax({
+        url: "{{ route('admin.getEmployeesByState') }}",
+        type: "GET",
+        data: { state_id: stateId },
+        success: function (res) {
+            let employeeSelect = $('#employeeSelect');
+            employeeSelect.empty();
+            employeeSelect.append('<option value="">All</option>');
+
+            $.each(res, function (key, emp) {
+                employeeSelect.append(
+                    `<option value="${emp.id}">${emp.name}</option>`
+                );
+            });
+        }
     });
 });
 </script>
