@@ -47,7 +47,7 @@
 
                     <div class="col-md-2">
                         <label class="form-label fw-semibold text-dark">State</label>
-                        <select class="form-select" name="state_id">
+                        <select id="stateSelect" class="form-select" name="state_id">
                             <option value="">Select State</option>
                             @foreach ($states as $state)
                                 <option value="{{ $state->id }}" {{ request('state_id')==$state->id?'selected':'' }}>
@@ -59,12 +59,10 @@
 
                     <div class="col-md-2">
                         <label class="form-label fw-semibold text-dark">Employee Name</label>
-                        <select class="form-select" name="user_id">
-                            <option value="">Select Employee</option>
-                            @foreach ($users as $user)
-                                <option value="{{ $user->id }}" {{ request('user_id')==$user->id?'selected':'' }}>
-                                    {{ $user->name }}
-                                </option>
+                        <select id="employeeSelect" class="form-select" name="user_id">
+                            <option value="">All</option>
+                            @foreach ($users as $e)
+                                <option value="{{ $e->id }}">{{ $e->name }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -247,5 +245,26 @@ function openStatusModal(id, status) {
     var modal = new bootstrap.Modal(document.getElementById('statusModal'));
     modal.show();
 }
+
+$('#stateSelect').on('change', function () {
+    let stateId = $(this).val();
+
+    $.ajax({
+        url: "{{ route('admin.getEmployeesByState') }}",
+        type: "GET",
+        data: { state_id: stateId },
+        success: function (res) {
+            let employeeSelect = $('#employeeSelect');
+            employeeSelect.empty();
+            employeeSelect.append('<option value="">All</option>');
+
+            $.each(res, function (key, emp) {
+                employeeSelect.append(
+                    `<option value="${emp.id}">${emp.name}</option>`
+                );
+            });
+        }
+    });
+});
 </script>
 @endpush

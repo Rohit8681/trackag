@@ -45,8 +45,7 @@ use Illuminate\Support\Facades\Response;
 
 
 Route::get('/logs', function () {
-    // Optional: Add a simple password for security
-    $accessKey = request('key'); // e.g. /logs?key=1234
+    $accessKey = request('key'); 
     if ($accessKey !== '1234') {
         abort(403, 'Unauthorized access.');
     }
@@ -57,35 +56,12 @@ Route::get('/logs', function () {
         return "No log file found.";
     }
 
-    // Read the log file
     $logs = File::get($path);
 
-    // Display formatted logs
     return response("<pre style='background:#000;color:#0f0;padding:15px;font-size:13px;'>"
         . e($logs) . "</pre>");
 });
-// Route::get('/logs', function () {
-//     $accessKey = request('key');
 
-//     if ($accessKey !== '1234') {
-//         abort(403, 'Unauthorized access.');
-//     }
-
-//     $path = storage_path('logs/laravel.log');
-
-//     if (!File::exists($path)) {
-//         return "No log file found.";
-//     }
-
-//     // Read only last 500 lines (safe & fast)
-//     $lines = 500;
-//     $output = shell_exec("tail -n $lines " . escapeshellarg($path));
-
-//     return response("<pre style='background:#000;color:#0f0;padding:15px;font-size:13px;font-family: monospace;'>"
-//         . e($output) . "</pre>");
-// });
-
-// ---------------- Central Domain Routes ----------------
 Route::middleware(['web'])->group(function () {
     Route::get('/', function () {
         return redirect()->route('admin.login');
