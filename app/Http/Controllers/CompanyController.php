@@ -202,7 +202,8 @@ class CompanyController extends Controller
                 'TehsilSeeder',
                 // 'RoleSeeder',
                 'PermissionSeeder',
-                'LookupTablesSeeder'
+                'LookupTablesSeeder',
+                'CropCategoryWithSubSeeder'
             ];
 
             DB::connection('tenant')->statement('SET FOREIGN_KEY_CHECKS=0;');
