@@ -31,6 +31,7 @@ use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\BudgetController;
 use App\Http\Controllers\MonthlyController;
 use App\Http\Controllers\AchievementController;
+use App\Http\Controllers\FarmerController;
 use App\Http\Controllers\CropCategoryController;
 use App\Http\Controllers\CropSubCategoryController;
 use App\Http\Controllers\PartyController;
@@ -200,6 +201,8 @@ Route::middleware(['web'])->group(function () {
 
             Route::resource('crop-categories', CropCategoryController::class);
             Route::resource('crop-sub-categories', CropSubCategoryController::class);
+
+            Route::get('farmers', [FarmerController::class, 'index'])->name('farmers.index');
             
         });
     });

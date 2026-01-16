@@ -27,6 +27,11 @@ class Farmer extends Model
         'irrigation_type'
     ];
 
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
     public function state()
     {
         return $this->belongsTo(State::class);

@@ -301,8 +301,8 @@
                 </li>
                 @endcanany
 
-                <li class="nav-item {{ request()->is('admin/expense*') ? 'menu-open' : '' }}">
-                <a href="#" class="nav-link {{ request()->is('admin/expense*') ? 'active' : '' }}">
+                <li class="nav-item {{ request()->is('farmers.index*') ? 'menu-open' : '' }}">
+                <a href="#" class="nav-link {{ request()->is('farmers.index*') ? 'active' : '' }}">
                     <i class="bi bi-people-fill me-2"></i>
                     <p>
                         Field Demo
@@ -310,10 +310,10 @@
                     </p>
                 </a>
 
-                <ul class="nav nav-treeview" style="{{ request()->is('admin/expense*') ? 'display: block;' : '' }}">
+                <ul class="nav nav-treeview" style="{{ request()->is('farmers.index*') ? 'display: block;' : '' }}">
                     <li class="nav-item">
-                        <a href="{{ route('coming-soon') }}" 
-                        class="nav-link {{ request()->is('admin/expense') ? 'active' : '' }}">
+                        <a href="{{ route('farmers.index') }}" 
+                        class="nav-link {{ request()->is('farmers.index') ? 'active' : '' }}">
                             <i class="bi bi-cash-stack me-2"></i>
                             <p>Daily Farm Demo</p>
                         </a>
