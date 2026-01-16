@@ -31,6 +31,8 @@ use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\BudgetController;
 use App\Http\Controllers\MonthlyController;
 use App\Http\Controllers\AchievementController;
+use App\Http\Controllers\CropCategoryController;
+use App\Http\Controllers\CropSubCategoryController;
 use App\Http\Controllers\PartyController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\StockController;
@@ -195,6 +197,9 @@ Route::middleware(['web'])->group(function () {
 
             Route::patch('/customers/{id}/toggle', [CustomerController::class, 'toggleStatus'])->name('customers.toggle');
             Route::post('/customers/import', [CustomerController::class, 'import'])->name('customers.import');
+
+            Route::resource('crop-categories', CropCategoryController::class);
+            Route::resource('crop-sub-categories', CropSubCategoryController::class);
             
         });
     });

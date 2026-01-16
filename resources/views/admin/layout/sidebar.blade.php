@@ -255,14 +255,6 @@
                         <li class="nav-item">
                             <a href="{{ route('attendance.index') }}" class="nav-link {{ request()->is('admin/attendance*') ? 'active' : '' }}">
                                 <i class="bi bi-cash-stack me-2"></i>
-                                <p>Monthly Attendance Report</p>
-                            </a>
-                        </li>
-                    </ul>
-                    <ul class="nav nav-treeview">
-                        <li class="nav-item">
-                            <a href="{{ route('attendance.index') }}" class="nav-link {{ request()->is('admin/attendance*') ? 'active' : '' }}">
-                                <i class="bi bi-cash-stack me-2"></i>
                                 <p>Leave reports</p>
                             </a>
                         </li>
@@ -769,6 +761,35 @@
                                     </a>
                                 </li>
                                 {{-- @endcan --}}
+                            </ul>
+                        </li>
+
+                        <li class="nav-item {{ request()->is('admin/crop-categories*') || request()->is('admin/crop-sub-categories*') ? 'menu-open' : '' }}">
+                            <a href="#" class="nav-link {{ request()->is('admin/crop-categories*') || request()->is('admin/crop-sub-categories*') ? 'active' : '' }}">
+                                <i class="bi bi-flower1 me-2"></i>
+                                <p>
+                                    Crop Master
+                                    <i class="bi bi-chevron-right ms-auto"></i>
+                                </p>
+                            </a>
+
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a href="{{ url('admin/crop-categories') }}"
+                                    class="nav-link {{ request()->is('admin/crop-categories*') ? 'active' : '' }}">
+                                        <i class="bi bi-circle me-2"></i>
+                                        <p>Crop Category</p>
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a href="{{ url('admin/crop-sub-categories') }}"
+                                    class="nav-link {{ request()->is('admin/crop-sub-categories*') ? 'active' : '' }}">
+                                        <i class="bi bi-circle me-2"></i>
+                                        <p>Crop Sub Category</p>
+                                    </a>
+                                </li>
+
                             </ul>
                         </li>
 

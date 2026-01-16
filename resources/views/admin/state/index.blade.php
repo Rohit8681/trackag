@@ -163,27 +163,6 @@
 
 @push('scripts')
 <script>
-// $(document).on('change', '.toggle-status', function () {
-//     let stateId = $(this).data('id');
-//     let status = $(this).is(':checked') ? 1 : 0;
 
-//     $.ajax({
-//         url: "{{ route('states.toggle-status') }}",
-//         type: "POST",
-//         data: {
-//             _token: "{{ csrf_token() }}",
-//             id: stateId,
-//             status: status
-//         },
-//         success: function (response) {
-//             if (response.success) {
-//                 toastr.success("Status changed to " + response.status);
-//             }
-//         },
-//         error: function () {
-//             toastr.error("Something went wrong!");
-//         }
-//     });
-// });
 </script>
 @endpush
