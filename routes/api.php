@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\ApiTripController;
 use App\Http\Controllers\Api\CommanController;
 use App\Http\Controllers\Api\ExpenseController;
 use App\Http\Controllers\Api\FailedJobController;
+use App\Http\Controllers\Api\FarmerController;
 use App\Http\Controllers\Api\LocationApiController;
 use App\Http\Controllers\Api\PartyController;
 use App\Http\Controllers\Api\PartyPaymentController;
@@ -60,6 +61,10 @@ Route::middleware([TenantAuthenticate::class])->group(function () {
     Route::get('brochures', [CommanController::class, 'brochures']);
     Route::get('messages', [CommanController::class, 'messages']);
     Route::get('attendance', [CommanController::class, 'myAttendance']);
+
+    Route::get('crop-sowing-list', [FarmerController::class, 'cropSowingList']);
+    Route::get('farmers-list', [FarmerController::class, 'index']);
+    Route::post('farmers-store', [FarmerController::class, 'store']);
 
 
 
