@@ -27,81 +27,91 @@
                 <div class="card-body">
 
                     {{-- 🔍 Filter Section --}}
-                    <form method="GET" class="row g-3 mb-3">
-                        <div class="col-md-3">
-                            <label class="form-label">From Date</label>
-                            <input type="date" name="from_date" class="form-control"
-                                value="{{ request('from_date') }}">
-                        </div>
+                    <form method="GET" class="row g-2 mb-3">
 
-                        {{-- To Date --}}
-                        <div class="col-md-3">
-                            <label class="form-label">To Date</label>
-                            <input type="date" name="to_date" class="form-control"
-                                value="{{ request('to_date') }}">
-                        </div>
+    {{-- From Date --}}
+    <div class="col-md-2">
+        <label class="form-label small mb-1">From Date</label>
+        <input type="date"
+               name="from_date"
+               class="form-control form-control-sm"
+               value="{{ request('from_date') }}">
+    </div>
 
-                        <div class="col-md-3">
-                            <label class="form-label">Farmer Name</label>
-                            <input type="text"
-                                   name="farmer_name"
-                                   class="form-control"
-                                   placeholder="Enter farmer name"
-                                   value="{{ request('farmer_name') }}">
-                        </div>
+    {{-- To Date --}}
+    <div class="col-md-2">
+        <label class="form-label small mb-1">To Date</label>
+        <input type="date"
+               name="to_date"
+               class="form-control form-control-sm"
+               value="{{ request('to_date') }}">
+    </div>
 
-                        <div class="col-md-3">
-                            <label class="form-label">Mobile No</label>
-                            <input type="text"
-                                   name="mobile_no"
-                                   class="form-control"
-                                   placeholder="Enter mobile no"
-                                   value="{{ request('mobile_no') }}">
-                        </div>
+    {{-- Farmer Name --}}
+    <div class="col-md-2">
+        <label class="form-label small mb-1">Farmer Name</label>
+        <input type="text"
+               name="farmer_name"
+               class="form-control form-control-sm"
+               placeholder="Farmer name"
+               value="{{ request('farmer_name') }}">
+    </div>
 
-                        <div class="col-md-3">
-                            <label class="form-label">State</label>
-                            <select name="state_id" class="form-select">
-                                <option value="">-- All State --</option>
-                                @foreach($states as $state)
-                                    <option value="{{ $state->id }}"
-                                        {{ request('state_id') == $state->id ? 'selected' : '' }}>
-                                        {{ $state->name }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
+    {{-- Mobile No --}}
+    <div class="col-md-2">
+        <label class="form-label small mb-1">Mobile No</label>
+        <input type="text"
+               name="mobile_no"
+               class="form-control form-control-sm"
+               placeholder="Mobile no"
+               value="{{ request('mobile_no') }}">
+    </div>
 
-                        {{-- Sales Person --}}
-                        <div class="col-md-3">
-                            <label class="form-label">Sales Person</label>
-                            <input type="text"
-                                name="sales_person"
-                                class="form-control"
-                                placeholder="Enter sales person name"
-                                value="{{ request('sales_person') }}">
-                        </div>
+    {{-- State --}}
+    <div class="col-md-2">
+        <label class="form-label small mb-1">State</label>
+        <select name="state_id" class="form-select form-select-sm">
+            <option value="">All State</option>
+            @foreach($states as $state)
+                <option value="{{ $state->id }}"
+                    {{ request('state_id') == $state->id ? 'selected' : '' }}>
+                    {{ $state->name }}
+                </option>
+            @endforeach
+        </select>
+    </div>
 
-                        {{-- Crop Name --}}
-                        <div class="col-md-3">
-                            <label class="form-label">Crop Name</label>
-                            <input type="text"
-                                name="crop_name"
-                                class="form-control"
-                                placeholder="Enter crop name"
-                                value="{{ request('crop_name') }}">
-                        </div>
+    {{-- Sales Person --}}
+    <div class="col-md-2">
+        <label class="form-label small mb-1">Sales Person</label>
+        <input type="text"
+               name="sales_person"
+               class="form-control form-control-sm"
+               placeholder="Sales person"
+               value="{{ request('sales_person') }}">
+    </div>
 
-                        <div class="col-md-3 d-flex align-items-end">
-                            <button class="btn btn-primary me-2">
-                                <i class="fas fa-search me-1"></i> Filter
-                            </button>
-                            <a href="{{ route('farmers.index') }}" class="btn btn-secondary">
-                                Reset
-                            </a>
-                        </div>
+    {{-- Crop Name --}}
+    <div class="col-md-2">
+        <label class="form-label small mb-1">Crop Name</label>
+        <input type="text"
+               name="crop_name"
+               class="form-control form-control-sm"
+               placeholder="Crop name"
+               value="{{ request('crop_name') }}">
+    </div>
 
-                    </form>
+    {{-- Buttons --}}
+    <div class="col-md-2 d-flex align-items-end gap-2">
+        <button class="btn btn-primary btn-sm">
+            <i class="fas fa-search me-1"></i> Filter
+        </button>
+        <a href="{{ route('farmers.index') }}" class="btn btn-secondary btn-sm">
+            Reset
+        </a>
+    </div>
+
+</form>
 
                     {{-- 📋 Farmers Table --}}
                     <div class="table-responsive" style="max-height:600px;">
