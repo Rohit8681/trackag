@@ -35,7 +35,7 @@
                         </div>
 
                         <div class="legend-item">
-                            <span class="legend-dot yellow"></span>
+                            <span class="legend-dot blue"></span>
                             <span>12:00 PM – 6:00 PM</span>
                         </div>
 
@@ -159,8 +159,8 @@
             background-color: #28a745;
         }
 
-        .legend-dot.yellow {
-            background-color: #ffc107;
+        .legend-dot.blue {
+            background-color: rgb(0 45 255);
         }
 
         .legend-dot.red {
