@@ -11,19 +11,34 @@
             <div class="d-flex justify-content-between align-items-start flex-wrap mb-4">
 
                 <!-- LEFT INFO -->
-                <div>
-                    <h3 class="fw-bold text-dark mb-1 d-flex align-items-center">
+                <div class="flex-grow-1">
+
+                    <h3 class="fw-bold text-dark mb-2 d-flex align-items-center">
                         <i class="fas fa-map-marked-alt text-primary me-2"></i> Trip Route Map
                     </h3>
-                    <div class="text-muted">
-                        <div><strong>Agent:</strong> {{ $trip->user->name ?? 'N/A' }}</div>
-                        <div><strong>Place to Visit:</strong> {{ $trip->place_to_visit ?? 'N/A' }}</div>
-                        <div><strong>Date:</strong> {{ \Carbon\Carbon::parse($trip->trip_date)->format('d-m-Y') }}</div>
+
+                    <!-- INFO IN ONE LINE -->
+                    <div class="trip-info-line text-muted d-flex flex-wrap align-items-center gap-4">
+                        <div>
+                            <strong>Agent:</strong>
+                            <span>{{ $trip->user->name ?? 'N/A' }}</span>
+                        </div>
+
+                        <div>
+                            <strong>Place to Visit:</strong>
+                            <span>{{ $trip->place_to_visit ?? 'N/A' }}</span>
+                        </div>
+
+                        <div>
+                            <strong>Date:</strong>
+                            <span>{{ \Carbon\Carbon::parse($trip->trip_date)->format('d-m-Y') }}</span>
+                        </div>
                     </div>
+
                 </div>
 
                 <!-- RIGHT SIDE (LEGEND + BACK) -->
-                <div class="d-flex gap-3 align-items-start flex-wrap">
+                <div class="d-flex gap-3 align-items-start flex-wrap mt-2 mt-md-0">
 
                     <!-- LEGEND -->
                     <div class="route-legend">
@@ -116,6 +131,16 @@
 
         .gm-ui-hover-effect {
             display: none !important;
+        }
+
+        /* ---------- INFO LINE ---------- */
+        .trip-info-line {
+            font-size: 14px;
+        }
+
+        .trip-info-line strong {
+            color: #111827;
+            font-weight: 600;
         }
 
         /* ---------- LEGEND ---------- */
