@@ -27,23 +27,25 @@
 
                     <!-- LEGEND -->
                     <div class="route-legend">
-                        <div class="legend-title">Route Time Legend</div>
+    <div class="legend-title">Route Time Legend</div>
 
-                        <div class="legend-item">
-                            <span class="legend-dot green"></span>
-                            <span>6:00 AM – 12:00 PM</span>
-                        </div>
+    <div class="legend-row">
+        <div class="legend-item">
+            <span class="legend-dot green"></span>
+            <span>6:00 AM – 12:00 PM</span>
+        </div>
 
-                        <div class="legend-item">
-                            <span class="legend-dot blue"></span>
-                            <span>12:00 PM – 6:00 PM</span>
-                        </div>
+        <div class="legend-item">
+            <span class="legend-dot blue"></span>
+            <span>12:00 PM – 6:00 PM</span>
+        </div>
 
-                        <div class="legend-item">
-                            <span class="legend-dot red"></span>
-                            <span>6:00 PM – 11:59 PM</span>
-                        </div>
-                    </div>
+        <div class="legend-item">
+            <span class="legend-dot red"></span>
+            <span>6:00 PM – 11:59 PM</span>
+        </div>
+    </div>
+</div>
 
                     <!-- BACK BUTTON -->
                     <a href="{{ route('trips.index') }}"
@@ -120,52 +122,56 @@
 
         /* ---------- LEGEND ---------- */
         .route-legend {
-            background: #ffffff;
-            border-radius: 12px;
-            padding: 14px 16px;
-            min-width: 220px;
-            box-shadow: 0 6px 18px rgba(0,0,0,0.08);
-            border: 1px solid #e5e7eb;
-        }
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 14px 16px;
+    min-width: 420px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+    border: 1px solid #e5e7eb;
+}
+
 
         .legend-title {
-            font-weight: 600;
-            font-size: 14px;
-            margin-bottom: 10px;
-            color: #111827;
-        }
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 10px;
+    color: #111827;
+}
 
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 13px;
-            color: #374151;
-            margin-bottom: 8px;
-        }
+/* 🔥 ONE LINE ROW */
+.legend-row {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    white-space: nowrap;
+}
 
-        .legend-item:last-child {
-            margin-bottom: 0;
-        }
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #374151;
+}
 
-        .legend-dot {
-            width: 14px;
-            height: 14px;
-            border-radius: 50%;
-            display: inline-block;
-        }
+.legend-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    display: inline-block;
+}
 
-        .legend-dot.green {
-            background-color: #28a745;
-        }
+.legend-dot.green {
+    background-color: #28a745;
+}
 
-        .legend-dot.blue {
-            background-color: rgb(0 45 255);
-        }
+.legend-dot.blue {
+    background-color: rgb(0 45 255);
+}
 
-        .legend-dot.red {
-            background-color: #dc3545;
-        }
+.legend-dot.red {
+    background-color: #dc3545;
+}
     </style>
 </main>
 @endsection
