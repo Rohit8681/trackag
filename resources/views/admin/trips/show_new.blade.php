@@ -8,7 +8,9 @@
         <div class="container-fluid">
 
             <!-- Page Header -->
-            <div class="d-flex justify-content-between align-items-center flex-wrap mb-4">
+            <div class="d-flex justify-content-between align-items-start flex-wrap mb-4">
+
+                <!-- LEFT INFO -->
                 <div>
                     <h3 class="fw-bold text-dark mb-1 d-flex align-items-center">
                         <i class="fas fa-map-marked-alt text-primary me-2"></i> Trip Route Map
@@ -20,10 +22,35 @@
                     </div>
                 </div>
 
-                <div>
-                    <a href="{{ route('trips.index') }}" class="btn btn-outline-secondary d-flex align-items-center shadow-sm">
+                <!-- RIGHT SIDE (LEGEND + BACK) -->
+                <div class="d-flex gap-3 align-items-start flex-wrap">
+
+                    <!-- LEGEND -->
+                    <div class="route-legend">
+                        <div class="legend-title">Route Time Legend</div>
+
+                        <div class="legend-item">
+                            <span class="legend-dot green"></span>
+                            <span>6:00 AM – 12:00 PM</span>
+                        </div>
+
+                        <div class="legend-item">
+                            <span class="legend-dot yellow"></span>
+                            <span>12:00 PM – 6:00 PM</span>
+                        </div>
+
+                        <div class="legend-item">
+                            <span class="legend-dot red"></span>
+                            <span>6:00 PM – 11:59 PM</span>
+                        </div>
+                    </div>
+
+                    <!-- BACK BUTTON -->
+                    <a href="{{ route('trips.index') }}"
+                       class="btn btn-outline-secondary d-flex align-items-center shadow-sm">
                         <i class="fas fa-arrow-left me-2"></i> Back to Trips
                     </a>
+
                 </div>
             </div>
 
@@ -37,14 +64,14 @@
         </div>
     </div>
 
-    <!-- Pass tripLogs to JS -->
+    <!-- Pass Data to JS -->
     <script>
-        window.tripLogs = @json($tripLogs);
+        window.tripLogs   = @json($tripLogs);
         window.tripEnded = {{ $trip->end_time ? 'true' : 'false' }};
-         window.partyVisits = @json($partyVisits);
+        window.partyVisits = @json($partyVisits);
     </script>
 
-    <!-- Enhanced CSS -->
+    <!-- CSS -->
     <style>
         body {
             background-color: #f5f6fa;
@@ -86,8 +113,58 @@
         .fw-bold {
             font-weight: 600 !important;
         }
+
         .gm-ui-hover-effect {
             display: none !important;
+        }
+
+        /* ---------- LEGEND ---------- */
+        .route-legend {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 14px 16px;
+            min-width: 220px;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+            border: 1px solid #e5e7eb;
+        }
+
+        .legend-title {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 10px;
+            color: #111827;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+            color: #374151;
+            margin-bottom: 8px;
+        }
+
+        .legend-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .legend-dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .legend-dot.green {
+            background-color: #28a745;
+        }
+
+        .legend-dot.yellow {
+            background-color: #ffc107;
+        }
+
+        .legend-dot.red {
+            background-color: #dc3545;
         }
     </style>
 </main>
