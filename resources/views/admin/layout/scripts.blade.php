@@ -125,17 +125,17 @@ function initMap() {
 
     const middleIcon = {
         url: "{{ asset('img/mid-blue.png') }}",
-        scaledSize: new google.maps.Size(15, 15)
+        scaledSize: new google.maps.Size(20, 20)
     };
 
     const middleGreenIcon = {
         url: "{{ asset('img/start-green.png') }}",
-        scaledSize: new google.maps.Size(15, 15)
+        scaledSize: new google.maps.Size(20, 20)
     };
 
     const middleRedIcon = {
         url: "{{ asset('img/end-red.png') }}",
-        scaledSize: new google.maps.Size(15, 15)
+        scaledSize: new google.maps.Size(20, 20)
     };
 
     const endIcon = {
