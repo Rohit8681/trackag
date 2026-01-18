@@ -82,381 +82,7 @@
         document.querySelectorAll('.connectedSortable .card-header').forEach(el => el.style.cursor = 'move');
     });
 </script>
-{{-- <script>
 
-function initMap() {
-    const tripLogs = window.tripLogs || [];
-    const tripEnded = window.tripEnded;
-
-    if (!tripLogs.length) {
-        console.warn("No trip logs available.");
-        return;
-    }
-
-    const pathCoordinates = tripLogs.map(l => ({
-        lat: parseFloat(l.latitude),
-        lng: parseFloat(l.longitude),
-        recorded_at: l.recorded_at ?? ''
-    }));
-
-    const map = new google.maps.Map(document.getElementById("map"), {
-        zoom: 12,
-        center: pathCoordinates[0],
-    });
-
-    // Draw Polyline
-    if (pathCoordinates.length > 1) {
-        const tripPath = new google.maps.Polyline({
-            path: pathCoordinates,
-            geodesic: true,
-            strokeColor: "#007bff",
-            strokeWeight: 4,
-        });
-        tripPath.setMap(map);
-    }
-
-    // Icons
-    const startIcon = {
-        url: "{{ asset('img/start-green.png') }}",
-        scaledSize: new google.maps.Size(60, 60)
-    };
-    const middleIcon = {
-        url: "{{ asset('img/mid-blue.png') }}",
-        scaledSize: new google.maps.Size(15, 15)
-    };
-    const endIcon = {
-        url: "{{ asset('img/end-red.png') }}",
-        scaledSize: new google.maps.Size(60, 60)
-    };
-
-    // START MARKER (always)
-    new google.maps.Marker({
-        position: pathCoordinates[0],
-        map,
-        title: "Start: " + (pathCoordinates[0].recorded_at || ''),
-        icon: startIcon,
-        label: {
-            text: "Start",
-            color: "#fff",
-            fontSize: "12px",
-            fontWeight: "bold"
-        }
-    });
-
-    // MIDDLE MARKERS
-    for (let i = 1; i < pathCoordinates.length - 1; i++) {
-        new google.maps.Marker({
-            position: pathCoordinates[i],
-            map,
-            icon: middleIcon,
-            title: pathCoordinates[i].recorded_at,
-        });
-    }
-
-    // END MARKER ONLY IF TRIP ENDED
-    if (tripEnded && pathCoordinates.length > 1) {
-        const last = pathCoordinates[pathCoordinates.length - 1];
-
-        new google.maps.Marker({
-            position: last,
-            map,
-            title: "End: " + (last.recorded_at || ''),
-            icon: endIcon,
-            label: {
-                text: "End",
-                color: "#fff",
-                fontSize: "12px",
-                fontWeight: "bold"
-            }
-        });
-    }
-
-    // Auto-fit zoom
-    // const bounds = new google.maps.LatLngBounds();
-    // pathCoordinates.forEach(p => bounds.extend(p));
-    // map.fitBounds(bounds);
-    map.setZoom(13);
-map.setCenter(pathCoordinates[0]);
-}
-
-
-// document.addEventListener("DOMContentLoaded", initMap);
-</script> --}}
-
-{{-- <script>
-function initMap() {
-
-    const tripLogs = window.tripLogs || [];
-    const partyVisits = window.partyVisits || [];
-    const tripEnded = window.tripEnded;
-
-    if (!tripLogs.length) {
-        console.warn("No trip logs found");
-        return;
-    }
-
-    // Convert trip logs to coordinates
-    const pathCoordinates = tripLogs.map(l => ({
-        lat: parseFloat(l.latitude),
-        lng: parseFloat(l.longitude),
-        recorded_at: l.recorded_at
-    }));
-
-    // Map init
-    const map = new google.maps.Map(document.getElementById("map"), {
-        zoom: 13,
-        center: pathCoordinates[0],
-    });
-
-    // ---------------- POLYLINE ----------------
-    if (pathCoordinates.length > 1) {
-        const tripPath = new google.maps.Polyline({
-            path: pathCoordinates,
-            geodesic: true,
-            strokeColor: "#007bff",
-            strokeOpacity: 1,
-            strokeWeight: 4,
-        });
-        tripPath.setMap(map);
-    }
-
-    // ---------------- ICONS ----------------
-    const startIcon = {
-        url: "{{ asset('img/start-green.png') }}",
-        scaledSize: new google.maps.Size(60, 60)
-    };
-
-    const middleIcon = {
-        url: "{{ asset('img/mid-blue.png') }}",
-        scaledSize: new google.maps.Size(15, 15)
-    };
-
-    const endIcon = {
-        url: "{{ asset('img/end-red.png') }}",
-        scaledSize: new google.maps.Size(60, 60)
-    };
-
-    const partyIcon = {
-        url: "{{ asset('img/end-red.png') }}",
-        scaledSize: new google.maps.Size(40, 40)
-    };
-
-    // ---------------- START MARKER ----------------
-    new google.maps.Marker({
-        position: pathCoordinates[0],
-        map,
-        icon: startIcon,
-        title: "Start: " + (pathCoordinates[0].recorded_at ?? ''),
-        label: {
-            text: "Start",
-            color: "#fff",
-            fontSize: "12px",
-            fontWeight: "bold"
-        }
-    });
-
-    // ---------------- MIDDLE MARKERS ----------------
-    for (let i = 1; i < pathCoordinates.length - 1; i++) {
-        new google.maps.Marker({
-            position: pathCoordinates[i],
-            map,
-            icon: middleIcon,
-            title: pathCoordinates[i].recorded_at,
-        });
-    }
-
-    // ---------------- END MARKER ----------------
-    if (tripEnded && pathCoordinates.length > 1) {
-        const last = pathCoordinates[pathCoordinates.length - 1];
-
-        new google.maps.Marker({
-            position: last,
-            map,
-            icon: endIcon,
-            title: "End: " + (last.recorded_at ?? ''),
-            label: {
-                text: "End",
-                color: "#fff",
-                fontSize: "12px",
-                fontWeight: "bold"
-            }
-        });
-    }
-
-    // ---------------- PARTY VISIT CHECK-IN MARKERS ----------------
-    partyVisits.forEach(party => {
-
-        if (!party.latitude || !party.longitude) return;
-
-        const marker = new google.maps.Marker({
-            position: {
-                lat: parseFloat(party.latitude),
-                lng: parseFloat(party.longitude)
-            },
-            map,
-            icon: partyIcon,
-            title: "Check-in: " + (party.check_in_time ?? '')
-        });
-
-        const infoWindow = new google.maps.InfoWindow({
-            content: `
-                <div style="font-size:14px">
-                    <strong>${party.party_name ?? 'Party Visit'}</strong><br>
-                    Check-in Time: ${party.check_in_time ?? ''}
-                </div>
-            `
-        });
-
-        marker.addListener("click", () => {
-            infoWindow.open(map, marker);
-        });
-    });
-
-}
-</script> --}}
-{{-- <script>
-function initMap() {
-
-    const tripLogs = window.tripLogs || [];
-    const partyVisits = window.partyVisits || [];
-    const tripEnded = window.tripEnded;
-
-    if (!tripLogs.length) {
-        console.warn("No trip logs found");
-        return;
-    }
-
-    // Convert trip logs to coordinates
-    const pathCoordinates = tripLogs.map(l => ({
-        lat: parseFloat(l.latitude),
-        lng: parseFloat(l.longitude),
-        recorded_at: l.recorded_at
-    }));
-
-    // Map init
-    const map = new google.maps.Map(document.getElementById("map"), {
-        zoom: 13,
-        center: pathCoordinates[0],
-    });
-
-    // ---------------- POLYLINE ----------------
-    if (pathCoordinates.length > 1) {
-        const tripPath = new google.maps.Polyline({
-            path: pathCoordinates,
-            geodesic: true,
-            strokeColor: "#007bff",
-            strokeOpacity: 1,
-            strokeWeight: 4,
-        });
-        tripPath.setMap(map);
-    }
-
-    // ---------------- ICONS ----------------
-    const startIcon = {
-        url: "{{ asset('img/start-green.png') }}",
-        scaledSize: new google.maps.Size(60, 60)
-    };
-
-    const middleIcon = {
-        url: "{{ asset('img/mid-blue.png') }}",
-        scaledSize: new google.maps.Size(15, 15)
-    };
-
-    const endIcon = {
-        url: "{{ asset('img/end-red.png') }}",
-        scaledSize: new google.maps.Size(60, 60)
-    };
-
-    const partyIcon = {
-        url: "{{ asset('img/yellow.png') }}",
-        scaledSize: new google.maps.Size(40, 40)
-    };
-
-    // ---------------- START MARKER ----------------
-    new google.maps.Marker({
-        position: pathCoordinates[0],
-        map,
-        icon: startIcon,
-        title: "Start: " + (pathCoordinates[0].recorded_at ?? ''),
-        label: {
-            text: "Start",
-            color: "#fff",
-            fontSize: "12px",
-            fontWeight: "bold"
-        }
-    });
-
-    // ---------------- MIDDLE MARKERS ----------------
-    for (let i = 1; i < pathCoordinates.length - 1; i++) {
-        new google.maps.Marker({
-            position: pathCoordinates[i],
-            map,
-            icon: middleIcon,
-            title: pathCoordinates[i].recorded_at,
-        });
-    }
-
-    // ---------------- END MARKER ----------------
-    if (tripEnded && pathCoordinates.length > 1) {
-        const last = pathCoordinates[pathCoordinates.length - 1];
-
-        new google.maps.Marker({
-            position: last,
-            map,
-            icon: endIcon,
-            title: "End: " + (last.recorded_at ?? ''),
-            label: {
-                text: "End",
-                color: "#fff",
-                fontSize: "12px",
-                fontWeight: "bold"
-            }
-        });
-    }
-
-    // ---------------- PARTY VISIT CHECK-IN MARKERS ----------------
-
-    // 🔹 ONE reusable infoWindow (IMPORTANT)
-    const infoWindow = new google.maps.InfoWindow();
-
-    partyVisits.forEach(party => {
-
-        if (!party.latitude || !party.longitude) return;
-
-        // ✅ customer agro name
-        const agroName = party.customer?.agro_name ?? 'Customer';
-        Check-in Time: ${party.check_in_time ?? ''}
-
-        const marker = new google.maps.Marker({
-            position: {
-                lat: parseFloat(party.latitude),
-                lng: parseFloat(party.longitude)
-            },
-            map,
-            icon: partyIcon,
-
-            // 🔹 SIMPLE tooltip on cursor hover
-            title: agroName
-        });
-
-        // 🔹 ON HOVER show agro_name + check-in time
-        marker.addListener("mouseover", () => {
-            infoWindow.setContent(`
-                <div style="font-size:14px">
-                    <strong>${agroName}</strong><br>
-                    Check-in Time: ${party.check_in_time ?? ''}
-                </div>
-            `);
-            infoWindow.open(map, marker);
-        });
-
-        marker.addListener("mouseout", () => {
-            infoWindow.close();
-        });
-    });
-
-}
-</script> --}}
 <script>
 function initMap() {
 
@@ -502,6 +128,16 @@ function initMap() {
         scaledSize: new google.maps.Size(15, 15)
     };
 
+    const middleGreenIcon = {
+        url: "{{ asset('img/start-green.png') }}",
+        scaledSize: new google.maps.Size(15, 15)
+    };
+
+    const middleRedIcon = {
+        url: "{{ asset('img/end-red.png') }}",
+        scaledSize: new google.maps.Size(15, 15)
+    };
+
     const endIcon = {
         url: "{{ asset('img/end-red.png') }}",
         scaledSize: new google.maps.Size(60, 60)
@@ -521,11 +157,39 @@ function initMap() {
     });
 
     // ---------- MIDDLE ----------
+    // for (let i = 1; i < pathCoordinates.length - 1; i++) {
+    //     new google.maps.Marker({
+    //         position: pathCoordinates[i],
+    //         map,
+    //         icon: middleIcon,
+    //         title: pathCoordinates[i].recorded_at
+    //     });
+    // }
     for (let i = 1; i < pathCoordinates.length - 1; i++) {
+
+        let iconToUse = middleIcon; // default mid-blue
+
+        if (pathCoordinates[i].recorded_at) {
+
+            // recorded_at format: YYYY-MM-DD HH:mm:ss
+            const date = new Date(pathCoordinates[i].recorded_at.replace(' ', 'T'));
+            const hour = date.getHours(); // 0–23
+
+            if (hour >= 6 && hour < 12) {
+                iconToUse = middleGreenIcon;   // 6 AM – 12 PM
+            } 
+            else if (hour >= 12 && hour < 18) {
+                iconToUse = middleIcon;        // 12 PM – 6 PM
+            } 
+            else {
+                iconToUse = middleRedIcon;     // 6 PM – 12 AM
+            }
+        }
+
         new google.maps.Marker({
             position: pathCoordinates[i],
             map,
-            icon: middleIcon,
+            icon: iconToUse,
             title: pathCoordinates[i].recorded_at
         });
     }
@@ -578,11 +242,6 @@ function initMap() {
     });
 }
 </script>
-
-
-
-
-
 
 <!-- Dependent Dropdowns (District/City/Tehsil/Pincode) -->
 <script>
