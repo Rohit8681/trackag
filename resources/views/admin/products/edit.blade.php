@@ -173,58 +173,58 @@
                                         </div>
                                     </td>
                                     <td class="text-center">
-                                        <button type="button" class="btn btn-danger removeRow">×</button>
+                                        {{-- <button type="button" class="btn btn-danger removeRow">×</button> --}}
                                     </td>
                                 </tr>
                             @endforeach
                         </tbody>
                         <table class="d-none">
-    <tbody>
-        <tr id="packingRowTemplate">
-            <td>
-                <input type="number" step="0.01" name="packing_value[]" class="form-control form-control-sm packing_value">
-            </td>
-            <td>
-                <select name="packing_size[]" class="form-select form-select-sm">
-                    <option value="">Select</option>
-                    <option>GM</option>
-                    <option>KG</option>
-                    <option>ML</option>
-                    <option>LTR</option>
-                    <option>UNIT</option>
-                </select>
-            </td>
-            <td>
-                <select name="shipper_type[]" class="form-select form-select-sm">
-                    <option value="">Select</option>
-                    <option>Bag</option>
-                    <option>Box</option>
-                    <option>Bucket</option>
-                    <option>Drum</option>
-                </select>
-            </td>
-            <td>
-                <input type="number" step="0.01" name="shipper_size[]" class="form-control form-control-sm shipper_size">
-            </td>
-            <td>
-                <input type="number" name="unit_in_shipper[]" class="form-control form-control-sm unit_in_shipper" readonly>
-            </td>
-            <td>
-                <select class="form-select form-select-sm packing-states" multiple>
-                    @foreach($states as $state)
-                        <option value="{{ $state->id }}">{{ $state->name }}</option>
-                    @endforeach
-                </select>
-            </td>
-            <td>
-                <input type="checkbox" name="packing_status[]" class="packing_status_toggle" value="1" checked>
-            </td>
-            <td class="text-center">
-                <button type="button" class="btn btn-danger removeRow">×</button>
-            </td>
-        </tr>
-    </tbody>
-</table>
+                            <tbody>
+                                <tr id="packingRowTemplate">
+                                    <td>
+                                        <input type="number" step="0.01" name="packing_value[]" class="form-control form-control-sm packing_value">
+                                    </td>
+                                    <td>
+                                        <select name="packing_size[]" class="form-select form-select-sm">
+                                            <option value="">Select</option>
+                                            <option>GM</option>
+                                            <option>KG</option>
+                                            <option>ML</option>
+                                            <option>LTR</option>
+                                            <option>UNIT</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <select name="shipper_type[]" class="form-select form-select-sm">
+                                            <option value="">Select</option>
+                                            <option>Bag</option>
+                                            <option>Box</option>
+                                            <option>Bucket</option>
+                                            <option>Drum</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <input type="number" step="0.01" name="shipper_size[]" class="form-control form-control-sm shipper_size">
+                                    </td>
+                                    <td>
+                                        <input type="number" name="unit_in_shipper[]" class="form-control form-control-sm unit_in_shipper" readonly>
+                                    </td>
+                                    <td>
+                                        <select class="form-select form-select-sm packing-states" multiple>
+                                            @foreach($states as $state)
+                                                <option value="{{ $state->id }}">{{ $state->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <input type="checkbox" name="packing_status[]" class="packing_status_toggle" value="1" checked>
+                                    </td>
+                                    <td class="text-center">
+                                        <button type="button" class="btn btn-danger removeRow">×</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </table>
 
                     <div class="mt-3">
