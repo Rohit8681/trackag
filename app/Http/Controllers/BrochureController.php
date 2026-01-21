@@ -55,7 +55,7 @@ class BrochureController extends Controller
         $request->validate([
             // 'date'     => 'required|date',
             'state_id' => 'required|exists:states,id',
-            'pdf'      => 'required|mimes:pdf|max:5120',
+            'pdf'      => 'required|mimes:pdf|max:102400',
         ]);
 
         $path = $request->file('pdf')->store('brochures', 'public');
