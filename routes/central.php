@@ -41,6 +41,7 @@ use App\Http\Controllers\TrackingController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\PartyPaymentController;
+use App\Http\Controllers\ProductCategoryController;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\File;
@@ -190,6 +191,7 @@ Route::middleware(['web'])->group(function () {
             Route::get('/expense-report/excel', [ExpenseController::class, 'exportExcel'])->name('expense.report.excel');
             Route::resource('brochure', BrochureController::class);
             Route::resource('price', PriceController::class);
+            Route::resource('product-categories', ProductCategoryController::class);
             Route::resource('products', ProductController::class);
 
              Route::resource('customers', CustomerController::class);
