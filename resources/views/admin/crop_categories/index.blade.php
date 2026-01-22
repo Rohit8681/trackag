@@ -24,11 +24,12 @@
                     <div class="card card-primary card-outline">
                         <div class="card-header d-flex align-items-center">
                             <h3 class="card-title mb-0">Category List</h3>
-
+                            @if(auth()->user()->hasRole('master_admin'))
                             <a href="{{ route('crop-categories.create') }}"
                                class="btn btn-primary ms-auto">
                                 <i class="fas fa-plus me-1"></i> Add Category
                             </a>
+                            @endif
                         </div>
 
                         <div class="card-body">
@@ -48,6 +49,8 @@
                                             <td>{{ $index + 1 }}</td>
                                             <td>{{ $category->name }}</td>
                                             <td>
+                                                @if(auth()->user()->hasRole('master_admin'))
+
                                                 <a href="{{ route('crop-categories.edit',$category->id) }}"
                                                    class="btn btn-sm btn-warning">
                                                     Edit
@@ -62,6 +65,7 @@
                                                         Delete
                                                     </button>
                                                 </form>
+                                                @endif
                                             </td>
                                         </tr>
                                     @empty

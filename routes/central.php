@@ -201,7 +201,7 @@ Route::middleware(['web'])->group(function () {
             Route::patch('/customers/{id}/toggle', [CustomerController::class, 'toggleStatus'])->name('customers.toggle');
             Route::post('/customers/import', [CustomerController::class, 'import'])->name('customers.import');
 
-            Route::resource('crop-categories', CropCategoryController::class);
+            Route::resource('crop-categories', controller: CropCategoryController::class);
             Route::resource('crop-sub-categories', CropSubCategoryController::class);
 
             Route::get('farmers', [FarmerController::class, 'index'])->name('farmers.index');
