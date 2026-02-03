@@ -47,6 +47,18 @@
     overflow: hidden !important;
     border: 1px solid #e3e3e3 !important;
 }
+#imagePreviewModal .modal-body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#imagePreviewModal img {
+    width: 600px;          /* FIXED WIDTH */
+    height: 400px;         /* FIXED HEIGHT */
+    object-fit: contain;   /* image stretch nahi thay */
+    background: #fff;
+}
 </style>
 @endpush
 @section('content')
