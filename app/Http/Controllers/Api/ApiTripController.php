@@ -427,6 +427,15 @@ class ApiTripController extends BaseController
 
             Log::info('Trip updated successfully', ['trip_id' => $trip->id]);
 
+            TripLog::create([
+                'trip_id' => $trip->id,
+                'latitude' => $validated['end_lat'],
+                'longitude' => $validated['end_lng'],
+                'gps_status' => 1,
+                'battery_percentage' => 0,
+                'recorded_at' => now(),
+            ]);
+
             // 🧩 Step 8: Return success
             return $this->sendResponse($trip, "Trip has been closed");
 

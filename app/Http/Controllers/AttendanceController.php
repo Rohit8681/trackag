@@ -151,29 +151,114 @@ class AttendanceController extends Controller
         ));
     }
 
+    // public function export(Request $request)
+    // {
+    //     $month = $request->input('month', now()->format('Y-m'));
+
+    //     // SAME FILTER LOGIC as index()
+    //     $usersQuery = User::where('status','Active');
+
+    //     if ($request->state) {
+    //         $usersQuery->where('state_id', $request->state);
+    //     }
+
+    //     if ($request->user_id) {
+    //         $usersQuery->where('id', $request->user_id);
+    //     }
+
+    //     $users = $usersQuery->orderBy('name')->get();
+
+    //     return Excel::download(
+    //         new AttendanceExport($month, $users),
+    //         'attendance_'.$month.'.xlsx'
+    //     );
+    // }
+
+
     public function export(Request $request)
     {
-        $month = $request->input('month', now()->format('Y-m'));
+        $loginUser = Auth::user();
+        $roleName  = $loginUser->getRoleNames()->first();
 
-        // SAME FILTER LOGIC as index()
+        $stateIds = [];
+        $userStateAccess = UserStateAccess::where('user_id',$loginUser->id)->first();
+        if ($userStateAccess && !empty($userStateAccess->state_ids)) {
+            $stateIds = $userStateAccess->state_ids;
+        }
+
         $usersQuery = User::where('status','Active');
 
+        if (!in_array($roleName,['master_admin','sub_admin'])) {
+            $usersQuery->where('reporting_to',$loginUser->id)
+                    ->whereIn('state_id',$stateIds);
+        }
+
         if ($request->state) {
-            $usersQuery->where('state_id', $request->state);
+            $usersQuery->where('state_id',$request->state);
         }
 
         if ($request->user_id) {
-            $usersQuery->where('id', $request->user_id);
+            $usersQuery->where('id',$request->user_id);
         }
 
         $users = $usersQuery->orderBy('name')->get();
 
+        $month = $request->input('month', now()->format('Y-m'));
+        $startDate = Carbon::parse($month.'-01')->startOfMonth();
+        $endDate   = Carbon::parse($month.'-01')->endOfMonth();
+        $today     = now()->format('Y-m-d');
+
+        $trips = Trip::whereBetween('trip_date',[$startDate,$endDate])
+            ->get()
+            ->groupBy(fn($t)=>$t->user_id.'_'.Carbon::parse($t->trip_date)->format('Y-m-d'));
+
+        $holidays = Holiday::pluck('holiday_date')->toArray();
+
+        $savedAttendance = Attendance::whereBetween('attendance_date',[$startDate,$endDate])
+            ->get()
+            ->keyBy(fn($a)=>$a->user_id.'_'.$a->attendance_date->format('Y-m-d'));
+
+        $attendance = [];
+
+        foreach ($users as $user) {
+            $date = $startDate->copy();
+
+            while ($date <= $endDate) {
+                $dateKey = $date->format('Y-m-d');
+                $key = $user->id.'_'.$dateKey;
+
+                if (isset($savedAttendance[$key])) {
+                    $status = $savedAttendance[$key]->status;
+                }
+                elseif (in_array($dateKey,$holidays)) {
+                    $status = 'H';
+                }
+                elseif ($date->isSunday()) {
+                    $status = 'WO';
+                }
+                elseif (isset($trips[$key])) {
+                    $trip = $trips[$key]->first();
+                    $status = $trip->approval_status === 'approved'
+                        ? ($trip->trip_type === 'full' ? 'P_FULL' : 'P_HALF')
+                        : 'A';
+                }
+                elseif ($dateKey > $today) {
+                    $status = 'NA';
+                }
+                else {
+                    $status = 'A';
+                }
+
+                $attendance[$user->id][$dateKey] = $status;
+                $date->addDay();
+            }
+        }
+
         return Excel::download(
-            new AttendanceExport($month, $users),
+            new AttendanceExport($month, $users, $attendance),
             'attendance_'.$month.'.xlsx'
         );
     }
-
 
     public function save(Request $request){
         Attendance::updateOrCreate(
