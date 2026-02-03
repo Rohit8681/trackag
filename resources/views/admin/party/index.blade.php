@@ -184,6 +184,21 @@
 
         </div>
     </div>
+    <!-- Image Preview Modal -->
+<div class="modal fade" id="imagePreviewModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-dark text-white">
+                <h5 class="modal-title">Agro Visit Image</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center bg-light">
+                <img id="previewImage" src="" class="img-fluid rounded" alt="Visit Image">
+            </div>
+        </div>
+    </div>
+</div>
+
 </main>
 @endsection
 
@@ -329,9 +344,11 @@ $(document).ready(function () {
                 <td class="text-center">
                     ${
                         item.agro_visit_image
-                            ? `<a href="${item.agro_visit_image}" target="_blank" class="btn btn-sm btn-outline-primary">
-                                <i class="fas fa-image"></i> View
-                              </a>`
+                            ? `<a href="javascript:void(0)"
+   class="btn btn-sm btn-outline-primary view-image"
+   data-image="${item.agro_visit_image}">
+   <i class="fas fa-image"></i> View
+</a>`
                             : '-'
                     }
                 </td>
@@ -376,6 +393,12 @@ $('#stateSelect').on('change', function () {
             });
         }
     });
+});
+
+$(document).on('click', '.view-image', function () {
+    let imgUrl = $(this).data('image');
+    $('#previewImage').attr('src', imgUrl);
+    $('#imagePreviewModal').modal('show');
 });
 </script>
 @endpush
