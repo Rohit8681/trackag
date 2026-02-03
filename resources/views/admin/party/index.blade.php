@@ -359,8 +359,7 @@ $(document).ready(function () {
                             ? `<a href="javascript:void(0)"
    class="btn btn-sm btn-outline-primary view-image"
    data-image="${item.agro_visit_image}">
-   <i class="fas fa-image"></i> View
-</a>`
+   <i class="fas fa-image"></i> </a>`
                             : '-'
                     }
                 </td>
