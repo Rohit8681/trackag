@@ -2,8 +2,6 @@
 
 namespace App\Exports;
 
-use App\Models\Attendance;
-use App\Models\Holiday;
 use Carbon\Carbon;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
@@ -12,11 +10,13 @@ class AttendanceExport implements FromCollection, WithHeadings
 {
     protected $month;
     protected $users;
+    protected $attendance;
 
-    public function __construct($month, $users)
+    public function __construct($month, $users, $attendance)
     {
-        $this->month = $month;
-        $this->users = $users;
+        $this->month      = $month;
+        $this->users      = $users;
+        $this->attendance = $attendance;
     }
 
     public function collection()
@@ -24,18 +24,11 @@ class AttendanceExport implements FromCollection, WithHeadings
         $startDate = Carbon::parse($this->month.'-01')->startOfMonth();
         $endDate   = Carbon::parse($this->month.'-01')->endOfMonth();
 
-        $holidays = Holiday::pluck('holiday_date')->toArray();
-
         $rows = collect();
 
         foreach ($this->users as $user) {
 
             $full = $half = $absent = $holiday = $wo = $leave = 0;
-
-            $saved = Attendance::where('user_id',$user->id)
-                ->whereBetween('attendance_date',[$startDate,$endDate])
-                ->get()
-                ->keyBy(fn($a)=>$a->attendance_date->format('Y-m-d'));
 
             $row = [
                 'Employee Name' => $user->name
@@ -46,44 +39,45 @@ class AttendanceExport implements FromCollection, WithHeadings
             while ($date <= $endDate) {
 
                 $key = $date->format('Y-m-d');
-                $label = '';
+                $status = $this->attendance[$user->id][$key] ?? 'A';
 
-                if (in_array($key,$holidays)) {
-                    $label = 'H';
-                    $holiday++;
-                }
-                elseif ($date->isSunday()) {
-                    $label = 'WO';
-                    $wo++;
-                }
-                elseif (isset($saved[$key])) {
-                    $status = $saved[$key]->status;
-
-                    if ($status === 'P_FULL') {
+                switch ($status) {
+                    case 'P_FULL':
                         $label = 'P';
                         $full++;
-                    }
-                    elseif ($status === 'P_HALF') {
+                        break;
+
+                    case 'P_HALF':
                         $label = 'HP';
                         $half++;
-                    }
-                    elseif ($status === 'A') {
+                        break;
+
+                    case 'WO':
+                        $label = 'WO';
+                        $wo++;
+                        break;
+
+                    case 'H':
+                        $label = 'H';
+                        $holiday++;
+                        break;
+
+                    case 'A':
                         $label = 'A';
                         $absent++;
-                    }
-                    else {
-                        $label = $status; // leave code
+                        break;
+
+                    case 'NA':
+                        $label = 'NA';
+                        break;
+
+                    default:
+                        $label = $status; // Leave codes
                         $leave++;
-                    }
-                }
-                else {
-                    $label = 'A';
-                    $absent++;
+                        break;
                 }
 
-                // Day column (01,02...)
                 $row[$date->format('d')] = $label;
-
                 $date->addDay();
             }
 
