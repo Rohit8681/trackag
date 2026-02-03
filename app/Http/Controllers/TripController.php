@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Customer;
 use App\Models\PartyVisit;
 use App\Models\State;
+use App\Models\TourType;
+use App\Models\TravelMode;
 use App\Models\User;
 use App\Models\UserStateAccess;
 use Carbon\Carbon;
@@ -24,76 +26,6 @@ class TripController extends Controller
         $this->middleware('permission:edit_all_trip')->only(['edit','update']);
         $this->middleware('permission:delete_all_trip')->only(['destroy']);
     }
-    // public function index(Request $request)
-    // {
-    //     $user = Auth::user();
-    //     $query = Trip::with(['user', 'company', 'approvedByUser', 'tripLogs', 'customers', 'travelMode', 'tourType']);
-
-    //     // 🔹 Role-based access
-    //     if (!($user->hasRole('master_admin') || $user->hasRole('sub_admin'))) {
-    //         $query->where(function ($q) use ($user) {
-    //             $q->where('user_id', $user->id);
-    //             $subordinateIds = \App\Models\User::where('reporting_to', $user->id)->pluck('id');
-    //             if ($subordinateIds->isNotEmpty()) {
-    //                 $q->orWhere(function ($inner) use ($subordinateIds) {
-    //                     $inner->whereIn('user_id', $subordinateIds);
-    //                         // ->where('approval_status', 'pending');
-    //                 });
-    //             }
-    //         });
-    //     }
-
-    //     // 🔹 Default date setup (if no filters applied)
-    //     $fromDate = $request->from_date ?? date('Y-m-d');
-    //     $toDate   = $request->to_date ?? date('Y-m-d');
-
-    //     // 🔹 Apply date filters
-    //     $query->whereDate('trip_date', '>=', $fromDate)
-    //         ->whereDate('trip_date', '<=', $toDate);
-
-    //     if ($request->filled('state')) {
-    //         $query->whereHas('user', function ($q) use ($request) {
-    //             $q->where('state_id', $request->state);
-    //         });
-    //     }
-    //     if ($request->filled('employee')) {
-    //         $query->where('user_id', $request->employee);
-    //     }
-    //     if ($request->filled('approval_status')) {
-    //         $query->where('approval_status', $request->approval_status);
-    //     }
-
-    //     $trips = $query->latest()->get();
-        
-    //     // Data for dropdowns
-    //     // $states = State::all(['id', 'name']);
-    //     $companyCount = Company::count();
-    //     $company = null;
-
-    //     if ($companyCount == 1) {
-    //         $company = Company::first();
-
-    //         if ($company && !empty($company->state)) {
-    //             $companyStates = array_map('intval', explode(',', $company->state));
-
-    //             $states = State::where('status', 1)
-    //                 ->whereIn('id', $companyStates)
-    //                 ->get();
-    //         } else {
-    //             $states = State::where('status', 1)->get();
-    //         }
-    //     } else {
-    //         // ⬅️ Company 1 થી વધારે હોય તો બધાં states
-    //         $states = State::where('status', 1)->get();
-    //     }
-    //     $employees = User::select('id', 'name')->get();
-    //     return view('admin.trips.index_new', compact('trips', 'states', 'employees'))
-    //         ->with([
-    //             'from_date' => $fromDate,
-    //             'to_date' => $toDate,
-    //         ]);
-    // }
-
     
     public function index(Request $request)
     {
@@ -184,7 +116,10 @@ class TripController extends Controller
                     ->where('reporting_to', $user->id)
                     ->get();
         }
-        return view('admin.trips.index_new', compact('trips', 'states', 'employees'))
+        $TourType = TourType::all();
+        $TravelMode = TravelMode::all();
+
+        return view('admin.trips.index_new', compact('trips', 'states', 'employees','TourType','TravelMode'))
             ->with([
                 'from_date' => $fromDate,
                 'to_date' => $toDate,
@@ -325,10 +260,14 @@ class TripController extends Controller
         $request->validate([
             'starting_km' => 'required',
             'end_km' => 'required',
+            'tour_type'   => 'required',
+            'travel_mode' => 'required',
             
         ]);
         $trip->starting_km = $request->starting_km;
         $trip->end_km = $request->end_km;
+        $trip->tour_type   = $request->tour_type;
+        $trip->travel_mode = $request->travel_mode;
         $trip->save();
 
         return redirect()->back()->with('success', 'End KM updated successfully!');

@@ -502,6 +502,30 @@
                             oninput="if(this.value < 0) this.value = '';"
                             readonly>
                     </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Tour Type</label>
+                        <select name="tour_type" class="form-select" required>
+                            <option value="">Select Tour Type</option>
+                            @foreach($TourType as $type)
+                                <option value="{{ $type->id }}"
+                                    {{ $trip->tour_type == $type->id ? 'selected' : '' }}>
+                                    {{ $type->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Travel Mode</label>
+                        <select name="travel_mode" class="form-select" required>
+                            <option value="">Select Travel Mode</option>
+                            @foreach($TravelMode as $mode)
+                                <option value="{{ $mode->id }}"
+                                    {{ $trip->travel_mode == $mode->id ? 'selected' : '' }}>
+                                    {{ $mode->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-secondary">
