@@ -112,7 +112,8 @@ class FarmerController extends Controller
             'state:id,name',
             'district:id,name',
             'taluka:id,name',
-            'cropSowing:id,name'
+            // 'cropSowing:id,name'
+            'cropSowings.crop:id,name' // 👈 IMPORTANT
         ]);
 
         if ($request->filled('from_date')) {
@@ -146,8 +147,13 @@ class FarmerController extends Controller
         }
 
         // 🔍 CROP NAME (MANUAL TYPE)
+        // if ($request->filled('crop_name')) {
+        //     $query->whereHas('cropSowing', function ($q) use ($request) {
+        //         $q->where('name', 'like', '%' . $request->crop_name . '%');
+        //     });
+        // }
         if ($request->filled('crop_name')) {
-            $query->whereHas('cropSowing', function ($q) use ($request) {
+            $query->whereHas('cropSowings.crop', function ($q) use ($request) {
                 $q->where('name', 'like', '%' . $request->crop_name . '%');
             });
         }

@@ -47,8 +47,13 @@ class Farmer extends Model
         return $this->belongsTo(Tehsil::class);
     }
 
-    public function cropSowing()
+    // public function cropSowing()
+    // {
+    //     return $this->belongsTo(CropSubCategory::class, 'crop_sowing_id');
+    // }
+
+    public function cropSowings()
     {
-        return $this->belongsTo(CropSubCategory::class, 'crop_sowing_id');
+        return $this->hasMany(FarmerCropSowing::class, 'farmer_id');
     }
 }

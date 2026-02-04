@@ -149,7 +149,13 @@
                                         <td>{{ $farmer->village }}</td>
                                         <td>{{ $farmer->land_acr }}</td>
                                         <td>{{ $farmer->irrigation_type ?? '-' }}</td>
-                                        <td>{{ $farmer->cropSowing->name ?? '-' }}</td>
+                                        <td>
+                                            @if($farmer->cropSowings->count())
+                                                {{ $farmer->cropSowings->pluck('crop.name')->implode(', ') }}
+                                            @else
+                                                -
+                                            @endif
+                                        </td>
                                         
                                         
                                     </tr>
