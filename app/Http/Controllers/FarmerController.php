@@ -8,6 +8,7 @@ use App\Models\State;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class FarmerController extends Controller
 {
@@ -85,6 +86,60 @@ class FarmerController extends Controller
         $farmers = $query->latest()->get();
 
         return view('admin.farmers.index', compact('farmers', 'states'));
+    }
+
+    public function downloadPdf(Request $request)
+    {
+        $query = Farmer::with([
+            'user:id,name',
+            'state:id,name',
+            'district:id,name',
+            'taluka:id,name',
+            'cropSowings.crop:id,name'
+        ]);
+
+        /* ---- SAME FILTER LOGIC ---- */
+        if ($request->filled('from_date') && $request->filled('to_date')) {
+            $query->whereBetween('created_at', [
+                Carbon::parse($request->from_date)->startOfDay(),
+                Carbon::parse($request->to_date)->endOfDay(),
+            ]);
+        } elseif ($request->filled('from_date')) {
+            $query->whereDate('created_at', '>=', $request->from_date);
+        } elseif ($request->filled('to_date')) {
+            $query->whereDate('created_at', '<=', $request->to_date);
+        }
+
+        if ($request->filled('farmer_name')) {
+            $query->where('farmer_name', 'like', '%' . $request->farmer_name . '%');
+        }
+
+        if ($request->filled('mobile_no')) {
+            $query->where('mobile_no', 'like', '%' . $request->mobile_no . '%');
+        }
+
+        if ($request->filled('state_id')) {
+            $query->where('state_id', $request->state_id);
+        }
+
+        if ($request->filled('sales_person')) {
+            $query->whereHas('user', function ($q) use ($request) {
+                $q->where('name', 'like', '%' . $request->sales_person . '%');
+            });
+        }
+
+        if ($request->filled('crop_name')) {
+            $query->whereHas('cropSowings.crop', function ($q) use ($request) {
+                $q->where('name', 'like', '%' . $request->crop_name . '%');
+            });
+        }
+
+        $farmers = $query->latest()->get();
+
+        $pdf = Pdf::loadView('admin.farmers.pdf', compact('farmers'))
+            ->setPaper('A4', 'landscape');
+
+        return $pdf->download('farmers-list.pdf');
     }
 
 }

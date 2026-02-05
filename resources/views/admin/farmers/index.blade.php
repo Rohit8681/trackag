@@ -30,88 +30,92 @@
                     <form method="GET" class="row g-2 mb-3">
 
     {{-- From Date --}}
-    <div class="col-md-2">
-        <label class="form-label small mb-1">From Date</label>
-        <input type="date"
-               name="from_date"
-               class="form-control form-control-sm"
-               value="{{ request('from_date') }}">
-    </div>
+                        <div class="col-md-2">
+                            <label class="form-label small mb-1">From Date</label>
+                            <input type="date"
+                                name="from_date"
+                                class="form-control form-control-sm"
+                                value="{{ request('from_date') }}">
+                        </div>
 
-    {{-- To Date --}}
-    <div class="col-md-2">
-        <label class="form-label small mb-1">To Date</label>
-        <input type="date"
-               name="to_date"
-               class="form-control form-control-sm"
-               value="{{ request('to_date') }}">
-    </div>
+                        {{-- To Date --}}
+                        <div class="col-md-2">
+                            <label class="form-label small mb-1">To Date</label>
+                            <input type="date"
+                                name="to_date"
+                                class="form-control form-control-sm"
+                                value="{{ request('to_date') }}">
+                        </div>
 
-    {{-- Farmer Name --}}
-    <div class="col-md-2">
-        <label class="form-label small mb-1">Farmer Name</label>
-        <input type="text"
-               name="farmer_name"
-               class="form-control form-control-sm"
-               placeholder="Farmer name"
-               value="{{ request('farmer_name') }}">
-    </div>
+                        {{-- Farmer Name --}}
+                        <div class="col-md-2">
+                            <label class="form-label small mb-1">Farmer Name</label>
+                            <input type="text"
+                                name="farmer_name"
+                                class="form-control form-control-sm"
+                                placeholder="Farmer name"
+                                value="{{ request('farmer_name') }}">
+                        </div>
 
-    {{-- Mobile No --}}
-    <div class="col-md-2">
-        <label class="form-label small mb-1">Mobile No</label>
-        <input type="text"
-               name="mobile_no"
-               class="form-control form-control-sm"
-               placeholder="Mobile no"
-               value="{{ request('mobile_no') }}">
-    </div>
+                        {{-- Mobile No --}}
+                        <div class="col-md-2">
+                            <label class="form-label small mb-1">Mobile No</label>
+                            <input type="text"
+                                name="mobile_no"
+                                class="form-control form-control-sm"
+                                placeholder="Mobile no"
+                                value="{{ request('mobile_no') }}">
+                        </div>
 
-    {{-- State --}}
-    <div class="col-md-2">
-        <label class="form-label small mb-1">State</label>
-        <select name="state_id" class="form-select form-select-sm">
-            <option value="">All State</option>
-            @foreach($states as $state)
-                <option value="{{ $state->id }}"
-                    {{ request('state_id') == $state->id ? 'selected' : '' }}>
-                    {{ $state->name }}
-                </option>
-            @endforeach
-        </select>
-    </div>
+                        {{-- State --}}
+                        <div class="col-md-2">
+                            <label class="form-label small mb-1">State</label>
+                            <select name="state_id" class="form-select form-select-sm">
+                                <option value="">All State</option>
+                                @foreach($states as $state)
+                                    <option value="{{ $state->id }}"
+                                        {{ request('state_id') == $state->id ? 'selected' : '' }}>
+                                        {{ $state->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
 
-    {{-- Sales Person --}}
-    <div class="col-md-2">
-        <label class="form-label small mb-1">Sales Person</label>
-        <input type="text"
-               name="sales_person"
-               class="form-control form-control-sm"
-               placeholder="Sales person"
-               value="{{ request('sales_person') }}">
-    </div>
+                        {{-- Sales Person --}}
+                        <div class="col-md-2">
+                            <label class="form-label small mb-1">Sales Person</label>
+                            <input type="text"
+                                name="sales_person"
+                                class="form-control form-control-sm"
+                                placeholder="Sales person"
+                                value="{{ request('sales_person') }}">
+                        </div>
 
-    {{-- Crop Name --}}
-    <div class="col-md-2">
-        <label class="form-label small mb-1">Crop Name</label>
-        <input type="text"
-               name="crop_name"
-               class="form-control form-control-sm"
-               placeholder="Crop name"
-               value="{{ request('crop_name') }}">
-    </div>
+                        {{-- Crop Name --}}
+                        <div class="col-md-2">
+                            <label class="form-label small mb-1">Crop Name</label>
+                            <input type="text"
+                                name="crop_name"
+                                class="form-control form-control-sm"
+                                placeholder="Crop name"
+                                value="{{ request('crop_name') }}">
+                        </div>
 
-    {{-- Buttons --}}
-    <div class="col-md-2 d-flex align-items-end gap-2">
-        <button class="btn btn-primary btn-sm">
-            <i class="fas fa-search me-1"></i> Filter
-        </button>
-        <a href="{{ route('farmers.index') }}" class="btn btn-secondary btn-sm">
-            Reset
-        </a>
-    </div>
+                        {{-- Buttons --}}
+                        <div class="col-md-2 d-flex align-items-end gap-2">
+                            <button class="btn btn-primary btn-sm">
+                                <i class="fas fa-search me-1"></i> Filter
+                            </button>
+                            <a href="{{ route('farmers.index') }}" class="btn btn-secondary btn-sm">
+                                Reset
+                            </a>
+                            <a href="{{ route('farmers.pdf', request()->query()) }}"
+                            class="btn btn-danger btn-sm">
+                            <i class="fas fa-file-pdf"></i> PDF
+                            </a>
+                        </div>
 
-</form>
+                    </form>
 
                     {{-- 📋 Farmers Table --}}
                     <div class="table-responsive" style="max-height:600px;">
