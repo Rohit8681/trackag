@@ -47,13 +47,6 @@ class FarmerController extends Controller
         if ($validator->fails()) {
             return response()->json(['status' => false,'errors' => $validator->errors()], 422);
         }
-        $landAcr = null;
-
-        if ($request->filled('land_acr') || $request->filled('land_acr_size')) {
-            $landAcr = trim(
-                ($request->land_acr ?? '') . ' ' . ($request->land_acr_size ?? '')
-            );
-        }
 
         $farmer = Farmer::create([
             'user_id'         => Auth::id() ?? $request->user_id,
@@ -65,7 +58,8 @@ class FarmerController extends Controller
             'district_id'     => $request->district_id,
             'taluka_id'       => $request->taluka_id,
             // 'crop_sowing_id'  => $request->crop_sowing_id,
-            'land_acr'        => $landAcr,
+            'land_acr'        => $request->land_acr,
+            'land_acr_size'   => $request->land_acr_size,
             'irrigation_type' => $request->irrigation_type,
         ]);
 
@@ -113,14 +107,6 @@ class FarmerController extends Controller
 
         DB::beginTransaction();
         try {
-            $landAcr = null;
-
-            if ($request->filled('land_acr') || $request->filled('land_acr_size')) {
-                $landAcr = trim(
-                    ($request->land_acr ?? '') . ' ' . ($request->land_acr_size ?? '')
-                );
-            }
-
             // ✅ Update farmer data
             $farmer->update([
                 'mobile_no'       => $request->mobile_no,
@@ -130,7 +116,8 @@ class FarmerController extends Controller
                 'state_id'        => $request->state_id,
                 'district_id'     => $request->district_id,
                 'taluka_id'       => $request->taluka_id,
-                'land_acr'        => $landAcr,
+                'land_acr'        => $request->land_acr,
+                'land_acr_size'   => $request->land_acr_size,
                 'irrigation_type' => $request->irrigation_type,
             ]);
 
@@ -163,24 +150,6 @@ class FarmerController extends Controller
             ], 500);
         }
     }
-
-    // public function index()
-    // {
-    //     $farmers = Farmer::with([
-    //             'state:id,name',
-    //             'district:id,name',
-    //             'taluka:id,name',
-    //             'cropSowing:id,name'
-    //         ])
-    //         ->where('user_id', Auth::id())
-    //         ->latest()
-    //         ->get();
-
-    //     return response()->json([
-    //         'status' => true,
-    //         'data' => $farmers
-    //     ]);
-    // }
 
     public function index()
     {

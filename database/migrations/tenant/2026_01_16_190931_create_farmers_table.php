@@ -29,6 +29,7 @@ return new class extends Migration
             $table->unsignedBigInteger('crop_sowing_id')->nullable();
 
             $table->string('land_acr')->nullable();
+            $table->string('land_acr_size')->nullable();
             
             $table->string('irrigation_type')->nullable();
 

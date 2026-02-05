@@ -151,7 +151,9 @@
                                         <td>{{ $farmer->district->name ?? '-' }}</td>
                                         <td>{{ $farmer->taluka->name ?? '-' }}</td>
                                         <td>{{ $farmer->village }}</td>
-                                        <td>{{ $farmer->land_acr }}</td>
+                                        <td>
+                                            {{ (isset($farmer->land_acr_size) ? $farmer->land_acr_size : '') . ' ' . (isset($farmer->land_acr) ? $farmer->land_acr : '') }}
+                                        </td>
                                         <td>{{ $farmer->irrigation_type ?? '-' }}</td>
                                         <td>
                                             @if($farmer->cropSowings->count())

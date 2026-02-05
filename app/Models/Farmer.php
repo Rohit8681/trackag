@@ -24,7 +24,8 @@ class Farmer extends Model
         'taluka_id',
         'crop_sowing_id',
         'land_acr',
-        'irrigation_type'
+        'irrigation_type',
+        'land_acr_size',
     ];
 
     public function user()
