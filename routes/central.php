@@ -67,7 +67,7 @@ Route::get('/logs', function () {
 });
 
 Route::middleware(['web'])->group(function () {
-    Route::get('/', function () {
+    Route::get('/login', function () {
         return redirect()->route('admin.login');
     });
     Route::get('/sample-download', function () {

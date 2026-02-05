@@ -84,11 +84,11 @@
                         </a>
                     </div>
                     <div class="col-md-2 mt-3">
-    <a href="{{ route('new-party.pdf', request()->query()) }}"
-       class="btn btn-danger w-100">
-        <i class="fas fa-file-pdf"></i> PDF
-    </a>
-</div>
+                        <a href="{{ route('new-party.pdf', request()->query()) }}"
+                        class="btn btn-danger w-100">
+                            <i class="fas fa-file-pdf"></i> PDF
+                        </a>
+                    </div>
 
                 </form>
                 </div>
