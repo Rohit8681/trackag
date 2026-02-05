@@ -9,6 +9,8 @@ use App\Models\State;
 use App\Models\User;
 use App\Models\UserStateAccess;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
 
 class PartyController extends Controller
 {
@@ -348,6 +350,73 @@ class PartyController extends Controller
         // ----------------------------
         return view('admin.new-party.index', compact('customer', 'users', 'states', 'company'));
     }
+
+    public function newPartyPdf(Request $request)
+{
+    $user = auth()->user();
+    $roleName = $user->getRoleNames()->first();
+
+    $stateIds = [];
+    $userStateAccess = UserStateAccess::where('user_id', $user->id)->first();
+    if ($userStateAccess && !empty($userStateAccess->state_ids)) {
+        $stateIds = $userStateAccess->state_ids;
+    }
+
+    $query = Customer::with('user')
+        ->where('is_active', 1)
+        ->where('type', 'mobile');
+
+    /* 🔐 ROLE & STATE ACCESS */
+    if (!in_array($roleName, ['master_admin', 'sub_admin'])) {
+        if (!empty($stateIds)) {
+            $query->whereHas('user', function ($q) use ($user, $stateIds) {
+                $q->whereIn('state_id', $stateIds)
+                  ->where('reporting_to', $user->id);
+            });
+        } else {
+            $query->whereRaw('1 = 0'); // no data
+        }
+    }
+
+    /* 📅 FILTERS (same as list page) */
+    if ($request->financial_year) {
+        $dates = explode('-', $request->financial_year);
+        $query->whereYear('visit_date', '>=', $dates[0])
+              ->whereYear('visit_date', '<=', $dates[1]);
+    }
+
+    if ($request->from_date && $request->to_date) {
+        $query->whereBetween('visit_date', [
+            Carbon::parse($request->from_date)->startOfDay(),
+            Carbon::parse($request->to_date)->endOfDay(),
+        ]);
+    } elseif ($request->from_date) {
+        $query->whereDate('visit_date', '>=', $request->from_date);
+    } elseif ($request->to_date) {
+        $query->whereDate('visit_date', '<=', $request->to_date);
+    }
+
+    if ($request->state_id) {
+        $query->whereHas('user', function ($q) use ($request) {
+            $q->where('state_id', $request->state_id);
+        });
+    }
+
+    if ($request->user_id) {
+        $query->where('user_id', $request->user_id);
+    }
+
+    if ($request->agro_name) {
+        $query->where('agro_name', 'LIKE', '%' . $request->agro_name . '%');
+    }
+
+    $customer = $query->orderBy('visit_date', 'desc')->get();
+
+    $pdf = Pdf::loadView('admin.new-party.pdf', compact('customer'))
+        ->setPaper('A4', 'landscape');
+
+    return $pdf->download('new-party-list.pdf');
+}
 
     public function updateStatus(Request $request)
     {
