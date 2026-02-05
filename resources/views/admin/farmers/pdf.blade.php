@@ -25,6 +25,7 @@
             <th>State</th>
             <th>District</th>
             <th>Taluka</th>
+            <th>City</th>
             <th>Land</th>
             <th>Irrigation</th>
             <th>Crops</th>
@@ -41,6 +42,8 @@
             <td>{{ $farmer->state->name ?? '-' }}</td>
             <td>{{ $farmer->district->name ?? '-' }}</td>
             <td>{{ $farmer->taluka->name ?? '-' }}</td>
+            <td>{{ $farmer->village }}</td>
+
             <td>{{ $farmer->land_acr }}</td>
             <td>{{ $farmer->irrigation_type }}</td>
             <td>

@@ -205,8 +205,7 @@ Route::middleware(['web'])->group(function () {
             Route::resource('crop-sub-categories', CropSubCategoryController::class);
 
             Route::get('farmers', [FarmerController::class, 'index'])->name('farmers.index');
-            Route::get('/farmers/pdf', [FarmerController::class, 'downloadPdf'])
-    ->name('farmers.pdf');
+            Route::get('/farmers/pdf', [FarmerController::class, 'downloadPdf'])->name('farmers.pdf');
             
         });
     });
