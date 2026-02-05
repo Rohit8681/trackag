@@ -68,7 +68,6 @@ Route::get('/logs', function () {
 
 Route::middleware(['web'])->group(function () {
     Route::get('/',function(){
-        dd('test rohit');
     });
     Route::get('/login', function () {
         return redirect()->route('admin.login');
