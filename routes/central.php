@@ -160,6 +160,7 @@ Route::middleware(['web'])->group(function () {
             Route::resource('trips', TripController::class)->names('trips');
             Route::get('/trips/{trip}/logs', [TripController::class, 'getLogs'])->name('trips.logs-new');
 
+            
             Route::put('trips/{trip}/update-km', [TripController::class, 'updateKm'])->name('trips.updateKm');
             Route::post('/trips/{trip}/approve', [TripController::class, 'approve'])->name('trips.approve');
             Route::post('/admin/trips/{id}/complete', [TripController::class, 'completeTrip'])->name('trips.complete');
