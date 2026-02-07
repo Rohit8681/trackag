@@ -567,7 +567,7 @@ $(document).on('click', '.view-logs-btn', function () {
     $('#noLogsText').addClass('d-none');
 
     $.ajax({
-        url: "{{ url('trips') }}/" + tripId + "/logs",
+        url: "{{ route('trips.logs', ':id') }}".replace(':id', tripId),
         type: "GET",
         success: function (logs) {
 
