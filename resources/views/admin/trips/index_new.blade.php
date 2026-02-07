@@ -245,7 +245,7 @@
     type="button"
     class="btn btn-sm btn-primary view-logs-btn"
     data-trip-id="{{ $trip->id }}"
-    data-url="{{ route('trips.logs', $trip->id) }}"
+    data-url="{{ route('trips.logs-new', $trip->id) }}"
     data-bs-toggle="modal"
     data-bs-target="#logsModal">
     View Logs
@@ -567,11 +567,8 @@
 @push('scripts')
 <script>
 $(document).on('click', '.view-logs-btn', function () {
-    alert('test')
     let tripId = $(this).data('trip-id');
     let url    = $(this).data('url');
-    alert(url);
-    alert(tripId);
 
     $('#logsModalTitle').text('Trip Logs #' + tripId);
     $('#logsTableBody').html('');

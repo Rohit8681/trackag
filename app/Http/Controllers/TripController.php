@@ -128,7 +128,6 @@ class TripController extends Controller
 
     public function getLogs($trip)
     {
-        dd($trip);
         $logs = TripLog::where('trip_id', $trip)
             ->orderBy('recorded_at')
             ->get()
