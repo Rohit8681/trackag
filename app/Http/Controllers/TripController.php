@@ -127,31 +127,28 @@ class TripController extends Controller
     }
 
     public function getLogs(Trip $trip)
-    {
-        dd($trip->id);
+{
+    $logs = $trip->tripLogs()
+        ->orderBy('recorded_at')
+        ->get()
+        ->map(function ($log) {
+            return [
+                'latitude' => $log->latitude,
+                'longitude' => $log->longitude,
+                'battery' => $log->battery_percentage
+                    ? $log->battery_percentage . '%'
+                    : 'N/A',
+                'gps_status' => $log->gps_status,
+                'recorded_at' => \Carbon\Carbon::parse($log->recorded_at)->format('d-m-Y H:i:s a'),
+                'created_at' => $log->created_at->format('d-m-Y H:i:s a'),
+                'updated_at' => $log->updated_at->format('d-m-Y H:i:s a'),
+            ];
+        });
 
-        $logs = $trip->tripLogs()
-            ->orderBy('recorded_at')
-            ->get()
-            ->map(function ($log) {
-                return [
-                    'latitude' => $log->latitude,
-                    'longitude' => $log->longitude,
-                    'battery' => $log->battery_percentage
-                        ? $log->battery_percentage . '%'
-                        : 'N/A',
-                    'gps_status' => $log->gps_status,
-                    'recorded_at' => \Carbon\Carbon::parse($log->recorded_at)->format('d-m-Y H:i:s a'),
-                    'created_at' => $log->created_at->format('d-m-Y H:i:s a'),
-                    'updated_at' => $log->updated_at->format('d-m-Y H:i:s a'),
-                ];
-            });
-
-        return response()->json([
-            'trip_id' => $trip->id,
-            'logs' => $logs
-        ]);
-    }
+    return response()->json([
+        'logs' => $logs
+    ]);
+}
     public function create()
     {
         $customers = Customer::where('is_active', true)->get();
