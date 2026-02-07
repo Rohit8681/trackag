@@ -324,19 +324,21 @@
     <div class="modal fade" id="logsModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-xl">
             <div class="modal-content border-0 shadow-sm">
+
                 <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title mb-0">Trip Logs</h5>
+                    <h5 class="modal-title mb-0" id="logsModalTitle">Trip Logs</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
 
                 <div class="modal-body">
+
                     <div id="logsLoader" class="text-center py-4">
-                        <span class="spinner-border text-primary"></span>
+                        <div class="spinner-border text-primary"></div>
                     </div>
 
                     <div class="table-responsive d-none" id="logsTableWrapper">
                         <table class="table table-bordered table-striped table-sm align-middle text-nowrap">
-                            <thead>
+                            <thead class="table-light">
                                 <tr>
                                     <th>#</th>
                                     <th>Latitude</th>
@@ -344,6 +346,8 @@
                                     <th>Battery</th>
                                     <th>GPS</th>
                                     <th>Recorded At</th>
+                                    <th>Created At</th>
+                                    <th>Updated At</th>
                                 </tr>
                             </thead>
                             <tbody id="logsTableBody"></tbody>
@@ -351,8 +355,9 @@
                     </div>
 
                     <p class="text-muted text-center d-none" id="noLogsText">
-                        No logs available
+                        No logs available for this trip.
                     </p>
+
                 </div>
             </div>
         </div>
@@ -561,6 +566,7 @@ $(document).on('click', '.view-logs-btn', function () {
 
     let tripId = $(this).data('trip-id');
 
+    $('#logsModalTitle').text('Trip Logs #' + tripId);
     $('#logsTableBody').html('');
     $('#logsLoader').removeClass('d-none');
     $('#logsTableWrapper').addClass('d-none');
@@ -569,37 +575,39 @@ $(document).on('click', '.view-logs-btn', function () {
     $.ajax({
         url: "{{ route('trips.logs', ':id') }}".replace(':id', tripId),
         type: "GET",
-        success: function (logs) {
+        success: function (res) {
 
             $('#logsLoader').addClass('d-none');
 
-            if (logs.length === 0) {
+            if (res.logs.length === 0) {
                 $('#noLogsText').removeClass('d-none');
                 return;
             }
 
             $('#logsTableWrapper').removeClass('d-none');
 
-            $.each(logs, function (index, log) {
+            $.each(res.logs, function (index, log) {
                 $('#logsTableBody').append(`
                     <tr>
                         <td>${index + 1}</td>
                         <td>${log.latitude}</td>
                         <td>${log.longitude}</td>
-                        <td>${log.battery_percentage ?? 'N/A'}%</td>
+                        <td>${log.battery}</td>
                         <td>
-                            ${log.gps_status == 1 
-                                ? '<span class="badge bg-success">On</span>' 
+                            ${log.gps_status == 1
+                                ? '<span class="badge bg-success">On</span>'
                                 : '<span class="badge bg-danger">Off</span>'}
                         </td>
                         <td>${log.recorded_at}</td>
+                        <td>${log.created_at}</td>
+                        <td>${log.updated_at}</td>
                     </tr>
                 `);
             });
         },
         error: function () {
             $('#logsLoader').addClass('d-none');
-            alert('Something went wrong while loading logs');
+            alert('Failed to load trip logs');
         }
     });
 });
