@@ -432,12 +432,37 @@ class TripController extends Controller
         return response()->json(['status' => 'success', 'log' => $log]);
     }
 
+    // public function logs(Trip $trip)
+    // {
+    //     return response()->json(
+    //         $trip->tripLogs()->select('latitude', 'longitude', 'recorded_at')->get()
+    //     );
+    // }
     public function logs(Trip $trip)
     {
-        return response()->json(
-            $trip->tripLogs()->select('latitude', 'longitude', 'recorded_at')->get()
-        );
+        $logs = TripLog::where('trip_id', $trip->id)
+            ->orderBy('recorded_at')
+            ->get()
+            ->map(function ($log) {
+                return [
+                    'latitude'     => $log->latitude,
+                    'longitude'    => $log->longitude,
+                    'battery'      => $log->battery_percentage !== null
+                                        ? $log->battery_percentage . '%'
+                                        : 'N/A',
+                    'gps_status'   => $log->gps_status,
+                    'recorded_at'  => Carbon::parse($log->recorded_at)->format('d-m-Y H:i:s a'),
+                    'created_at'   => optional($log->created_at)->format('d-m-Y H:i:s a'),
+                    'updated_at'   => optional($log->updated_at)->format('d-m-Y H:i:s a'),
+                ];
+            });
+
+        return response()->json([
+            'logs' => $logs
+        ]);
+
     }
+
 
     public function updateTripCoordinates($tripId)
     {
