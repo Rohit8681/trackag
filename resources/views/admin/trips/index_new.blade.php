@@ -238,19 +238,21 @@
                                                     View Map
                                                 </a>
                                                 <br>
-                                                {{-- @can('view_trip_logs') --}}
-                                                    <span class="badge bg-info mt-2" style="color:black;">{{ $trip->tripLogs->count() }} logs</span><br>
-                                                    {{-- <a href="#" class="text-primary small" data-bs-toggle="modal" title="view log" data-bs-target="#logsModal{{ $trip->id }}">View Logs</a> --}}
-                                                    <button
-    type="button"
-    class="btn btn-sm btn-primary view-logs-btn"
-    data-trip-id="{{ $trip->id }}"
-    data-url="{{ route('trips.logs', $trip->id) }}"
-    data-bs-toggle="modal"
-    data-bs-target="#logsModal">
-    View Logs
-</button>
-                                                {{-- @endcan --}}
+                                                <div class="d-flex flex-column gap-1 align-items-start">
+    <span class="badge bg-info text-dark">
+        {{ $trip->logs_count ?? 0 }} logs
+    </span>
+
+    <button
+        type="button"
+        class="btn btn-sm btn-primary view-logs-btn"
+        data-trip-id="{{ $trip->id }}"
+        data-url="{{ route('trips.logs', $trip->id) }}"
+        data-bs-toggle="modal"
+        data-bs-target="#logsModal">
+        <i class="bi bi-list-ul me-1"></i> View Logs
+    </button>
+</div>
                                             </td>
 
                                             <td class="text-center">
