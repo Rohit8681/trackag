@@ -145,13 +145,6 @@ class ApiTripController extends BaseController
                 
             });
         });
-
-        // 🪵 Log successful insertions
-        // Log::info('Trip logs inserted successfully', [
-        //     'count' => count($logs),
-        //     'trip_ids' => collect($logs)->pluck('trip_id'),
-        // ]);
-
         return $this->sendResponse($logs, "Trip logs recorded successfully");
     }
 
