@@ -241,13 +241,15 @@
                                                 {{-- @can('view_trip_logs') --}}
                                                     <span class="badge bg-info mt-2" style="color:black;">{{ $trip->tripLogs->count() }} logs</span><br>
                                                     {{-- <a href="#" class="text-primary small" data-bs-toggle="modal" title="view log" data-bs-target="#logsModal{{ $trip->id }}">View Logs</a> --}}
-                                                    <a href="#"
-                                                    class="text-primary small view-logs-btn"
-                                                    data-trip-id="{{ $trip->id }}"
-                                                    data-bs-toggle="modal"
-                                                    data-bs-target="#logsModal">
-                                                    View Logs
-                                                    </a>
+                                                    <button
+    type="button"
+    class="btn btn-sm btn-primary view-logs-btn"
+    data-trip-id="{{ $trip->id }}"
+    data-url="{{ route('trips.logs', $trip->id) }}"
+    data-bs-toggle="modal"
+    data-bs-target="#logsModal">
+    View Logs
+</button>
                                                 {{-- @endcan --}}
                                             </td>
 
@@ -321,47 +323,49 @@
         </div>
     </div>
 
-    <div class="modal fade" id="logsModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-xl">
-            <div class="modal-content border-0 shadow-sm">
+    <div class="modal fade" id="logsModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="logsModalTitle">Trip Logs</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
 
-                <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title mb-0" id="logsModalTitle">Trip Logs</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            <div class="modal-body">
+
+                <!-- Loader -->
+                <div id="logsLoader" class="text-center py-4 d-none">
+                    <div class="spinner-border text-primary"></div>
                 </div>
 
-                <div class="modal-body">
+                <!-- No logs -->
+                <p id="noLogsText" class="text-center text-muted d-none">
+                    No logs available
+                </p>
 
-                    <div id="logsLoader" class="text-center py-4">
-                        <div class="spinner-border text-primary"></div>
-                    </div>
-
-                    <div class="table-responsive d-none" id="logsTableWrapper">
-                        <table class="table table-bordered table-striped table-sm align-middle text-nowrap">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>#</th>
-                                    <th>Latitude</th>
-                                    <th>Longitude</th>
-                                    <th>Battery</th>
-                                    <th>GPS</th>
-                                    <th>Recorded At</th>
-                                    <th>Created At</th>
-                                    <th>Updated At</th>
-                                </tr>
-                            </thead>
-                            <tbody id="logsTableBody"></tbody>
-                        </table>
-                    </div>
-
-                    <p class="text-muted text-center d-none" id="noLogsText">
-                        No logs available for this trip.
-                    </p>
-
+                <!-- Table -->
+                <div id="logsTableWrapper" class="table-responsive d-none">
+                    <table class="table table-bordered table-striped table-sm align-middle text-nowrap">
+                        <thead class="table-light">
+                            <tr>
+                                <th>#</th>
+                                <th>Latitude</th>
+                                <th>Longitude</th>
+                                <th>Battery</th>
+                                <th>GPS</th>
+                                <th>Recorded At</th>
+                                <th>Created At</th>
+                                <th>Updated At</th>
+                            </tr>
+                        </thead>
+                        <tbody id="logsTableBody"></tbody>
+                    </table>
                 </div>
+
             </div>
         </div>
     </div>
+</div>
 
     {{-- Logs Modals --}}
     @foreach ($trips as $trip)
@@ -565,6 +569,7 @@
 $(document).on('click', '.view-logs-btn', function () {
 
     let tripId = $(this).data('trip-id');
+    let url    = $(this).data('url');
 
     $('#logsModalTitle').text('Trip Logs #' + tripId);
     $('#logsTableBody').html('');
@@ -573,23 +578,20 @@ $(document).on('click', '.view-logs-btn', function () {
     $('#noLogsText').addClass('d-none');
 
     $.ajax({
-        url: "{{ route('trips.logs', ':id') }}".replace(':id', tripId),
+        url: url,
         type: "GET",
         success: function (res) {
-            console.log(res); // 🔍 see actual response
 
             $('#logsLoader').addClass('d-none');
 
-            // SAFETY: handle both response types
-            let logs = Array.isArray(res) ? res : res.logs;
+            let logs = res.logs ?? [];
 
-            if (!logs || logs.length === 0) {
+            if (logs.length === 0) {
                 $('#noLogsText').removeClass('d-none');
                 return;
             }
 
             $('#logsTableWrapper').removeClass('d-none');
-            $('#logsTableBody').html('');
 
             $.each(logs, function (index, log) {
                 $('#logsTableBody').append(`
@@ -597,7 +599,7 @@ $(document).on('click', '.view-logs-btn', function () {
                         <td>${index + 1}</td>
                         <td>${log.latitude}</td>
                         <td>${log.longitude}</td>
-                        <td>${log.battery ?? 'N/A'}</td>
+                        <td>${log.battery}</td>
                         <td>
                             ${log.gps_status == 1
                                 ? '<span class="badge bg-success">On</span>'
@@ -616,6 +618,7 @@ $(document).on('click', '.view-logs-btn', function () {
         }
     });
 });
+
 document.addEventListener("DOMContentLoaded", function () {
     document.querySelectorAll(".trip-type-btn input").forEach(input => {
         input.addEventListener("change", function () {
