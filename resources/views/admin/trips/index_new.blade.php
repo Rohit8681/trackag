@@ -234,25 +234,34 @@
                                             </td>
 
                                             <td class="text-center">
-                                                <a href="{{ route('trips.show', $trip) }}" target="_blank" class="text-primary small" title="view map">
-                                                    View Map
-                                                </a>
-                                                <br>
-                                                <div class="d-flex flex-column gap-1 align-items-start">
-    <span class="badge bg-info text-dark">
-        {{ $trip->tripLogs->count() ?? 0 }} logs
-    </span>
+                                                <div class="d-inline-flex flex-column align-items-center gap-1">
 
-    <button
-        type="button"
-        class="btn btn-sm btn-primary view-logs-btn"
-        data-trip-id="{{ $trip->id }}"
-        data-url="{{ route('trips.logs', $trip->id) }}"
-        data-bs-toggle="modal"
-        data-bs-target="#logsModal">
-        <i class="bi bi-list-ul me-1"></i> View Logs
-    </button>
-</div>
+                                                    {{-- View Map --}}
+                                                    <a href="{{ route('trips.show', $trip) }}"
+                                                    target="_blank"
+                                                    class="text-primary small fw-semibold">
+                                                        View Map
+                                                    </a>
+
+                                                    {{-- Logs count --}}
+                                                    <span class="badge bg-info text-dark px-2 py-1"
+                                                        style="font-size: 11px;">
+                                                        {{ $trip->tripLogs->count() ?? 0 }} logs
+                                                    </span>
+
+                                                    {{-- View Logs --}}
+                                                    <button
+                                                        type="button"
+                                                        class="btn btn-primary btn-sm px-2 py-1 view-logs-btn"
+                                                        style="font-size: 11px;"
+                                                        data-trip-id="{{ $trip->id }}"
+                                                        data-url="{{ route('trips.logs', $trip->id) }}"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#logsModal">
+                                                        <i class="bi bi-list-ul me-1"></i> View Logs
+                                                    </button>
+
+                                                </div>
                                             </td>
 
                                             <td class="text-center">

@@ -319,14 +319,13 @@
                         </a>
                     </li>
 
-                    <li class="nav-item">
-                        {{-- <a href="{{ url('admin/expense/monthly-report') }}"  --}}
+                    {{-- <li class="nav-item">
                         <a href="{{ route('coming-soon') }}" 
                         class="nav-link {{ request()->is('admin/expense/monthly-report*') ? 'active' : '' }}">
                             <i class="bi bi-cash-stack me-2"></i>
                             <p>Monthly Farm Demo Report</p>
                         </a>
-                    </li>
+                    </li> --}}
                 </ul>
             </li>
 
