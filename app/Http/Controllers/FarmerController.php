@@ -96,7 +96,6 @@ class FarmerController extends Controller
             ->where('farmer_id', $farmer->id)
             ->latest()
             ->get();
-        dd($visits);
         return view('admin.farmers.farm_visits', compact('farmer', 'visits'));
     }
 

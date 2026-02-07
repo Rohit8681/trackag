@@ -10,7 +10,7 @@ class FarmVisit extends Model
 {
     use HasFactory,TenantConnectionTrait;
 
-    protected $table = 'farmer_crop_sowings';
+    protected $table = 'farm_visits';
     protected $fillable = [
         'user_id',
         'farmer_id',
