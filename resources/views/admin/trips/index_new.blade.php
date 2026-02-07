@@ -258,7 +258,7 @@
                                                         data-url="{{ route('trips.logs', $trip->id) }}"
                                                         data-bs-toggle="modal"
                                                         data-bs-target="#logsModal">
-                                                        <i class="bi bi-list-ul me-1"></i> View Logs
+                                                         View Logs
                                                     </button>
 
                                                 </div>
