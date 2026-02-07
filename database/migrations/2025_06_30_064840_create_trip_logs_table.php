@@ -26,6 +26,7 @@ class CreateTripLogsTable extends Migration
 
     // GPS status (on/off)
     $table->boolean('gps_status')->default(true);
+    $table->boolean('mobile_status')->default(true);
 
     // Laravel's created_at and updated_at
     $table->timestamps();

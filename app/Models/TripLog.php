@@ -15,7 +15,8 @@ class TripLog extends Model
         'longitude',
         'recorded_at',
         'battery_percentage',
-        'gps_status'
+        'gps_status',
+        'mobile_status'
     ];
 
     public function trip(): BelongsTo

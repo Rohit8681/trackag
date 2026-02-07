@@ -101,15 +101,6 @@ class ApiTripController extends BaseController
     
     public function logPoint(Request $request)
     {
-        // 🪵 Log the entire incoming request
-        // Log::info('Received logPoint request:', [
-        //     'payload' => $request->all(),
-        //     'ip' => $request->ip(),
-        //     'user_agent' => $request->userAgent(),
-        //     'timestamp' => now()->toDateTimeString(),
-        // ]);
-
-        // Validate incoming request
         $validated = $request->validate([
             'location' => 'required|array|min:1',
             'location.*.tripId' => 'required',
@@ -122,10 +113,6 @@ class ApiTripController extends BaseController
 
         $locations = $validated['location'];
 
-        // 🪵 Log validated data
-        // Log::info('Validated logPoint data:', $locations);
-
-        // Check for completed trips
         $tripIds = collect($locations)->pluck('tripId'); // fixed typo (was trip_id)
         $completedTrips = Trip::whereIn('id', $tripIds)
             ->where('status', 'completed')
@@ -133,10 +120,6 @@ class ApiTripController extends BaseController
             ->toArray();
 
         if (!empty($completedTrips)) {
-            // Log::warning('Attempt to log points for completed trips', [
-            //     'trip_ids' => $completedTrips,
-            // ]);
-
             return response()->json([
                 'success' => false,
                 'message' => "Cannot log points for completed trips: " . implode(', ', $completedTrips)
@@ -152,6 +135,7 @@ class ApiTripController extends BaseController
                         'latitude' => $loc['latitude'],
                         'longitude' => $loc['longitude'],
                         'gps_status' => $loc['gps_status'] ?? null,
+                        'mobile_status' => $loc['mobile_status'] ?? 1,
                         'battery_percentage' => ($loc['battery_percentage'] === "null" || $loc['battery_percentage'] === null)
                             ? null
                             : $loc['battery_percentage'],
