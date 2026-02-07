@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Company;
 use App\Models\Farmer;
+use App\Models\FarmVisit;
 use App\Models\State;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -86,6 +87,29 @@ class FarmerController extends Controller
         $farmers = $query->latest()->get();
 
         return view('admin.farmers.index', compact('farmers', 'states'));
+    }
+
+    public function farmerWiseList(Farmer $farmer)
+    {
+        $visits = FarmVisit::with('crop:id,name')
+            ->where('farmer_id', $farmer->id)
+            ->latest()
+            ->get();
+
+        return view('admin.farmers.farm_visits', compact('farmer', 'visits'));
+    }
+
+    public function saveAgronomistRemark(Request $request, FarmVisit $visit)
+    {
+        $request->validate([
+            'agronomist_remark' => 'nullable|string'
+        ]);
+
+        $visit->update([
+            'agronomist_remark' => $request->agronomist_remark
+        ]);
+
+        return back()->with('success', 'Agronomist remark saved');
     }
 
     public function downloadPdf(Request $request)

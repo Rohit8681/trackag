@@ -335,49 +335,49 @@
     </div>
 
     <div class="modal fade" id="logsModal" tabindex="-1">
-    <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-            <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title" id="logsModalTitle">Trip Logs</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
-
-            <div class="modal-body">
-
-                <!-- Loader -->
-                <div id="logsLoader" class="text-center py-4 d-none">
-                    <div class="spinner-border text-primary"></div>
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="logsModalTitle">Trip Logs</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
 
-                <!-- No logs -->
-                <p id="noLogsText" class="text-center text-muted d-none">
-                    No logs available
-                </p>
+                <div class="modal-body">
 
-                <!-- Table -->
-                <div id="logsTableWrapper" class="table-responsive d-none">
-                    <table class="table table-bordered table-striped table-sm align-middle text-nowrap">
-                        <thead class="table-light">
-                            <tr>
-                                <th>#</th>
-                                <th>Latitude</th>
-                                <th>Longitude</th>
-                                <th>Battery</th>
-                                <th>GPS</th>
-                                <th>Mobile Status</th>
-                                <th>Recorded At</th>
-                                <th>Created At</th>
-                                <th>Updated At</th>
-                            </tr>
-                        </thead>
-                        <tbody id="logsTableBody"></tbody>
-                    </table>
+                    <!-- Loader -->
+                    <div id="logsLoader" class="text-center py-4 d-none">
+                        <div class="spinner-border text-primary"></div>
+                    </div>
+
+                    <!-- No logs -->
+                    <p id="noLogsText" class="text-center text-muted d-none">
+                        No logs available
+                    </p>
+
+                    <!-- Table -->
+                    <div id="logsTableWrapper" class="table-responsive d-none">
+                        <table class="table table-bordered table-striped table-sm align-middle text-nowrap">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>#</th>
+                                    <th>Latitude</th>
+                                    <th>Longitude</th>
+                                    <th>Battery</th>
+                                    <th>GPS</th>
+                                    <th>Mobile Status</th>
+                                    <th>Recorded At</th>
+                                    <th>Created At</th>
+                                    <th>Updated At</th>
+                                </tr>
+                            </thead>
+                            <tbody id="logsTableBody"></tbody>
+                        </table>
+                    </div>
+
                 </div>
-
             </div>
         </div>
     </div>
-</div>
 
     {{-- Logs Modals --}}
     @foreach ($trips as $trip)

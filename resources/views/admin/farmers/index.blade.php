@@ -135,6 +135,7 @@
                                     <th>Farmer Land Area</th>
                                     <th>Irrigation Type</th>
                                     <th>Crop Name</th>
+                                    <th>Action</th>
                                     
                                     
                                 </tr>
@@ -162,12 +163,18 @@
                                                 -
                                             @endif
                                         </td>
+                                        <td>
+                                            <a href="{{ route('farmers.farm-visits', $farmer->id) }}"
+                                            class="btn btn-sm btn-primary">
+                                                View Farm Visits
+                                            </a>
+                                        </td>
                                         
                                         
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="12" class="text-center text-muted">
+                                        <td colspan="13" class="text-center text-muted">
                                             No farmers found.
                                         </td>
                                     </tr>

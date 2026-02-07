@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\PartyController;
 use App\Http\Controllers\Api\PartyPaymentController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\TenantAuthenticate;
+use App\Http\Controllers\Api\FarmVisitController;
 
 // Existing Auth API routes
 Route::post('/login', [ApiAuthController::class, 'login']);
@@ -66,6 +67,9 @@ Route::middleware([TenantAuthenticate::class])->group(function () {
     Route::get('farmers-list', [FarmerController::class, 'index']);
     Route::post('farmers-store', [FarmerController::class, 'store']);
     Route::post('farmers-update/{id}', [FarmerController::class, 'update']);
+
+    Route::get('farm-visits', [FarmVisitController::class, 'index']);
+    Route::post('farm-visits-store', [FarmVisitController::class, 'store']);
 
 
 
