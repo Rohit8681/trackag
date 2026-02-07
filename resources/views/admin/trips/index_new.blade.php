@@ -567,9 +567,11 @@
 @push('scripts')
 <script>
 $(document).on('click', '.view-logs-btn', function () {
-
+    alert('test')
     let tripId = $(this).data('trip-id');
     let url    = $(this).data('url');
+    alert(url);
+    alert(tripId);
 
     $('#logsModalTitle').text('Trip Logs #' + tripId);
     $('#logsTableBody').html('');
