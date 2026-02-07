@@ -54,24 +54,6 @@
 </style>
 @section('content')
 <main class="app-main">
-
-    {{-- Header Section --}}
-    {{-- <div class="app-content-header py-4 bg-light border-bottom">
-        <div class="container-fluid px-4">
-            <div class="d-flex flex-wrap align-items-center justify-content-between">
-                <div>
-                    <h3 class="fw-bold mb-0 text-primary">
-                        <i class="fas fa-route me-2 text-secondary"></i>Trips
-                    </h3>
-                    <p class="text-muted small mb-0">Monitor and manage all trip records</p>
-                </div>
-                <ol class="breadcrumb mb-0">
-                    <li class="breadcrumb-item"><a href="#" class="text-decoration-none">Trip Management</a></li>
-                    <li class="breadcrumb-item active">All Trips</li>
-                </ol>
-            </div>
-        </div>
-    </div> --}}
     <div class="app-content-header">
         <div class="container-fluid">
             <div class="row">
@@ -92,14 +74,6 @@
     <div class="app-content">
         <div class="container-fluid">
             <div class="card shadow-sm border-0">
-                {{-- <div class="card-header bg-white d-flex align-items-center justify-content-between border-0 py-3">
-                    <h5 class="card-title mb-0 fw-semibold text-dark">
-                        <i class="fas fa-list-ul me-2 text-primary"></i>Trip List
-                    </h5>
-                    
-                    <a href="{{ route('trips.create') }}" class="btn btn-primary btn-sm"><i class="fas fa-plus me-1"></i> Add Trip</a>
-                </div> --}}
-
                 <div class="card-body">
                     {{-- 🔹 Filter Section --}}
                     <form method="GET" action="{{ route('trips.index') }}" class="mb-4">
@@ -188,7 +162,6 @@
 
                                             <td>
                                                 <span class="fw-semibold text-dark">{{ $trip->user->name ?? 'N/A' }}</span><br>
-                                                {{-- <small class="text-muted">{{ $trip->company->name ?? '' }}</small> --}}
                                             </td>
                                             <td>
                                                  <div>
@@ -212,28 +185,6 @@
                                                     @endif
                                                 </div>
                                             </td>
-
-                                            {{-- <td>
-                                                <div>
-                                                    <strong>Start:</strong>
-                                                    @php $startTime = $trip->tripLogs->min('recorded_at'); @endphp
-                                                    <span class="text-success">
-                                                        {{ $startTime ? \Carbon\Carbon::parse($startTime)->format('d-m-Y H:i a') : '-' }}
-                                                    </span>
-                                                </div>
-                                                <div>
-                                                    <strong>End:</strong>
-                                                    @if ($trip->status === 'completed')
-                                                        @php $endTime = $trip->tripLogs->max('recorded_at'); @endphp
-                                                        <span class="text-danger">
-                                                            {{ $endTime ? \Carbon\Carbon::parse($endTime)->format('d-m-Y H:i a') : '-' }}
-                                                        </span>
-                                                    @else
-                                                        <span class="badge bg-warning text-dark">Running</span>
-                                                    @endif
-                                                </div>
-                                            </td> --}}
-
 
                                             <td>
                                                 <span class="badge bg-info text-dark px-3 py-2">
@@ -289,7 +240,14 @@
                                                 <br>
                                                 {{-- @can('view_trip_logs') --}}
                                                     <span class="badge bg-info mt-2" style="color:black;">{{ $trip->tripLogs->count() }} logs</span><br>
-                                                    <a href="#" class="text-primary small" data-bs-toggle="modal" title="view log" data-bs-target="#logsModal{{ $trip->id }}">View Logs</a>
+                                                    {{-- <a href="#" class="text-primary small" data-bs-toggle="modal" title="view log" data-bs-target="#logsModal{{ $trip->id }}">View Logs</a> --}}
+                                                    <a href="#"
+                                                    class="text-primary small view-logs-btn"
+                                                    data-trip-id="{{ $trip->id }}"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#logsModal">
+                                                    View Logs
+                                                    </a>
                                                 {{-- @endcan --}}
                                             </td>
 
@@ -363,10 +321,46 @@
         </div>
     </div>
 
-    {{-- Deny Modals --}}
+    <div class="modal fade" id="logsModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content border-0 shadow-sm">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title mb-0">Trip Logs</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    <div id="logsLoader" class="text-center py-4">
+                        <span class="spinner-border text-primary"></span>
+                    </div>
+
+                    <div class="table-responsive d-none" id="logsTableWrapper">
+                        <table class="table table-bordered table-striped table-sm align-middle text-nowrap">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Latitude</th>
+                                    <th>Longitude</th>
+                                    <th>Battery</th>
+                                    <th>GPS</th>
+                                    <th>Recorded At</th>
+                                </tr>
+                            </thead>
+                            <tbody id="logsTableBody"></tbody>
+                        </table>
+                    </div>
+
+                    <p class="text-muted text-center d-none" id="noLogsText">
+                        No logs available
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Logs Modals --}}
     @foreach ($trips as $trip)
-        {{-- @can('approvals_all_trip') --}}
-            @if ($trip->approval_status === 'pending')
+        @if ($trip->approval_status === 'pending')
                 <div class="modal fade" id="denyModal{{ $trip->id }}" tabindex="-1" aria-hidden="true">
                     <div class="modal-dialog">
                         <form method="POST" action="{{ route('trips.approve', $trip->id) }}" class="modal-content border-0 shadow">
@@ -393,152 +387,93 @@
                         </form>
                     </div>
                 </div>
-            @endif
-        {{-- @endcan --}}
-    @endforeach
+        @endif
 
-    {{-- Logs Modals --}}
-    @foreach ($trips as $trip)
-        {{-- @can('logs_all_trip') --}}
-            <div class="modal fade" id="logsModal{{ $trip->id }}" tabindex="-1" aria-hidden="true">
-                <div class="modal-dialog modal-xl">
-                    <div class="modal-content border-0 shadow-sm">
-                        <div class="modal-header bg-primary text-white">
-                            <h5 class="modal-title mb-0">Trip Logs #{{ $trip->id }}</h5>
-                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                        </div>
-                        <div class="modal-body">
-                            @if ($trip->tripLogs->count())
-                                <div class="table-responsive">
-                                    <table class="table table-bordered table-striped table-sm align-middle text-nowrap">
-                                        <thead class="table-light">
-                                            <tr>
-                                                <th>#</th>
-                                                <th>Latitude</th>
-                                                <th>Longitude</th>
-                                                <th>Battery</th>
-                                                <th>GPS</th>
-                                                <th>Recorded At</th>
-                                                <th>Created At</th>
-                                                <th>Updated At</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach ($trip->tripLogs as $index => $log)
-                                                <tr>
-                                                    <td>{{ $index + 1 }}</td>
-                                                    <td>{{ $log->latitude }}</td>
-                                                    <td>{{ $log->longitude }}</td>
-                                                    <td>{{ $log->battery_percentage ?? 'N/A' }}%</td>
-                                                    <td>
-                                                        @if ($log->gps_status == 1)
-                                                            <span class="badge bg-success">On</span>
-                                                        @else
-                                                            <span class="badge bg-danger">Off</span>
-                                                        @endif
-                                                    </td>
-                                                    <td>{{ \Carbon\Carbon::parse($log->recorded_at)->format('d-m-Y H:i:s a') }}</td>
-                                                    <td>{{ $log->created_at->format('d-m-Y H:i:s a') }}</td>
-                                                    <td>{{ $log->updated_at->format('d-m-Y H:i:s a') }}</td>
-                                                </tr>
-                                            @endforeach
-                                        </tbody>
-                                    </table>
-                                </div>
-                            @else
-                                <p class="text-muted text-center">No logs available for this trip.</p>
-                            @endif
-                        </div>
-                    </div>
-                </div>
-            </div>
-        {{-- @endcan --}}
         <div class="modal fade" id="editKmModal{{ $trip->id }}" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <form method="POST" action="{{ route('trips.updateKm', $trip->id) }}" class="modal-content border-0 shadow">
-                @csrf
-                @method('PUT')
-                <div class="modal-header bg-secondary text-white">
-                    <h5 class="modal-title">Edit KM for Trip #{{ $trip->id }}</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">Starting KM</label>
-                        <input type="number" name="starting_km"
-                            class="form-control"
-                            min="0"
-                            oninput="if(this.value < 0) this.value = '';"
-                            value="{{ $trip->starting_km ?? '' }}" required
-                            >
+            <div class="modal-dialog modal-dialog-centered">
+                <form method="POST" action="{{ route('trips.updateKm', $trip->id) }}" class="modal-content border-0 shadow">
+                    @csrf
+                    @method('PUT')
+                    <div class="modal-header bg-secondary text-white">
+                        <h5 class="modal-title">Edit KM for Trip #{{ $trip->id }}</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">Ending KM</label>
-                        <input type="number" name="end_km"
-                            class="form-control"
-                            value="{{ $trip->end_km ?? '' }}"
-                            placeholder="Enter end KM"
-                            min="0"
-                            oninput="if(this.value < 0) this.value = '';"
-                            required>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Starting KM</label>
+                            <input type="number" name="starting_km"
+                                class="form-control"
+                                min="0"
+                                oninput="if(this.value < 0) this.value = '';"
+                                value="{{ $trip->starting_km ?? '' }}" required
+                                >
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Ending KM</label>
+                            <input type="number" name="end_km"
+                                class="form-control"
+                                value="{{ $trip->end_km ?? '' }}"
+                                placeholder="Enter end KM"
+                                min="0"
+                                oninput="if(this.value < 0) this.value = '';"
+                                required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Diff</label>
+                            <input type="number" name="diff"
+                                class="form-control"
+                                value="{{ (float) $trip->end_km - (float) $trip->starting_km }}"
+                                placeholder="Enter end KM"
+                                min="0"
+                                oninput="if(this.value < 0) this.value = '';"
+                                readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">gps</label>
+                            <input type="number" name="gps"
+                                class="form-control"
+                                value="{{ $trip->total_distance_km ?? '' }}"
+                                placeholder="Enter end KM"
+                                min="0"
+                                oninput="if(this.value < 0) this.value = '';"
+                                readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Tour Type</label>
+                            <select name="tour_type" class="form-select" required>
+                                <option value="">Select Tour Type</option>
+                                @foreach($TourType as $type)
+                                    <option value="{{ $type->id }}"
+                                        {{ $trip->tour_type == $type->id ? 'selected' : '' }}>
+                                        {{ $type->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Travel Mode</label>
+                            <select name="travel_mode" class="form-select" required>
+                                <option value="">Select Travel Mode</option>
+                                @foreach($TravelMode as $mode)
+                                    <option value="{{ $mode->id }}"
+                                        {{ $trip->travel_mode == $mode->id ? 'selected' : '' }}>
+                                        {{ $mode->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">Diff</label>
-                        <input type="number" name="diff"
-                            class="form-control"
-                            value="{{ (float) $trip->end_km - (float) $trip->starting_km }}"
-                            placeholder="Enter end KM"
-                            min="0"
-                            oninput="if(this.value < 0) this.value = '';"
-                            readonly>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-secondary">
+                            <i class="fas fa-save me-1"></i> Save Changes
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                            Cancel
+                        </button>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">gps</label>
-                        <input type="number" name="gps"
-                            class="form-control"
-                            value="{{ $trip->total_distance_km ?? '' }}"
-                            placeholder="Enter end KM"
-                            min="0"
-                            oninput="if(this.value < 0) this.value = '';"
-                            readonly>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">Tour Type</label>
-                        <select name="tour_type" class="form-select" required>
-                            <option value="">Select Tour Type</option>
-                            @foreach($TourType as $type)
-                                <option value="{{ $type->id }}"
-                                    {{ $trip->tour_type == $type->id ? 'selected' : '' }}>
-                                    {{ $type->name }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">Travel Mode</label>
-                        <select name="travel_mode" class="form-select" required>
-                            <option value="">Select Travel Mode</option>
-                            @foreach($TravelMode as $mode)
-                                <option value="{{ $mode->id }}"
-                                    {{ $trip->travel_mode == $mode->id ? 'selected' : '' }}>
-                                    {{ $mode->name }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-secondary">
-                        <i class="fas fa-save me-1"></i> Save Changes
-                    </button>
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-                        Cancel
-                    </button>
-                </div>
-            </form>
+                </form>
+            </div>
         </div>
-        </div>
-
         
         <div class="modal fade" id="approveModal{{ $trip->id }}" tabindex="-1" aria-labelledby="approveModalLabel{{ $trip->id }}" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
@@ -576,55 +511,98 @@
                 </div>
             </div>
         </div>
-    @endforeach
 
-    <!-- KM Images Modal -->
-    @foreach ($trips as $trip)
-    <div class="modal fade" id="kmImagesModal{{ $trip->id }}" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content border-0 shadow">
-                <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title mb-0">Trip #{{ $trip->id }} - KM Images</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body text-center">
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <h6 class="fw-semibold text-success">Opening</h6>
-                            @if ($trip->start_km_photo)
-                                <a href="{{ asset('storage/' . $trip->start_km_photo) }}" target="_blank">
-                                    <img src="{{ asset('storage/' . $trip->start_km_photo) }}" class="img-fluid rounded shadow-sm border" alt="Opening KM">
-                                </a>
-                            @else
-                                <p class="text-muted mb-0">No Image</p>
-                            @endif
-                        </div>
-                        <div class="col-md-6">
-                            <h6 class="fw-semibold text-danger">Closing</h6>
-                            @if ($trip->end_km_photo)
-                                <a href="{{ asset('storage/' . $trip->end_km_photo) }}" target="_blank">
-                                    <img src="{{ asset('storage/' . $trip->end_km_photo) }}" class="img-fluid rounded shadow-sm border" alt="Closing KM">
-                                </a>
-                            @else
-                                <p class="text-muted mb-0">No Image</p>
-                            @endif
+        <div class="modal fade" id="kmImagesModal{{ $trip->id }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title mb-0">Trip #{{ $trip->id }} - KM Images</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body text-center">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <h6 class="fw-semibold text-success">Opening</h6>
+                                @if ($trip->start_km_photo)
+                                    <a href="{{ asset('storage/' . $trip->start_km_photo) }}" target="_blank">
+                                        <img src="{{ asset('storage/' . $trip->start_km_photo) }}" class="img-fluid rounded shadow-sm border" alt="Opening KM">
+                                    </a>
+                                @else
+                                    <p class="text-muted mb-0">No Image</p>
+                                @endif
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="fw-semibold text-danger">Closing</h6>
+                                @if ($trip->end_km_photo)
+                                    <a href="{{ asset('storage/' . $trip->end_km_photo) }}" target="_blank">
+                                        <img src="{{ asset('storage/' . $trip->end_km_photo) }}" class="img-fluid rounded shadow-sm border" alt="Closing KM">
+                                    </a>
+                                @else
+                                    <p class="text-muted mb-0">No Image</p>
+                                @endif
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                        Close
-                    </button>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            Close
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
     @endforeach
 
 </main>
 @endsection
 @push('scripts')
 <script>
+$(document).on('click', '.view-logs-btn', function () {
+
+    let tripId = $(this).data('trip-id');
+
+    $('#logsTableBody').html('');
+    $('#logsLoader').removeClass('d-none');
+    $('#logsTableWrapper').addClass('d-none');
+    $('#noLogsText').addClass('d-none');
+
+    $.ajax({
+        url: "{{ url('trips') }}/" + tripId + "/logs",
+        type: "GET",
+        success: function (logs) {
+
+            $('#logsLoader').addClass('d-none');
+
+            if (logs.length === 0) {
+                $('#noLogsText').removeClass('d-none');
+                return;
+            }
+
+            $('#logsTableWrapper').removeClass('d-none');
+
+            $.each(logs, function (index, log) {
+                $('#logsTableBody').append(`
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${log.latitude}</td>
+                        <td>${log.longitude}</td>
+                        <td>${log.battery_percentage ?? 'N/A'}%</td>
+                        <td>
+                            ${log.gps_status == 1 
+                                ? '<span class="badge bg-success">On</span>' 
+                                : '<span class="badge bg-danger">Off</span>'}
+                        </td>
+                        <td>${log.recorded_at}</td>
+                    </tr>
+                `);
+            });
+        },
+        error: function () {
+            $('#logsLoader').addClass('d-none');
+            alert('Something went wrong while loading logs');
+        }
+    });
+});
 document.addEventListener("DOMContentLoaded", function () {
     document.querySelectorAll(".trip-type-btn input").forEach(input => {
         input.addEventListener("change", function () {

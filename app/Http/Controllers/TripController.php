@@ -125,6 +125,15 @@ class TripController extends Controller
                 'to_date' => $toDate,
             ]);
     }
+
+    public function getLogs(Trip $trip)
+    {
+        $logs = $trip->tripLogs()
+            ->orderBy('recorded_at')
+            ->get();
+
+        return response()->json($logs);
+    }
     public function create()
     {
         $customers = Customer::where('is_active', true)->get();
