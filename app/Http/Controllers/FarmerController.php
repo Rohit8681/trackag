@@ -91,6 +91,7 @@ class FarmerController extends Controller
 
     public function farmerWiseList(Farmer $farmer)
     {
+        dd($farmer);
         $visits = FarmVisit::with('crop:id,name')
             ->where('farmer_id', $farmer->id)
             ->latest()
