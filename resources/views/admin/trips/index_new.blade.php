@@ -245,7 +245,7 @@
     type="button"
     class="btn btn-sm btn-primary view-logs-btn"
     data-trip-id="{{ $trip->id }}"
-    data-url="{{ route('trips.logs-new', $trip->id) }}"
+    data-url="{{ route('trips.logs', $trip->id) }}"
     data-bs-toggle="modal"
     data-bs-target="#logsModal">
     View Logs
