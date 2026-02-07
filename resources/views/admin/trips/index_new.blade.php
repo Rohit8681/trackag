@@ -576,31 +576,36 @@ $(document).on('click', '.view-logs-btn', function () {
         url: "{{ route('trips.logs', ':id') }}".replace(':id', tripId),
         type: "GET",
         success: function (res) {
+            console.log(res); // 🔍 see actual response
 
             $('#logsLoader').addClass('d-none');
 
-            if (res.logs.length === 0) {
+            // SAFETY: handle both response types
+            let logs = Array.isArray(res) ? res : res.logs;
+
+            if (!logs || logs.length === 0) {
                 $('#noLogsText').removeClass('d-none');
                 return;
             }
 
             $('#logsTableWrapper').removeClass('d-none');
+            $('#logsTableBody').html('');
 
-            $.each(res.logs, function (index, log) {
+            $.each(logs, function (index, log) {
                 $('#logsTableBody').append(`
                     <tr>
                         <td>${index + 1}</td>
                         <td>${log.latitude}</td>
                         <td>${log.longitude}</td>
-                        <td>${log.battery}</td>
+                        <td>${log.battery ?? 'N/A'}</td>
                         <td>
                             ${log.gps_status == 1
                                 ? '<span class="badge bg-success">On</span>'
                                 : '<span class="badge bg-danger">Off</span>'}
                         </td>
                         <td>${log.recorded_at}</td>
-                        <td>${log.created_at}</td>
-                        <td>${log.updated_at}</td>
+                        <td>${log.created_at ?? '-'}</td>
+                        <td>${log.updated_at ?? '-'}</td>
                     </tr>
                 `);
             });
