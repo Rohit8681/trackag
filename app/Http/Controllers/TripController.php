@@ -126,9 +126,9 @@ class TripController extends Controller
             ]);
     }
 
-    public function getLogs($trip)
+    public function getLogs($tripId)
     {
-        $logs = TripLog::where('trip_id', $trip)
+        $logs = TripLog::where('trip_id', $tripId)
             ->orderBy('recorded_at')
             ->get()
             ->map(function ($log) {
