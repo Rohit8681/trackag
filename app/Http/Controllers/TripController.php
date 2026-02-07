@@ -451,6 +451,7 @@ class TripController extends Controller
                                         ? $log->battery_percentage . '%'
                                         : 'N/A',
                     'gps_status'   => $log->gps_status,
+                    'mobile_status' =>  $log->mobile_status,
                     'recorded_at'  => Carbon::parse($log->recorded_at)->format('d-m-Y H:i:s a'),
                     'created_at'   => optional($log->created_at)->format('d-m-Y H:i:s a'),
                     'updated_at'   => optional($log->updated_at)->format('d-m-Y H:i:s a'),

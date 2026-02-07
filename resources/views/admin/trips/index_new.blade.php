@@ -364,6 +364,7 @@
                                 <th>Longitude</th>
                                 <th>Battery</th>
                                 <th>GPS</th>
+                                <th>Mobile Status</th>
                                 <th>Recorded At</th>
                                 <th>Created At</th>
                                 <th>Updated At</th>
@@ -612,6 +613,11 @@ $(document).on('click', '.view-logs-btn', function () {
                         <td>${log.battery}</td>
                         <td>
                             ${log.gps_status == 1
+                                ? '<span class="badge bg-success">On</span>'
+                                : '<span class="badge bg-danger">Off</span>'}
+                        </td>
+                        <td>
+                            ${log.mobile_status == 1
                                 ? '<span class="badge bg-success">On</span>'
                                 : '<span class="badge bg-danger">Off</span>'}
                         </td>
