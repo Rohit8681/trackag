@@ -240,7 +240,7 @@
                                                 <br>
                                                 <div class="d-flex flex-column gap-1 align-items-start">
     <span class="badge bg-info text-dark">
-        {{ $trip->logs_count ?? 0 }} logs
+        {{ $trip->tripLogs->count() ?? 0 }} logs
     </span>
 
     <button
