@@ -21,6 +21,7 @@ return new class extends Migration
             $table->foreignId('product_category_id')->constrained()->cascadeOnDelete();
             $table->decimal('shipper_gross_weight', 10, 2)->nullable();
             $table->enum('master_packing', ['Yes', 'No'])->default('No');
+            $table->string('gst')->nullable();
             $table->boolean('status')->default(1);
             $table->timestamps();
         });

@@ -20,7 +20,7 @@
 
                     {{-- PRODUCT DETAILS --}}
                     <div class="row g-3">
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <label class="form-label">Product Name <span class="text-danger">*</span></label>
                             <input type="text" name="product_name"
                                    class="form-control"
@@ -28,14 +28,14 @@
                             <span class="text-danger error-text product_name_error"></span>
                         </div>
 
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <label class="form-label">Technical Name <span class="text-danger">*</span></label>
                             <input type="text" name="technical_name"
                                    class="form-control"
                                    value="{{ old('technical_name', $product->technical_name) }}">
                             <span class="text-danger error-text technical_name_error"></span>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <label class="form-label">Product Category <span class="text-danger">*</span></label>
                             <select name="product_category_id" class="form-select">
                                 <option value="">-- Select Category --</option>
@@ -87,6 +87,16 @@
                                 <option value="No" {{ $product->master_packing == "No" ? 'selected' : '' }}>No</option>
                             </select>
                             <span class="text-danger error-text master_packing_error"></span>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">GST<span class="text-danger">*</span></label>
+                            <select name="gst" class="form-select" required>
+                                <option value="0" {{ $product->gst == "0" ? 'selected' : '' }}>0%</option>
+                                <option value="12" {{ $product->gst == "12" ? 'selected' : '' }}>12%</option>
+                                <option value="18" {{ $product->gst == "18" ? 'selected' : '' }}>18%</option>
+                                <option value="24" {{ $product->gst == "24" ? 'selected' : '' }}>24%</option>
+                            </select>
+                            <span class="text-danger error-text gst_error"></span>
                         </div>
                         
                     </div>
@@ -242,21 +252,37 @@
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 <script>
-$(document).on('input', '.packing_value, .shipper_size', function () {
-    let row = $(this).closest('tr');
-    let packingValue = parseFloat(row.find('.packing_value').val()) || 0;
-    let shipperSize = parseFloat(row.find('.shipper_size').val()) || 0;
-    row.find('.unit_in_shipper').val(packingValue > 0 && shipperSize > 0 ? Math.floor((shipperSize * 1000) / packingValue) : '');
+$(document).on(
+    'input change',
+    '.packing_value, .shipper_size, select[name="packing_size[]"]',
+    function () {
+
+        let row = $(this).closest('tr');
+
+        let packingValue = parseFloat(row.find('.packing_value').val()) || 0;
+        let shipperSize  = parseFloat(row.find('.shipper_size').val()) || 0;
+        let packingSize  = row.find('select[name="packing_size[]"]').val();
+
+        let units = '';
+
+        if (packingValue > 0 && shipperSize > 0) {
+
+            // ✅ KG / LTR logic
+            if (packingSize === 'KG' || packingSize === 'LTR') {
+                units = shipperSize / packingValue;
+            }
+            // ✅ GM / ML / UNIT (old logic)
+            else {
+                units = (shipperSize * 1000) / packingValue;
+            }
+
+            row.find('.unit_in_shipper').val(Math.floor(units));
+        } else {
+            row.find('.unit_in_shipper').val('');
+        }
 });
 $('.select2').select2({ width: '100%' });
-// Add row
-// $('#addRow').click(function () {
-//     let row = $('#packingTable tbody tr:first').clone();
-//     row.find('input').val('');
-//     row.find('select').val('');
-//     row.find('.packing_status_toggle').prop('checked', true);
-//     $('#packingTable tbody').append(row);
-// });
+
 let packingIndex = {{ $product->packings->count() }};
 
 $('#addRow').click(function(){

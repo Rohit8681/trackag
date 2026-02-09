@@ -55,6 +55,7 @@ class ProductController extends Controller
             'product_category_id' => 'required',
             'shipper_gross_weight' => 'required',
             'master_packing' => 'required|in:Yes,No',
+            'gst' => 'required',
             'product_states' => 'required|array',
             'packing_value' => 'required|array',
         ]);
@@ -68,6 +69,7 @@ class ProductController extends Controller
                 'product_category_id' => $request->product_category_id,
                 'shipper_gross_weight' => $request->shipper_gross_weight,
                 'master_packing' => $request->master_packing,
+                'gst' => $request->gst,
                 'status' => 1
             ]);
 
@@ -146,6 +148,7 @@ class ProductController extends Controller
             'product_category_id' => 'required',
             'shipper_gross_weight' => 'required',
             'master_packing' => 'required|in:Yes,No',
+            'gst' => 'required',
             'product_states' => 'required|array',
             'packing_value' => 'required|array',
         ]);
@@ -160,6 +163,7 @@ class ProductController extends Controller
                 'product_category_id' => $request->product_category_id,
                 'shipper_gross_weight' => $request->shipper_gross_weight,
                 'master_packing' => $request->master_packing,
+                'gst' => $request->gst,
                 'status' => 1
             ]);
 

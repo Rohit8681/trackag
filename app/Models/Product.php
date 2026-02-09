@@ -18,6 +18,7 @@ class Product extends Model
         'product_category_id',
         'shipper_gross_weight',
         'master_packing',
+        'gst',
         'status'
     ];
 

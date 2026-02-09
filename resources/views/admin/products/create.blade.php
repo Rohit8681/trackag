@@ -40,19 +40,19 @@
                     {{-- PRODUCT INFO --}}
                     <div class="row g-3">
 
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <label class="form-label">Product Name <span class="text-danger">*</span></label>
                             <input type="text" name="product_name" class="form-control">
                             <span class="text-danger error-text product_name_error"></span>
                         </div>
 
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <label class="form-label">Technical Name <span class="text-danger">*</span></label>
                             <input type="text" name="technical_name" class="form-control">
                             <span class="text-danger error-text technical_name_error"></span>
                         </div>
 
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <label class="form-label">Product Category <span class="text-danger">*</span></label>
                             <select name="product_category_id" class="form-select">
                                 <option value="">-- Select Category --</option>
@@ -92,6 +92,16 @@
                                 <option value="No">No</option>
                             </select>
                             <span class="text-danger error-text master_packing_error"></span>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">GST<span class="text-danger">*</span></label>
+                            <select name="gst" class="form-select" required>
+                                <option value="0">0%</option>
+                                <option value="12">12%</option>
+                                <option value="18">18%</option>
+                                <option value="24">24%</option>
+                            </select>
+                            <span class="text-danger error-text gst_error"></span>
                         </div>
 
                     </div>
@@ -257,11 +267,31 @@ $(document).on('click','.removeRow',function(){
     }
 });
 
-$(document).on('input','.packing_value, .shipper_size',function(){
+$(document).on('input change', '.packing_value, .shipper_size, select[name="packing_size[]"]', function () {
+
     let row = $(this).closest('tr');
-    let pv = parseFloat(row.find('.packing_value').val()) || 0;
-    let ss = parseFloat(row.find('.shipper_size').val()) || 0;
-    row.find('.unit_in_shipper').val(pv && ss ? Math.floor((ss*1000)/pv) : '');
+
+    let packingValue = parseFloat(row.find('.packing_value').val()) || 0;
+    let shipperSize  = parseFloat(row.find('.shipper_size').val()) || 0;
+    let packingSize  = row.find('select[name="packing_size[]"]').val();
+
+    let units = '';
+
+    if (packingValue > 0 && shipperSize > 0) {
+
+        // 👉 KG / LTR logic
+        if (packingSize === 'KG' || packingSize === 'LTR') {
+            units = shipperSize / packingValue;
+        }
+        // 👉 GM / ML / UNIT logic (old logic)
+        else {
+            units = (shipperSize * 1000) / packingValue;
+        }
+
+        row.find('.unit_in_shipper').val(Math.floor(units));
+    } else {
+        row.find('.unit_in_shipper').val('');
+    }
 });
 
 $('#productForm').submit(function(e){
