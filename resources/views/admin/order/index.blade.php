@@ -65,7 +65,7 @@
         {{-- ROW 2 --}}
         <div class="row g-3 align-items-end">
 
-            <div class="col-md-3">
+            <div class="col-md-2">
                 <label class="form-label">Party Name</label>
                 <select class="form-select">
                     <option>All Parties</option>
