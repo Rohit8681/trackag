@@ -61,7 +61,7 @@
                         Filter
                     </button>
 
-                    <a href="{{ route('daily-farm-visits') }}"
+                    <a href="{{ route('farmers.daily-farm-visits') }}"
                        class="btn btn-secondary w-100">
                         Reset
                     </a>
