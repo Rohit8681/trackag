@@ -253,7 +253,7 @@
                     @endcanany
                     <ul class="nav nav-treeview">
                         <li class="nav-item">
-                            <a href="{{ route('attendance.index') }}" class="nav-link {{ request()->is('admin/attendance*') ? 'active' : '' }}">
+                            <a href="{{ route('coming-soon') }}" class="nav-link">
                                 <i class="bi bi-cash-stack me-2"></i>
                                 <p>Leave reports</p>
                             </a>
