@@ -89,6 +89,33 @@ class FarmerController extends Controller
         return view('admin.farmers.index', compact('farmers', 'states'));
     }
 
+    public function dailyFarmVisits(Request $request)
+    {
+        // 👉 Default today date
+        $selectedDate = $request->date ?? now()->toDateString();
+        $selectedFarmer = $request->farmer_id ?? null;
+
+        $visits = FarmVisit::with('crop:id,name', 'farmer:id,farmer_name')
+            ->when($selectedDate, function ($q) use ($selectedDate) {
+                $q->whereDate('created_at', $selectedDate);
+            })
+            ->when($selectedFarmer, function ($q) use ($selectedFarmer) {
+                $q->where('farmer_id', $selectedFarmer);
+            })
+            ->latest()
+            ->get();
+
+        // Farmer dropdown data
+        $farmers = Farmer::select('id', 'farmer_name')->orderBy('farmer_name')->get();
+
+        return view('admin.farmers.daily_farm_visits', compact(
+            'visits',
+            'farmers',
+            'selectedDate',
+            'selectedFarmer'
+        ));
+    }
+
     public function farmerWiseList(Farmer $farmer)
     {
         

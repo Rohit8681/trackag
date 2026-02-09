@@ -315,17 +315,17 @@
                         <a href="{{ route('farmers.index') }}" 
                         class="nav-link {{ request()->is('farmers.index') ? 'active' : '' }}">
                             <i class="bi bi-cash-stack me-2"></i>
-                            <p>Daily Farm Demo</p>
+                            <p>Farmers</p>
                         </a>
                     </li>
 
-                    {{-- <li class="nav-item">
-                        <a href="{{ route('coming-soon') }}" 
-                        class="nav-link {{ request()->is('admin/expense/monthly-report*') ? 'active' : '' }}">
+                    <li class="nav-item">
+                        <a href="{{ route('farmers.daily-farm-visits') }}"
+                        class="nav-link {{ request()->routeIs('farmers.daily-farm-visits') ? 'active' : '' }}">
                             <i class="bi bi-cash-stack me-2"></i>
-                            <p>Monthly Farm Demo Report</p>
+                            <p>Daily Farm Demo</p>
                         </a>
-                    </li> --}}
+                    </li>
                 </ul>
             </li>
 

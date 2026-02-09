@@ -211,6 +211,8 @@ Route::middleware(['web'])->group(function () {
             Route::resource('crop-sub-categories', CropSubCategoryController::class);
 
             Route::get('farmers', [FarmerController::class, 'index'])->name('farmers.index');
+            Route::get('daily-farm-visits', [FarmerController::class, 'dailyFarmVisits'])->name('farmers.daily-farm-visits');
+
             Route::get('farmers/{farmer}/farm-visits', [FarmerController::class, 'farmerWiseList'])->name('farmers.farm-visits');
             Route::post('farm-visits/{visit}/agronomist-remark', [FarmerController::class, 'saveAgronomistRemark'])->name('farm-visits.agronomist-remark');
             Route::get('/farmers/pdf', [FarmerController::class, 'downloadPdf'])->name('farmers.pdf');
