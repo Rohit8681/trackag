@@ -345,25 +345,19 @@ class ApiTripController extends BaseController
     public function close(Request $request)
     {
         try {
-            Log::info('Trip close API called', ['request_data' => $request->all()]);
-
-            // 🧩 Step 1: Validate input
             $validated = $request->validate([
                 'end_time'       => 'required|date_format:H:i:s',
                 'end_lat'        => 'required|numeric',
                 'end_lng'        => 'required|numeric',
                 'closenote'      => 'nullable|string',
                 'end_km'         => 'nullable|string',
+                'battery_percentage'         => 'nullable|string',
                 'end_km_photo'   => 'nullable|mimes:jpeg,jpg,png,bmp,gif,svg,webp,tiff,ico|max:5120',
                 'status'         => 'in:completed',
             ]);
-            Log::info('Validation passed successfully', ['validated_data' => $validated]);
-
-            // 🧩 Step 2: Find Trip
+            
             $trip = Trip::findOrFail($request->id);
-            Log::info('Trip found', ['trip_id' => $trip->id]);
 
-            // 🧩 Step 3: Auth check
             $user = Auth::user();
             if ($trip->user_id !== $user->id) {
                 Log::warning('Unauthorized trip access attempt', [
@@ -373,24 +367,17 @@ class ApiTripController extends BaseController
                 return $this->sendError('Trip is not assigned you', [], 403);
             }
 
-            // 🧩 Step 4: Already closed?
             if ($trip->status === 'completed') {
-                Log::info('Trip already closed', ['trip_id' => $trip->id]);
                 return $this->sendError('Trip is already closed.', [], 400);
             }
 
-            // 🧩 Step 5: Handle photo upload
             $endKmPhoto = null;
             if ($request->hasFile('end_km_photo')) {
                 $endKmPhoto = $request->file('end_km_photo')->store('trip_photos', 'public');
-                Log::info('End KM photo uploaded', ['photo_path' => $endKmPhoto]);
             }
 
-            // 🧩 Step 6: Calculate distance
             $total_distance_km = $this->calculateDistanceFromLogs($request->id);
-            Log::info('Total distance calculated', ['distance_km' => $total_distance_km]);
 
-            // 🧩 Step 7: Update trip
             $trip->update([
                 'end_time'          => $validated['end_time'],
                 'end_lat'           => $validated['end_lat'],
@@ -402,14 +389,13 @@ class ApiTripController extends BaseController
                 'updated_at'        => Carbon::now(),
             ]);
 
-            Log::info('Trip updated successfully', ['trip_id' => $trip->id]);
 
             TripLog::create([
                 'trip_id' => $trip->id,
                 'latitude' => $validated['end_lat'],
                 'longitude' => $validated['end_lng'],
                 'gps_status' => 1,
-                'battery_percentage' => 0,
+                'battery_percentage' => $validated['battery_percentage'] ?? 0,
                 'recorded_at' => now(),
             ]);
 
