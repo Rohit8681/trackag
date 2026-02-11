@@ -51,7 +51,7 @@ class FarmVisitController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'farmer_id'               => 'required|exists:farmers,id',
-            'crop_id'                 => 'required|exists:crops,id',
+            'crop_id'                 => 'required',
             'crop_days'               => 'nullable|string',
             'crop_sowing_land_area'   => 'nullable|string',
             'crop_condition'          => 'nullable|string',
