@@ -22,7 +22,7 @@ class RoleController extends Controller
         $user = Auth::user();
         $roleName = $user->getRoleNames()->first();
         $roles = Role::all();
-        if($roleName == 'sub_admin'){
+        if($roleName != 'master_admin'){
             $roles = Role::where('name', '!=', 'sub_admin')->get();
         }
         
