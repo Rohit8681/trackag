@@ -47,7 +47,7 @@
                            <tr>
                               <th>#</th>
                               <th>Name</th>
-                              <th>Permissions</th>
+                              {{-- <th>Permissions</th> --}}
                               <th>Status</th>
                               <th>Created</th>
                               <th>Actions</th>
@@ -58,24 +58,29 @@
                            <tr>
                               <td>{{ $loop->iteration }}</td>
                               <td>{{ $role->name }}</td>
-                              <td>
+                              {{-- <td>
                                  <button type="button" class="btn btn-sm btn-outline-dark"
                                     data-bs-toggle="modal"
                                     data-bs-target="#permissionsModal{{ $role->id }}">
                                     View
                                  </button>
-                              </td>
+                              </td> --}}
                               <td>
-                                 @if ($role->is_active ?? true)
-                                 <span class="badge bg-success">Active</span>
-                                 @else
-                                 <span class="badge bg-secondary">Inactive</span>
-                                 @endif
+                                 
+                              <form action="{{ route('roles.toggle', $role->id) }}" method="POST" class="d-inline">
+                                 @csrf
+                                 <button type="submit"
+                                    class="btn btn-link p-0 {{ $role->status == 1 ? 'text-success' : 'text-danger' }}"
+                                    title="{{ $role->status == 1 ? 'Deactivate' : 'Activate' }}">
+                                    
+                                    <i class="fas {{ $role->status == 1 ? 'fa-toggle-on' : 'fa-toggle-off' }} fa-2x"></i>
+                                 </button>
+                              </form>
                               </td>
                               <td>{{ $role->created_at->format('Y-m-d') }}</td>
                               <td>
                                  @can('view_roles')
-                                 <a href="{{ route('roles.show', $role) }}" class="text-info me-2" title="View Role"><i class="fas fa-eye"></i></a>
+                                 {{-- <a href="{{ route('roles.show', $role) }}" class="text-info me-2" title="View Role"><i class="fas fa-eye"></i></a> --}}
                                  @endcan
                                  @can('edit_roles')
                                  {{-- @if(auth()->user() && auth()->user()->hasRole('master_admin')) --}}
@@ -137,7 +142,7 @@
 
                            @empty
                            <tr>
-                              <td colspan="6" class="text-center text-muted">No roles found.</td>
+                              <td colspan="5" class="text-center text-muted">No roles found.</td>
                            </tr>
                            @endforelse
                         </tbody>

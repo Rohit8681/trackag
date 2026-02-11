@@ -117,6 +117,8 @@ Route::middleware(['web'])->group(function () {
             Route::resource('cities', CityController::class);
             Route::resource('tehsils', TehsilController::class);
             Route::resource('roles', RoleController::class);
+            Route::post('roles/{role}/toggle-status', [RoleController::class, 'toggleStatus'])
+    ->name('roles.toggle');
             Route::resource('permissions', PermissionController::class);
             Route::resource('/hr/designations', DesignationController::class);
             Route::post('/hr/designations/toggle-status', [DesignationController::class, 'toggleStatus'])->name('designations.toggle-status');

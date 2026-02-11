@@ -126,7 +126,7 @@ class UserController extends Controller
             }
         }
         
-        $roles = Role::all();
+        $roles = Role::where('status',1)->get();
         // if($roleName == 'sub_admin'){
         //     $roles = Role::where('name', '!=', 'sub_admin')->get();
         // }
@@ -192,7 +192,7 @@ class UserController extends Controller
     {
         $authUser = auth()->user();
         $roleName = $authUser->getRoleNames()->first();
-        $roles = Role::all();
+        $roles = Role::where('status',1)->get();
         // if($roleName == 'sub_admin'){
         //     $roles = Role::where('name', '!=', 'sub_admin')->get();
         // }

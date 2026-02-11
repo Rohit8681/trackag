@@ -29,6 +29,18 @@ class RoleController extends Controller
         return view('admin.roles.index', compact('roles'));
     }
 
+    public function toggleStatus(Role $role)
+    {
+        if ($role->name === 'master_admin') {
+            return back()->with('error', 'Master Admin status cannot be changed');
+        }
+
+        $role->status = !$role->status;
+        $role->save();
+
+        return back()->with('success', 'Role status updated successfully');
+    }
+
     public function create()
     {
         return view('admin.roles.create', [

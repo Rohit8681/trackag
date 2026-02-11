@@ -619,7 +619,7 @@ $(document).on('click', '.view-logs-btn', function () {
                         <td>
                             ${log.mobile_status == 1
                                 ? '<span class="badge bg-success">On</span>'
-                                : '<span class="badge bg-danger">Off</span>'}
+                                : '<span class="badge bg-danger">-</span>'}
                         </td>
                         <td>${log.recorded_at}</td>
                         <td>${log.created_at ?? '-'}</td>

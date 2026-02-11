@@ -135,7 +135,7 @@ class ApiTripController extends BaseController
                         'latitude' => $loc['latitude'],
                         'longitude' => $loc['longitude'],
                         'gps_status' => $loc['gps_status'] ?? null,
-                        'mobile_status' => $loc['mobile_status'] ?? 1,
+                        'mobile_status' => $loc['mobile_status'] ?? 0,
                         'battery_percentage' => ($loc['battery_percentage'] === "null" || $loc['battery_percentage'] === null)
                             ? null
                             : $loc['battery_percentage'],
