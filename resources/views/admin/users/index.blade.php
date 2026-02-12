@@ -203,23 +203,23 @@
                                                     </span>
                                                 </td>
                                                 <td class="text-center">
-                                                    @if(!auth()->user()->hasRole('sub_admin'))
+                                                    @if(!auth()->user()->hasRole('sub_admin') && $user->id != 1)
                                                         <i class="fas fa-cog text-muted"></i>
                                                     @endif
                                                     
                                                 </td>
                                                 <td class="text-center">
-                                                    @if(!auth()->user()->hasRole('sub_admin'))
+                                                    @if(!auth()->user()->hasRole('sub_admin') && $user->id != 1)
                                                     <i class="fas fa-cog text-muted" style="cursor:pointer;" onclick="openSlabModal('{{ $user->id }}')"></i>
                                                     @endif
                                                 </td>
                                                 <td class="text-center">
-                                                    @if(!auth()->user()->hasRole('sub_admin'))
+                                                    @if(!auth()->user()->hasRole('sub_admin') && $user->id != 1)
                                                     <i class="fas fa-cog text-muted depo_access" style="cursor:pointer;" data-user-id="{{ $user->id }}"></i>
                                                     @endif
                                                 </td>
                                                 <td class="text-center">
-                                                    @if(!auth()->user()->hasRole('sub_admin'))
+                                                    @if(!auth()->user()->hasRole('sub_admin') && $user->id != 1)
                                                     <i class="fas fa-cog text-muted state_access" style="cursor:pointer;" data-user-id="{{ $user->id }}"></i>
                                                     @endif
                                                 </td>
