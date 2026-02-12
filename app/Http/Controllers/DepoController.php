@@ -42,7 +42,7 @@ class DepoController extends Controller
         // active states
         $states = State::where('status', 1)->orderBy('name')->get();
         // $designation = Designation::where('status', 1)->orderBy('name')->get();
-        $users = User::where('status','Active')->get();
+        $users = User::where('status','Active')->where('id', '!=', 1)->get();
         
         return view('admin.depos.create', compact('states','users'));
     }
@@ -82,7 +82,7 @@ class DepoController extends Controller
         $districts = $depo->state_id ? District::where('state_id', $depo->state_id)->where('status',1)->orderBy('name')->get() : collect();
         $tehsils = $depo->district_id ? Tehsil::where('district_id', $depo->district_id)->where('status',1)->orderBy('name')->get() : collect();
         //$designation = Designation::where('status', 1)->orderBy('name')->get();
-        $users = User::where('status','Active')->get();
+        $users = User::where('status','Active')->where('id', '!=', 1)->get();
 
         return view('admin.depos.edit', compact('depo','states','districts','tehsils','users'));
     }
