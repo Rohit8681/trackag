@@ -38,7 +38,7 @@ class PartyController extends Controller
         
         }
         if (in_array($roleName, ['master_admin', 'sub_admin'])) {
-            $employees = User::where('status','Active')->where('id', '!=', $user->id)->get();
+            $employees = User::where('status','Active')->where('id', '!=', 1)->get();
         }else{
             if (empty($stateIds)) {
                 $employees = collect();
@@ -210,7 +210,7 @@ class PartyController extends Controller
         // ✅ Master / Sub admin → all employees
         if (in_array($roleName, ['master_admin', 'sub_admin'])) {
 
-            $employees = User::where('status', 'Active')
+            $employees = User::where('status', 'Active')->where('id', '!=', 1)
                 ->when($stateId && $stateId !== 'all', function ($q) use ($stateId) {
                     $q->where('state_id', $stateId);
                 })
@@ -227,7 +227,7 @@ class PartyController extends Controller
             return response()->json([]);
         }
 
-        $employees = User::where('status', 'Active')
+        $employees = User::where('status', 'Active')->where('id', '!=', 1)
             ->whereIn('state_id', $stateIds)
             ->where('reporting_to', $user->id)
             ->when($stateId && $stateId !== 'all', function ($q) use ($stateId) {
