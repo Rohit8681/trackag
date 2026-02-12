@@ -237,7 +237,7 @@ select[disabled] {
                         <select id="employeeSelect" name="user_id" class="form-select me-2">
                             <option value="">All Users</option>
                             @foreach($users as $u)
-                                @if($u != 1)
+                                @if($u->id != 1)
                                 <option value="{{ $u->id }}" {{ $userFilter==$u->id?'selected':'' }}>
                                     {{ $u->name }}
                                 </option>
