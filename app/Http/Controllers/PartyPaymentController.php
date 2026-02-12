@@ -63,11 +63,11 @@ class PartyPaymentController extends Controller
         }
 
         if (in_array($roleName, ['master_admin', 'sub_admin'])) {
-            $employees = User::where('status', 'Active')->get();
+            $employees = User::where('status', 'Active')->where('id', '!=', 1)->get();
         } else {
             $employees = empty($stateIds)
                 ? collect()
-                : User::where('status', 'Active')
+                : User::where('status', 'Active')->where('id', '!=', 1)
                     ->whereIn('state_id', $stateIds)
                     ->where('reporting_to', $user->id)
                     ->get();
