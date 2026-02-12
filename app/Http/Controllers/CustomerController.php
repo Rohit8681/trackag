@@ -131,9 +131,7 @@ class CustomerController extends Controller
     {
         $admin = Auth::user();
         $executives = collect();
-        $executives = User::whereDoesntHave('roles', function ($q) {
-                $q->where('name', 'master_admin');
-            })->get();
+        $executives = User::where('id', '!=', 1)->get();
         $depos = Depo::where('status',1)->orderBy('depo_name')->get();
         $states = State::where('status', 1)->orderBy('name')->get();
         return view('admin.customers.create', compact( 'executives','depos','states'));
@@ -182,9 +180,7 @@ class CustomerController extends Controller
         $admin = Auth::user();
 
         $executives = collect();
-        $executives = User::whereDoesntHave('roles', function ($q) {
-                $q->where('name', 'master_admin');
-            })->get();
+        $executives = User::where('id', '!=', 1)->get();
         $depos = Depo::where('status',1)->orderBy('depo_name')->get();
         $states = State::where('status', 1)->orderBy('name')->get();
         $districts = District::where('state_id', $customer->state_id)->where('status',1)->orderBy('name')->get();
