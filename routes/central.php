@@ -68,6 +68,7 @@ Route::get('/logs', function () {
 
 Route::middleware(['web'])->group(function () {
     Route::get('/',function(){
+
     });
     Route::get('/login', function () {
         return redirect()->route('admin.login');
@@ -117,8 +118,7 @@ Route::middleware(['web'])->group(function () {
             Route::resource('cities', CityController::class);
             Route::resource('tehsils', TehsilController::class);
             Route::resource('roles', RoleController::class);
-            Route::post('roles/{role}/toggle-status', [RoleController::class, 'toggleStatus'])
-    ->name('roles.toggle');
+            Route::post('roles/{role}/toggle-status', [RoleController::class, 'toggleStatus'])->name('roles.toggle');
             Route::resource('permissions', PermissionController::class);
             Route::resource('/hr/designations', DesignationController::class);
             Route::post('/hr/designations/toggle-status', [DesignationController::class, 'toggleStatus'])->name('designations.toggle-status');
@@ -153,9 +153,6 @@ Route::middleware(['web'])->group(function () {
             Route::get('ta-da-slab', [TaDaSlabController::class, 'form'])->name('ta-da-slab.form');
             Route::post('ta-da-slab', [TaDaSlabController::class, 'save'])->name('ta-da-slab.save');
 
-
-
-            // Route::prefix('trips')->group(function () {
             Route::resource('travelmode', TravelModeController::class)->names('travelmode');
             Route::resource('tourtype', TourTypeController::class)->names('tourtype');
             Route::resource('purpose', PurposeController::class)->names('purpose');
@@ -166,46 +163,45 @@ Route::middleware(['web'])->group(function () {
             Route::post('/trips/{trip}/approve', [TripController::class, 'approve'])->name('trips.approve');
             Route::post('/admin/trips/{id}/complete', [TripController::class, 'completeTrip'])->name('trips.complete');
             Route::post('/trips/{trip}/toggle-status', [TripController::class, 'toggleStatus'])->name('trips.status.toggle');
-            // });
 
             Route::resource('budget', BudgetController::class);
             Route::resource('monthly', MonthlyController::class);
             Route::resource('achievement', AchievementController::class);
             Route::resource('party', PartyController::class);
-            Route::get('/admin/get-employees-by-state', [PartyController::class, 'getEmployeesByState'])
-    ->name('admin.getEmployeesByState');
+            Route::get('/admin/get-employees-by-state', [PartyController::class, 'getEmployeesByState'])->name('admin.getEmployeesByState');
             Route::get('/admin/get-party-visits', [PartyController::class, 'getPartyVisits'])->name('admin.get-party-visits');
             Route::get('new-party', [PartyController::class, 'newPartyList'])->name('new-party.list');
-            Route::get('new-party/pdf', [PartyController::class, 'newPartyPdf'])
-    ->name('new-party.pdf');
+            Route::get('new-party/pdf', [PartyController::class, 'newPartyPdf'])->name('new-party.pdf');
             Route::post('new-party/status-update', [PartyController::class, 'updateStatus'])->name('new-party.update-status');
 
             Route::get('party-payment', [PartyPaymentController::class, 'index'])->name('party-payment');
-            Route::post('/party-payment/clear-return', [PartyPaymentController::class, 'clearReturn'])
-    ->name('party-payment.clear-return');
+            Route::post('/party-payment/clear-return', [PartyPaymentController::class, 'clearReturn'])->name('party-payment.clear-return');
             
             Route::resource('order', OrderController::class);
             Route::resource('stock', StockController::class);
             Route::resource('tracking', TrackingController::class);
+
             Route::resource('expense', ExpenseController::class);
             Route::patch('expense/{id}/approve', [ExpenseController::class, 'approve'])->name('expense.approve');
             Route::patch('expense/{id}/reject', [ExpenseController::class, 'reject'])->name('expense.reject');
             Route::get('expense-report', [ExpenseController::class, 'expenseReport'])->name('expense.report');
-            Route::get('/expense-pdf-list', [ExpenseController::class, 'expensePdfList'])
-    ->name('expense.pdf.list');
-            Route::post('expense/bulk-approve', [ExpenseController::class, 'bulkApprove'])
-            ->name('expense.bulk.approve');
+            Route::get('/expense-pdf-list', [ExpenseController::class, 'expensePdfList'])->name('expense.pdf.list');
+            Route::post('expense/bulk-approve', [ExpenseController::class, 'bulkApprove'])->name('expense.bulk.approve');
             Route::get('/expense-report/pdf', [ExpenseController::class, 'exportPDF'])->name('expense.report.pdf');
             Route::get('/expense-report/excel', [ExpenseController::class, 'exportExcel'])->name('expense.report.excel');
+
             Route::resource('brochure', BrochureController::class);
             Route::resource('price', PriceController::class);
+
             Route::resource('product-categories', ProductCategoryController::class);
             Route::resource('products', ProductController::class);
+            Route::get('product-price-list', [ProductController::class, 'priceList'])->name('products.price.list');
+            Route::post('product-price-store', [ProductController::class, 'priceStore'])->name('products.price.store');
 
-             Route::resource('customers', CustomerController::class);
-             Route::resource('messages', MessageController::class);
+            
+            Route::resource('messages', MessageController::class);
              
-
+            Route::resource('customers', CustomerController::class);
             Route::patch('/customers/{id}/toggle', [CustomerController::class, 'toggleStatus'])->name('customers.toggle');
             Route::post('/customers/import', [CustomerController::class, 'import'])->name('customers.import');
 
@@ -214,7 +210,6 @@ Route::middleware(['web'])->group(function () {
 
             Route::get('farmers', [FarmerController::class, 'index'])->name('farmers.index');
             Route::get('daily-farm-visits', [FarmerController::class, 'dailyFarmVisits'])->name('farmers.daily-farm-visits');
-
             Route::get('farmers/{farmer}/farm-visits', [FarmerController::class, 'farmerWiseList'])->name('farmers.farm-visits');
             Route::post('farm-visits/{visit}/agronomist-remark', [FarmerController::class, 'saveAgronomistRemark'])->name('farm-visits.agronomist-remark');
             Route::get('/farmers/pdf', [FarmerController::class, 'downloadPdf'])->name('farmers.pdf');

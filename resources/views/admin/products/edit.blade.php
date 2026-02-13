@@ -125,7 +125,7 @@
                             @foreach ($product->packings as $index => $pack)
                                 <tr>
                                     <td>
-                                        <input type="number" step="0.01" name="packing_value[]"
+                                        <input type="number" step="0.01" min="0" step="0.01" oninput="this.value = this.value < 0 ? 0 : this.value" name="packing_value[]"
                                                value="{{ $pack->packing_value }}"
                                                class="form-control form-control-sm packing_value">
                                         <span class="text-danger error-text packing_value_error"></span>
@@ -153,13 +153,13 @@
                                         <span class="text-danger error-text shipper_type_error"></span>
                                     </td>
                                     <td>
-                                        <input type="number" step="0.01" name="shipper_size[]"
+                                        <input type="number" step="0.01" min="0" step="0.01" oninput="this.value = this.value < 0 ? 0 : this.value" name="shipper_size[]"
                                                value="{{ $pack->shipper_size }}"
                                                class="form-control form-control-sm shipper_size">
                                         <span class="text-danger error-text shipper_size_error"></span>
                                     </td>
                                     <td>
-                                        <input type="number" name="unit_in_shipper[]"
+                                        <input type="number" step="0.01" min="0" step="0.01" oninput="this.value = this.value < 0 ? 0 : this.value" name="unit_in_shipper[]"
                                                value="{{ $pack->unit_in_shipper }}"
                                                class="form-control form-control-sm unit_in_shipper"
                                                readonly>
@@ -192,7 +192,7 @@
                             <tbody>
                                 <tr id="packingRowTemplate">
                                     <td>
-                                        <input type="number" step="0.01" name="packing_value[]" class="form-control form-control-sm packing_value">
+                                        <input type="number" step="0.01" min="0" step="0.01" oninput="this.value = this.value < 0 ? 0 : this.value" name="packing_value[]" class="form-control form-control-sm packing_value">
                                     </td>
                                     <td>
                                         <select name="packing_size[]" class="form-select form-select-sm">
@@ -214,10 +214,10 @@
                                         </select>
                                     </td>
                                     <td>
-                                        <input type="number" step="0.01" name="shipper_size[]" class="form-control form-control-sm shipper_size">
+                                        <input type="number" step="0.01" min="0" step="0.01" oninput="this.value = this.value < 0 ? 0 : this.value" name="shipper_size[]" class="form-control form-control-sm shipper_size">
                                     </td>
                                     <td>
-                                        <input type="number" name="unit_in_shipper[]" class="form-control form-control-sm unit_in_shipper" readonly>
+                                        <input type="number" step="0.01" min="0" step="0.01" oninput="this.value = this.value < 0 ? 0 : this.value" name="unit_in_shipper[]" class="form-control form-control-sm unit_in_shipper" readonly>
                                     </td>
                                     <td>
                                         <select class="form-select form-select-sm packing-states" multiple>

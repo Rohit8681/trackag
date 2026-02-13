@@ -6,6 +6,8 @@ use App\Models\Company;
 use App\Models\PackingState;
 use App\Models\Product;
 use App\Models\ProductCategory;
+use App\Models\ProductPacking;
+use App\Models\ProductPackingPrice;
 use App\Models\ProductState;
 use App\Models\State;
 use Illuminate\Http\Request;
@@ -15,9 +17,7 @@ class ProductController extends Controller
 {
     public function index()
     {
-        $products = Product::with(['category', 'packings'])
-            ->latest()
-            ->get();
+        $products = Product::with(['category', 'packings'])->latest()->get();
 
         return view('admin.products.index', compact('products'));
     }
@@ -39,15 +39,12 @@ class ProductController extends Controller
         }else{
             $states = State::where('status', 1)->get();
         }
-
-        
         return view('admin.products.create', compact('categories','states'));
     }
     
 
     public function store(Request $request)
     {
-        // dd($request->all());
         $request->validate([
             'product_name' => 'required',
             'technical_name' => 'required',
@@ -79,7 +76,6 @@ class ProductController extends Controller
                         ProductState::create([
                             'product_id' => $product->id,
                             'state_id' => $value,
-
                         ]);
 
                     }
@@ -215,5 +211,59 @@ class ProductController extends Controller
     {
         $product->delete();
         return back()->with('success', 'Product deleted');
+    }
+
+    public function priceList()
+    {
+        $companyCount = Company::count();
+        $company = null;
+        if ($companyCount == 1) {
+            $company = Company::first();
+
+            if ($company && !empty($company->state)) {
+                $companyStates = array_map('intval', explode(',', $company->state));
+                    $states = State::where('status', 1)
+                        ->whereIn('id', $companyStates)
+                        ->get();
+            } 
+        }else{
+            $states = State::where('status', 1)->get();
+        }
+
+        $products = Product::with(['packings.prices'])->get();
+
+        return view('admin.products.price_list', compact('products', 'states'));
+    }
+
+    public function priceStore(Request $request)
+    {
+        foreach ($request->prices as $packingId => $statePrices) {
+
+            $packing = ProductPacking::with('packingStates')->find($packingId);
+            if (!$packing) continue;
+
+            $allowedStates = $packing->packingStates->pluck('state_id')->toArray();
+
+            foreach ($statePrices as $stateId => $price) {
+
+                if (!in_array($stateId, $allowedStates)) {
+                    continue; // ❌ skip unauthorized state
+                }
+
+                ProductPackingPrice::updateOrCreate(
+                    [
+                        'packing_id' => $packingId,
+                        'state_id'   => $stateId,
+                    ],
+                    [
+                        'product_id'   => $request->product_id[$packingId],
+                        'cash_price'   => $price['cash_price'] ?? null,
+                        'credit_price' => $price['credit_price'] ?? null,
+                    ]
+                );
+            }
+        }
+
+        return back()->with('success','Product prices saved successfully');
     }
 }

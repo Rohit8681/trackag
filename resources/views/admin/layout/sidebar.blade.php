@@ -690,7 +690,13 @@
                                 <li class="nav-item"><a href="{{ route('coming-soon') }}" class="nav-link {{ request()->is('coming-soon*') ? 'active' : '' }}"><i class="bi bi-circle me-2"></i><p>Technical Master</p></a></li>
                                 <li class="nav-item"><a href="{{ url('admin/product-categories') }}" class="nav-link {{ request()->is('admin/product-categories*') ? 'active' : '' }}"><i class="bi bi-circle me-2"></i><p>Product Category</p></a></li>
 
-                                <li class="nav-item"><a href="{{ route('coming-soon') }}" class="nav-link {{ request()->is('coming-soon*') ? 'active' : '' }}"><i class="bi bi-circle me-2"></i><p>Product Price</p></a></li>
+                                <li class="nav-item">
+                                    <a href="{{ route('products.price.list') }}"
+                                    class="nav-link {{ request()->routeIs('products.price.list') ? 'active' : '' }}">
+                                        <i class="bi bi-circle me-2"></i>
+                                        <p>Product Price</p>
+                                    </a>
+                                </li>
                                 <li class="nav-item"><a href="{{ route('coming-soon') }}" class="nav-link {{ request()->is('coming-soon*') ? 'active' : '' }}"><i class="bi bi-circle me-2"></i><p>Product Collection</p></a></li>
                                 <li class="nav-item"><a href="{{ route('coming-soon') }}" class="nav-link {{ request()->is('coming-soon*') ? 'active' : '' }}"><i class="bi bi-circle me-2"></i><p>Product Financial Mapping</p></a></li>
                             </ul>

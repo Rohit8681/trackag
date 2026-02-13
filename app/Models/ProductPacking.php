@@ -26,8 +26,13 @@ class ProductPacking extends Model
     }
 
     public function packingStates()
-{
-    return $this->hasMany(PackingState::class, 'packing_id', 'id');
-}
+    {
+        return $this->hasMany(PackingState::class, 'packing_id', 'id');
+    }
+
+    public function prices()
+    {
+        return $this->hasMany(ProductPackingPrice::class, 'packing_id');
+    }
 
 }

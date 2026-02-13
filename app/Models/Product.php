@@ -41,4 +41,9 @@ class Product extends Model
     {
         return $this->hasMany(ProductState::class, 'product_id', 'id');
     }
+
+    public function prices()
+    {
+        return $this->hasMany(ProductPackingPrice::class);
+    }
 }
