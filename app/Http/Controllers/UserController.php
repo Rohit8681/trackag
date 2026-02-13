@@ -382,11 +382,11 @@ class UserController extends Controller
                 'km' => 'nullable|numeric',
                 'approved_bills_in_da' => 'nullable|array',
                 'travel_mode_id' => 'nullable|array',
-                'travel_mode_id.*' => 'exists:travel_modes,id',
+                // 'travel_mode_id.*' => 'exists:travel_modes,id',
                 'travelling_allow_per_km' => 'nullable|array',
                 'travelling_allow_per_km.*' => 'numeric',
                 'tour_type_id' => 'nullable|array',
-                'tour_type_id.*' => 'exists:tour_types,id',
+                // 'tour_type_id.*' => 'exists:tour_types,id',
                 'da_amount' => 'nullable|array',
                 'da_amount.*' => 'numeric',
             ]);
@@ -433,118 +433,6 @@ class UserController extends Controller
 
         return response()->json(['message' => 'Slab saved successfully']);
     }
-
-    // public function saveSlab(Request $request)
-    // {
-    //     // Basic validation
-    //     $request->validate([
-    //         'user_id' => 'required',
-    //         'slab' => 'required|string',
-    //     ]);
-
-    //     $user = User::findOrFail($request->user_id);
-    //     $user->slab = $request->slab;
-    //     $user->save();
-
-    //     // If slab is "Individual", insert/update detailed records
-    //     if ($request->slab != "Slab Wise") {
-
-    //         $request->validate([
-    //             'max_monthly_travel' => 'nullable|in:yes,no',
-    //             'km' => 'nullable|numeric',
-    //             'approved_bills_in_da' => 'nullable|array',
-    //             'approved_bills_in_da.*' => 'string',
-    //             'designation_id' => 'nullable|exists:designations,id',
-    //             'vehicle_type_id' => 'nullable|array',
-    //             'vehicle_type_id.*' => 'exists:vehicle_types,id',
-    //             'travelling_allow_per_km' => 'nullable|array',
-    //             'travelling_allow_per_km.*' => 'numeric',
-    //             'tour_type_id' => 'nullable|array',
-    //             'tour_type_id.*' => 'exists:tour_types,id',
-    //             'da_amount' => 'nullable|array',
-    //             'da_amount.*' => 'numeric',
-    //         ]);
-
-    //         // Check if user already has a TA/DA slab
-    //         $taDaSlab = TaDaSlab::updateOrCreate(
-    //             ['user_id' => $user->id], // matching condition
-    //             [
-    //                 'max_monthly_travel' => $request->max_monthly_travel,
-    //                 'km' => $request->km,
-    //                 'approved_bills_in_da' => $request->approved_bills_in_da, // store array directly, cast in model
-    //                 'designation_id' => $request->designation_id,
-    //             ]
-    //         );
-
-    //         // Clear old vehicle and tour slabs for this user
-    //         TaDaVehicleSlab::where('ta_da_slab_id', $taDaSlab->id)->delete();
-    //         TaDaTourSlab::where('ta_da_slab_id', $taDaSlab->id)->delete();
-
-    //         // Vehicle slabs
-    //         if ($request->has('vehicle_type_id') && $request->has('travelling_allow_per_km')) {
-    //             foreach ($request->vehicle_type_id as $index => $vehicleId) {
-    //                 TaDaVehicleSlab::create([
-    //                     'ta_da_slab_id' => $taDaSlab->id,
-    //                     'vehicle_type_id' => $vehicleId,
-    //                     'travelling_allow_per_km' => $request->travelling_allow_per_km[$index] ?? 0,
-    //                     'user_id' => $user->id,
-    //                     'type' => "individual"
-    //                 ]);
-    //             }
-    //         }
-
-    //         // Tour slabs
-    //         if ($request->has('tour_type_id') && $request->has('da_amount')) {
-    //             foreach ($request->tour_type_id as $index => $tourId) {
-    //                 TaDaTourSlab::create([
-    //                     'ta_da_slab_id' => $taDaSlab->id,
-    //                     'tour_type_id' => $tourId,
-    //                     'da_amount' => $request->da_amount[$index] ?? 0,
-    //                     'user_id' => $user->id,
-    //                     'type' => "individual"
-    //                 ]);
-    //             }
-    //         }
-    //     }
-
-    //     return response()->json(['message' => 'Slab saved successfully']);
-    // }
-    // public function getUserSlab(Request $request)
-    // {
-    //     $userId = $request->user_id;
-    //     $slabType = $request->slab;
-    //     $travelModes = TravelMode::get();
-    //     $tourTypes = TourType::all();
-
-    //     $vehicleSlabs = collect();
-    //     $tourSlabs = collect();
-    //     $taDaSlab = null;
-
-    //     if ($slabType === "Slab Wise") {
-    //         $taDaSlab = TaDaSlab::whereNull('user_id')->first();
-    //         $vehicleSlabs = TaDaVehicleSlab::where('type', 'slab_wise')->whereNull('user_id')->get();
-    //         $tourSlabs = TaDaTourSlab::where('type', 'slab_wise')->whereNull('user_id')->get();
-    //     } elseif ($slabType === "Individual") {
-    //         $taDaSlab = TaDaSlab::where('user_id', $userId)->first();
-    //         $vehicleSlabs = TaDaVehicleSlab::where('user_id', $userId)->get();
-    //         $tourSlabs = TaDaTourSlab::where('user_id', $userId)->get();
-
-    //         if (!$taDaSlab && $vehicleSlabs->isEmpty() && $tourSlabs->isEmpty()) {
-    //             $taDaSlab = TaDaSlab::whereNull('user_id')->first();
-    //             $vehicleSlabs = TaDaVehicleSlab::where('type', 'individual')->whereNull('user_id')->get();
-    //             $tourSlabs = TaDaTourSlab::where('type', 'individual')->whereNull('user_id')->get();
-    //         }
-    //     }
-
-    //     return response()->json([
-    //         'vehicle_types' => $travelModes,
-    //         'tour_types' => $tourTypes,
-    //         'vehicle_slabs' => $vehicleSlabs,
-    //         'tour_slabs' => $tourSlabs,
-    //         'ta_da_slab' => $taDaSlab
-    //     ]);
-    // }
-
     
     public function toggle(User $user)
     {
