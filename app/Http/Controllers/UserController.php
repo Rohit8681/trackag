@@ -26,6 +26,7 @@ use App\Models\TaDaVehicleSlab;
 use App\Models\TourType;
 use App\Models\VehicleType;
 use Illuminate\Support\Facades\Hash;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class UserController extends Controller
 {
@@ -261,6 +262,36 @@ class UserController extends Controller
         $user->delete();
 
         return redirect()->route('users.index')->with('success', 'User deleted successfully.');
+    }
+
+    public function exportPdf(Request $request)
+    {
+        $user = auth()->user();
+        $roleName = $user->getRoleNames()->first();
+
+        $query = User::with([
+            'state',
+            'district',
+            'tehsil',
+            'designation',
+            'reportingManager'
+        ])->latest();
+
+        // Same filters (optional – index page jeva)
+        if ($request->filled('state_id')) {
+            $query->where('state_id', $request->state_id);
+        }
+
+        if (!in_array($roleName, ['master_admin', 'sub_admin'])) {
+            $query->where('reporting_to', $user->id);
+        }
+
+        $users = $query->get();
+
+        $pdf = Pdf::loadView('admin.users.pdf', compact('users'))
+            ->setPaper('A4', 'landscape');
+
+        return $pdf->download('users-list.pdf');
     }
 
 

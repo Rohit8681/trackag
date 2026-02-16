@@ -46,6 +46,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Response;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 
 Route::get('/logs', function () {
@@ -93,6 +94,7 @@ Route::middleware(['web'])->group(function () {
             Route::get('/upload-apk', [ApkUploadController::class, 'create'])->name('apk.create');
             Route::post('/upload-apk', [ApkUploadController::class, 'store'])->name('apk.store');
             Route::resource('users', UserController::class);
+            Route::get('users-pdf', [UserController::class, 'exportPdf'])->name('users.pdf');
             Route::post('/users/{user}/toggle', [UserController::class, 'toggle'])->name('users.toggle');
             Route::post('/users/reset-password', [UserController::class, 'resetPassword'])->name('users.reset-password');
             Route::get('get-depos', [UserController::class,'getDepos'])->name('admin.get.depos');
