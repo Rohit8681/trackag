@@ -209,7 +209,7 @@ class ExpenseController extends Controller
 
         // 🔹 All active states (company logic same as before)
         $states = State::where('status', 1)
-            ->when(!in_array($roleName, ['master_admin']),
+            ->when(!in_array($roleName, ['master_admin', 'sub_admin']),
                 fn ($q) => $q->whereIn('id', $stateIds)
             )->get();
 
