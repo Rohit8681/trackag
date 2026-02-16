@@ -494,7 +494,6 @@ class ExpenseController extends Controller
 
     public function bulkApprove(Request $request)
     {
-        dd($request->all());
         $ids = json_decode($request->trip_ids, true);
         $selected_user_id = $request->selected_user_id;
 
@@ -582,7 +581,7 @@ class ExpenseController extends Controller
         ];
 
         /* ================= PDF ================= */
-        $month = now()->format('Y-m');
+        $month = Carbon::parse($trips->min('trip_date'))->format('Y-m');
 
         $pdf = Pdf::loadView('admin.expense.pdf.report', compact(
             'trips',
