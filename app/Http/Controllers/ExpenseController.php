@@ -208,10 +208,21 @@ class ExpenseController extends Controller
         $trips = $query->get();
 
         // 🔹 All active states (company logic same as before)
-        $states = State::where('status', 1)
-            ->when(!in_array($roleName, ['master_admin', 'sub_admin']),
-                fn ($q) => $q->whereIn('id', $stateIds)
-            )->get();
+        // $states = State::where('status', 1)
+        //     ->when(!in_array($roleName, ['master_admin', 'sub_admin']),
+        //         fn ($q) => $q->whereIn('id', $stateIds)
+        //     )->get();
+        $companyCount = Company::count();
+        $company = null;
+        if ($companyCount == 1) {
+            $company = Company::first();
+            $companyStates = array_map('intval', explode(',', $company->state));
+            $states = State::where('status', 1)
+                        ->whereIn('id', $companyStates)
+                        ->get();
+        }else{
+            $states = State::where('status', 1)->get();
+        }
 
         // 🔹 Initialize result array
         $report = [];
@@ -601,7 +612,6 @@ class ExpenseController extends Controller
 
         return view('admin.expense.pdf.list', compact('pdfs'));
     }
-
 
     public function stateWiseReport(Request $request)
     {
