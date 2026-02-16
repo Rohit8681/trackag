@@ -183,7 +183,7 @@ Route::middleware(['web'])->group(function () {
             Route::resource('stock', StockController::class);
             Route::resource('tracking', TrackingController::class);
 
-            Route::resource('expense', ExpenseController::class);
+            
             Route::patch('expense/{id}/approve', [ExpenseController::class, 'approve'])->name('expense.approve');
             Route::patch('expense/{id}/reject', [ExpenseController::class, 'reject'])->name('expense.reject');
             Route::get('expense-report', [ExpenseController::class, 'expenseReport'])->name('expense.report');
@@ -191,6 +191,8 @@ Route::middleware(['web'])->group(function () {
             Route::post('expense/bulk-approve', [ExpenseController::class, 'bulkApprove'])->name('expense.bulk.approve');
             Route::get('/expense-report/pdf', [ExpenseController::class, 'exportPDF'])->name('expense.report.pdf');
             Route::get('/expense-report/excel', [ExpenseController::class, 'exportExcel'])->name('expense.report.excel');
+            Route::get('/expense/state-wise-report', [ExpenseController::class, 'stateWiseReport'])->name('expense.state-wise-report');
+            Route::resource('expense', ExpenseController::class)->except(['show'])->where(['expense' => '[0-9]+']);
 
             Route::resource('brochure', BrochureController::class);
             Route::resource('price', PriceController::class);

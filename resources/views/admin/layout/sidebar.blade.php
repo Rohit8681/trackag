@@ -327,6 +327,17 @@
                         </li>
                     </ul>
 
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="{{ route('expense.state-wise-report') }}"
+                            class="nav-link {{ request()->routeIs('expense.state-wise-report*') ? 'active' : '' }}">
+                                <i class="bi bi-calendar-month me-2"></i>
+                                <p>State Wise Expense Report</p>
+                            </a>
+                        </li>
+                    </ul>
+
+
                     {{-- TA-DA Report --}}
                     <ul class="nav nav-treeview">
                         <li class="nav-item">

@@ -123,9 +123,9 @@
                                         <a href="{{ route('users.index') }}" class="btn btn-secondary me-2 px-3">
                                             <i class="fas fa-undo"></i>
                                         </a>
-                                        {{-- <a href="{{ route('users.pdf', request()->query()) }}" class="btn btn-danger me-2 px-3">
+                                        <a href="{{ route('users.pdf', request()->query()) }}" class="btn btn-danger me-2 px-3">
                                             PDF
-                                        </a> --}}
+                                        </a>
                                     </div>
 
                                 </div>

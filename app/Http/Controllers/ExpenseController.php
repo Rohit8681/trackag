@@ -171,6 +171,117 @@ class ExpenseController extends Controller
         return redirect()->route('expense.index')->with('success', 'Expense Updated Successfully!');
     }
 
+    public function show($id, Request $request)
+    {
+        $user = auth()->user();
+        $roleName = $user->getRoleNames()->first();
+
+        // 🔹 State access
+        $stateIds = [];
+        $userStateAccess = UserStateAccess::where('user_id', $user->id)->first();
+        if ($userStateAccess && !empty($userStateAccess->state_ids)) {
+            $stateIds = $userStateAccess->state_ids;
+        }
+
+        // 🔹 Month
+        $month = $request->month ?? now()->format('Y-m');
+
+        $from = Carbon::parse($month . '-01')->startOfMonth()->toDateString();
+        $to   = Carbon::parse($month . '-01')->endOfMonth()->toDateString();
+
+        // 🔹 Base trip query (same as your expenseReport)
+        $query = Trip::with(['user.state'])
+            ->where('approval_status', 'approved')
+            ->whereBetween('trip_date', [$from, $to]);
+
+        if (!in_array($roleName, ['master_admin', 'sub_admin'])) {
+            if (empty($stateIds)) {
+                $query->whereRaw('1 = 0');
+            } else {
+                $query->whereHas('user', function ($q) use ($stateIds, $user) {
+                    $q->whereIn('state_id', $stateIds)
+                    ->where('reporting_to', $user->id);
+                });
+            }
+        }
+
+        $trips = $query->get();
+
+        // 🔹 All active states (company logic same as before)
+        $states = State::where('status', 1)
+            ->when(!in_array($roleName, ['master_admin', 'sub_admin']),
+                fn ($q) => $q->whereIn('id', $stateIds)
+            )->get();
+
+        // 🔹 Initialize result array
+        $report = [];
+        foreach ($states as $state) {
+            $report[$state->id] = [
+                'state' => $state->name,
+                'ta' => 0,
+                'da' => 0,
+                'other' => 0,
+                'total' => 0,
+            ];
+        }
+
+        // 🔹 SAME calculation logic (copied from your code)
+        foreach ($trips as $item) {
+
+            if (!$item->user || !$item->user->state_id) continue;
+
+            $stateId = $item->user->state_id;
+
+            $slabType = $item->user->slab ?? "";
+
+            $da_amount = null;
+            $ta_amount = null;
+
+            if ($slabType == "Slab Wise") {
+                $da_amount = TaDaTourSlab::where('tour_type_id', $item->tour_type)
+                    ->whereNull('user_id')
+                    ->where('designation_id', $item->user->slab_designation_id)
+                    ->first();
+
+                $ta_amount = TaDaVehicleSlab::where('travel_mode_id', $item->travel_mode)
+                    ->whereNull('user_id')
+                    ->where('designation_id', $item->user->slab_designation_id)
+                    ->first();
+            }
+
+            if ($slabType == "Individual") {
+                $da_amount = TaDaTourSlab::where('tour_type_id', $item->tour_type)
+                    ->where('user_id', $item->user->id)
+                    ->first();
+
+                $ta_amount = TaDaVehicleSlab::where('travel_mode_id', $item->travel_mode)
+                    ->where('user_id', $item->user->id)
+                    ->first();
+            }
+
+            $expense = Expense::where('user_id', $item->user_id)
+                ->whereDate('bill_date', $item->trip_date)
+                ->where('approval_status', 'Approved')
+                ->get();
+
+            $travelKm = ($item->end_km - $item->starting_km);
+
+            $ta = ($ta_amount->travelling_allow_per_km ?? 0) * $travelKm;
+            $da = $da_amount->da_amount ?? 0;
+            $other = $expense->sum('amount') ?? 0;
+
+            $report[$stateId]['ta'] += $ta;
+            $report[$stateId]['da'] += $da;
+            $report[$stateId]['other'] += $other;
+            $report[$stateId]['total'] += ($ta + $da + $other);
+        }
+
+        return view(
+            'admin.expense.state_wise_report',
+            compact('states', 'report', 'month')
+        );
+    }
+
     public function destroy(string $id)
     {
         try {
@@ -483,8 +594,6 @@ class ExpenseController extends Controller
         // return response()->download(storage_path('app/public/'.$path));
         return back()->with('success', 'Expense PDF generated successfully.');
     }
-
-
     public function expensePdfList(){
         $pdfs = ExpensePdf::with('user')
         ->latest()
@@ -492,4 +601,116 @@ class ExpenseController extends Controller
 
         return view('admin.expense.pdf.list', compact('pdfs'));
     }
+
+
+    public function stateWiseReport(Request $request)
+    {
+        $user = auth()->user();
+        $roleName = $user->getRoleNames()->first();
+
+        // 🔹 State access
+        $stateIds = [];
+        $userStateAccess = UserStateAccess::where('user_id', $user->id)->first();
+        if ($userStateAccess && !empty($userStateAccess->state_ids)) {
+            $stateIds = $userStateAccess->state_ids;
+        }
+
+        // 🔹 Month
+        $month = $request->month ?? now()->format('Y-m');
+        $from = Carbon::parse($month . '-01')->startOfMonth()->toDateString();
+        $to   = Carbon::parse($month . '-01')->endOfMonth()->toDateString();
+
+        // 🔹 Base trip query (same as your expenseReport)
+        $query = Trip::with(['user.state'])
+            ->where('approval_status', 'approved')
+            ->whereBetween('trip_date', [$from, $to]);
+
+        if (!in_array($roleName, ['master_admin', 'sub_admin'])) {
+            if (empty($stateIds)) {
+                $query->whereRaw('1 = 0');
+            } else {
+                $query->whereHas('user', function ($q) use ($stateIds, $user) {
+                    $q->whereIn('state_id', $stateIds)
+                    ->where('reporting_to', $user->id);
+                });
+            }
+        }
+
+        $trips = $query->get();
+
+        // 🔹 All active states (company logic same as before)
+        $states = State::where('status', 1)
+            ->when(!in_array($roleName, ['master_admin', 'sub_admin']),
+                fn ($q) => $q->whereIn('id', $stateIds)
+            )->get();
+
+        // 🔹 Initialize result array
+        $report = [];
+        foreach ($states as $state) {
+            $report[$state->id] = [
+                'state' => $state->name,
+                'ta' => 0,
+                'da' => 0,
+                'other' => 0,
+                'total' => 0,
+            ];
+        }
+
+        // 🔹 SAME calculation logic (copied from your code)
+        foreach ($trips as $item) {
+
+            if (!$item->user || !$item->user->state_id) continue;
+
+            $stateId = $item->user->state_id;
+
+            $slabType = $item->user->slab ?? "";
+
+            $da_amount = null;
+            $ta_amount = null;
+
+            if ($slabType == "Slab Wise") {
+                $da_amount = TaDaTourSlab::where('tour_type_id', $item->tour_type)
+                    ->whereNull('user_id')
+                    ->where('designation_id', $item->user->slab_designation_id)
+                    ->first();
+
+                $ta_amount = TaDaVehicleSlab::where('travel_mode_id', $item->travel_mode)
+                    ->whereNull('user_id')
+                    ->where('designation_id', $item->user->slab_designation_id)
+                    ->first();
+            }
+
+            if ($slabType == "Individual") {
+                $da_amount = TaDaTourSlab::where('tour_type_id', $item->tour_type)
+                    ->where('user_id', $item->user->id)
+                    ->first();
+
+                $ta_amount = TaDaVehicleSlab::where('travel_mode_id', $item->travel_mode)
+                    ->where('user_id', $item->user->id)
+                    ->first();
+            }
+
+            $expense = Expense::where('user_id', $item->user_id)
+                ->whereDate('bill_date', $item->trip_date)
+                ->where('approval_status', 'Approved')
+                ->get();
+
+            $travelKm = ($item->end_km - $item->starting_km);
+
+            $ta = ($ta_amount->travelling_allow_per_km ?? 0) * $travelKm;
+            $da = $da_amount->da_amount ?? 0;
+            $other = $expense->sum('amount') ?? 0;
+
+            $report[$stateId]['ta'] += $ta;
+            $report[$stateId]['da'] += $da;
+            $report[$stateId]['other'] += $other;
+            $report[$stateId]['total'] += ($ta + $da + $other);
+        }
+
+        return view(
+            'admin.expense.state_wise_report',
+            compact('states', 'report', 'month')
+        );
+    }
+
 }
