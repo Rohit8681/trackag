@@ -494,6 +494,7 @@ class ExpenseController extends Controller
 
     public function bulkApprove(Request $request)
     {
+        dd($request->all());
         $ids = json_decode($request->trip_ids, true);
         $selected_user_id = $request->selected_user_id;
 
