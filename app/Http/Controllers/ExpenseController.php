@@ -172,25 +172,60 @@ class ExpenseController extends Controller
     }
 
     public function show($id, Request $request)
-    {
-        $user = auth()->user();
-        $roleName = $user->getRoleNames()->first();
+{
+    $user = auth()->user();
+    $roleName = $user->getRoleNames()->first();
 
-        // 🔹 State access
-        $stateIds = [];
-        $userStateAccess = UserStateAccess::where('user_id', $user->id)->first();
-        if ($userStateAccess && !empty($userStateAccess->state_ids)) {
-            $stateIds = $userStateAccess->state_ids;
+    // 🔹 Year (default current year)
+    $year = $request->year ?? now()->year;
+
+    // 🔹 State access
+    $stateIds = [];
+    $userStateAccess = UserStateAccess::where('user_id', $user->id)->first();
+    if ($userStateAccess && !empty($userStateAccess->state_ids)) {
+        $stateIds = $userStateAccess->state_ids;
+    }
+
+    // 🔹 States (company logic)
+    $companyCount = Company::count();
+    if ($companyCount == 1) {
+        $company = Company::first();
+        $companyStates = array_map('intval', explode(',', $company->state));
+        $states = State::where('status', 1)
+            ->whereIn('id', $companyStates)
+            ->get();
+    } else {
+        $states = State::where('status', 1)->get();
+    }
+
+    // 🔹 Initialize final report (12 months)
+    $finalReport = [];
+
+    for ($m = 1; $m <= 12; $m++) {
+
+        $monthKey = Carbon::create($year, $m, 1)->format('Y-m');
+        $monthName = Carbon::create($year, $m, 1)->format('F');
+
+        $from = Carbon::create($year, $m, 1)->startOfMonth()->toDateString();
+        $to   = Carbon::create($year, $m, 1)->endOfMonth()->toDateString();
+
+        // Init month row
+        $finalReport[$monthKey] = [
+            'month' => $monthName,
+            'states' => []
+        ];
+
+        foreach ($states as $state) {
+            $finalReport[$monthKey]['states'][$state->id] = [
+                'ta' => 0,
+                'da' => 0,
+                'other' => 0,
+                'total' => 0,
+            ];
         }
 
-        // 🔹 Month
-        $month = $request->month ?? now()->format('Y-m');
-
-        $from = Carbon::parse($month . '-01')->startOfMonth()->toDateString();
-        $to   = Carbon::parse($month . '-01')->endOfMonth()->toDateString();
-
-        // 🔹 Base trip query (same as your expenseReport)
-        $query = Trip::with(['user.state'])
+        // 🔹 Trip query
+        $query = Trip::with('user')
             ->where('approval_status', 'approved')
             ->whereBetween('trip_date', [$from, $to]);
 
@@ -200,49 +235,19 @@ class ExpenseController extends Controller
             } else {
                 $query->whereHas('user', function ($q) use ($stateIds, $user) {
                     $q->whereIn('state_id', $stateIds)
-                    ->where('reporting_to', $user->id);
+                      ->where('reporting_to', $user->id);
                 });
             }
         }
 
         $trips = $query->get();
 
-        // 🔹 All active states (company logic same as before)
-        // $states = State::where('status', 1)
-        //     ->when(!in_array($roleName, ['master_admin', 'sub_admin']),
-        //         fn ($q) => $q->whereIn('id', $stateIds)
-        //     )->get();
-        $companyCount = Company::count();
-        $company = null;
-        if ($companyCount == 1) {
-            $company = Company::first();
-            $companyStates = array_map('intval', explode(',', $company->state));
-            $states = State::where('status', 1)
-                        ->whereIn('id', $companyStates)
-                        ->get();
-        }else{
-            $states = State::where('status', 1)->get();
-        }
-
-        // 🔹 Initialize result array
-        $report = [];
-        foreach ($states as $state) {
-            $report[$state->id] = [
-                'state' => $state->name,
-                'ta' => 0,
-                'da' => 0,
-                'other' => 0,
-                'total' => 0,
-            ];
-        }
-
-        // 🔹 SAME calculation logic (copied from your code)
+        // 🔹 Calculation (same logic)
         foreach ($trips as $item) {
 
             if (!$item->user || !$item->user->state_id) continue;
 
             $stateId = $item->user->state_id;
-
             $slabType = $item->user->slab ?? "";
 
             $da_amount = null;
@@ -273,25 +278,27 @@ class ExpenseController extends Controller
             $expense = Expense::where('user_id', $item->user_id)
                 ->whereDate('bill_date', $item->trip_date)
                 ->where('approval_status', 'Approved')
-                ->get();
+                ->sum('amount');
 
             $travelKm = ($item->end_km - $item->starting_km);
 
             $ta = ($ta_amount->travelling_allow_per_km ?? 0) * $travelKm;
             $da = $da_amount->da_amount ?? 0;
-            $other = $expense->sum('amount') ?? 0;
+            $other = $expense ?? 0;
 
-            $report[$stateId]['ta'] += $ta;
-            $report[$stateId]['da'] += $da;
-            $report[$stateId]['other'] += $other;
-            $report[$stateId]['total'] += ($ta + $da + $other);
+            $finalReport[$monthKey]['states'][$stateId]['ta'] += $ta;
+            $finalReport[$monthKey]['states'][$stateId]['da'] += $da;
+            $finalReport[$monthKey]['states'][$stateId]['other'] += $other;
+            $finalReport[$monthKey]['states'][$stateId]['total'] += ($ta + $da + $other);
         }
-
-        return view(
-            'admin.expense.state_wise_report',
-            compact('states', 'report', 'month')
-        );
     }
+
+    return view(
+        'admin.expense.state_wise_report',
+        compact('states', 'finalReport', 'year')
+    );
+}
+
 
     public function destroy(string $id)
     {
@@ -649,10 +656,21 @@ class ExpenseController extends Controller
         $trips = $query->get();
 
         // 🔹 All active states (company logic same as before)
-        $states = State::where('status', 1)
-            ->when(!in_array($roleName, ['master_admin', 'sub_admin']),
-                fn ($q) => $q->whereIn('id', $stateIds)
-            )->get();
+        // $states = State::where('status', 1)
+        //     ->when(!in_array($roleName, ['master_admin', 'sub_admin']),
+        //         fn ($q) => $q->whereIn('id', $stateIds)
+        //     )->get();
+        $companyCount = Company::count();
+        $company = null;
+        if ($companyCount == 1) {
+            $company = Company::first();
+            $companyStates = array_map('intval', explode(',', $company->state));
+            $states = State::where('status', 1)
+                        ->whereIn('id', $companyStates)
+                        ->get();
+        }else{
+            $states = State::where('status', 1)->get();
+        }
 
         // 🔹 Initialize result array
         $report = [];

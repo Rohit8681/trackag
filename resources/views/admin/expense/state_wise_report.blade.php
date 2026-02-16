@@ -2,64 +2,86 @@
 @section('title', 'State Wise Expense Report')
 
 @section('content')
-    <main class="app-main">
-        <div class="app-content">
-            <div class="container-fluid">
+<main class="app-main">
+    <div class="app-content">
+        <div class="container-fluid">
 
-                <div class="card card-primary card-outline">
-                    <div class="card-header d-flex justify-content-between">
-                        <h5 class="card-title">STATE WISE EXPENSE REPORT</h5>
+            <div class="card card-primary card-outline">
 
-                        <form method="GET">
-                            <input type="month" name="month" value="{{ $month }}" class="form-control form-control-sm"
-                                onchange="this.form.submit()">
-                        </form>
-                    </div>
+                {{-- HEADER --}}
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">STATE WISE EXPENSE REPORT (YEAR WISE)</h5>
 
-                    <div class="card-body table-responsive">
-                        <table class="table table-bordered text-center align-middle">
-
-                            <thead>
-                                <tr>
-                                    <th rowspan="2" style="background:#9bb7e0;">MONTH NAME</th>
-                                    @foreach($states as $state)
-                                        <th colspan="4" style="background:#f4b183;">
-                                            {{ strtoupper($state->name) }}
-                                        </th>
-                                    @endforeach
-                                </tr>
-                                <tr>
-                                    @foreach($states as $state)
-                                        <th style="background:#d5f5e3;">TA EXP</th>
-                                        <th style="background:#d5f5e3;">DA EXP</th>
-                                        <th style="background:#d5f5e3;">OTHER</th>
-                                        <th style="background:#abebc6;">TOTAL</th>
-                                    @endforeach
-                                </tr>
-                            </thead>
-
-                            <tbody>
-                                @php
-                                    $monthName = \Carbon\Carbon::createFromFormat('Y-m', $month)->format('F Y');
-                                @endphp
-
-                                <tr>
-                                    <td><strong>{{ $monthName }}</strong></td>
-
-                                    @foreach($states as $state)
-                                        <td>{{ number_format($report[$state->id]['ta'], 2) }}</td>
-                                        <td>{{ number_format($report[$state->id]['da'], 2) }}</td>
-                                        <td>{{ number_format($report[$state->id]['other'], 2) }}</td>
-                                        <td><strong>{{ number_format($report[$state->id]['total'], 2) }}</strong></td>
-                                    @endforeach
-                                </tr>
-                            </tbody>
-
-                        </table>
-                    </div>
+                    {{-- YEAR FILTER --}}
+                    <form method="GET" class="d-flex align-items-center gap-2">
+                        <label class="mb-0 fw-bold">Year:</label>
+                        <input type="number"
+                               name="year"
+                               value="{{ $year }}"
+                               min="2020"
+                               max="{{ now()->year }}"
+                               class="form-control form-control-sm"
+                               style="width:100px"
+                               onchange="this.form.submit()">
+                    </form>
                 </div>
 
+                {{-- BODY --}}
+                <div class="card-body table-responsive">
+                    <table class="table table-bordered text-center align-middle">
+
+                        {{-- TABLE HEADER --}}
+                        <thead>
+                            <tr>
+                                <th rowspan="2" style="background:#9bb7e0;">MONTH</th>
+                                @foreach($states as $state)
+                                    <th colspan="4" style="background:#f4b183;">
+                                        {{ strtoupper($state->name) }}
+                                    </th>
+                                @endforeach
+                            </tr>
+
+                            <tr>
+                                @foreach($states as $state)
+                                    <th style="background:#d5f5e3;">TA</th>
+                                    <th style="background:#d5f5e3;">DA</th>
+                                    <th style="background:#d5f5e3;">OTHER</th>
+                                    <th style="background:#abebc6;">TOTAL</th>
+                                @endforeach
+                            </tr>
+                        </thead>
+
+                        {{-- TABLE BODY --}}
+                        <tbody>
+                            @forelse($finalReport as $row)
+                                <tr>
+                                    <td><strong>{{ $row['month'] }}</strong></td>
+
+                                    @foreach($states as $state)
+                                        <td>{{ number_format($row['states'][$state->id]['ta'], 2) }}</td>
+                                        <td>{{ number_format($row['states'][$state->id]['da'], 2) }}</td>
+                                        <td>{{ number_format($row['states'][$state->id]['other'], 2) }}</td>
+                                        <td>
+                                            <strong>
+                                                {{ number_format($row['states'][$state->id]['total'], 2) }}
+                                            </strong>
+                                        </td>
+                                    @endforeach
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="{{ (count($states) * 4) + 1 }}">
+                                        No data found
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+
+                    </table>
+                </div>
             </div>
+
         </div>
-    </main>
+    </div>
+</main>
 @endsection
