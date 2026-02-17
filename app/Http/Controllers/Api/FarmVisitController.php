@@ -87,6 +87,7 @@ class FarmVisitController extends Controller
         }
 
         $visit = FarmVisit::create([
+            'user_id'               => Auth::id(), // 🔐 logged-in user visits
             'farmer_id'             => $request->farmer_id,
             'crop_id'               => $request->crop_id,
             'crop_days'             => $request->crop_days,
