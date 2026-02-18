@@ -39,20 +39,6 @@ class CustomerController extends Controller
 
         $query = Customer::with(['user', 'company', 'state', 'district', 'tehsil'])->where('type','web');
         
-        // if (!($admin->hasRole('master_admin') || $admin->hasRole('sub_admin'))) {
-
-        //     $subordinateIds = \App\Models\User::where('reporting_to', $admin->id)
-        //         ->pluck('id')
-        //         ->toArray();
-
-        //     $query->where(function ($q) use ($admin, $subordinateIds) {
-        //         $q->where('user_id', $admin->id);
-
-        //         if (!empty($subordinateIds)) {
-        //             $q->orWhereIn('user_id', $subordinateIds);
-        //         }
-        //     });
-        // }
         if (!in_array($roleName, ['master_admin', 'sub_admin'])) {
             if (empty($stateIds)) {
                 $query->whereRaw('1 = 0'); 
@@ -272,51 +258,6 @@ class CustomerController extends Controller
         return redirect()->route('customers.index')->with('success', 'Selected customers deleted successfully.');
     }
 
-    // public function import(Request $request)
-    // {
-    //     $request->validate([
-    //         'file' => 'required|mimes:xlsx,csv,xls|max:2048',
-    //     ]);
-
-    //     try {
-    //         Excel::import(new CustomersImport, $request->file('file'));
-    //         return redirect()->route('customers.index')->with('success', 'Customers imported successfully!');
-    //     } catch (\Exception $e) {
-    //         // dd($e->getMessage());
-    //         return redirect()->back()->with('error', 'Import failed: ' . $e->getMessage());
-    //     }
-    // }
-
-    // public function import(Request $request)
-    // {
-    //     $request->validate([
-    //         'file' => 'required|mimes:xlsx,csv,xls|max:2048',
-    //     ]);
-
-    //     $import = new CustomersImport;
-
-    //     try {
-    //         $import->import($request->file('file'));
-
-    //         $failures = $import->failures(); // get skipped rows
-    //         $errorMessage = '';
-    //         if (!empty($failures)) {
-    //             foreach ($failures as $failure) {
-    //                 $errorMessage .= 'Row '.$failure->row().': '.implode(', ', $failure->errors()).'<br>';
-    //             }
-    //         }
-
-    //         $message = 'Customers imported successfully!';
-    //         if ($errorMessage) {
-    //             $message .= '<br>However, some rows were skipped:<br>'.$errorMessage;
-    //         }
-
-    //         return redirect()->route('customers.index')->with('success', $message);
-
-    //     } catch (\Exception $e) {
-    //         return redirect()->back()->with('error', 'Import failed: ' . $e->getMessage());
-    //     }
-    // }
 
     public function import(Request $request)
     {
@@ -329,7 +270,6 @@ class CustomerController extends Controller
         try {
             $import->import($request->file('file'));
 
-            // 🔥 GROUP ERRORS BY ROW (IMPORTANT)
             $rowErrors = [];
 
             foreach ($import->failures() as $failure) {
