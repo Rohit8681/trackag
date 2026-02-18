@@ -13,18 +13,29 @@ class FarmVisitController extends Controller
     public function index(Request $request)
     {
         $visits = FarmVisit::with([
-                'farmer:id,farmer_name',
-                'crop:id,name'
-            ])
-            ->where('user_id', Auth::id()) // 🔐 logged-in user visits
-            ->latest()
-            ->get();
+        'farmer:id,farmer_name,state_id,district_id,taluka_id',
+        'farmer.state:id,name',
+        'farmer.district:id,name',
+        'farmer.taluka:id,name',
+        'crop:id,name'
+    ])
+    ->where('user_id', Auth::id())
+    ->latest()
+    ->get();
 
         $data = $visits->map(function ($visit) {
             return [
                 'id'                    => $visit->id,
                 'farmer_id'             => $visit->farmer_id,
                 'farmer_name'           => $visit->farmer->farmer_name ?? null,
+                'state_id'              => $visit->farmer->state_id ?? null,
+                'state_name'            => $visit->farmer->state->name ?? null,
+
+                'district_id'           => $visit->farmer->district_id ?? null,
+                'district_name'         => $visit->farmer->district->name ?? null,
+
+                'taluka_id'             => $visit->farmer->taluka_id ?? null,
+                'taluka_name'           => $visit->farmer->taluka->name ?? null,
                 'crop_id'               => $visit->crop_id,
                 'crop_name'             => $visit->crop->name ?? null,
                 'crop_days'             => $visit->crop_days,
