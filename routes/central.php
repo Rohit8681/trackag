@@ -205,10 +205,11 @@ Route::middleware(['web'])->group(function () {
             
             Route::resource('messages', MessageController::class);
              
-            Route::resource('customers', CustomerController::class);
+            
             Route::patch('customers/{customer}/toggle-status', [CustomerController::class, 'toggleStatus'])->name('customers.toggle-status');
-            Route::patch('/customers/{id}/toggle', [CustomerController::class, 'toggleStatus'])->name('customers.toggle');
+            // Route::patch('/customers/{id}/toggle', [CustomerController::class, 'toggleStatus'])->name('customers.toggle');
             Route::post('/customers/import', [CustomerController::class, 'import'])->name('customers.import');
+            Route::resource('customers', CustomerController::class);
 
             Route::resource('crop-categories', controller: CropCategoryController::class);
             Route::resource('crop-sub-categories', CropSubCategoryController::class);
