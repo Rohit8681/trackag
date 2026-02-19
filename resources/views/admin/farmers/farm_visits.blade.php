@@ -123,10 +123,10 @@
                                                 </div>
                                                 <div class="modal-body">
                                                     <div class="row">
-                                                        @foreach(json_decode($visit->images, true) as $img)
+                                                        @foreach($visit->images as $img)
                                                             <div class="col-md-4 mb-2">
                                                                 <img src="{{ asset('storage/'.$img) }}"
-                                                                     class="img-fluid rounded border">
+                                                                    class="img-fluid rounded border">
                                                             </div>
                                                         @endforeach
                                                     </div>

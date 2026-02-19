@@ -24,6 +24,23 @@ class FarmVisitController extends Controller
     ->get();
 
         $data = $visits->map(function ($visit) {
+            $images = [];
+            if (!empty($visit->images)) {
+
+                $imageArray = json_decode($visit->images, true);
+
+                if (is_array($imageArray)) {
+                    foreach ($imageArray as $img) {
+                        $images[] = asset('storage/' . $img);
+                    }
+                }
+            }
+
+            // ✅ VIDEO (single)
+            $video = null;
+            if (!empty($visit->video)) {
+                $video = asset('storage/' . $visit->video);
+            }
             return [
                 'id'                    => $visit->id,
                 'farmer_id'             => $visit->farmer_id,
@@ -42,8 +59,8 @@ class FarmVisitController extends Controller
                 'crop_sowing_land_area' => $visit->crop_sowing_land_area,
                 'crop_condition'        => $visit->crop_condition,
                 'pest_disease'          => $visit->pest_disease,
-                'images'                => $visit->images,
-                'video'                 => $visit->video,
+                'images'            => $images,   // ARRAY of full URLs
+                'video'             => $video,
                 'remark'                => $visit->remark,
                 'next_visit_date'       => optional($visit->next_visit_date)->format('d-m-Y'),
                 'agronomist_remark'     => $visit->agronomist_remark,

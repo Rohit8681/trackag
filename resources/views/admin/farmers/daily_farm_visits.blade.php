@@ -164,11 +164,11 @@
                                                 <div class="modal-body">
                                                     <div class="row">
                                                         @foreach($visit->images as $img)
-    <div class="col-md-4 mb-2">
-        <img src="{{ asset('storage/'.$img) }}"
-             class="img-fluid rounded border">
-    </div>
-@endforeach
+                                                            <div class="col-md-4 mb-2">
+                                                                <img src="{{ asset('storage/'.$img) }}"
+                                                                    class="img-fluid rounded border">
+                                                            </div>
+                                                        @endforeach
                                                     </div>
                                                 </div>
                                             </div>
