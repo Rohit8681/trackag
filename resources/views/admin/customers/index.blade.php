@@ -159,17 +159,17 @@
                                         <td>{{ $customer->contact_person_name ?? '-' }}</td>
                                         <td>{{ optional($customer->user)->name ?? '' }}</td>
 
-                                        <td>
-                                            <form action="{{ route('customers.toggle', $customer->id) }}" method="POST" style="display:inline;">
-                                                @csrf
-                                                @method('PATCH')
-                                                <button type="submit"
-                                                    class="badge {{ $customer->is_active ? 'bg-success' : 'bg-danger' }}"
-                                                    onclick="return confirm('Are you sure you want to {{ $customer->is_active ? 'deactivate' : 'activate' }} this customer?')">
-                                                    {{ $customer->is_active ? 'Active' : 'Inactive' }}
-                                                </button>
-                                            </form>
-                                        </td>
+                                        <td class="text-center">
+    <div class="form-check form-switch d-inline-flex align-items-center">
+        <input class="form-check-input customer-toggle"
+               type="checkbox"
+               data-id="{{ $customer->id }}"
+               {{ $customer->is_active ? 'checked' : '' }}>
+        <span class="ms-2 fw-semibold">
+            {{ $customer->is_active ? 'Active' : 'Inactive' }}
+        </span>
+    </div>
+</td>
 
                                         <td>
                                             @can('edit_customers')
@@ -255,6 +255,33 @@ $(document).ready(function() {
             ]
         });
     }
+});
+
+$(document).on('change', '.customer-toggle', function () {
+    let customerId = $(this).data('id');
+    let toggle = $(this);
+
+    if (!confirm('Are you sure you want to change status?')) {
+        toggle.prop('checked', !toggle.prop('checked'));
+        return;
+    }
+
+    $.ajax({
+        url: "{{ url('customers') }}/" + customerId + "/toggle-status",
+        type: "PATCH",
+        data: {
+            _token: "{{ csrf_token() }}"
+        },
+        success: function (response) {
+            if (response.success) {
+                toggle.next('span').text(response.status ? 'Active' : 'Inactive');
+            }
+        },
+        error: function () {
+            alert('Something went wrong!');
+            toggle.prop('checked', !toggle.prop('checked'));
+        }
+    });
 });
 </script>
 @endpush

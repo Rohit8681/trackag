@@ -113,6 +113,17 @@ class CustomerController extends Controller
         return view('admin.customers.index', compact('customers', 'states', 'financialYears'));
     }
 
+    public function toggleStatus(Customer $customer)
+    {
+        $customer->is_active = !$customer->is_active;
+        $customer->save();
+
+        return response()->json([
+            'success' => true,
+            'status' => $customer->is_active
+        ]);
+    }
+
     public function create()
     {
         $admin = Auth::user();
@@ -235,15 +246,6 @@ class CustomerController extends Controller
         }
     }
 
-    public function toggleStatus(Customer $id)
-    {
-        $this->authorizeCustomerAccess($id);
-
-        $id->is_active = !$id->is_active;
-        $id->save();
-
-        return redirect()->route('customers.index')->with('success', 'Customer status updated successfully.');
-    }
 
     public function bulkDelete(Request $request)
     {
