@@ -267,7 +267,7 @@ $(document).on('change', '.customer-toggle', function () {
     }
 
     $.ajax({
-        url: "{{ url('customers') }}/" + customerId + "/toggle-status",
+        url: "{{ route('customers.toggle-status', ':id') }}".replace(':id', customerId),
         type: "PATCH",
         data: {
             _token: "{{ csrf_token() }}"
