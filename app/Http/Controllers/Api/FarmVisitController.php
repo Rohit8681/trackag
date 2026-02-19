@@ -25,14 +25,10 @@ class FarmVisitController extends Controller
 
         $data = $visits->map(function ($visit) {
             $images = [];
-            if (!empty($visit->images)) {
 
-                $imageArray = json_decode($visit->images, true);
-
-                if (is_array($imageArray)) {
-                    foreach ($imageArray as $img) {
-                        $images[] = asset('storage/' . $img);
-                    }
+            if (is_array($visit->images)) {
+                foreach ($visit->images as $img) {
+                    $images[] = asset('storage/' . $img);
                 }
             }
 
