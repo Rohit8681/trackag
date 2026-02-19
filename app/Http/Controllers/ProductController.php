@@ -65,7 +65,7 @@ class ProductController extends Controller
                 'item_code' => $request->item_code,
                 'product_category_id' => $request->product_category_id,
                 'shipper_gross_weight' => $request->shipper_gross_weight,
-                'master_packing' => $request->master_packing,
+                'master_packing' => $request->master_packing ?? 'No',
                 'gst' => $request->gst,
                 'status' => 1
             ]);
@@ -158,7 +158,7 @@ class ProductController extends Controller
                 'item_code' => $request->item_code,
                 'product_category_id' => $request->product_category_id,
                 'shipper_gross_weight' => $request->shipper_gross_weight,
-                'master_packing' => $request->master_packing,
+                'master_packing' => $request->master_packing ?? 'No',
                 'gst' => $request->gst,
                 'status' => 1
             ]);
