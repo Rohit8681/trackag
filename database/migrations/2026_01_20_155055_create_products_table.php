@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('product_name');
             $table->string('technical_name')->nullable();
             $table->string('item_code')->nullable();
-            $table->foreignId('product_category_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('product_category_id')->nullable()->constrained()->cascadeOnDelete();
             $table->decimal('shipper_gross_weight', 10, 2)->nullable();
             $table->enum('master_packing', ['Yes', 'No'])->default('No');
             $table->string('gst')->nullable();

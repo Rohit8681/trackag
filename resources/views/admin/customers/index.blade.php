@@ -109,14 +109,6 @@
                                 </select>
                             </div>
 
-                            {{-- <div class="col-10 d-flex justify-content-end mt-2">
-                                <button type="submit" class="btn btn-sm btn-primary me-2">
-                                    <i class="fas fa-filter"></i> Filter
-                                </button>
-                                <a href="{{ route('customers.index') }}" class="btn btn-sm btn-secondary">
-                                    <i class="fas fa-sync"></i> Reset
-                                </a>
-                            </div> --}}
                              <div class="col-md-2 d-flex gap-2 align-items-end">
                                     <button type="submit" class="btn btn-sm btn-primary px-3 py-2">
                                         <i class="fas fa-filter me-1"></i> Filter
@@ -160,16 +152,16 @@
                                         <td>{{ optional($customer->user)->name ?? '' }}</td>
 
                                         <td class="text-center">
-    <div class="form-check form-switch d-inline-flex align-items-center">
-        <input class="form-check-input customer-toggle"
-               type="checkbox"
-               data-id="{{ $customer->id }}"
-               {{ $customer->is_active ? 'checked' : '' }}>
-        <span class="ms-2 fw-semibold">
-            {{ $customer->is_active ? 'Active' : 'Inactive' }}
-        </span>
-    </div>
-</td>
+                                            <div class="form-check form-switch d-inline-flex align-items-center">
+                                                <input class="form-check-input customer-toggle"
+                                                    type="checkbox"
+                                                    data-id="{{ $customer->id }}"
+                                                    {{ $customer->is_active ? 'checked' : '' }}>
+                                                <span class="ms-2 fw-semibold">
+                                                    {{ $customer->is_active ? 'Active' : 'Inactive' }}
+                                                </span>
+                                            </div>
+                                        </td>
 
                                         <td>
                                             @can('edit_customers')

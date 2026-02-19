@@ -36,7 +36,7 @@
                             <span class="text-danger error-text technical_name_error"></span>
                         </div>
                         <div class="col-md-3">
-                            <label class="form-label">Product Category <span class="text-danger">*</span></label>
+                            <label class="form-label">Product Category </label>
                             <select name="product_category_id" class="form-select">
                                 <option value="">-- Select Category --</option>
                                 @foreach ($categories as $cat)
@@ -50,7 +50,7 @@
                         </div>
 
                         <div class="col-md-3">
-                            <label class="form-label">Item Code <span class="text-danger">*</span></label>
+                            <label class="form-label">Item Code</label>
                             <input type="text" name="item_code"
                                    class="form-control"
                                    value="{{ old('item_code', $product->item_code) }}">
@@ -80,7 +80,7 @@
                         </div>
 
                         <div class="col-md-3">
-                            <label class="form-label">Master Packing <span class="text-danger">*</span></label>
+                            <label class="form-label">Master Packing </label>
                             <select name="master_packing" class="form-select" required>
                                 <option value="">-- Select Master Packing --</option>
                                 <option value="Yes" {{ $product->master_packing == "Yes" ? 'selected' : '' }}>Yes</option>
@@ -333,9 +333,9 @@ $('#productForm').submit(function(e){
     // Product fields
     if(!$('input[name="product_name"]').val().trim()) { $('.product_name_error').text('Product Name is required'); valid=false; }
     if(!$('input[name="technical_name"]').val().trim()) { $('.technical_name_error').text('Technical Name is required'); valid=false; }
-    if(!$('input[name="item_code"]').val().trim()) { $('.item_code_error').text('Item Code is required'); valid=false; }
-    if(!$('select[name="product_category_id"]').val()) { $('.product_category_id_error').text('Select Category'); valid=false; }
-    if(!$('select[name="master_packing"]').val()) { $('.master_packing_error').text('Select master packing'); valid=false; }
+    // if(!$('input[name="item_code"]').val().trim()) { $('.item_code_error').text('Item Code is required'); valid=false; }
+    // if(!$('select[name="product_category_id"]').val()) { $('.product_category_id_error').text('Select Category'); valid=false; }
+    // if(!$('select[name="master_packing"]').val()) { $('.master_packing_error').text('Select master packing'); valid=false; }
     if(!$('input[name="shipper_gross_weight"]').val().trim()) { $('.shipper_gross_weight_error').text('Shipper Gross Weight is required'); valid=false; }
 
     // Packing rows
