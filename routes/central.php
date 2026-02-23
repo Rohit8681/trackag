@@ -69,7 +69,7 @@ Route::get('/logs', function () {
 
 Route::middleware(['web'])->group(function () {
     Route::get('/',function(){
-
+        return view('frontend.home');
     });
     Route::get('/login', function () {
         return redirect()->route('admin.login');
