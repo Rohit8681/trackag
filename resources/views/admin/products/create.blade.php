@@ -212,18 +212,18 @@
 
                                             <div class="option-item">
                                                 <input type="checkbox" name="state_config[{{ $state->id }}][rpl]">
-                                                <span>RPL Available</span>
+                                                <span>Debit</span>
                                             </div>
 
                                             <div class="option-item">
                                                 <input type="checkbox" name="state_config[{{ $state->id }}][ncr]">
-                                                <span>NCR Available</span>
+                                                <span>Cash</span>
                                             </div>
 
-                                            <div class="option-item">
+                                            {{-- <div class="option-item">
                                                 <input type="checkbox" name="state_config[{{ $state->id }}][advance]">
                                                 <span>Advance Available</span>
-                                            </div>
+                                            </div> --}}
 
                                         </div>
 

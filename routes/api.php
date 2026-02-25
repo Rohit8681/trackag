@@ -8,9 +8,10 @@ use App\Http\Controllers\Api\FarmerController;
 use App\Http\Controllers\Api\LocationApiController;
 use App\Http\Controllers\Api\PartyController;
 use App\Http\Controllers\Api\PartyPaymentController;
+use App\Http\Controllers\Api\FarmVisitController;
+use App\Http\Controllers\Api\OrderController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\TenantAuthenticate;
-use App\Http\Controllers\Api\FarmVisitController;
 
 // Existing Auth API routes
 Route::post('/login', [ApiAuthController::class, 'login']);
@@ -70,6 +71,12 @@ Route::middleware([TenantAuthenticate::class])->group(function () {
 
     Route::get('farm-visits', [FarmVisitController::class, 'index']);
     Route::post('farm-visits-store', [FarmVisitController::class, 'store']);
+
+    Route::get('product-list', [OrderController::class, 'getProductList']);
+    Route::get('product-packings', [OrderController::class, 'getProductPackings']);
+    Route::post('orders-store', [OrderController::class, 'store']);
+    Route::get('orders-list', [OrderController::class, 'index']);
+    
 
 
 

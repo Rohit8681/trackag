@@ -183,22 +183,22 @@
                                     <input type="checkbox"
                                         name="state_config[{{ $state->id }}][rpl]"
                                         {{ $existingState && $existingState->is_rpl ? 'checked' : '' }}>
-                                    <span>RPL Available</span>
+                                    <span>Debit</span>
                                 </div>
 
                                 <div class="option-item">
                                     <input type="checkbox"
                                         name="state_config[{{ $state->id }}][ncr]"
                                         {{ $existingState && $existingState->is_ncr ? 'checked' : '' }}>
-                                    <span>NCR Available</span>
+                                    <span>Cash</span>
                                 </div>
 
-                                <div class="option-item">
+                                {{-- <div class="option-item">
                                     <input type="checkbox"
                                         name="state_config[{{ $state->id }}][advance]"
                                         {{ $existingState && $existingState->is_advance ? 'checked' : '' }}>
                                     <span>Advance Available</span>
-                                </div>
+                                </div> --}}
 
                             </div>
 
