@@ -12,5 +12,14 @@ class ProductState extends Model
     protected $fillable = [
         'product_id',
         'state_id',
+        'is_rpl',
+        'is_ncr',
+        'is_advance',
+        'status'
     ];
+
+    public function state()
+    {
+        return $this->belongsTo(State::class);
+    }
 }
