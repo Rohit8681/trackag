@@ -34,15 +34,39 @@ class ApiTripController extends BaseController
         // Return the response
         return $this->sendResponse($success, 'Tour details fetch successfully');
     }
+    // public function fetchCustomer()
+    // {
+
+    //     $user = Auth::user(); 
+
+    //     $customers = Customer::where('is_active', 1)
+    //         ->where('user_id', $user->id)
+    //         ->latest()
+    //         ->get();
+
+    //     return $this->sendResponse($customers, "Customers fetched successfully");
+    // }
+
     public function fetchCustomer()
     {
+        $user = Auth::user();
 
-        $user = Auth::user(); 
+        $getReporting = User::where('reporting_to', $user->id)->pluck('id');
 
-        $customers = Customer::where('is_active', 1)
-            ->where('user_id', $user->id)
-            ->latest()
-            ->get();
+        if ($getReporting->isNotEmpty()) {
+            $userIds = $getReporting->push($user->id);
+
+            $customers = Customer::where('is_active', 1)
+                ->whereIn('user_id', $userIds)
+                ->latest()
+                ->get();
+
+        } else {
+            $customers = Customer::where('is_active', 1)
+                ->where('user_id', $user->id)
+                ->latest()
+                ->get();
+        }
 
         return $this->sendResponse($customers, "Customers fetched successfully");
     }
