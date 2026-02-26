@@ -13,6 +13,96 @@ use Illuminate\Support\Facades\Auth;
 
 class OrderController extends Controller
 {
+    // public function getProductList(Request $request)
+    // {
+    //     $request->validate([
+    //         'order_type' => 'required|in:cash,debit'
+    //     ]);
+
+    //     $user = Auth::user();
+    //     $userState = $user->state_id;
+    //     $orderType = $request->order_type;
+
+    //     $products = Product::where('status', 1)
+
+    //         ->whereHas('productStates', function ($query) use ($userState, $orderType) {
+
+    //             $query->where('state_id', $userState);
+
+    //             if ($orderType == 'cash') {
+    //                 $query->where('is_ncr', 1);   // cash
+    //             }
+
+    //             if ($orderType == 'debit') {
+    //                 $query->where('is_rpl', 1);   // debit
+    //             }
+    //         })
+
+    //         ->select('id', 'product_name')
+    //         ->get();
+
+    //     return response()->json([
+    //         'status' => true,
+    //         'order_type' => $orderType,
+    //         'state_id' => $userState,
+    //         'data' => $products
+    //     ]);
+    // }
+
+    // public function getProductPackings(Request $request)
+    // {
+    //     $request->validate([
+    //         'product_id' => 'required',
+    //         'order_type' => 'required|in:cash,debit'
+    //     ]);
+
+    //     $user = Auth::user();
+    //     $stateId = $user->state_id;
+    //     $productId = $request->product_id;
+    //     $orderType = $request->order_type;
+
+    //     $packings = ProductPacking::where('product_id', $productId)
+    //         ->where('status', 1)
+
+    //         // ✅ State wise packing check
+    //         ->whereHas('packingStates', function ($q) use ($stateId) {
+    //             $q->where('state_id', $stateId);
+    //         })
+
+    //         // ✅ Price relation load with state filter
+    //         ->with(['prices' => function ($q) use ($stateId) {
+    //             $q->where('state_id', $stateId);
+    //         }])
+
+    //         ->get()
+    //         ->map(function ($packing) use ($orderType) {
+
+    //             $priceData = $packing->prices->first();
+
+    //             return [
+    //                 'packing_id' => $packing->id,
+    //                 'packing_value' => $packing->packing_value,
+    //                 'packing_size' => $packing->packing_size,
+    //                 'shipper_type' => $packing->shipper_type,
+    //                 'shipper_size' => $packing->shipper_size,
+    //                 'unit_in_shipper' => $packing->unit_in_shipper,
+
+    //                 // ✅ Cash / Debit price logic
+    //                 'price' => $orderType == 'cash'
+    //                             ? ($priceData->cash_price ?? 0)
+    //                             : ($priceData->credit_price ?? 0)
+    //             ];
+    //         });
+
+    //     return response()->json([
+    //         'status' => true,
+    //         'product_id' => $productId,
+    //         'state_id' => $stateId,
+    //         'order_type' => $orderType,
+    //         'data' => $packings
+    //     ]);
+    // }
+
     public function getProductList(Request $request)
     {
         $request->validate([
@@ -20,31 +110,27 @@ class OrderController extends Controller
         ]);
 
         $user = Auth::user();
-        $userState = $user->state_id;
+        $stateId = $user->state_id;
         $orderType = $request->order_type;
 
         $products = Product::where('status', 1)
+            ->whereHas('productStates', function ($q) use ($stateId, $orderType) {
 
-            ->whereHas('productStates', function ($query) use ($userState, $orderType) {
-
-                $query->where('state_id', $userState);
+                $q->where('state_id', $stateId);
 
                 if ($orderType == 'cash') {
-                    $query->where('is_ncr', 1);   // cash
+                    $q->where('is_ncr', 1);
                 }
 
                 if ($orderType == 'debit') {
-                    $query->where('is_rpl', 1);   // debit
+                    $q->where('is_rpl', 1);
                 }
             })
-
             ->select('id', 'product_name')
             ->get();
 
         return response()->json([
             'status' => true,
-            'order_type' => $orderType,
-            'state_id' => $userState,
             'data' => $products
         ]);
     }
@@ -52,54 +138,61 @@ class OrderController extends Controller
     public function getProductPackings(Request $request)
     {
         $request->validate([
-            'product_id' => 'required|exists:products,id',
+            'product_id' => 'required',
             'order_type' => 'required|in:cash,debit'
         ]);
 
         $user = Auth::user();
         $stateId = $user->state_id;
-        $productId = $request->product_id;
         $orderType = $request->order_type;
 
-        $packings = ProductPacking::where('product_id', $productId)
+        $packings = ProductPacking::where('product_id', $request->product_id)
             ->where('status', 1)
-
-            // ✅ State wise packing check
-            ->whereHas('packingStates', function ($q) use ($stateId) {
+            ->whereHas('packingStates', function ($q) use ($stateId, $orderType) {
                 $q->where('state_id', $stateId);
             })
-
-            // ✅ Price relation load with state filter
-            ->with(['prices' => function ($q) use ($stateId) {
-                $q->where('state_id', $stateId);
-            }])
-
-            ->get()
-            ->map(function ($packing) use ($orderType) {
-
-                $priceData = $packing->prices->first();
-
-                return [
-                    'packing_id' => $packing->id,
-                    'packing_value' => $packing->packing_value,
-                    'packing_size' => $packing->packing_size,
-                    'shipper_type' => $packing->shipper_type,
-                    'shipper_size' => $packing->shipper_size,
-                    'unit_in_shipper' => $packing->unit_in_shipper,
-
-                    // ✅ Cash / Debit price logic
-                    'price' => $orderType == 'cash'
-                                ? ($priceData->cash_price ?? 0)
-                                : ($priceData->credit_price ?? 0)
-                ];
-            });
+            ->select('id','packing_value','packing_size')
+            ->get();
 
         return response()->json([
             'status' => true,
-            'product_id' => $productId,
-            'state_id' => $stateId,
-            'order_type' => $orderType,
             'data' => $packings
+        ]);
+    }
+
+    public function getPackingDetails(Request $request)
+    {
+        $request->validate([
+            'packing_id' => 'required',
+            'order_type' => 'required|in:cash,debit'
+        ]);
+
+        $user = Auth::user();
+        $stateId = $user->state_id;
+        $orderType = $request->order_type;
+
+        $packing = ProductPacking::with(['prices' => function ($q) use ($stateId) {
+                $q->where('state_id', $stateId);
+            }])
+            ->where('id', $request->packing_id)
+            ->where('status', 1)
+            ->firstOrFail();
+
+        $priceData = $packing->prices->first();
+
+        return response()->json([
+            'status' => true,
+            'data' => [
+                'packing_id' => $packing->id,
+                'packing_value' => $packing->packing_value,
+                'packing_size' => $packing->packing_size,
+                'shipper_type' => $packing->shipper_type,
+                'shipper_size' => $packing->shipper_size,
+                'unit_in_shipper' => $packing->unit_in_shipper,
+                'price' => $orderType == 'cash'
+                    ? optional($priceData)->cash_price ?? 0
+                    : optional($priceData)->credit_price ?? 0
+            ]
         ]);
     }
 
