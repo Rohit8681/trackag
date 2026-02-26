@@ -27,91 +27,49 @@
             <div class="container-fluid">
 
                 {{-- FILTER SECTION --}}
-                <div class="card mb-3">
-                    <div class="card-header">
+                <div class="card mb-3 border-warning">
+                    <div class="card-header bg-warning text-dark">
                         <strong>Filters</strong>
                     </div>
                     <div class="card-body">
+                        <form method="GET">
 
-                        {{-- ROW 1 --}}
-                        <div class="row g-3 mb-2">
+                            <div class="row g-3">
+                                <div class="col-md-2">
+                                    <input type="date" name="from_date" class="form-control">
+                                </div>
 
-                            <div class="col-md-3">
-                                <label class="form-label">From Date</label>
-                                <input type="date" class="form-control">
+                                <div class="col-md-2">
+                                    <input type="date" name="to_date" class="form-control">
+                                </div>
+
+                                <div class="col-md-2">
+                                    <input type="text" name="order_no" class="form-control" placeholder="Order No">
+                                </div>
+
+                                <div class="col-md-2">
+                                    <select name="status" class="form-select">
+                                        <option value="">All Status</option>
+                                        <option>PENDING</option>
+                                        <option>EDIT</option>
+                                        <option>HOLD</option>
+                                        <option>APPROVED</option>
+                                        <option>REJECT</option>
+                                        <option>PART DISPATCHED</option>
+                                        <option>DISPATCHED</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-2">
+                                    <button class="btn btn-dark w-100">Search</button>
+                                </div>
+
+                                <div class="col-md-2">
+                                    <a href="{{ route('order.index') }}" class="btn btn-secondary w-100">Reset</a>
+                                </div>
                             </div>
 
-                            <div class="col-md-3">
-                                <label class="form-label">To Date</label>
-                                <input type="date" class="form-control">
-                            </div>
-
-                            <div class="col-md-3">
-                                <label class="form-label">State</label>
-                                <select class="form-select">
-                                    <option>All States</option>
-                                </select>
-                            </div>
-
-                            <div class="col-md-3">
-                                <label class="form-label">Emp Name</label>
-                                <select class="form-select">
-                                    <option>All Employees</option>
-                                </select>
-                            </div>
-
-                        </div>
-
-                        {{-- ROW 2 --}}
-                        <div class="row g-3 align-items-end">
-
-                            <div class="col-md-2">
-                                <label class="form-label">Party Name</label>
-                                <select class="form-select">
-                                    <option>All Parties</option>
-                                </select>
-                            </div>
-
-                            <div class="col-md-2">
-                                <label class="form-label">Product</label>
-                                <select class="form-select">
-                                    <option>All Products</option>
-                                </select>
-                            </div>
-
-                            <div class="col-md-2">
-                                <label class="form-label">Order Type</label>
-                                <select class="form-select">
-                                    <option>All</option>
-                                </select>
-                            </div>
-
-                            <div class="col-md-2">
-                                <label class="form-label">Order No</label>
-                                <input type="text" class="form-control" placeholder="Enter Order No">
-                            </div>
-
-                            <div class="col-md-2">
-                                <label class="form-label">Order Status</label>
-                                <select class="form-select">
-                                    <option>All Status</option>
-                                    <option>PENDING</option>
-                                    <option>APPROVED</option>
-                                    <option>EDIT</option>
-                                    <option>HOLD</option>
-                                    <option>PART DISPATCHED</option>
-                                    <option>DISPATCHED</option>
-                                    <option>REJECT</option>
-                                </select>
-                            </div>
-
-                            <div class="col-md-1 d-flex gap-2">
-                                <button class="btn btn-primary w-100">Search</button>
-                                <button class="btn btn-secondary w-100">Reset</button>
-                            </div>
-
-                        </div>
-
+                        </form>
                     </div>
                 </div>
 
@@ -139,13 +97,30 @@
                                 </tr>
                             </thead>
                             <tbody>
-
-                                <tr>
-                                    <td colspan="10" class="text-center text-muted py-4">
-                                        <strong>No Data Found</strong>
-                                    </td>
-                                </tr>
-
+                                @forelse($orders as $order)
+                                    <tr>
+                                        <td>{{ $order->created_at->format('d-m-Y') }}</td>
+                                        <td>{{ $order->user->state->name ?? '-' }}</td>
+                                        <td>{{ $order->order_type }}</td>
+                                        <td>{{ $order->order_no }}</td>
+                                        <td>{{ $order->customer->agro_name ?? '-' }}</td>
+                                        <td>{{ $order->user->name ?? '-' }}</td>
+                                        <td>{{ $order->items->sum('total') }}</td>
+                                        <td>
+                                            <span class="badge bg-info">{{ $order->status }}</span>
+                                        </td>
+                                        <td>{{ $order->dispatch_date ?? '-' }}</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-primary" onclick="changeStatus({{ $order->id }})">
+                                                Change
+                                            </button>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="10" class="text-center">No Data Found</td>
+                                    </tr>
+                                @endforelse
                             </tbody>
                         </table>
 
@@ -157,3 +132,26 @@
         </div>
     </main>
 @endsection
+@push('scripts')
+    <script>
+        function changeStatus(id) {
+            let status = prompt("Enter Status:\nPENDING\nEDIT\nHOLD\nAPPROVED\nREJECT\nPART DISPATCHED\nDISPATCHED");
+
+            if (!status) return;
+
+            $.ajax({
+                url: "{{ route('order.status.update') }}",
+                type: "POST",
+                data: {
+                    _token: "{{ csrf_token() }}",
+                    order_id: id,
+                    status: status
+                },
+                success: function (res) {
+                    alert(res.message);
+                    location.reload();
+                }
+            });
+        }
+    </script>
+@endpush

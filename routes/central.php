@@ -179,6 +179,7 @@ Route::middleware(['web'])->group(function () {
             Route::get('party-payment', [PartyPaymentController::class, 'index'])->name('party-payment');
             Route::post('/party-payment/clear-return', [PartyPaymentController::class, 'clearReturn'])->name('party-payment.clear-return');
             
+            Route::post('order-status-update', [OrderController::class, 'updateStatus'])->name('order.status.update');
             Route::resource('order', OrderController::class);
             Route::resource('stock', StockController::class);
             Route::resource('tracking', TrackingController::class);
