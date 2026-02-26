@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Attendance;
 use App\Models\Brochure;
+use App\Models\Depo;
 use App\Models\Holiday;
 use App\Models\Message;
 use Illuminate\Support\Facades\Auth;
@@ -95,6 +96,18 @@ class CommanController extends Controller
         return response()->json([
             'status' => true,
             'data'   => $messages
+        ]);
+    }
+
+    public function getDepoList()
+    {
+        $depos = Depo::where('status', 1)
+            ->select('id', 'depo_name')
+            ->get();
+
+        return response()->json([
+            'status' => true,
+            'data' => $depos
         ]);
     }
 
