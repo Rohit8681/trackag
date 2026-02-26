@@ -63,6 +63,7 @@ Route::middleware([TenantAuthenticate::class])->group(function () {
     Route::get('brochures', [CommanController::class, 'brochures']);
     Route::get('messages', [CommanController::class, 'messages']);
     Route::get('attendance', [CommanController::class, 'myAttendance']);
+    Route::get('depo-list', [CommanController::class, 'getDepoList']);
 
     Route::get('crop-sowing-list', [FarmerController::class, 'cropSowingList']);
     Route::get('farmers-list', [FarmerController::class, 'index']);
@@ -75,7 +76,7 @@ Route::middleware([TenantAuthenticate::class])->group(function () {
     Route::get('product-list', [OrderController::class, 'getProductList']);
     Route::get('product-packings', [OrderController::class, 'getProductPackings']);
     Route::get('packing-details', [OrderController::class, 'getPackingDetails']);
-    
+
     Route::post('orders-store', [OrderController::class, 'store']);
     Route::get('orders-list', [OrderController::class, 'index']);
     
