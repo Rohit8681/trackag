@@ -52,7 +52,7 @@ class OrderController extends Controller
     public function getProductPackings(Request $request)
     {
         $request->validate([
-            'product_id' => 'required|exists:products,id',
+            'product_id' => 'required',
             'order_type' => 'required|in:cash,debit'
         ]);
 
