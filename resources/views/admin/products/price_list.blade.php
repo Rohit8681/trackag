@@ -104,8 +104,8 @@
                                                     ->where('state_id', $state->id)
                                                     ->first();
 
-                                                $productCash = $productState && $productState->is_rpl == 1;
-                                                $productCredit = $productState && $productState->is_ncr == 1;
+                                                $productCredit = $productState && $productState->is_rpl == 1;
+                                                 $productCash = $productState && $productState->is_ncr == 1;
 
                                                 // Packing State
                                                 $packingAllowed = $packing->packingStates
