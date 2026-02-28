@@ -315,7 +315,6 @@ class ProductController extends Controller
         }
 
         $products = Product::with(['packings.prices','productStates'])->get();
-        dd($products);
 
         return view('admin.products.price_list', compact('products', 'states'));
     }
