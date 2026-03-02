@@ -62,13 +62,31 @@ function loadLiveLocationsNew() {
 
             data.forEach(user => {
 
+                // ❗ Skip if invalid coordinates
+                if (!user.latitude || !user.longitude) return;
+
                 let marker = new google.maps.Marker({
                     position: {
                         lat: parseFloat(user.latitude),
                         lng: parseFloat(user.longitude)
                     },
                     map: mapNew,
-                    title: user.name
+                    title: user.name,
+
+                    // 🔥 Custom Icon
+                    icon: {
+                        url: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png",
+                        scaledSize: new google.maps.Size(40, 40)
+                    }
+                });
+
+                // 🔥 InfoWindow (Name Popup)
+                let infoWindow = new google.maps.InfoWindow({
+                    content: `<strong>${user.name}</strong>`
+                });
+
+                marker.addListener("click", function () {
+                    infoWindow.open(mapNew, marker);
                 });
 
                 markersNew.push(marker);
