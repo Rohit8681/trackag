@@ -1,4 +1,5 @@
 @extends('admin.layout.layout')
+
 @section('title', 'Live Tracking | Trackag')
 
 @section('content')
@@ -28,6 +29,7 @@
 @endsection
 
 @push('scripts')
+<script>
 var map;
 var markers = [];
 
