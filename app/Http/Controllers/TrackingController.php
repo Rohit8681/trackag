@@ -32,7 +32,7 @@ class TrackingController extends Controller
                     ->groupBy('trip_id');
             })
             ->get();
-
+        dd($locations);
         return response()->json($locations);
     }
     public function create()
