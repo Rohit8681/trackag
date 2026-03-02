@@ -185,6 +185,7 @@ Route::middleware(['web'])->group(function () {
 
             Route::get('tracking/live-data', [TrackingController::class, 'liveData'])->name('tracking.liveData');
             Route::resource('tracking', TrackingController::class);
+            
 
             
             Route::patch('expense/{id}/approve', [ExpenseController::class, 'approve'])->name('expense.approve');

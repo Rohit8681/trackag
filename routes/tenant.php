@@ -103,7 +103,7 @@ Route::prefix('admin')->group(function () {
         Route::resource('party', PartyController::class);
         Route::resource('order', OrderController::class);
         Route::resource('stock', StockController::class);
-        Route::resource('tracking', TrackingController::class);
+        // Route::resource('tracking', TrackingController::class);
         Route::resource('expense', ExpenseController::class);
 
         // Location management (tenant database)

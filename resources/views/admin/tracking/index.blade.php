@@ -52,7 +52,7 @@ function initMapNewSafe() {
 }
 
 function loadLiveLocationsNew() {
-    fetch("{{ route('tracking.liveData') }}")
+    fetch("{{ url('admin/tracking/live-data') }}")
         .then(response => response.json())
         .then(data => {
 
