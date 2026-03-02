@@ -28,9 +28,8 @@
 @endsection
 
 @push('scripts')
-
-let map;
-let markers = [];
+var map;
+var markers = [];
 
 function initMapNew() {
 
@@ -43,11 +42,13 @@ function initMapNew() {
 }
 
 function loadLiveLocations() {
+    console.log("loadLiveLocations");
 
     fetch("{{ route('tracking.liveData') }}")
         .then(response => response.json())
         .then(data => {
-
+            console.log(data);
+            console.log('testttt');
             // Remove old markers
             markers.forEach(marker => marker.setMap(null));
             markers = [];
@@ -81,5 +82,4 @@ initMapNew();
 setInterval(loadLiveLocations, 15000);
 
 </script>
-
 @endpush
