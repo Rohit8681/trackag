@@ -52,7 +52,6 @@ function initMapNewSafe() {
 }
 
 function loadLiveLocationsNew() {
-    alert('test one');
     fetch("{{ route('tracking.liveData') }}")
         .then(response => response.json())
         .then(data => {
