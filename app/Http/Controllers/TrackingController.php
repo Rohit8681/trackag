@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Trip;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -17,21 +18,29 @@ class TrackingController extends Controller
 
     public function liveData()
     {
-        $locations = DB::table('trips')
-            ->join('trip_logs', 'trips.id', '=', 'trip_logs.trip_id')
-            ->join('users', 'users.id', '=', 'trips.user_id')
-            ->select(
-                'users.name',
-                'trip_logs.latitude',
-                'trip_logs.longitude',
-                'trip_logs.mobile_status'
-            )
-            ->whereIn('trip_logs.id', function ($query) {
-                $query->select(DB::raw('MAX(id)'))
-                    ->from('trip_logs')
-                    ->groupBy('trip_id');
-            })
+        $trips = Trip::with([
+                'user:id,name',
+                'tripLogs' => function ($query) {
+                    $query->latest()->limit(1);
+                }
+            ])
+            ->whereHas('tripLogs')
             ->get();
+
+        $locations = $trips->map(function ($trip) {
+
+            $latestLog = $trip->tripLogs->first();
+
+            if (!$latestLog) return null;
+
+            return [
+                'name'          => $trip->user->name ?? 'Unknown',
+                'latitude'      => $latestLog->latitude,
+                'longitude'     => $latestLog->longitude,
+                'mobile_status' => $latestLog->mobile_status,
+            ];
+        })->filter()->values();
+
         return response()->json($locations);
     }
     public function create()
