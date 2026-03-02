@@ -17,6 +17,7 @@ class TrackingController extends Controller
 
     public function liveData()
     {
+        dd('test rohit');
         $locations = DB::table('trips')
             ->join('trip_logs', 'trips.id', '=', 'trip_logs.trip_id')
             ->join('users', 'users.id', '=', 'trips.user_id')
@@ -32,7 +33,6 @@ class TrackingController extends Controller
                     ->groupBy('trip_id');
             })
             ->get();
-        dd($locations);
         return response()->json($locations);
     }
     public function create()
