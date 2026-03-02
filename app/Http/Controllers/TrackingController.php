@@ -19,12 +19,16 @@ class TrackingController extends Controller
 
     public function liveData()
     {
+        $today = now()->toDateString(); // YYYY-MM-DD
+
         $latestLogs = TripLog::select('trip_logs.*')
             ->join('trips', 'trips.id', '=', 'trip_logs.trip_id')
-            ->whereIn('trip_logs.id', function ($query) {
+            ->whereDate('trip_logs.created_at', $today) // 👈 Only today
+            ->whereIn('trip_logs.id', function ($query) use ($today) {
                 $query->selectRaw('MAX(trip_logs.id)')
                     ->from('trip_logs')
                     ->join('trips', 'trips.id', '=', 'trip_logs.trip_id')
+                    ->whereDate('trip_logs.created_at', $today) // 👈 Only today
                     ->groupBy('trips.user_id');
             })
             ->with('trip.user:id,name')
@@ -42,6 +46,7 @@ class TrackingController extends Controller
 
         return response()->json($locations);
     }
+
     public function create()
     {
         //
