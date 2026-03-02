@@ -17,7 +17,6 @@ class TrackingController extends Controller
 
     public function liveData()
     {
-        dd('test rohit');
         $locations = DB::table('trips')
             ->join('trip_logs', 'trips.id', '=', 'trip_logs.trip_id')
             ->join('users', 'users.id', '=', 'trips.user_id')
