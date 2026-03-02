@@ -29,6 +29,7 @@
 @endsection
 
 @push('scripts')
+
 <script>
 var map;
 var markers = [];
@@ -37,21 +38,19 @@ function initMapNew() {
 
     map = new google.maps.Map(document.getElementById("mapNew"), {
         zoom: 10,
-        center: { lat: 23.0225, lng: 72.5714 } // Default Ahmedabad
+        center: { lat: 23.0225, lng: 72.5714 }
     });
 
     loadLiveLocations();
+    setInterval(loadLiveLocations, 15000);
 }
 
 function loadLiveLocations() {
-    console.log("loadLiveLocations");
 
     fetch("{{ route('tracking.liveData') }}")
         .then(response => response.json())
         .then(data => {
-            console.log(data);
-            console.log('testttt');
-            // Remove old markers
+
             markers.forEach(marker => marker.setMap(null));
             markers = [];
 
@@ -76,12 +75,11 @@ function loadLiveLocations() {
 
         });
 }
-
-// Start map
-initMapNew();
-
-// Auto refresh every 15 seconds
-setInterval(loadLiveLocations, 15000);
-
 </script>
+
+<script
+    src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_MAPS_API_KEY') }}&libraries=places&callback=initMap"
+    async defer>
+</script>
+
 @endpush
