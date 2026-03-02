@@ -31,28 +31,34 @@
 @push('scripts')
 
 <script>
-var map;
-var markers = [];
 
-function initMapNew() {
+var mapNew;
+var markersNew = [];
 
-    map = new google.maps.Map(document.getElementById("mapNew"), {
+function initMapNewSafe() {
+
+    if (typeof google === "undefined") {
+        console.error("Google not loaded yet");
+        return;
+    }
+
+    mapNew = new google.maps.Map(document.getElementById("mapNew"), {
         zoom: 10,
         center: { lat: 23.0225, lng: 72.5714 }
     });
 
-    loadLiveLocations();
-    setInterval(loadLiveLocations, 15000);
+    loadLiveLocationsNew();
+    setInterval(loadLiveLocationsNew, 15000);
 }
 
-function loadLiveLocations() {
+function loadLiveLocationsNew() {
 
     fetch("{{ route('tracking.liveData') }}")
         .then(response => response.json())
         .then(data => {
 
-            markers.forEach(marker => marker.setMap(null));
-            markers = [];
+            markersNew.forEach(marker => marker.setMap(null));
+            markersNew = [];
 
             data.forEach(user => {
 
@@ -61,25 +67,21 @@ function loadLiveLocations() {
                         lat: parseFloat(user.latitude),
                         lng: parseFloat(user.longitude)
                     },
-                    map: map,
-                    title: user.name,
-                    icon: {
-                        url: user.mobile_status == 1
-                            ? "http://maps.google.com/mapfiles/ms/icons/green-dot.png"
-                            : "http://maps.google.com/mapfiles/ms/icons/red-dot.png"
-                    }
+                    map: mapNew,
+                    title: user.name
                 });
 
-                markers.push(marker);
+                markersNew.push(marker);
             });
 
         });
 }
-</script>
 
-<script
-    src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_MAPS_API_KEY') }}&libraries=places&callback=initMap"
-    async defer>
+// Wait until page fully loads
+window.addEventListener("load", function() {
+    setTimeout(initMapNewSafe, 500);
+});
+
 </script>
 
 @endpush
