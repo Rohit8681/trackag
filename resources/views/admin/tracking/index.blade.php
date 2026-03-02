@@ -18,7 +18,7 @@
         <div class="container-fluid">
             <div class="card card-primary card-outline">
                 <div class="card-body">
-                    <div id="map" style="height:600px; width:100%;" class="rounded border"></div>
+                    <div id="mapNew" style="height:600px; width:100%;" class="rounded border"></div>
                 </div>
             </div>
         </div>
@@ -40,7 +40,7 @@ let markers = [];
 
 function initMap() {
 
-    map = new google.maps.Map(document.getElementById("map"), {
+    map = new google.maps.Map(document.getElementById("mapNew"), {
         zoom: 10,
         center: { lat: 23.0225, lng: 72.5714 } // Default Ahmedabad
     });
