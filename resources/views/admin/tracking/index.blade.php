@@ -38,7 +38,7 @@
 let map;
 let markers = [];
 
-function initMap() {
+function initMapNew() {
 
     map = new google.maps.Map(document.getElementById("mapNew"), {
         zoom: 10,
@@ -81,7 +81,7 @@ function loadLiveLocations() {
 }
 
 // Start map
-initMap();
+initMapNew();
 
 // Auto refresh every 15 seconds
 setInterval(loadLiveLocations, 15000);
