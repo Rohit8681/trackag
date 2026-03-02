@@ -1,36 +1,91 @@
 @extends('admin.layout.layout')
+@section('title', 'Live Tracking | Trackag')
 
 @section('content')
 <main class="app-main">
+
     <div class="app-content-header">
         <div class="container-fluid">
             <div class="row">
                 <div class="col-sm-6">
-                    <h3 class="mb-0">Tracking</h3>
-                </div>
-                <div class="col-sm-6">
-                    <ol class="breadcrumb float-sm-end">
-                        <li class="breadcrumb-item"><a href="#">Dashboard</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">
-                            Tracking
-                        </li>
-                    </ol>
+                    <h3 class="mb-0">User Live Tracking</h3>
                 </div>
             </div>
         </div>
     </div>
+
     <div class="app-content">
         <div class="container-fluid">
-            <div class="row">
-                <div class="col-12">
-                    <div class="card">
-                        <div class="card-body">
-                            <h1 class="text-center">Coming Soon</h1>
-                        </div>
-                    </div>
+            <div class="card card-primary card-outline">
+                <div class="card-body">
+                    <div id="map" style="height:600px; width:100%;" class="rounded border"></div>
                 </div>
             </div>
         </div>
     </div>
+
 </main>
 @endsection
+
+@push('scripts')
+
+<script
+    src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_MAPS_API_KEY') }}&libraries=places&callback=initMap"
+    async defer>
+
+<script>
+
+let map;
+let markers = [];
+
+function initMap() {
+
+    map = new google.maps.Map(document.getElementById("map"), {
+        zoom: 10,
+        center: { lat: 23.0225, lng: 72.5714 } // Default Ahmedabad
+    });
+
+    loadLiveLocations();
+}
+
+function loadLiveLocations() {
+
+    fetch("{{ route('tracking.liveData') }}")
+        .then(response => response.json())
+        .then(data => {
+
+            // Remove old markers
+            markers.forEach(marker => marker.setMap(null));
+            markers = [];
+
+            data.forEach(user => {
+
+                let marker = new google.maps.Marker({
+                    position: {
+                        lat: parseFloat(user.latitude),
+                        lng: parseFloat(user.longitude)
+                    },
+                    map: map,
+                    title: user.name,
+                    icon: {
+                        url: user.mobile_status == 1
+                            ? "http://maps.google.com/mapfiles/ms/icons/green-dot.png"
+                            : "http://maps.google.com/mapfiles/ms/icons/red-dot.png"
+                    }
+                });
+
+                markers.push(marker);
+            });
+
+        });
+}
+
+// Start map
+initMap();
+
+// Auto refresh every 15 seconds
+setInterval(loadLiveLocations, 15000);
+
+</script>
+
+@endpush

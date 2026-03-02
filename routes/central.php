@@ -182,6 +182,8 @@ Route::middleware(['web'])->group(function () {
             Route::post('order-status-update', [OrderController::class, 'updateStatus'])->name('order.status.update');
             Route::resource('order', OrderController::class);
             Route::resource('stock', StockController::class);
+
+            Route::get('tracking/live-data', [TrackingController::class, 'liveData'])->name('tracking.liveData');
             Route::resource('tracking', TrackingController::class);
 
             

@@ -213,7 +213,7 @@
                 @endcanany
 
                 <!-- Tracking -->
-                @canany(['view_tracking','create_tracking','edit_tracking','delete_tracking'])
+                {{-- @canany(['view_tracking','create_tracking','edit_tracking','delete_tracking']) --}}
                 @php
                     $trackingActive = request()->is(
                         'admin/tracking',
@@ -253,7 +253,7 @@
 
                     </ul>
                 </li>
-                @endcanany
+                {{-- @endcanany --}}
 
                 <!-- Attendance -->
                 @canany(['view_attendance','create_attendance','edit_attendance','delete_attendance'])

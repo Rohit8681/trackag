@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class TrackingController extends Controller
 {
@@ -14,9 +15,26 @@ class TrackingController extends Controller
         return view('admin.tracking.index');
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
+    public function liveData()
+    {
+        $locations = DB::table('trips')
+            ->join('trip_logs', 'trips.id', '=', 'trip_logs.trip_id')
+            ->join('users', 'users.id', '=', 'trips.user_id')
+            ->select(
+                'users.name',
+                'trip_logs.latitude',
+                'trip_logs.longitude',
+                'trip_logs.mobile_status'
+            )
+            ->whereIn('trip_logs.id', function ($query) {
+                $query->select(DB::raw('MAX(id)'))
+                    ->from('trip_logs')
+                    ->groupBy('trip_id');
+            })
+            ->get();
+
+        return response()->json($locations);
+    }
     public function create()
     {
         //
