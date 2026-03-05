@@ -34,4 +34,11 @@ class Order extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function depo(){
+        return $this->belongsTo(Depo::class);
+    
+    }
+
+
 }
