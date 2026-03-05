@@ -25,6 +25,7 @@ return new class extends Migration
             $table->decimal('gst', 10, 2)->default(0);
             $table->decimal('discount', 10, 2)->default(0);
             $table->decimal('grand_total', 10, 2);
+            $table->integer('qty')->default(1);
 
             $table->timestamps();
 

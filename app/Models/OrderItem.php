@@ -17,7 +17,8 @@ class OrderItem extends Model
         'total_price',
         'gst',
         'discount',
-        'grand_total'
+        'grand_total',
+        'qty'
     ];
 
     public function order()

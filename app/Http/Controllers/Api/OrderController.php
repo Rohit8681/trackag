@@ -293,6 +293,7 @@ class OrderController extends Controller
                         'gst' => $item->gst,
                         'discount' => $item->discount,
                         'grand_total' => $item->grand_total,
+                        'qty' => $item->qty
                     ];
                 })
             ];
@@ -346,6 +347,7 @@ class OrderController extends Controller
                 'gst' => $item['gst'] ?? 0,
                 'discount' => $item['discount'] ?? 0,
                 'grand_total' => $item['grand_total'],
+                'qty' => $item['qty'] ?? 1
             ]);
         }
 
