@@ -160,38 +160,97 @@ class OrderController extends Controller
         ]);
     }
 
+    // public function getPackingDetails(Request $request)
+    // {
+    //     $request->validate([
+    //         'packing_id' => 'required',
+    //         'order_type' => 'required|in:cash,debit',
+    //         'qty' => 'required|numeric|min:1',
+    //     ]);
+
+    //     $user = Auth::user();
+    //     $stateId = $user->state_id;
+    //     $orderType = $request->order_type;
+
+    //     $packing = ProductPacking::with(['prices' => function ($q) use ($stateId) {
+    //             $q->where('state_id', $stateId);
+    //         }])
+    //         ->where('id', $request->packing_id)
+    //         ->where('status', 1)
+    //         ->firstOrFail();
+
+    //     $priceData = $packing->prices->first();
+
+    //     return response()->json([
+    //         'status' => true,
+    //         'data' => [
+    //             'packing_id' => $packing->id,
+    //             'packing_value' => $packing->packing_value,
+    //             'packing_size' => $packing->packing_size,
+    //             'shipper_type' => $packing->shipper_type,
+    //             'shipper_size' => $packing->shipper_size,
+    //             'unit_in_shipper' => $packing->unit_in_shipper,
+    //             'qty' => $qty,
+    //             'price' => $orderType == 'cash'
+    //                 ? optional($priceData)->cash_price ?? 0
+    //                 : optional($priceData)->credit_price ?? 0
+    //         ]
+    //     ]);
+    // }
+
     public function getPackingDetails(Request $request)
     {
         $request->validate([
             'packing_id' => 'required',
-            'order_type' => 'required|in:cash,debit'
+            'order_type' => 'required|in:cash,debit',
+            'qty' => 'required|numeric|min:1',
         ]);
 
         $user = Auth::user();
         $stateId = $user->state_id;
         $orderType = $request->order_type;
+        $qty = $request->qty;
 
-        $packing = ProductPacking::with(['prices' => function ($q) use ($stateId) {
-                $q->where('state_id', $stateId);
-            }])
+        $packing = ProductPacking::with([
+                'product:id,product_name,gst',
+                'prices' => function ($q) use ($stateId) {
+                    $q->where('state_id', $stateId);
+                }
+            ])
             ->where('id', $request->packing_id)
             ->where('status', 1)
             ->firstOrFail();
 
         $priceData = $packing->prices->first();
 
+        $unitPrice = $orderType == 'cash'
+            ? optional($priceData)->cash_price ?? 0
+            : optional($priceData)->credit_price ?? 0;
+
+        $totalPrice = $qty * $packing->unit_in_shipper * $unitPrice;
+
+        $gstPercent = optional($packing->product)->gst ?? 0;
+
+        $gstAmount = ($totalPrice * $gstPercent) / 100;
+
+        $grandTotal = $totalPrice + $gstAmount;
+
         return response()->json([
             'status' => true,
             'data' => [
+                'product_name' => optional($packing->product)->product_name,
                 'packing_id' => $packing->id,
                 'packing_value' => $packing->packing_value,
                 'packing_size' => $packing->packing_size,
                 'shipper_type' => $packing->shipper_type,
                 'shipper_size' => $packing->shipper_size,
                 'unit_in_shipper' => $packing->unit_in_shipper,
-                'price' => $orderType == 'cash'
-                    ? optional($priceData)->cash_price ?? 0
-                    : optional($priceData)->credit_price ?? 0
+                'qty' => $qty,
+                'gst_percent' => $gstPercent,
+                'gst_amount' => $gstAmount,
+                'unit_price' => $unitPrice,
+                'total_price' => $totalPrice,
+                'grand_total' => $grandTotal
             ]
         ]);
     }
