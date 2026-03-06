@@ -2,12 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Company;
 use App\Models\State;
 use App\Models\Trip;
 use App\Models\TripLog;
 use App\Models\User;
+use App\Models\UserStateAccess;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+
 
 class TrackingController extends Controller
 {
@@ -48,12 +52,64 @@ class TrackingController extends Controller
 
     
     public function index()
-{
-    $states = State::where('status',1)->get();
-    $users = User::where('status','Active')->get();
+    {
+        $user = Auth::user();
+        $roleName = $user->getRoleNames()->first();
 
-    return view('admin.tracking.index',compact('states','users'));
-}
+        $stateIds = [];
+        $userStateAccess = UserStateAccess::where('user_id', $user->id)->first();
+        if ($userStateAccess && !empty($userStateAccess->state_ids)) {
+            $stateIds = $userStateAccess->state_ids;
+        }
+
+        $companyCount = Company::count();
+        $company = null;
+
+        if ($companyCount == 1) {
+            $company = Company::first();
+
+            if ($company && !empty($company->state)) {
+                $companyStates = array_map('intval', explode(',', $company->state));
+
+                if ($roleName === 'sub_admin') {
+                    $states = State::where('status', 1)
+                        ->whereIn('id', $companyStates)
+                        ->get();
+                } else {
+                    $states = empty($stateIds)
+                        ? collect()
+                        : State::where('status', 1)
+                            ->whereIn('id', $stateIds)
+                            ->get();
+                }
+            } else {
+                $states = in_array($roleName, ['master_admin', 'sub_admin'])
+                    ? State::where('status', 1)->get()
+                    : (empty($stateIds)
+                        ? collect()
+                        : State::where('status', 1)->whereIn('id', $stateIds)->get());
+            }
+        } else {
+            $states = in_array($roleName, ['master_admin', 'sub_admin'])
+                ? State::where('status', 1)->get()
+                : (empty($stateIds)
+                    ? collect()
+                    : State::where('status', 1)->whereIn('id', $stateIds)->get());
+        }
+        // $employees = User::select('id', 'name')->get();
+        if (in_array($roleName, ['master_admin', 'sub_admin'])) {
+            $users = User::where('status', 'Active')->where('id', '!=', 1)->get();
+        } else {
+            $users = empty($stateIds)
+                ? collect()
+                : User::where('status', 'Active')->where('id', '!=', 1)
+                    ->whereIn('state_id', $stateIds)
+                    ->where('reporting_to', $user->id)
+                    ->get();
+        }
+
+        return view('admin.tracking.index',compact('states','users'));
+    }
 
 
 public function liveData(Request $request)
