@@ -19,6 +19,26 @@
         <div class="container-fluid">
             <div class="card card-primary card-outline">
                 <div class="card-body">
+                    <div class="row mb-3"> 
+                        <div class="col-md-3"> 
+                        <label>State</label> 
+                        <select id="stateFilter" class="form-control"> 
+                            <option value="">All State</option> 
+                            @foreach($states as $state) 
+                            <option value="{{ $state->id }}">{{ $state->name }}</option> 
+                            @endforeach 
+                        </select> 
+                    </div> 
+                    <div class="col-md-3"> 
+                        <label>User</label> 
+                        <select id="userFilter" class="form-control"> 
+                            <option value="">All User</option> 
+                            @foreach($users as $user) 
+                            <option value="{{ $user->id }}">{{ $user->name }}</option> 
+                            @endforeach 
+                        </select> 
+                    </div> 
+                </div>
                     <div id="mapNew" style="height:600px; width:100%;" class="rounded border"></div>
                 </div>
             </div>
@@ -37,22 +57,23 @@ var markersNew = [];
 
 function initMapNewSafe() {
 
-    if (typeof google === "undefined") {
-        console.error("Google not loaded yet");
-        return;
-    }
-
     mapNew = new google.maps.Map(document.getElementById("mapNew"), {
-        zoom: 10,
+        zoom: 7,
         center: { lat: 23.0225, lng: 72.5714 }
     });
 
     loadLiveLocationsNew();
+
     setInterval(loadLiveLocationsNew, 15000);
 }
 
+
 function loadLiveLocationsNew() {
-    fetch("{{ url('admin/tracking/live-data') }}")
+
+    let state_id = document.getElementById('stateFilter').value;
+    let user_id  = document.getElementById('userFilter').value;
+
+    fetch("{{ url('admin/tracking/live-data') }}?state_id="+state_id+"&user_id="+user_id)
         .then(response => response.json())
         .then(data => {
 
@@ -61,40 +82,57 @@ function loadLiveLocationsNew() {
 
             data.forEach(user => {
 
-                // ❗ Skip if invalid coordinates
                 if (!user.latitude || !user.longitude) return;
 
                 let marker = new google.maps.Marker({
+
                     position: {
                         lat: parseFloat(user.latitude),
                         lng: parseFloat(user.longitude)
                     },
+
                     map: mapNew,
                     title: user.name,
 
-                    // 🔥 Custom Icon
                     icon: {
                         url: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png",
-                        scaledSize: new google.maps.Size(40, 40)
+                        scaledSize: new google.maps.Size(40,40)
                     }
+
                 });
 
-                // 🔥 InfoWindow (Name Popup)
+
                 let infoWindow = new google.maps.InfoWindow({
-                    content: `<strong>${user.name}</strong>`
+                    content: `
+                        <div style="min-width:150px">
+                            <strong>${user.name}</strong><br>
+                            <small>Time : ${user.time}</small>
+                        </div>
+                    `
                 });
+
 
                 marker.addListener("click", function () {
                     infoWindow.open(mapNew, marker);
                 });
 
                 markersNew.push(marker);
+
             });
 
         });
 }
 
-// Wait until page fully loads
+
+document.getElementById('stateFilter').addEventListener('change',function(){
+    loadLiveLocationsNew();
+});
+
+document.getElementById('userFilter').addEventListener('change',function(){
+    loadLiveLocationsNew();
+});
+
+
 window.addEventListener("load", function() {
     setTimeout(initMapNewSafe, 500);
 });
