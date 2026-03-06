@@ -50,7 +50,7 @@ class TrackingController extends Controller
     public function index()
 {
     $states = State::where('status',1)->get();
-    $users = User::where('status',1)->get();
+    $users = User::where('status','Active')->get();
 
     return view('admin.tracking.index',compact('states','users'));
 }
