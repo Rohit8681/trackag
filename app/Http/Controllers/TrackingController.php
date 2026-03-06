@@ -123,7 +123,7 @@ public function liveData(Request $request)
         ->join('trips','trips.id','=','trip_logs.trip_id')
         ->join('users','users.id','=','trips.user_id')
 
-        ->whereDate('trip_logs.created_at',$today)
+        // ->whereDate('trip_logs.created_at',$today)
 
         ->when($stateId,function($q) use ($stateId){
             $q->where('users.state_id',$stateId);
