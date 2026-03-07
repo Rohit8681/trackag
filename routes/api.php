@@ -78,8 +78,9 @@ Route::middleware([TenantAuthenticate::class])->group(function () {
     Route::get('product-packings', [OrderController::class, 'getProductPackings']);
     Route::get('packing-details', [OrderController::class, 'getPackingDetails']);
 
-    Route::post('orders-store', [OrderController::class, 'store']);
     Route::get('orders-list', [OrderController::class, 'index']);
+    Route::post('orders-store', [OrderController::class, 'store']);
+    Route::post('orders-update/{id}', [OrderController::class, 'update']);
     
 
 

@@ -357,4 +357,51 @@ class OrderController extends Controller
             'order_id' => $order->id
         ]);
     }
+
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'party_id' => 'required',
+            'order_type' => 'required|in:cash,debit',
+            'products' => 'required|array|min:1',
+        ]);
+
+        $order = Order::findOrFail($id);
+
+        // 🔹 Update Order Main Details
+        $order->update([
+            'party_id' => $request->party_id,
+            'order_type' => $request->order_type,
+            'depo_id' => $request->depo_id,
+            'delivery_place' => $request->delivery_place,
+            'preferred_transport' => $request->preferred_transport,
+            'remark' => $request->remark,
+        ]);
+
+        // 🔹 Delete Old Order Items
+        OrderItem::where('order_id', $order->id)->delete();
+
+        // 🔹 Insert New Order Items
+        foreach ($request->products as $item) {
+
+            OrderItem::create([
+                'order_id' => $order->id,
+                'product_id' => $item['product_id'],
+                'packing_id' => $item['packing_id'] ?? null,
+                'shipper_size' => $item['shipper_size'] ?? null,
+                'price' => $item['price'],
+                'total_price' => $item['total_price'],
+                'gst' => $item['gst'] ?? 0,
+                'discount' => $item['discount'] ?? 0,
+                'grand_total' => $item['grand_total'],
+                'qty' => $item['qty'] ?? 1
+            ]);
+        }
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Order Updated Successfully',
+            'order_id' => $order->id
+        ]);
+    }
 }
