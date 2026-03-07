@@ -241,8 +241,10 @@
 
 
             $(document).on('click', '.toggle-items', function () {
-
+                alert('hello test');
                 let id = $(this).data('id');
+                alert(id);
+)
 
                 $('#items-' + id).slideToggle();
 
