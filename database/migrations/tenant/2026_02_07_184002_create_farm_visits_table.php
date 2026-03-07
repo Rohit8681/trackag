@@ -19,6 +19,7 @@ return new class extends Migration
 
             $table->string('crop_days')->nullable();
             $table->string('crop_sowing_land_area')->nullable();
+            $table->string('land_area_size')->nullable();
             $table->string('crop_condition')->nullable();
             $table->string('pest_disease')->nullable();
 

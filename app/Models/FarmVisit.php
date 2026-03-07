@@ -17,6 +17,7 @@ class FarmVisit extends Model
         'crop_id',
         'crop_days',
         'crop_sowing_land_area',
+        'land_area_size',
         'crop_condition',
         'pest_disease',
         'images',
