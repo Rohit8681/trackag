@@ -8,6 +8,7 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\ProductPacking;
+use App\Models\State;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 
@@ -304,6 +305,61 @@ class OrderController extends Controller
             'data' => $data
         ]);
     }
+    // public function store(Request $request)
+    // {
+    //     $request->validate([
+    //         'party_id' => 'required',
+    //         'order_type' => 'required|in:cash,debit',
+    //         'products' => 'required|array|min:1',
+    //     ]);
+    //     $lastOrder = Order::latest()->first();
+    //     $nextNumber = 1;
+
+    //     if ($lastOrder) {
+    //         $lastNumber = (int) substr($lastOrder->order_no, -4);
+    //         $nextNumber = $lastNumber + 1;
+    //     }
+
+    //     $orderNo = 'ORD-' . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+
+    //     // 🔹 Create Order (Common fields)
+    //     $order = Order::create([
+    //         'order_no' => $orderNo,
+    //         'user_id' => Auth::id(),
+    //         'party_id' => $request->party_id,
+    //         'order_type' => $request->order_type,
+    //         'depo_id' => $request->depo_id,
+    //         'delivery_place' => $request->delivery_place,
+    //         'preferred_transport' => $request->preferred_transport,
+    //         'remark' => $request->remark,
+    //         'status' => 'pending'
+    //     ]);
+
+    //     // 🔹 Store Multiple Products
+    //     foreach ($request->products as $item) {
+
+    //         OrderItem::create([
+    //             'order_id' => $order->id,
+    //             'product_id' => $item['product_id'],
+    //             'packing_id' => $item['packing_id'] ?? null,
+    //             'shipper_size' => $item['shipper_size'] ?? null,
+    //             'price' => $item['price'],
+    //             'total_price' => $item['total_price'],
+    //             'gst' => $item['gst'] ?? 0,
+    //             'discount' => $item['discount'] ?? 0,
+    //             'grand_total' => $item['grand_total'],
+    //             'qty' => $item['qty'] ?? 1
+    //         ]);
+    //     }
+
+    //     return response()->json([
+    //         'status' => true,
+    //         'message' => 'Order Created Successfully',
+    //         'order_id' => $order->id
+    //     ]);
+    // }
+
+    
     public function store(Request $request)
     {
         $request->validate([
@@ -311,7 +367,18 @@ class OrderController extends Controller
             'order_type' => 'required|in:cash,debit',
             'products' => 'required|array|min:1',
         ]);
-        $lastOrder = Order::latest()->first();
+
+        $user = Auth::user();
+
+        // 🔹 Get State Code
+        $state = State::find($user->state_id); 
+        $stateCode = $state ? $state->state_code : 'ORD';
+
+        // 🔹 Get Last Order
+        $lastOrder = Order::where('order_no', 'like', $stateCode . '-%')
+            ->latest()
+            ->first();
+
         $nextNumber = 1;
 
         if ($lastOrder) {
@@ -319,12 +386,13 @@ class OrderController extends Controller
             $nextNumber = $lastNumber + 1;
         }
 
-        $orderNo = 'ORD-' . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+        // 🔹 Generate Order Number
+        $orderNo = $stateCode . '-ORD-' . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
 
-        // 🔹 Create Order (Common fields)
+        // 🔹 Create Order
         $order = Order::create([
             'order_no' => $orderNo,
-            'user_id' => Auth::id(),
+            'user_id' => $user->id,
             'party_id' => $request->party_id,
             'order_type' => $request->order_type,
             'depo_id' => $request->depo_id,
@@ -334,7 +402,7 @@ class OrderController extends Controller
             'status' => 'pending'
         ]);
 
-        // 🔹 Store Multiple Products
+        // 🔹 Store Products
         foreach ($request->products as $item) {
 
             OrderItem::create([
@@ -354,10 +422,10 @@ class OrderController extends Controller
         return response()->json([
             'status' => true,
             'message' => 'Order Created Successfully',
-            'order_id' => $order->id
+            'order_id' => $order->id,
+            'order_no' => $orderNo
         ]);
     }
-
     public function update(Request $request, $id)
     {
         $request->validate([
