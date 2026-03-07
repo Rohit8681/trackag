@@ -133,39 +133,41 @@ class OrderController extends Controller
     {
         $request->validate([
             'order_id' => 'required',
-            'status' => 'required'
+            'status'   => 'required'
         ]);
 
         $order = Order::findOrFail($request->order_id);
-
-        // HOLD & REJECT → Remark required
-        if (in_array($request->status,['HOLD','REJECT'])) {
+        // HOLD / REJECT → remark required
+        if (in_array($request->status, ['HOLD','REJECT'])) {
             if (!$request->remark) {
                 return response()->json([
-                    'status'=>false,
-                    'message'=>'Remark required'
+                    'status' => false,
+                    'message' => 'Remark required'
                 ]);
             }
             $order->remark = $request->remark;
         }
-
         // DISPATCH DETAILS
-        if (in_array($request->status,['PART DISPATCHED','DISPATCHED'])) {
-            $order->lr_number = $request->lr_number;
-            $order->transport_name = $request->transport_name;
-            $order->destination = $request->destination;
-            $order->dispatch_date = now();
-        }
+        if (in_array($request->status, ['PART DISPATCHED','DISPATCHED'])) {
 
+            $order->lr_number       = $request->lr_number;
+            $order->transport_name  = $request->transport_name;
+            $order->destination     = $request->destination;
+            $order->dispatch_date   = now();
+
+        }
+        // UPDATE STATUS
         $order->status = $request->status;
+
         $order->save();
 
-        return response()->json([
-            'status'=>true,
-            'message'=>'Status Updated Successfully'
-        ]);
-    }
 
+        return response()->json([
+            'status'  => true,
+            'message' => 'Status Updated Successfully'
+        ]);
+
+    }
     
     public function create()
     {

@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('preferred_transport')->nullable();
             $table->text('remark')->nullable();
 
-            $table->enum('status', ['pending','approved','rejected'])
+            $table->enum('status', ['pending','approved','rejected',''])
                 ->default('pending');
 
             $table->timestamps();
