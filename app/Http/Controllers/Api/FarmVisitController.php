@@ -7,6 +7,7 @@ use App\Models\FarmVisit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class FarmVisitController extends Controller
 {
@@ -128,6 +129,79 @@ class FarmVisitController extends Controller
         return response()->json([
             'status' => true,
             'message' => 'Farm visit added successfully',
+            'data' => $visit
+        ]);
+    }
+
+    public function update(Request $request, $id)
+    {
+        $visit = FarmVisit::findOrFail($id);
+
+        $validator = Validator::make($request->all(), [
+            'farmer_id'               => 'required',
+            'crop_id'                 => 'required',
+            'crop_days'               => 'nullable|string',
+            'crop_sowing_land_area'   => 'nullable|string',
+            'crop_condition'          => 'nullable|string',
+            'pest_disease'            => 'nullable|string',
+            'images.*'                => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
+            'video'                   => 'nullable|mimes:mp4,mov,avi|max:102400',
+            'remark'                  => 'nullable|string',
+            'next_visit_date'         => 'nullable|date',
+            'agronomist_remark'       => 'nullable|string',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => false,
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        /* 📸 Existing Images */
+        $imagePaths = $visit->images ?? [];
+
+        /* 📸 New Images Upload */
+        if ($request->hasFile('images')) {
+
+            foreach ($request->file('images') as $image) {
+
+                $path = $image->store('farm_visits/images', 'public');
+
+                $imagePaths[] = $path;
+            }
+        }
+
+        /* 🎥 Video Upload */
+        $videoPath = $visit->video;
+
+        if ($request->hasFile('video')) {
+
+            if ($visit->video && Storage::disk('public')->exists($visit->video)) {
+                Storage::disk('public')->delete($visit->video);
+            }
+
+            $videoPath = $request->file('video')
+                ->store('farm_visits/videos', 'public');
+        }
+
+        $visit->update([
+            'farmer_id'             => $request->farmer_id,
+            'crop_id'               => $request->crop_id,
+            'crop_days'             => $request->crop_days,
+            'crop_sowing_land_area' => $request->crop_sowing_land_area,
+            'crop_condition'        => $request->crop_condition,
+            'pest_disease'          => $request->pest_disease,
+            'images'                => $imagePaths,
+            'video'                 => $videoPath,
+            'remark'                => $request->remark,
+            'next_visit_date'       => $request->next_visit_date,
+            'agronomist_remark'     => $request->agronomist_remark,
+        ]);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Farm visit updated successfully',
             'data' => $visit
         ]);
     }
