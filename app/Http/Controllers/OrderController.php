@@ -132,14 +132,14 @@ class OrderController extends Controller
     public function updateStatus(Request $request)
     {
         $request->validate([
-            'order_id' => 'required',
-            'status'   => 'required',
+            'order_id'       => 'required',
+            'status'         => 'required',
             'dispatch_image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
         ]);
 
         $order = Order::findOrFail($request->order_id);
-        // HOLD / REJECT → remark required
-        if (in_array($request->status, ['HOLD','REJECT'])) {
+        // hold / rejected → remark required
+        if (in_array($request->status, ['hold','rejected'])) {
             if (!$request->remark) {
                 return response()->json([
                     'status' => false,
@@ -149,7 +149,7 @@ class OrderController extends Controller
             $order->remark = $request->remark;
         }
         // DISPATCH DETAILS
-        if (in_array($request->status, ['PART DISPATCHED','DISPATCHED'])) {
+        if (in_array($request->status, ['part_dispatched','dispatched'])) {
 
             $order->lr_number       = $request->lr_number;
             $order->transport_name  = $request->transport_name;

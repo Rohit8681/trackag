@@ -99,13 +99,12 @@
                                                 <select class="form-select form-select-sm status-change"
                                                     data-id="{{ $order->id }}">
 
-                                                    <option {{ $order->status == 'PENDING' ? 'selected' : '' }}>PENDING</option>
-                                                    <option {{ $order->status == 'HOLD' ? 'selected' : '' }}>HOLD</option>
-                                                    <option {{ $order->status == 'APPROVED' ? 'selected' : '' }}>APPROVED</option>
-                                                    <option {{ $order->status == 'REJECT' ? 'selected' : '' }}>REJECT</option>
-                                                    <option {{ $order->status == 'PART DISPATCHED' ? 'selected' : '' }}>PART
-                                                        DISPATCHED</option>
-                                                    <option {{ $order->status == 'DISPATCHED' ? 'selected' : '' }}>DISPATCHED</option>
+                                                    <option value="pending" {{ $order->status == 'pending' ? 'selected' : '' }}>PENDING</option>
+                                                    <option value="hold" {{ $order->status == 'hold' ? 'selected' : '' }}>HOLD</option>
+                                                    <option value="approved" {{ $order->status == 'approved' ? 'selected' : '' }}>APPROVED</option>
+                                                    <option value="rejected" {{ $order->status == 'rejected' ? 'selected' : '' }}>REJECTED</option>
+                                                    <option value="part_dispatched" {{ $order->status == 'part_dispatched' ? 'selected' : '' }}>PART DISPATCHED</option>
+                                                    <option value="dispatched" {{ $order->status == 'dispatched' ? 'selected' : '' }}>DISPATCHED</option>
 
                                                 </select>
 
@@ -378,14 +377,14 @@ $(document).on('change', '.status-change', function () {
     $('#dispatch_box').hide();
 
 
-    if (status === 'HOLD' || status === 'REJECT') {
+    if (status === 'hold' || status === 'rejected') {
 
         $('#remark_box').show();
         $('#statusModal').modal('show');
 
     }
 
-    else if (status === 'PART DISPATCHED' || status === 'DISPATCHED') {
+    else if (status === 'part_dispatched' || status === 'dispatched') {
 
         $('#dispatch_box').show();
         $('#statusModal').modal('show');
