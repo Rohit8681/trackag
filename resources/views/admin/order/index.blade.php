@@ -64,7 +64,7 @@
                                                     return [
                                                         'id'          => $item->id,
                                                         'product'     => optional($item->product)->product_name,
-                                                        'packing_value' => optional($item->product)->packing_value,
+                                                        'packing_value' => optional($item->packing)->packing_value,
                                                         'packing'     => optional($item->packing)->packing_size,
                                                         'price'       => $item->price,
                                                         'gst'         => $item->gst,
