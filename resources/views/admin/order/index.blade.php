@@ -231,150 +231,168 @@
 @push('scripts')
 <script>
 
-    $(document).ready(function () {
-        alert('testing ready');
-        $('#order-table').DataTable({
-            responsive: true,
-            pageLength: 10
-        });
+$(function () {
+
+    $('#order-table').DataTable({
+        responsive: true,
+        pageLength: 10
+    });
+
+});
 
 
-        $(document).on('click', '.toggle-items', function () {
-            alert('hello test');
-            let id = $(this).data('id');
-            alert(id);
+/* -----------------------
+   PLUS ICON TOGGLE
+----------------------- */
+
+$(document).on('click', '.toggle-items', function (e) {
+
+    e.preventDefault();
+
+    let id = $(this).data('id');
+
+    console.log("clicked id:", id);
+
+    $('#items-' + id).toggle();
+
+    $(this).find('i').toggleClass('fa-plus fa-minus');
+
+});
 
 
-            $('#items-' + id).slideToggle();
+/* -----------------------
+   STATUS CHANGE
+----------------------- */
 
-            $(this).find('i').toggleClass('fa-plus fa-minus');
+$(document).on('change', '.status-change', function () {
 
-        });
+    let status = $(this).val();
+    let order_id = $(this).data('id');
 
+    console.log("status change", order_id, status);
 
-        $(document).on('change', '.status-change', function () {
+    $('#modal_order_id').val(order_id);
 
-            let status = $(this).val();
-            let order_id = $(this).data('id');
-
-            $('#modal_order_id').val(order_id);
-
-            $('#remark_box').hide();
-            $('#dispatch_box').hide();
+    $('#remark_box').hide();
+    $('#dispatch_box').hide();
 
 
-            if (status == 'HOLD' || status == 'REJECT') {
+    if (status === 'HOLD' || status === 'REJECT') {
 
-                $('#remark_box').show();
-                $('#statusModal').modal('show');
+        $('#remark_box').show();
+        $('#statusModal').modal('show');
+
+    }
+
+    else if (status === 'PART DISPATCHED' || status === 'DISPATCHED') {
+
+        $('#dispatch_box').show();
+        $('#statusModal').modal('show');
+
+    }
+
+    else {
+
+        updateStatus(order_id, status);
+
+    }
+
+});
+
+
+/* -----------------------
+   MODAL SAVE BUTTON
+----------------------- */
+
+$(document).on('click', '#saveStatus', function () {
+
+    let order_id = $('#modal_order_id').val();
+
+    let status = $('.status-change[data-id="' + order_id + '"]').val();
+
+    let remark = $('#remark').val();
+
+    let lr_number = $('#lr_number').val();
+
+    let transport_name = $('#transport_name').val();
+
+    let destination = $('#destination').val();
+
+
+    $.ajax({
+
+        url: "{{ route('order.status.update') }}",
+
+        type: "POST",
+
+        data: {
+
+            _token: "{{ csrf_token() }}",
+
+            order_id: order_id,
+
+            status: status,
+
+            remark: remark,
+
+            lr_number: lr_number,
+
+            transport_name: transport_name,
+
+            destination: destination
+
+        },
+
+        success: function (res) {
+
+            if (res.status) {
+
+                location.reload();
 
             }
-
-            else if (status == 'PART DISPATCHED' || status == 'DISPATCHED') {
-
-                $('#dispatch_box').show();
-                $('#statusModal').modal('show');
-
-            }
-
-            else {
-
-                updateStatus(order_id, status);
-
-            }
-
-        });
-
-
-        $('#saveStatus').click(function () {
-
-            let order_id = $('#modal_order_id').val();
-
-            let status = $('.status-change[data-id="' + order_id + '"]').val();
-
-            let remark = $('#remark').val();
-
-            let lr_number = $('#lr_number').val();
-
-            let transport_name = $('#transport_name').val();
-
-            let destination = $('#destination').val();
-
-
-            $.ajax({
-
-                url: "{{ route('order.status.update') }}",
-
-                type: "POST",
-
-                data: {
-
-                    _token: "{{ csrf_token() }}",
-
-                    order_id: order_id,
-
-                    status: status,
-
-                    remark: remark,
-
-                    lr_number: lr_number,
-
-                    transport_name: transport_name,
-
-                    destination: destination
-
-                },
-
-                success: function (res) {
-
-                    if (res.status) {
-
-                        $('#statusModal').modal('hide');
-
-                        location.reload();
-
-                    }
-
-                }
-
-            });
-
-        });
-
-
-        function updateStatus(order_id, status) {
-
-            $.ajax({
-
-                url: "{{ route('order.status.update') }}",
-
-                type: "POST",
-
-                data: {
-
-                    _token: "{{ csrf_token() }}",
-
-                    order_id: order_id,
-
-                    status: status
-
-                },
-
-                success: function (res) {
-
-                    if (res.status) {
-
-                        location.reload();
-
-                    }
-
-                }
-
-            });
 
         }
 
     });
+
+});
+
+
+/* -----------------------
+   SIMPLE STATUS UPDATE
+----------------------- */
+
+function updateStatus(order_id, status) {
+
+    $.ajax({
+
+        url: "{{ route('order.status.update') }}",
+
+        type: "POST",
+
+        data: {
+
+            _token: "{{ csrf_token() }}",
+
+            order_id: order_id,
+
+            status: status
+
+        },
+
+        success: function (res) {
+
+            if (res.status) {
+
+                location.reload();
+
+            }
+
+        }
+
+    });
+
+}
 
 </script>
 
