@@ -285,6 +285,8 @@ class OrderController extends Controller
 
                 'products' => $order->items->map(function ($item) {
                     return [
+                        'product_id' => $item->product_id,
+                        'packing_id' => $item->packing_id,
                         'product_name' => $item->product->product_name ?? null,
                         'packing_value' => $item->packing->packing_value ?? null,
                         'packing_size' => $item->packing->packing_size ?? null,
