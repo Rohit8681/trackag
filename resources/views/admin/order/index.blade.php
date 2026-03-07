@@ -104,7 +104,7 @@
                                         </tr>
 
 
-                                        <tr id="items-{{ $order->id }}" style="display:none;background:#f9f9f9">
+                                        <tr class="child-row" id="items-{{ $order->id }}" style="display:none;background:#f9f9f9">
 
                                             <td colspan="9">
 
@@ -235,7 +235,8 @@ $(function () {
 
     $('#order-table').DataTable({
         responsive: true,
-        pageLength: 10
+        pageLength: 10,
+        ordering: false
     });
 
 });
