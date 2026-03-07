@@ -60,7 +60,18 @@
                                         <tr>
 
                                             <td>
-                                                <button class="btn btn-sm btn-info toggle-items" data-id="{{ $order->id }}">
+                                                <button class="btn btn-sm btn-info view-items-btn" data-bs-toggle="modal" data-bs-target="#orderItemsModal" data-items="{{ json_encode($order->items->map(function($item) {
+                                                    return [
+                                                        'id'          => $item->id,
+                                                        'product'     => optional($item->product)->product_name,
+                                                        'packing'     => optional($item->packing)->packing_size,
+                                                        'price'       => $item->price,
+                                                        'gst'         => $item->gst,
+                                                        'discount'    => $item->discount,
+                                                        'qty'         => $item->qty,
+                                                        'grand_total' => $item->grand_total
+                                                    ];
+                                                })) }}">
                                                     <i class="fas fa-plus"></i>
                                                 </button>
                                             </td>
@@ -89,7 +100,6 @@
                                                     data-id="{{ $order->id }}">
 
                                                     <option {{ $order->status == 'PENDING' ? 'selected' : '' }}>PENDING</option>
-                                                    <option {{ $order->status == 'EDIT' ? 'selected' : '' }}>EDIT</option>
                                                     <option {{ $order->status == 'HOLD' ? 'selected' : '' }}>HOLD</option>
                                                     <option {{ $order->status == 'APPROVED' ? 'selected' : '' }}>APPROVED</option>
                                                     <option {{ $order->status == 'REJECT' ? 'selected' : '' }}>REJECT</option>
@@ -98,57 +108,6 @@
                                                     <option {{ $order->status == 'DISPATCHED' ? 'selected' : '' }}>DISPATCHED</option>
 
                                                 </select>
-
-                                            </td>
-
-                                        </tr>
-
-
-                                        <tr class="child-row" id="items-{{ $order->id }}" style="display:none;background:#f9f9f9">
-
-                                            <td colspan="9">
-
-                                                <table class="table table-bordered table-sm mb-0">
-
-                                                    <thead class="table-secondary">
-                                                        <tr>
-                                                            <th>Product</th>
-                                                            <th>Packing</th>
-                                                            <th>Price</th>
-                                                            <th>GST</th>
-                                                            <th>Discount</th>
-                                                            <th>Qty</th>
-                                                            <th>Total</th>
-                                                        </tr>
-                                                    </thead>
-
-                                                    <tbody>
-
-                                                        @foreach($order->items as $item)
-
-                                                            <tr>
-
-                                                                <td>{{ $item->product->product_name ?? '-' }}</td>
-
-                                                                <td>{{ $item->packing->packing_size ?? '-' }}</td>
-
-                                                                <td>{{ $item->price }}</td>
-
-                                                                <td>{{ $item->gst }}</td>
-
-                                                                <td>{{ $item->discount }}</td>
-
-                                                                <td>{{ $item->qty }}</td>
-
-                                                                <td>{{ $item->grand_total }}</td>
-
-                                                            </tr>
-
-                                                        @endforeach
-
-                                                    </tbody>
-
-                                                </table>
 
                                             </td>
 
@@ -168,6 +127,39 @@
         </div>
 
     </main>
+
+
+    <!-- ORDER ITEMS MODAL -->
+    <div class="modal fade" id="orderItemsModal" tabindex="-1" aria-labelledby="orderItemsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="orderItemsModalLabel">Order Items</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped" id="modalItemsTable">
+                            <thead class="table-secondary">
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Packing</th>
+                                    <th>Price</th>
+                                    <th>GST (%)</th>
+                                    <th>Discount</th>
+                                    <th>Qty</th>
+                                    <th>Total</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="modalItemsBody">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
 
     <!-- STATUS MODAL -->
@@ -243,21 +235,126 @@ $(function () {
 
 
 /* -----------------------
-   PLUS ICON TOGGLE
+   ORDER ITEMS MODAL & EDIT
 ----------------------- */
 
-$(document).on('click', '.toggle-items', function (e) {
-
+$(document).on('click', '.view-items-btn', function (e) {
     e.preventDefault();
+    let items = $(this).data('items');
+    let tbody = $('#modalItemsBody');
+    tbody.empty();
 
-    let id = $(this).data('id');
+    if (items.length > 0) {
+        $.each(items, function (index, item) {
+            let row = `
+            <tr data-id="${item.id}">
+                <td>${item.product ? item.product : '-'}</td>
+                <td>${item.packing ? item.packing : '-'}</td>
+                <td><input type="number" class="form-control form-control-sm edit-input item-price" value="${item.price}" disabled step="0.01" style="width: 80px;"></td>
+                <td><input type="number" class="form-control form-control-sm edit-input item-gst" value="${item.gst}" disabled step="0.01" style="width: 70px;"></td>
+                <td><input type="number" class="form-control form-control-sm edit-input item-discount" value="${item.discount}" disabled step="0.01" style="width: 80px;"></td>
+                <td><input type="number" class="form-control form-control-sm edit-input item-qty" value="${item.qty}" disabled step="1" style="width: 70px;"></td>
+                <td class="item-grand-total align-middle font-weight-bold">₹ ${parseFloat(item.grand_total).toFixed(2)}</td>
+                <td class="align-middle">
+                    <button class="btn btn-sm btn-primary edit-item-btn"><i class="fas fa-edit"></i></button>
+                    <button class="btn btn-sm btn-success save-item-btn d-none"><i class="fas fa-save"></i></button>
+                    <button class="btn btn-sm btn-secondary cancel-item-btn d-none"><i class="fas fa-times"></i></button>
+                </td>
+            </tr>`;
+            tbody.append(row);
+        });
+    } else {
+        tbody.append('<tr><td colspan="8" class="text-center">No items found.</td></tr>');
+    }
+});
 
-    console.log("clicked id:", id);
+$(document).on('click', '.edit-item-btn', function () {
+    let tr = $(this).closest('tr');
+    tr.find('.edit-input').prop('disabled', false);
+    $(this).addClass('d-none');
+    tr.find('.save-item-btn').removeClass('d-none');
+    tr.find('.cancel-item-btn').removeClass('d-none');
+    
+    // Check if original data attributes are stored, if not, store them.
+    if(typeof tr.data('orig-price') === "undefined") {
+        tr.data('orig-price', tr.find('.item-price').val());
+        tr.data('orig-gst', tr.find('.item-gst').val());
+        tr.data('orig-discount', tr.find('.item-discount').val());
+        tr.data('orig-qty', tr.find('.item-qty').val());
+    }
+});
 
-    $('#items-' + id).toggle();
+$(document).on('click', '.cancel-item-btn', function () {
+    let tr = $(this).closest('tr');
+    tr.find('.edit-input').prop('disabled', true);
+    
+    // Restore original values
+    tr.find('.item-price').val(tr.data('orig-price'));
+    tr.find('.item-gst').val(tr.data('orig-gst'));
+    tr.find('.item-discount').val(tr.data('orig-discount'));
+    tr.find('.item-qty').val(tr.data('orig-qty'));
+    
+    tr.find('.save-item-btn').addClass('d-none');
+    tr.find('.cancel-item-btn').addClass('d-none');
+    tr.find('.edit-item-btn').removeClass('d-none');
+});
 
-    $(this).find('i').toggleClass('fa-plus fa-minus');
+$(document).on('click', '.save-item-btn', function () {
+    let btn = $(this);
+    let tr = btn.closest('tr');
+    
+    let itemId = tr.data('id');
+    let price = tr.find('.item-price').val();
+    let gst = tr.find('.item-gst').val();
+    let discount = tr.find('.item-discount').val();
+    let qty = tr.find('.item-qty').val();
 
+    if (!price || !gst || !discount || !qty) {
+        alert('All fields are required!');
+        return;
+    }
+
+    let originalHtml = btn.html();
+
+    $.ajax({
+        url: "{{ route('order.item.update') }}",
+        type: "POST",
+        data: {
+            _token: "{{ csrf_token() }}",
+            item_id: itemId,
+            price: price,
+            gst: gst,
+            discount: discount,
+            qty: qty
+        },
+        beforeSend: function () {
+            btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i>');
+        },
+        success: function (res) {
+            btn.prop('disabled', false).html(originalHtml);
+            if (res.success) {
+                // Update grand total
+                tr.find('.item-grand-total').html('₹ ' + res.data.grand_total);
+                tr.find('.edit-input').prop('disabled', true);
+                
+                // Update original data
+                tr.data('orig-price', price);
+                tr.data('orig-gst', gst);
+                tr.data('orig-discount', discount);
+                tr.data('orig-qty', qty);
+                
+                btn.addClass('d-none');
+                tr.find('.cancel-item-btn').addClass('d-none');
+                tr.find('.edit-item-btn').removeClass('d-none');
+            } else {
+                alert(res.message || 'Error occurred');
+            }
+        },
+        error: function (xhr) {
+            btn.prop('disabled', false).html(originalHtml);
+            alert('An error occurred during update. Please try again.');
+        }
+    });
 });
 
 

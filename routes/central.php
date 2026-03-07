@@ -180,6 +180,7 @@ Route::middleware(['web'])->group(function () {
             Route::post('/party-payment/clear-return', [PartyPaymentController::class, 'clearReturn'])->name('party-payment.clear-return');
             
             Route::post('order-status-update', [OrderController::class, 'updateStatus'])->name('order.status.update');
+            Route::post('order/item/update', [OrderController::class, 'updateItem'])->name('order.item.update');
             Route::resource('order', OrderController::class);
             Route::resource('stock', StockController::class);
 

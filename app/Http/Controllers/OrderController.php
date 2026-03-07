@@ -168,6 +168,39 @@ class OrderController extends Controller
         ]);
 
     }
+
+    public function updateItem(Request $request)
+    {
+        $request->validate([
+            'item_id'  => 'required|exists:order_items,id',
+            'price'    => 'required|numeric|min:0',
+            'gst'      => 'required|numeric|min:0',
+            'discount' => 'required|numeric|min:0',
+            'qty'      => 'required|integer|min:1',
+        ]);
+
+        $item = \App\Models\OrderItem::findOrFail($request->item_id);
+        
+        $item->price = $request->price;
+        $item->gst = $request->gst;
+        $item->discount = $request->discount;
+        $item->qty = $request->qty;
+        
+        $amount = $item->price * $item->qty;
+        $amountAfterDiscount = $amount - $item->discount;
+        $gstAmount = ($amountAfterDiscount * $item->gst) / 100;
+        
+        $item->grand_total = round($amountAfterDiscount + $gstAmount, 2);
+        $item->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Item updated successfully',
+            'data'    => [
+                'grand_total' => number_format($item->grand_total, 2, '.', '')
+            ]
+        ]);
+    }
     
     public function create()
     {
