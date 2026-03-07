@@ -133,7 +133,8 @@ class OrderController extends Controller
     {
         $request->validate([
             'order_id' => 'required',
-            'status'   => 'required'
+            'status'   => 'required',
+            'dispatch_image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
         ]);
 
         $order = Order::findOrFail($request->order_id);
@@ -155,6 +156,15 @@ class OrderController extends Controller
             $order->destination     = $request->destination;
             $order->dispatch_date   = now();
 
+            if ($request->hasFile('dispatch_image')) {
+                $path = $request->file('dispatch_image')->store('dispatch_images', 'public');
+                $order->dispatch_image = $path;
+            } else if (!$order->dispatch_image) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Dispatch Image is required'
+                ]);
+            }
         }
         // UPDATE STATUS
         $order->status = $request->status;

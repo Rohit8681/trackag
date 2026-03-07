@@ -22,7 +22,8 @@ class Order extends Model
         'lr_number',
         'transport_name',
         'destination',
-        'dispatch_date'
+        'dispatch_date',
+        'dispatch_image'
     ];
 
     public function items()

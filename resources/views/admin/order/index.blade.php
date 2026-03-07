@@ -191,15 +191,18 @@
 
                         <label>LR Number</label>
 
-                        <input type="text" id="lr_number" class="form-control mb-2">
+                        <input type="text" id="lr_number" name="lr_number" class="form-control mb-2">
 
                         <label>Transport Name</label>
 
-                        <input type="text" id="transport_name" class="form-control mb-2">
+                        <input type="text" id="transport_name" name="transport_name" class="form-control mb-2">
 
                         <label>Destination</label>
 
-                        <input type="text" id="destination" class="form-control">
+                        <input type="text" id="destination" name="destination" class="form-control mb-2">
+
+                        <label>Dispatch Image <span class="text-danger">*</span></label>
+                        <input type="file" id="dispatch_image" name="dispatch_image" class="form-control" accept="image/jpeg,image/png,image/jpg">
 
                     </div>
 
@@ -404,53 +407,61 @@ $(document).on('change', '.status-change', function () {
 
 $(document).on('click', '#saveStatus', function () {
 
+    let btn = $(this);
+    let originalHtml = btn.html();
+
     let order_id = $('#modal_order_id').val();
-
     let status = $('.status-change[data-id="' + order_id + '"]').val();
-
     let remark = $('#remark').val();
-
     let lr_number = $('#lr_number').val();
-
     let transport_name = $('#transport_name').val();
-
     let destination = $('#destination').val();
+    let dispatch_image = $('#dispatch_image')[0].files[0];
 
+    let formData = new FormData();
+    formData.append('_token', "{{ csrf_token() }}");
+    formData.append('order_id', order_id);
+    formData.append('status', status);
+    formData.append('remark', remark);
+    formData.append('lr_number', lr_number);
+    formData.append('transport_name', transport_name);
+    formData.append('destination', destination);
+
+    if (dispatch_image) {
+        formData.append('dispatch_image', dispatch_image);
+    }
 
     $.ajax({
-
         url: "{{ route('order.status.update') }}",
-
         type: "POST",
-
-        data: {
-
-            _token: "{{ csrf_token() }}",
-
-            order_id: order_id,
-
-            status: status,
-
-            remark: remark,
-
-            lr_number: lr_number,
-
-            transport_name: transport_name,
-
-            destination: destination
-
+        data: formData,
+        processData: false,
+        contentType: false,
+        beforeSend: function () {
+            btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Saving...');
         },
-
         success: function (res) {
-
+            btn.prop('disabled', false).html(originalHtml);
             if (res.status) {
-
+                $('#statusModal').modal('hide');
                 location.reload();
-
+            } else {
+                alert(res.message);
             }
-
+        },
+        error: function (xhr) {
+            btn.prop('disabled', false).html(originalHtml);
+            let errors = xhr.responseJSON.errors;
+            if (errors) {
+                let errorMsg = '';
+                $.each(errors, function(key, value) {
+                    errorMsg += value[0] + '\n';
+                });
+                alert(errorMsg);
+            } else {
+                alert('An error occurred while updating status.');
+            }
         }
-
     });
 
 });
