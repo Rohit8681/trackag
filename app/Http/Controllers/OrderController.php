@@ -146,7 +146,7 @@ class OrderController extends Controller
                     'message' => 'Remark required'
                 ]);
             }
-            $order->remark = $request->remark;
+            $order->remark2 = $request->remark;
         }
         // DISPATCH DETAILS
         if (in_array($request->status, ['part_dispatched','dispatched'])) {

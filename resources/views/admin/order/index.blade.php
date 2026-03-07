@@ -64,6 +64,7 @@
                                                     return [
                                                         'id'          => $item->id,
                                                         'product'     => optional($item->product)->product_name,
+                                                        'packing_value' => optional($item->product)->packing_value,
                                                         'packing'     => optional($item->packing)->packing_size,
                                                         'price'       => $item->price,
                                                         'gst'         => $item->gst,
@@ -251,7 +252,9 @@ $(document).on('click', '.view-items-btn', function (e) {
             let row = `
             <tr data-id="${item.id}">
                 <td>${item.product ? item.product : '-'}</td>
-                <td>${item.packing ? item.packing : '-'}</td>
+                <td>
+${item.packing_value && item.packing ? item.packing_value + ' ' + item.packing : '-'}
+</td>
                 <td><input type="number" class="form-control form-control-sm edit-input item-price" value="${item.price}" disabled step="0.01" style="width: 80px;"></td>
                 <td><input type="number" class="form-control form-control-sm edit-input item-gst" value="${item.gst}" disabled step="0.01" style="width: 70px;"></td>
                 <td><input type="number" class="form-control form-control-sm edit-input item-discount" value="${item.discount}" disabled step="0.01" style="width: 80px;"></td>
