@@ -18,6 +18,11 @@ class Order extends Model
         'preferred_transport',
         'remark',
         'status',
+        'remark2',
+        'lr_number',
+        'transport_name',
+        'destination',
+        'dispatch_date'
     ];
 
     public function items()

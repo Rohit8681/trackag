@@ -19,8 +19,13 @@ return new class extends Migration
             $table->string('delivery_place')->nullable();
             $table->string('preferred_transport')->nullable();
             $table->text('remark')->nullable();
+            $table->text('remark2')->nullable();
+            $table->string('lr_number')->nullable();
+            $table->string('transport_name')->nullable();
+            $table->string('destination')->nullable();
+            $table->dateTime('dispatch_date')->nullable();
 
-            $table->enum('status', ['pending','approved','rejected',''])
+            $table->enum('status', ['pending','approved','rejected','hold','part_dispatched','dispatched'])
                 ->default('pending');
 
             $table->timestamps();
