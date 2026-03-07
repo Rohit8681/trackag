@@ -232,7 +232,7 @@
 <script>
 
     $(document).ready(function () {
-
+        alert('testing ready');
         $('#order-table').DataTable({
             responsive: true,
             pageLength: 10
