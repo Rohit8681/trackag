@@ -229,154 +229,153 @@
 
 
 @push('scripts')
+<script>
 
-    <script>
+    $(document).ready(function () {
 
-        $(document).ready(function () {
+        $('#order-table').DataTable({
+            responsive: true,
+            pageLength: 10
+        });
 
-            $('#order-table').DataTable({
-                responsive: true,
-                pageLength: 10
-            });
 
+        $(document).on('click', '.toggle-items', function () {
+            alert('hello test');
+            let id = $(this).data('id');
+            alert(id);
 
-            $(document).on('click', '.toggle-items', function () {
-                alert('hello test');
-                let id = $(this).data('id');
-                alert(id);
-)
 
-                $('#items-' + id).slideToggle();
+            $('#items-' + id).slideToggle();
 
-                $(this).find('i').toggleClass('fa-plus fa-minus');
+            $(this).find('i').toggleClass('fa-plus fa-minus');
 
-            });
+        });
 
 
-            $(document).on('change', '.status-change', function () {
+        $(document).on('change', '.status-change', function () {
 
-                let status = $(this).val();
-                let order_id = $(this).data('id');
+            let status = $(this).val();
+            let order_id = $(this).data('id');
 
-                $('#modal_order_id').val(order_id);
+            $('#modal_order_id').val(order_id);
 
-                $('#remark_box').hide();
-                $('#dispatch_box').hide();
+            $('#remark_box').hide();
+            $('#dispatch_box').hide();
 
 
-                if (status == 'HOLD' || status == 'REJECT') {
+            if (status == 'HOLD' || status == 'REJECT') {
 
-                    $('#remark_box').show();
-                    $('#statusModal').modal('show');
+                $('#remark_box').show();
+                $('#statusModal').modal('show');
 
-                }
+            }
 
-                else if (status == 'PART DISPATCHED' || status == 'DISPATCHED') {
+            else if (status == 'PART DISPATCHED' || status == 'DISPATCHED') {
 
-                    $('#dispatch_box').show();
-                    $('#statusModal').modal('show');
+                $('#dispatch_box').show();
+                $('#statusModal').modal('show');
 
-                }
+            }
 
-                else {
+            else {
 
-                    updateStatus(order_id, status);
-
-                }
-
-            });
-
-
-            $('#saveStatus').click(function () {
-
-                let order_id = $('#modal_order_id').val();
-
-                let status = $('.status-change[data-id="' + order_id + '"]').val();
-
-                let remark = $('#remark').val();
-
-                let lr_number = $('#lr_number').val();
-
-                let transport_name = $('#transport_name').val();
-
-                let destination = $('#destination').val();
-
-
-                $.ajax({
-
-                    url: "{{ route('order.status.update') }}",
-
-                    type: "POST",
-
-                    data: {
-
-                        _token: "{{ csrf_token() }}",
-
-                        order_id: order_id,
-
-                        status: status,
-
-                        remark: remark,
-
-                        lr_number: lr_number,
-
-                        transport_name: transport_name,
-
-                        destination: destination
-
-                    },
-
-                    success: function (res) {
-
-                        if (res.status) {
-
-                            $('#statusModal').modal('hide');
-
-                            location.reload();
-
-                        }
-
-                    }
-
-                });
-
-            });
-
-
-            function updateStatus(order_id, status) {
-
-                $.ajax({
-
-                    url: "{{ route('order.status.update') }}",
-
-                    type: "POST",
-
-                    data: {
-
-                        _token: "{{ csrf_token() }}",
-
-                        order_id: order_id,
-
-                        status: status
-
-                    },
-
-                    success: function (res) {
-
-                        if (res.status) {
-
-                            location.reload();
-
-                        }
-
-                    }
-
-                });
+                updateStatus(order_id, status);
 
             }
 
         });
 
-    </script>
+
+        $('#saveStatus').click(function () {
+
+            let order_id = $('#modal_order_id').val();
+
+            let status = $('.status-change[data-id="' + order_id + '"]').val();
+
+            let remark = $('#remark').val();
+
+            let lr_number = $('#lr_number').val();
+
+            let transport_name = $('#transport_name').val();
+
+            let destination = $('#destination').val();
+
+
+            $.ajax({
+
+                url: "{{ route('order.status.update') }}",
+
+                type: "POST",
+
+                data: {
+
+                    _token: "{{ csrf_token() }}",
+
+                    order_id: order_id,
+
+                    status: status,
+
+                    remark: remark,
+
+                    lr_number: lr_number,
+
+                    transport_name: transport_name,
+
+                    destination: destination
+
+                },
+
+                success: function (res) {
+
+                    if (res.status) {
+
+                        $('#statusModal').modal('hide');
+
+                        location.reload();
+
+                    }
+
+                }
+
+            });
+
+        });
+
+
+        function updateStatus(order_id, status) {
+
+            $.ajax({
+
+                url: "{{ route('order.status.update') }}",
+
+                type: "POST",
+
+                data: {
+
+                    _token: "{{ csrf_token() }}",
+
+                    order_id: order_id,
+
+                    status: status
+
+                },
+
+                success: function (res) {
+
+                    if (res.status) {
+
+                        location.reload();
+
+                    }
+
+                }
+
+            });
+
+        }
+
+    });
+
+</script>
 
 @endpush
