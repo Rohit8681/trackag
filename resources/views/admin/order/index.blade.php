@@ -128,7 +128,7 @@
 
                                                             <tr>
 
-                                                                <td>{{ $item->product->name ?? '-' }}</td>
+                                                                <td>{{ $item->product->product_name ?? '-' }}</td>
 
                                                                 <td>{{ $item->packing->packing_size ?? '-' }}</td>
 
