@@ -478,7 +478,7 @@ class OrderController extends Controller
     public function destroy($id)
     {
         $order = Order::where('id', $id)
-            ->where('user_id', auth()->id())
+            // ->where('user_id', auth()->id())
             ->first();
 
         if (!$order) {
