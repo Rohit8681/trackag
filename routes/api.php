@@ -66,6 +66,7 @@ Route::middleware([TenantAuthenticate::class])->group(function () {
     Route::get('depo-list', [CommanController::class, 'getDepoList']);
 
     Route::get('crop-sowing-list', [FarmerController::class, 'cropSowingList']);
+    Route::get('farmer-crop-sowing/{farmer_id}', [FarmerController::class, 'farmerCropSowing']);
     Route::get('farmers-list', [FarmerController::class, 'index']);
     Route::post('farmers-store', [FarmerController::class, 'store']);
     Route::post('farmers-update/{id}', [FarmerController::class, 'update']);

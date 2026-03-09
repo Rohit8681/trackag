@@ -28,6 +28,24 @@ class FarmerController extends Controller
             'data' => $cropSowing
         ]);
     }
+
+    public function farmerCropSowing($farmer_id)
+    {
+        $cropSowing = FarmerCropSowing::with('crop:id,name')
+            ->where('farmer_id', $farmer_id)
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'id' => $item->crop->id ?? null,
+                    'name' => $item->crop->name ?? null,
+                ];
+            });
+
+        return response()->json([
+            'status' => true,
+            'data' => $cropSowing
+        ]);
+    }
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
