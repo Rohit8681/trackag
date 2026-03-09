@@ -32,6 +32,123 @@
                     <div class="card-header">
                         <h3 class="card-title">Order Management</h3>
                     </div>
+                    <div class="card-body border-bottom">
+
+<form method="GET" action="{{ route('order.index') }}">
+
+<div class="row g-2">
+
+<div class="col-md-2">
+<label>From Date</label>
+<input type="date" name="from_date" class="form-control"
+value="{{ request('from_date') }}">
+</div>
+
+<div class="col-md-2">
+<label>To Date</label>
+<input type="date" name="to_date" class="form-control"
+value="{{ request('to_date') }}">
+</div>
+
+<div class="col-md-2">
+<label>State</label>
+<select name="state_id" class="form-control">
+<option value="">All</option>
+@foreach($states as $state)
+<option value="{{ $state->id }}"
+{{ request('state_id')==$state->id ? 'selected':'' }}>
+{{ $state->name }}
+</option>
+@endforeach
+</select>
+</div>
+
+<div class="col-md-2">
+<label>Sales Person</label>
+<select name="user_id" class="form-control">
+<option value="">All</option>
+@foreach($employees as $user)
+<option value="{{ $user->id }}"
+{{ request('user_id')==$user->id ? 'selected':'' }}>
+{{ $user->name }}
+</option>
+@endforeach
+</select>
+</div>
+
+<div class="col-md-2">
+<label>Party</label>
+<select name="party_id" class="form-control">
+<option value="">All</option>
+@foreach($customers as $c)
+<option value="{{ $c->id }}"
+{{ request('party_id')==$c->id ? 'selected':'' }}>
+{{ $c->agro_name }}
+</option>
+@endforeach
+</select>
+</div>
+
+<div class="col-md-2">
+<label>Product</label>
+<input type="text" name="product" class="form-control"
+value="{{ request('product') }}">
+</div>
+
+<div class="col-md-2">
+<label>Order Type</label>
+<select name="order_type" class="form-control">
+<option value="">All</option>
+<option value="cash" {{ request('order_type')=='cash'?'selected':'' }}>Cash</option>
+<option value="debit" {{ request('order_type')=='debit'?'selected':'' }}>Debit</option>
+</select>
+</div>
+
+<div class="col-md-2">
+<label>Order No</label>
+<input type="text" name="order_no" class="form-control"
+value="{{ request('order_no') }}">
+</div>
+
+<div class="col-md-2">
+<label>Depo</label>
+<select name="depo_id" class="form-control">
+<option value="">All</option>
+@foreach($depos as $depo)
+<option value="{{ $depo->id }}"
+{{ request('depo_id')==$depo->id ? 'selected':'' }}>
+{{ $depo->name }}
+</option>
+@endforeach
+</select>
+</div>
+
+<div class="col-md-2">
+<label>Status</label>
+<select name="status" class="form-control">
+<option value="">All</option>
+<option value="pending" {{ request('status')=='pending'?'selected':'' }}>Pending</option>
+<option value="hold" {{ request('status')=='hold'?'selected':'' }}>Hold</option>
+<option value="approved" {{ request('status')=='approved'?'selected':'' }}>Approved</option>
+<option value="rejected" {{ request('status')=='rejected'?'selected':'' }}>Rejected</option>
+<option value="part_dispatched" {{ request('status')=='part_dispatched'?'selected':'' }}>Part Dispatched</option>
+<option value="dispatched" {{ request('status')=='dispatched'?'selected':'' }}>Dispatched</option>
+</select>
+</div>
+
+<div class="col-md-2 align-self-end">
+<button class="btn btn-primary w-100">Filter</button>
+</div>
+
+<div class="col-md-2 align-self-end">
+<a href="{{ route('order.index') }}" class="btn btn-secondary w-100">Reset</a>
+</div>
+
+</div>
+
+</form>
+
+</div>
 
                     <div class="card-body">
 

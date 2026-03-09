@@ -14,88 +14,205 @@ use Illuminate\Support\Facades\Auth;
 
 class OrderController extends Controller
 {
+    // public function index(Request $request)
+    // {
+    //     $user = Auth::user();
+    //     $roleName = $user->getRoleNames()->first();
+    //     $query = Order::with([
+    //         'user.state',
+    //         'customer',
+    //         'depo',
+    //         'items.product',
+    //         'items.packing'
+    //     ])->latest();
+
+    //     if ($request->filled('state_id')) {
+    //         $query->whereHas('user', function ($q) use ($request) {
+    //             $q->where('state_id', $request->state_id);
+    //         });
+    //     }
+
+    //     if ($request->filled('user_id')) {
+    //         $query->where('user_id', $request->user_id);
+    //     }
+
+    //     if ($request->filled('party_id')) {
+    //         $query->where('party_id', $request->party_id);
+    //     }
+
+    //     if ($request->filled('product')) {
+    //         $query->whereHas('items.product', function ($q) use ($request) {
+    //             $q->where('name', 'like', "%{$request->product}%");
+    //         });
+    //     }
+
+    //     if ($request->filled('packing')) {
+    //         $query->whereHas('items.packing', function ($q) use ($request) {
+    //             $q->where('packing_size', 'like', "%{$request->packing}%");
+    //         });
+    //     }
+
+    //     if ($request->filled('order_type')) {
+    //         $query->where('order_type', $request->order_type);
+    //     }
+
+    //     if ($request->filled('order_no')) {
+    //         $query->where('order_no', 'like', "%{$request->order_no}%");
+    //     }
+
+    //     if ($request->filled('depo_id')) {
+    //         $query->where('depo_id', $request->depo_id);
+    //     }
+
+    //     if ($request->filled('status')) {
+    //         $query->where('status', $request->status);
+    //     }
+
+    //     $orders = $query->get();
+
+    //     $companyCount = Company::count();
+    //     $company = null;
+
+    //     if ($companyCount == 1) {
+    //         $company = Company::first();
+
+    //         if ($company && !empty($company->state)) {
+    //             $companyStates = array_map('intval', explode(',', $company->state));
+
+    //             if ($roleName === 'sub_admin') {
+    //                 $states = State::where('status', 1)
+    //                     ->whereIn('id', $companyStates)
+    //                     ->get();
+    //             } else {
+    //                 $states = empty($stateIds)
+    //                     ? collect()
+    //                     : State::where('status', 1)
+    //                         ->whereIn('id', $stateIds)
+    //                         ->get();
+    //             }
+    //         } else {
+    //             $states = in_array($roleName, ['master_admin', 'sub_admin'])
+    //                 ? State::where('status', 1)->get()
+    //                 : (empty($stateIds)
+    //                     ? collect()
+    //                     : State::where('status', 1)->whereIn('id', $stateIds)->get());
+    //         }
+    //     } else {
+    //         $states = in_array($roleName, ['master_admin', 'sub_admin'])
+    //             ? State::where('status', 1)->get()
+    //             : (empty($stateIds)
+    //                 ? collect()
+    //                 : State::where('status', 1)->whereIn('id', $stateIds)->get());
+    //     }
+    //     // $employees = User::select('id', 'name')->get();
+    //     if (in_array($roleName, ['master_admin', 'sub_admin'])) {
+    //         $employees = User::where('status', 'Active')->where('id', '!=', 1)->get();
+    //     } else {
+    //         $employees = empty($stateIds)
+    //             ? collect()
+    //             : User::where('status', 'Active')->where('id', '!=', 1)
+    //                 ->whereIn('state_id', $stateIds)
+    //                 ->where('reporting_to', $user->id)
+    //                 ->get();
+    //     }
+
+    //     $customer = Customer::where('is_active', true)->get();
+    //     $depos = Depo::where('status',1)->get();
+
+
+    //     return view('admin.order.index', [
+    //         'orders' => $orders,
+    //         'states' => $states,
+    //         'users' => $employees,
+    //         'customers' => $customer,
+    //         'depos' => $depos,
+    //     ]);
+    // }
+
     public function index(Request $request)
-    {
-        $user = Auth::user();
-        $roleName = $user->getRoleNames()->first();
-        $query = Order::with([
-            'user.state',
-            'customer',
-            'depo',
-            'items.product',
-            'items.packing'
-        ])->latest();
+{
+    $user = Auth::user();
+    $roleName = $user->getRoleNames()->first();
 
-        if ($request->filled('state_id')) {
-            $query->whereHas('user', function ($q) use ($request) {
-                $q->where('state_id', $request->state_id);
-            });
-        }
+    $query = Order::with([
+        'user.state',
+        'customer',
+        'depo',
+        'items.product',
+        'items.packing'
+    ])->latest();
 
-        if ($request->filled('user_id')) {
-            $query->where('user_id', $request->user_id);
-        }
+    // NEW DATE FILTER
+    if ($request->filled('from_date') && $request->filled('to_date')) {
+        $query->whereBetween('created_at', [
+            $request->from_date . ' 00:00:00',
+            $request->to_date . ' 23:59:59'
+        ]);
+    }
 
-        if ($request->filled('party_id')) {
-            $query->where('party_id', $request->party_id);
-        }
+    if ($request->filled('state_id')) {
+        $query->whereHas('user', function ($q) use ($request) {
+            $q->where('state_id', $request->state_id);
+        });
+    }
 
-        if ($request->filled('product')) {
-            $query->whereHas('items.product', function ($q) use ($request) {
-                $q->where('name', 'like', "%{$request->product}%");
-            });
-        }
+    if ($request->filled('user_id')) {
+        $query->where('user_id', $request->user_id);
+    }
 
-        if ($request->filled('packing')) {
-            $query->whereHas('items.packing', function ($q) use ($request) {
-                $q->where('packing_size', 'like', "%{$request->packing}%");
-            });
-        }
+    if ($request->filled('party_id')) {
+        $query->where('party_id', $request->party_id);
+    }
 
-        if ($request->filled('order_type')) {
-            $query->where('order_type', $request->order_type);
-        }
+    if ($request->filled('product')) {
+        $query->whereHas('items.product', function ($q) use ($request) {
+            $q->where('name', 'like', "%{$request->product}%");
+        });
+    }
 
-        if ($request->filled('order_no')) {
-            $query->where('order_no', 'like', "%{$request->order_no}%");
-        }
+    if ($request->filled('packing')) {
+        $query->whereHas('items.packing', function ($q) use ($request) {
+            $q->where('packing_size', 'like', "%{$request->packing}%");
+        });
+    }
 
-        if ($request->filled('depo_id')) {
-            $query->where('depo_id', $request->depo_id);
-        }
+    if ($request->filled('order_type')) {
+        $query->where('order_type', $request->order_type);
+    }
 
-        if ($request->filled('status')) {
-            $query->where('status', $request->status);
-        }
+    if ($request->filled('order_no')) {
+        $query->where('order_no', 'like', "%{$request->order_no}%");
+    }
 
-        $orders = $query->get();
+    if ($request->filled('depo_id')) {
+        $query->where('depo_id', $request->depo_id);
+    }
 
-        $companyCount = Company::count();
-        $company = null;
+    if ($request->filled('status')) {
+        $query->where('status', $request->status);
+    }
 
-        if ($companyCount == 1) {
-            $company = Company::first();
+    $orders = $query->get();
 
-            if ($company && !empty($company->state)) {
-                $companyStates = array_map('intval', explode(',', $company->state));
+    $companyCount = Company::count();
+    $company = null;
 
-                if ($roleName === 'sub_admin') {
-                    $states = State::where('status', 1)
-                        ->whereIn('id', $companyStates)
-                        ->get();
-                } else {
-                    $states = empty($stateIds)
-                        ? collect()
-                        : State::where('status', 1)
-                            ->whereIn('id', $stateIds)
-                            ->get();
-                }
+    if ($companyCount == 1) {
+        $company = Company::first();
+
+        if ($company && !empty($company->state)) {
+            $companyStates = array_map('intval', explode(',', $company->state));
+
+            if ($roleName === 'sub_admin') {
+                $states = State::where('status', 1)
+                    ->whereIn('id', $companyStates)
+                    ->get();
             } else {
-                $states = in_array($roleName, ['master_admin', 'sub_admin'])
-                    ? State::where('status', 1)->get()
-                    : (empty($stateIds)
-                        ? collect()
-                        : State::where('status', 1)->whereIn('id', $stateIds)->get());
+                $states = empty($stateIds)
+                    ? collect()
+                    : State::where('status', 1)
+                        ->whereIn('id', $stateIds)
+                        ->get();
             }
         } else {
             $states = in_array($roleName, ['master_admin', 'sub_admin'])
@@ -104,30 +221,36 @@ class OrderController extends Controller
                     ? collect()
                     : State::where('status', 1)->whereIn('id', $stateIds)->get());
         }
-        // $employees = User::select('id', 'name')->get();
-        if (in_array($roleName, ['master_admin', 'sub_admin'])) {
-            $employees = User::where('status', 'Active')->where('id', '!=', 1)->get();
-        } else {
-            $employees = empty($stateIds)
+    } else {
+        $states = in_array($roleName, ['master_admin', 'sub_admin'])
+            ? State::where('status', 1)->get()
+            : (empty($stateIds)
                 ? collect()
-                : User::where('status', 'Active')->where('id', '!=', 1)
-                    ->whereIn('state_id', $stateIds)
-                    ->where('reporting_to', $user->id)
-                    ->get();
-        }
-
-        $customer = Customer::where('is_active', true)->get();
-        $depos = Depo::where('status',1)->get();
-
-
-        return view('admin.order.index', [
-            'orders' => $orders,
-            'states' => $states,
-            'users' => $employees,
-            'customers' => $customer,
-            'depos' => $depos,
-        ]);
+                : State::where('status', 1)->whereIn('id', $stateIds)->get());
     }
+
+    if (in_array($roleName, ['master_admin', 'sub_admin'])) {
+        $employees = User::where('status', 'Active')->where('id', '!=', 1)->get();
+    } else {
+        $employees = empty($stateIds)
+            ? collect()
+            : User::where('status', 'Active')->where('id', '!=', 1)
+                ->whereIn('state_id', $stateIds)
+                ->where('reporting_to', $user->id)
+                ->get();
+    }
+
+    $customer = Customer::where('is_active', true)->get();
+    $depos = Depo::where('status',1)->get();
+
+    return view('admin.order.index', [
+        'orders' => $orders,
+        'states' => $states,
+        'users' => $employees,
+        'customers' => $customer,
+        'depos' => $depos,
+    ]);
+}
 
     public function updateStatus(Request $request)
     {
