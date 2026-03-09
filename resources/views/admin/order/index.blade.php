@@ -67,7 +67,7 @@ value="{{ request('to_date') }}">
 <label>Sales Person</label>
 <select name="user_id" class="form-control">
 <option value="">All</option>
-@foreach($employees as $user)
+@foreach($users as $user)
 <option value="{{ $user->id }}"
 {{ request('user_id')==$user->id ? 'selected':'' }}>
 {{ $user->name }}
