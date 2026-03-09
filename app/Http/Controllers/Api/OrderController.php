@@ -474,4 +474,29 @@ class OrderController extends Controller
             'order_id' => $order->id
         ]);
     }
+
+    public function destroy($id)
+    {
+        $order = Order::where('id', $id)
+            ->where('user_id', auth()->id())
+            ->first();
+
+        if (!$order) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Order not found'
+            ], 404);
+        }
+
+        // delete order items first
+        $order->items()->delete();
+
+        // delete order
+        $order->delete();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Order deleted successfully'
+        ]);
+    }
 }
