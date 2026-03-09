@@ -130,89 +130,96 @@ class OrderController extends Controller
     // }
 
     public function index(Request $request)
-{
-    $user = Auth::user();
-    $roleName = $user->getRoleNames()->first();
+    {
+        $user = Auth::user();
+        $roleName = $user->getRoleNames()->first();
 
-    $query = Order::with([
-        'user.state',
-        'customer',
-        'depo',
-        'items.product',
-        'items.packing'
-    ])->latest();
+        $query = Order::with([
+            'user.state',
+            'customer',
+            'depo',
+            'items.product',
+            'items.packing'
+        ])->latest();
 
-    // NEW DATE FILTER
-    if ($request->filled('from_date') && $request->filled('to_date')) {
-        $query->whereBetween('created_at', [
-            $request->from_date . ' 00:00:00',
-            $request->to_date . ' 23:59:59'
-        ]);
-    }
+        // NEW DATE FILTER
+        if ($request->filled('from_date') && $request->filled('to_date')) {
+            $query->whereBetween('created_at', [
+                $request->from_date . ' 00:00:00',
+                $request->to_date . ' 23:59:59'
+            ]);
+        }
 
-    if ($request->filled('state_id')) {
-        $query->whereHas('user', function ($q) use ($request) {
-            $q->where('state_id', $request->state_id);
-        });
-    }
+        if ($request->filled('state_id')) {
+            $query->whereHas('user', function ($q) use ($request) {
+                $q->where('state_id', $request->state_id);
+            });
+        }
 
-    if ($request->filled('user_id')) {
-        $query->where('user_id', $request->user_id);
-    }
+        if ($request->filled('user_id')) {
+            $query->where('user_id', $request->user_id);
+        }
 
-    if ($request->filled('party_id')) {
-        $query->where('party_id', $request->party_id);
-    }
+        if ($request->filled('party_id')) {
+            $query->where('party_id', $request->party_id);
+        }
 
-    if ($request->filled('product')) {
-        $query->whereHas('items.product', function ($q) use ($request) {
-            $q->where('product_name', 'like', "%{$request->product}%");
-        });
-    }
+        if ($request->filled('product')) {
+            $query->whereHas('items.product', function ($q) use ($request) {
+                $q->where('product_name', 'like', "%{$request->product}%");
+            });
+        }
 
-    if ($request->filled('packing')) {
-        $query->whereHas('items.packing', function ($q) use ($request) {
-            $q->where('packing_size', 'like', "%{$request->packing}%");
-        });
-    }
+        if ($request->filled('packing')) {
+            $query->whereHas('items.packing', function ($q) use ($request) {
+                $q->where('packing_size', 'like', "%{$request->packing}%");
+            });
+        }
 
-    if ($request->filled('order_type')) {
-        $query->where('order_type', $request->order_type);
-    }
+        if ($request->filled('order_type')) {
+            $query->where('order_type', $request->order_type);
+        }
 
-    if ($request->filled('order_no')) {
-        $query->where('order_no', 'like', "%{$request->order_no}%");
-    }
+        if ($request->filled('order_no')) {
+            $query->where('order_no', 'like', "%{$request->order_no}%");
+        }
 
-    if ($request->filled('depo_id')) {
-        $query->where('depo_id', $request->depo_id);
-    }
+        if ($request->filled('depo_id')) {
+            $query->where('depo_id', $request->depo_id);
+        }
 
-    if ($request->filled('status')) {
-        $query->where('status', $request->status);
-    }
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
 
-    $orders = $query->get();
+        $orders = $query->get();
 
-    $companyCount = Company::count();
-    $company = null;
+        $companyCount = Company::count();
+        $company = null;
 
-    if ($companyCount == 1) {
-        $company = Company::first();
+        if ($companyCount == 1) {
+            $company = Company::first();
 
-        if ($company && !empty($company->state)) {
-            $companyStates = array_map('intval', explode(',', $company->state));
+            if ($company && !empty($company->state)) {
+                $companyStates = array_map('intval', explode(',', $company->state));
 
-            if ($roleName === 'sub_admin') {
-                $states = State::where('status', 1)
-                    ->whereIn('id', $companyStates)
-                    ->get();
-            } else {
-                $states = empty($stateIds)
-                    ? collect()
-                    : State::where('status', 1)
+                if ($roleName === 'sub_admin') {
+                    $states = State::where('status', 1)
+                        ->whereIn('id', $companyStates)
+                        ->get();
+                } else {
+                    $states = empty($stateIds)
+                        ? collect()
+                        : State::where('status', 1)
                         ->whereIn('id', $stateIds)
                         ->get();
+                }
+            } else {
+                $states = in_array($roleName, ['master_admin', 'sub_admin'])
+                    ? State::where('status', 1)->get()
+                    : (empty($stateIds)
+                        ? collect()
+                        : State::where('status', 1)->whereIn('id', $stateIds)->get());
             }
         } else {
             $states = in_array($roleName, ['master_admin', 'sub_admin'])
@@ -221,36 +228,29 @@ class OrderController extends Controller
                     ? collect()
                     : State::where('status', 1)->whereIn('id', $stateIds)->get());
         }
-    } else {
-        $states = in_array($roleName, ['master_admin', 'sub_admin'])
-            ? State::where('status', 1)->get()
-            : (empty($stateIds)
-                ? collect()
-                : State::where('status', 1)->whereIn('id', $stateIds)->get());
-    }
 
-    if (in_array($roleName, ['master_admin', 'sub_admin'])) {
-        $employees = User::where('status', 'Active')->where('id', '!=', 1)->get();
-    } else {
-        $employees = empty($stateIds)
-            ? collect()
-            : User::where('status', 'Active')->where('id', '!=', 1)
+        if (in_array($roleName, ['master_admin', 'sub_admin'])) {
+            $employees = User::where('status', 'Active')->where('id', '!=', 1)->get();
+        } else {
+            $employees = empty($stateIds)
+                ? collect()
+                : User::where('status', 'Active')->where('id', '!=', 1)
                 ->whereIn('state_id', $stateIds)
                 ->where('reporting_to', $user->id)
                 ->get();
+        }
+
+        $customer = Customer::where('is_active', true)->get();
+        $depos = Depo::where('status', 1)->get();
+
+        return view('admin.order.index', [
+            'orders' => $orders,
+            'states' => $states,
+            'users' => $employees,
+            'customers' => $customer,
+            'depos' => $depos,
+        ]);
     }
-
-    $customer = Customer::where('is_active', true)->get();
-    $depos = Depo::where('status',1)->get();
-
-    return view('admin.order.index', [
-        'orders' => $orders,
-        'states' => $states,
-        'users' => $employees,
-        'customers' => $customer,
-        'depos' => $depos,
-    ]);
-}
 
     public function updateStatus(Request $request)
     {
@@ -262,7 +262,7 @@ class OrderController extends Controller
 
         $order = Order::findOrFail($request->order_id);
         // hold / rejected → remark required
-        if (in_array($request->status, ['hold','rejected'])) {
+        if (in_array($request->status, ['hold', 'rejected'])) {
             if (!$request->remark) {
                 return response()->json([
                     'status' => false,
@@ -272,7 +272,7 @@ class OrderController extends Controller
             $order->remark2 = $request->remark;
         }
         // DISPATCH DETAILS
-        if (in_array($request->status, ['part_dispatched','dispatched'])) {
+        if (in_array($request->status, ['part_dispatched', 'dispatched'])) {
 
             $order->lr_number       = $request->lr_number;
             $order->transport_name  = $request->transport_name;
@@ -299,7 +299,6 @@ class OrderController extends Controller
             'status'  => true,
             'message' => 'Status Updated Successfully'
         ]);
-
     }
 
     public function updateItem(Request $request)
@@ -313,16 +312,16 @@ class OrderController extends Controller
         ]);
 
         $item = \App\Models\OrderItem::findOrFail($request->item_id);
-        
+
         $item->price = $request->price;
         $item->gst = $request->gst;
         $item->discount = $request->discount;
         $item->qty = $request->qty;
-        
+
         $amount = $item->price * $item->qty;
         $amountAfterDiscount = $amount - $item->discount;
         $gstAmount = ($amountAfterDiscount * $item->gst) / 100;
-        
+
         $item->grand_total = round($amountAfterDiscount + $gstAmount, 2);
         $item->save();
 
@@ -334,7 +333,7 @@ class OrderController extends Controller
             ]
         ]);
     }
-    
+
     public function create()
     {
         //
