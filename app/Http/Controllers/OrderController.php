@@ -166,7 +166,7 @@ class OrderController extends Controller
 
     if ($request->filled('product')) {
         $query->whereHas('items.product', function ($q) use ($request) {
-            $q->where('name', 'like', "%{$request->product}%");
+            $q->where('product_name', 'like', "%{$request->product}%");
         });
     }
 
