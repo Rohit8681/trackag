@@ -512,6 +512,7 @@
                         <thead>
                             <tr>
                                 <th>Travel Mode</th>
+                                <th class="text-center">Enable</th>
                                 <th>Allowance</th>
                             </tr>
                         </thead>
@@ -524,6 +525,7 @@
                         <thead>
                             <tr>
                                 <th>Tour Type</th>
+                                <th class="text-center">Enable</th>
                                 <th>DA Amount</th>
                             </tr>
                         </thead>
@@ -624,12 +626,17 @@ $(document).ready(function() {
                 $.each(res.travel_modes, function (i, vt) {
                     let slabData = res.vehicle_slabs.find(s => s.travel_mode_id === vt.id);
                     let amount = slabData ? slabData.travelling_allow_per_km : '';
+                    let isChecked = slabData ? 'checked' : '';
+                    let isDisabled = slabData ? '' : 'disabled';
                     $('#vehicleSlabBody').append(`
                         <tr>
                             <td>${vt.name}</td>
+                            <td class="text-center">
+                                <input class="form-check-input row-enable-checkbox" type="checkbox" ${isChecked} ${isSlabWise ? 'disabled' : ''}>
+                            </td>
                             <td>
-                                <input type="hidden" name="travel_mode_id[]" value="${vt.id}">
-                                <input step="0.01" type="number" class="form-control text-center vehicle-amount" name="travelling_allow_per_km[]" value="${amount}" ${readOnlyAttr}>
+                                <input type="hidden" class="row-hidden-id" name="travel_mode_id[]" value="${vt.id}" ${isDisabled}>
+                                <input step="0.01" type="number" class="form-control text-center vehicle-amount row-amount-input" name="travelling_allow_per_km[]" value="${amount}" ${readOnlyAttr} ${isDisabled}>
                             </td>
                         </tr>
                     `);
@@ -640,12 +647,17 @@ $(document).ready(function() {
                 $.each(res.tour_types, function (i, tt) {
                     let slabData = res.tour_slabs.find(s => s.tour_type_id === tt.id);
                     let da = slabData ? slabData.da_amount : '';
+                    let isChecked = slabData ? 'checked' : '';
+                    let isDisabled = slabData ? '' : 'disabled';
                     $('#tourSlabBody').append(`
                         <tr>
                             <td>${tt.name}</td>
+                            <td class="text-center">
+                                <input class="form-check-input row-enable-checkbox" type="checkbox" ${isChecked} ${isSlabWise ? 'disabled' : ''}>
+                            </td>
                             <td>
-                                <input type="hidden" name="tour_type_id[]" value="${tt.id}">
-                                <input type="number" step="0.01" class="form-control text-center tour-amount" name="da_amount[]" value="${da}" ${readOnlyAttr}>
+                                <input type="hidden" class="row-hidden-id" name="tour_type_id[]" value="${tt.id}" ${isDisabled}>
+                                <input type="number" step="0.01" class="form-control text-center tour-amount row-amount-input" name="da_amount[]" value="${da}" ${readOnlyAttr} ${isDisabled}>
                             </td>
                         </tr>
                     `);
@@ -690,6 +702,22 @@ $(document).ready(function() {
         });
     }
 
+
+    $(document).on('change', '.row-enable-checkbox', function() {
+        let tr = $(this).closest('tr');
+        let isChecked = $(this).is(':checked');
+        let hiddenId = tr.find('.row-hidden-id');
+        let amountInput = tr.find('.row-amount-input');
+
+        if (isChecked) {
+            hiddenId.prop('disabled', false);
+            amountInput.prop('disabled', false);
+        } else {
+            hiddenId.prop('disabled', true);
+            amountInput.prop('disabled', true);
+            amountInput.val('');
+        }
+    });
 
    // Save Form
     $('#slabForm').on('submit', function (e) {
