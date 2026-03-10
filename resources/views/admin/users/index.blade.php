@@ -510,9 +510,9 @@
                     <div class="d-flex align-items-center mb-2">
                         <h6 class="mb-0 me-3">Travel Mode Allowance (Per KM)</h6>
                         <div class="form-check me-3 mb-0">
-                            <input class="form-check-input" type="checkbox" id="travelModeCheckbox">
+                            <input class="form-check-input" type="checkbox" id="travelModeCheckbox" name="travel_mode_enabled" value="1">
                         </div>
-                        <input type="number" step="0.01" class="form-control form-control-sm w-auto d-none" id="travelModeInput" name="travel_mode_allowance_input" placeholder="Amount" disabled>
+                        <input type="number" step="0.01" class="form-control form-control-sm w-auto d-none" id="travelModeInput" name="travel_mode_limit" placeholder="Amount" disabled>
                     </div>
                     <table class="table table-bordered">
                         <thead>
@@ -528,9 +528,9 @@
                     <div class="d-flex align-items-center mb-2">
                         <h6 class="mb-0 me-3">Tour Type Allowance</h6>
                         <div class="form-check me-3 mb-0">
-                            <input class="form-check-input" type="checkbox" id="tourTypeCheckbox">
+                            <input class="form-check-input" type="checkbox" id="tourTypeCheckbox" name="tour_type_enabled" value="1">
                         </div>
-                        <input type="number" step="0.01" class="form-control form-control-sm w-auto d-none" id="tourTypeInput" name="tour_type_allowance_input" placeholder="Amount" disabled>
+                        <input type="number" step="0.01" class="form-control form-control-sm w-auto d-none" id="tourTypeInput" name="tour_type_limit" placeholder="Amount" disabled>
                     </div>
                     <table class="table table-bordered">
                         <thead>
@@ -696,6 +696,29 @@ $(document).ready(function() {
                                 : JSON.parse(res.ta_da_slab.approved_bills_in_da);
                             $('#approvedBills').val(bills).trigger('change');
                         }
+
+                        // ✅ Pre-fill checkboxes and limits
+                        if(res.ta_da_slab.travel_mode_enabled == 1) {
+                            $('#travelModeCheckbox').prop('checked', true);
+                            $('#travelModeInput').removeClass('d-none').prop('disabled', false).val(res.ta_da_slab.travel_mode_limit);
+                        } else {
+                            $('#travelModeCheckbox').prop('checked', false);
+                            $('#travelModeInput').addClass('d-none').prop('disabled', true).val('');
+                        }
+
+                        if(res.ta_da_slab.tour_type_enabled == 1) {
+                            $('#tourTypeCheckbox').prop('checked', true);
+                            $('#tourTypeInput').removeClass('d-none').prop('disabled', false).val(res.ta_da_slab.tour_type_limit);
+                        } else {
+                            $('#tourTypeCheckbox').prop('checked', false);
+                            $('#tourTypeInput').addClass('d-none').prop('disabled', true).val('');
+                        }
+                    } else {
+                        // Reset if no record
+                        $('#travelModeCheckbox').prop('checked', false);
+                        $('#travelModeInput').addClass('d-none').prop('disabled', true).val('');
+                        $('#tourTypeCheckbox').prop('checked', false);
+                        $('#tourTypeInput').addClass('d-none').prop('disabled', true).val('');
                     }
                 }
             }

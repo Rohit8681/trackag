@@ -428,6 +428,10 @@ class UserController extends Controller
                     'max_monthly_travel' => $request->max_monthly_travel,
                     'km' => $request->km,
                     'approved_bills_in_da' => $request->approved_bills_in_da,
+                    'travel_mode_enabled' => $request->has('travel_mode_enabled') ? 1 : 0,
+                    'travel_mode_limit' => $request->has('travel_mode_enabled') ? $request->travel_mode_limit : null,
+                    'tour_type_enabled' => $request->has('tour_type_enabled') ? 1 : 0,
+                    'tour_type_limit' => $request->has('tour_type_enabled') ? $request->tour_type_limit : null,
                 ]
             );
 
