@@ -507,7 +507,13 @@
                     </div>
 
                     <hr>
-                    <h6>Travel Mode Allowance (Per KM)</h6>
+                    <div class="d-flex align-items-center mb-2">
+                        <h6 class="mb-0 me-3">Travel Mode Allowance (Per KM)</h6>
+                        <div class="form-check me-3 mb-0">
+                            <input class="form-check-input" type="checkbox" id="travelModeCheckbox">
+                        </div>
+                        <input type="number" step="0.01" class="form-control form-control-sm w-auto d-none" id="travelModeInput" name="travel_mode_allowance_input" placeholder="Amount" disabled>
+                    </div>
                     <table class="table table-bordered">
                         <thead>
                             <tr>
@@ -519,7 +525,13 @@
                     </table>
 
                     <hr>
-                    <h6>Tour Type Allowance</h6>
+                    <div class="d-flex align-items-center mb-2">
+                        <h6 class="mb-0 me-3">Tour Type Allowance</h6>
+                        <div class="form-check me-3 mb-0">
+                            <input class="form-check-input" type="checkbox" id="tourTypeCheckbox">
+                        </div>
+                        <input type="number" step="0.01" class="form-control form-control-sm w-auto d-none" id="tourTypeInput" name="tour_type_allowance_input" placeholder="Amount" disabled>
+                    </div>
                     <table class="table table-bordered">
                         <thead>
                             <tr>
@@ -856,6 +868,26 @@ $(document).ready(function() {
                 $('#resetPasswordMessage').html(errorHtml);
             }
         });
+    });
+
+    // Toggle Travel Mode Input
+    $('#travelModeCheckbox').on('change', function() {
+        if ($(this).is(':checked')) {
+            $('#travelModeInput').removeClass('d-none').prop('disabled', false);
+        } else {
+            $('#travelModeInput').addClass('d-none').prop('disabled', true);
+            $('#travelModeInput').val(''); // Clear value when hidden
+        }
+    });
+
+    // Toggle Tour Type Input
+    $('#tourTypeCheckbox').on('change', function() {
+        if ($(this).is(':checked')) {
+            $('#tourTypeInput').removeClass('d-none').prop('disabled', false);
+        } else {
+            $('#tourTypeInput').addClass('d-none').prop('disabled', true);
+            $('#tourTypeInput').val(''); // Clear value when hidden
+        }
     });
 });
 
