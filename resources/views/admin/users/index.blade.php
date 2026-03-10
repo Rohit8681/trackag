@@ -508,11 +508,6 @@
 
                     <hr>
                     <h6>Travel Mode Allowance (Per KM)</h6>
-                    <div class="mb-2">
-                    <label>
-                    <input type="checkbox" id="addVehicleRow"> Add Travel Mode
-                    </label>
-                    </div>
                     <table class="table table-bordered">
                         <thead>
                             <tr>
@@ -525,11 +520,6 @@
 
                     <hr>
                     <h6>Tour Type Allowance</h6>
-                    <div class="mb-2">
-                    <label>
-                    <input type="checkbox" id="addTourRow"> Add Tour Type
-                    </label>
-                    </div>
                     <table class="table table-bordered">
                         <thead>
                             <tr>
@@ -589,7 +579,6 @@ function openSlabModal(userId) {
         }
     });
 }
-
 $('#slabModal').on('shown.bs.modal', function () {
     $('#approvedBills,#approvedSlabBills').select2({
         placeholder: "Select Approved Bills",
@@ -597,67 +586,7 @@ $('#slabModal').on('shown.bs.modal', function () {
         dropdownParent: $('#slabModal') // dropdown modal ni andar show thaye
     });
 });
-
 $(document).ready(function() {
-    $(document).on('change','#addVehicleRow',function(){
-
-if($(this).is(':checked')){
-
-let row = `
-<tr>
-
-<td>
-<select name="travel_mode_id[]" class="form-control">
-${window.travelModeOptions}
-</select>
-</td>
-
-<td>
-<input type="number" step="0.01"
-name="travelling_allow_per_km[]"
-class="form-control">
-</td>
-
-</tr>
-`;
-
-$('#vehicleSlabBody').append(row);
-
-$(this).prop('checked',false);
-
-}
-
-});
-
-$(document).on('change','#addTourRow',function(){
-
-if($(this).is(':checked')){
-
-let row = `
-<tr>
-
-<td>
-<select name="tour_type_id[]" class="form-control">
-${window.tourTypeOptions}
-</select>
-</td>
-
-<td>
-<input type="number" step="0.01"
-name="da_amount[]"
-class="form-control">
-</td>
-
-</tr>
-`;
-
-$('#tourSlabBody').append(row);
-
-$(this).prop('checked',false);
-
-}
-
-});
     $('#slabSelect, #designation_id_modal').on('change', function () {
         loadSlabData();
     });
@@ -673,16 +602,6 @@ $(this).prop('checked',false);
             data: { user_id: userId, slab: slab, designation_id: designationId },
             success: function (res) {
                 console.log(res);
-                window.travelModeOptions = '';
-
-$.each(res.travel_modes, function(i, mode){
-    window.travelModeOptions += `<option value="${mode.id}">${mode.name}</option>`;
-});
-window.tourTypeOptions = '';
-
-$.each(res.tour_types, function(i, tour){
-    window.tourTypeOptions += `<option value="${tour.id}">${tour.name}</option>`;
-});
                 // 🔹 Reset Designations
                 $('#designation_id_modal').empty();
                 $.each(res.designations, function (i, d) {
