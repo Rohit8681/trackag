@@ -3,6 +3,19 @@
 @section('title', 'Add TA-DA Slab | Trackag')
 
 @section('content')
+<style>
+    /* Remove spinner arrows from number inputs for Chrome, Safari, Edge, Opera */
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="number"]::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    /* Remove spinner arrows from number inputs for Firefox */
+    input[type="number"] {
+        -moz-appearance: textfield;
+    }
+</style>
 <main class="app-main">
     <div class="app-content-header mb-4">
         <div class="container-fluid">
