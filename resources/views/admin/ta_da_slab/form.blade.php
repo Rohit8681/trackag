@@ -142,19 +142,32 @@
                         {{-- ==================== SLAB-WISE (DESIGNATION-WISE) ==================== --}}
                         <div class="row g-4 mt-4">
                             <h5 class="text-primary fw-bold">Slab-wise (Designation-wise Rates)</h5>
-                            <div class="col-md-4">
-                                <label class="form-label fw-bold">Approved Bills in DA</label>
-                                <select name="approved_bills_in_da_slab_wise[]" class="form-select select2 @error('approved_bills_in_da_slab_wise') is-invalid @enderror" multiple>
-                                    @foreach(['Petrol','Food','Accomodation','Travel','Courier','Hotel','Others'] as $opt)
-                                        <option value="{{ $opt }}"
-                                            {{ (is_array(old('approved_bills_in_da_slab_wise', $slab->approved_bills_in_da_slab_wise ?? [])) && in_array($opt, old('approved_bills_in_da_slab_wise', $slab->approved_bills_in_da_slab_wise ?? []))) ? 'selected':'' }}>
-                                            {{ $opt }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                @error('approved_bills_in_da')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
+                            <div class="col-md-12 mb-4">
+                                <label class="form-label fw-bold d-flex align-items-center mb-3">
+                                    <span>Approved Bills in DA</span>
+                                    <div class="form-check ms-4 mb-0 fw-normal">
+                                        <input class="form-check-input global-travel-mode-checkbox" type="checkbox" name="travel_mode_enabled" value="1" id="global_travel_mode_enabled" {{ old('travel_mode_enabled', $slab->travel_mode_enabled ?? 0) ? 'checked' : '' }}>
+                                        <label class="form-check-label" for="global_travel_mode_enabled">Travel Mode Enable</label>
+                                    </div>
+                                    <div class="form-check ms-4 mb-0 fw-normal">
+                                        <input class="form-check-input global-tour-type-checkbox" type="checkbox" name="tour_type_enabled" value="1" id="global_tour_type_enabled" {{ old('tour_type_enabled', $slab->tour_type_enabled ?? 0) ? 'checked' : '' }}>
+                                        <label class="form-check-label" for="global_tour_type_enabled">Tour Type Enable</label>
+                                    </div>
+                                </label>
+
+                                <div class="col-md-4">
+                                    <select name="approved_bills_in_da_slab_wise[]" class="form-select select2 @error('approved_bills_in_da_slab_wise') is-invalid @enderror" multiple>
+                                        @foreach(['Petrol','Food','Accomodation','Travel','Courier','Hotel','Others'] as $opt)
+                                            <option value="{{ $opt }}"
+                                                {{ (is_array(old('approved_bills_in_da_slab_wise', $slab->approved_bills_in_da_slab_wise ?? [])) && in_array($opt, old('approved_bills_in_da_slab_wise', $slab->approved_bills_in_da_slab_wise ?? []))) ? 'selected':'' }}>
+                                                {{ $opt }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    @error('approved_bills_in_da_slab_wise')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
                             </div>
 
                             <ul class="nav nav-tabs" id="designationTabs" role="tablist">
@@ -185,10 +198,6 @@
                                                     <div class="card-header bg-light fw-bold">
                                                         <div class="d-flex align-items-center justify-content-between mb-2">
                                                             <span>Travel Mode ({{ $d->name }})</span>
-                                                            <div class="form-check mb-0 fw-normal">
-                                                                <input class="form-check-input travel-mode-checkbox" type="checkbox" name="travel_mode_enabled" value="1" id="travel_mode_enabled_{{ $d->id }}" {{ old('travel_mode_enabled', $slab->travel_mode_enabled) ? 'checked' : '' }}>
-                                                                <label class="form-check-label" for="travel_mode_enabled_{{ $d->id }}">Enable</label>
-                                                            </div>
                                                         </div>
                                                         <div class="mb-2 fw-normal">
                                                             <input type="number" step="0.01" name="travel_mode_limit" class="form-control form-control-sm travel-mode-limit" placeholder="Enter KM limit" value="{{ old('travel_mode_limit', $slab->travel_mode_limit) }}">
@@ -228,10 +237,6 @@
                                                     <div class="card-header bg-light fw-bold">
                                                         <div class="d-flex align-items-center justify-content-between mb-2">
                                                             <span>Tour Type ({{ $d->name }})</span>
-                                                            <div class="form-check mb-0 fw-normal">
-                                                                <input class="form-check-input tour-type-checkbox" type="checkbox" name="tour_type_enabled" value="1" id="tour_type_enabled_{{ $d->id }}" {{ old('tour_type_enabled', $slab->tour_type_enabled) ? 'checked' : '' }}>
-                                                                <label class="form-check-label" for="tour_type_enabled_{{ $d->id }}">Enable</label>
-                                                            </div>
                                                         </div>
                                                         <div class="mb-2 fw-normal">
                                                             <input type="number" step="0.01" name="tour_type_limit" class="form-control form-control-sm tour-type-limit" placeholder="Enter amount limit" value="{{ old('tour_type_limit', $slab->tour_type_limit) }}">
@@ -292,17 +297,12 @@ $(document).ready(function() {
 
     // Travel Mode Checkbox sync & disable limit logic
     function syncTravelMode() {
-        if ($('.travel-mode-checkbox').length) {
-            let isChecked = $('.travel-mode-checkbox').first().is(':checked');
-            $('.travel-mode-checkbox').prop('checked', isChecked);
-            $('.travel-mode-limit').prop('disabled', !isChecked);
-        }
+        let isChecked = $('.global-travel-mode-checkbox').is(':checked');
+        $('.travel-mode-limit').prop('disabled', !isChecked);
     }
     
-    $(document).on('change', '.travel-mode-checkbox', function() {
-        let isChecked = $(this).is(':checked');
-        $('.travel-mode-checkbox').prop('checked', isChecked);
-        $('.travel-mode-limit').prop('disabled', !isChecked);
+    $(document).on('change', '.global-travel-mode-checkbox', function() {
+        syncTravelMode();
     });
 
     $(document).on('input', '.travel-mode-limit', function() {
@@ -311,17 +311,12 @@ $(document).ready(function() {
 
     // Tour Type Checkbox sync & disable limit logic
     function syncTourType() {
-        if ($('.tour-type-checkbox').length) {
-            let isChecked = $('.tour-type-checkbox').first().is(':checked');
-            $('.tour-type-checkbox').prop('checked', isChecked);
-            $('.tour-type-limit').prop('disabled', !isChecked);
-        }
+        let isChecked = $('.global-tour-type-checkbox').is(':checked');
+        $('.tour-type-limit').prop('disabled', !isChecked);
     }
 
-    $(document).on('change', '.tour-type-checkbox', function() {
-        let isChecked = $(this).is(':checked');
-        $('.tour-type-checkbox').prop('checked', isChecked);
-        $('.tour-type-limit').prop('disabled', !isChecked);
+    $(document).on('change', '.global-tour-type-checkbox', function() {
+        syncTourType();
     });
 
     $(document).on('input', '.tour-type-limit', function() {
