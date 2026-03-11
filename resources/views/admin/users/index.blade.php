@@ -506,7 +506,6 @@
                     </div>
                     </div>
 
-                    <div id="allowanceSection">
                     <hr>
                     <div class="d-flex align-items-center mb-2">
                         <h6 class="mb-0 me-3">Travel Mode Allowance (Per KM)</h6>
@@ -542,7 +541,6 @@
                         </thead>
                         <tbody id="tourSlabBody"></tbody>
                     </table>
-                    </div>
                 </div>
 
                 <div class="modal-footer">
@@ -667,7 +665,8 @@ $(document).ready(function() {
 
                 // 🔹 Slab type toggle
                 if (isSlabWise) {
-                    $('#allowanceSection').hide();
+                    $('#travelModeCheckbox').closest('.form-check').hide();
+                    $('#tourTypeCheckbox').closest('.form-check').hide();
                     $('#individualFields').hide();
                     $('#approved_bills_in_da_slab_wise').show();
                     // $('#saveSlabBtn').hide();
@@ -682,7 +681,8 @@ $(document).ready(function() {
                 }
 
                 } else {
-                    $('#allowanceSection').show();
+                    $('#travelModeCheckbox').closest('.form-check').show();
+                    $('#tourTypeCheckbox').closest('.form-check').show();
                     $('#individualFields').show();
                     $('#saveSlabBtn').show();
                     $('#approved_bills_in_da_slab_wise').hide();
