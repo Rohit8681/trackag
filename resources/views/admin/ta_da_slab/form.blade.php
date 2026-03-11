@@ -145,13 +145,25 @@
                             <div class="col-md-12 mb-4">
                                 <label class="form-label fw-bold d-flex align-items-center mb-3">
                                     <span>Approved Bills in DA</span>
-                                    <div class="form-check ms-4 mb-0 fw-normal">
-                                        <input class="form-check-input global-travel-mode-checkbox" type="checkbox" name="travel_mode_enabled" value="1" id="global_travel_mode_enabled" {{ old('travel_mode_enabled', $slab->travel_mode_enabled ?? 0) ? 'checked' : '' }}>
-                                        <label class="form-check-label" for="global_travel_mode_enabled">Travel Mode Enable</label>
+                                    
+                                    <div class="d-flex align-items-center ms-4">
+                                        <div class="form-check mb-0 fw-normal">
+                                            <input class="form-check-input global-travel-mode-checkbox" type="checkbox" name="travel_mode_enabled" value="1" id="global_travel_mode_enabled" {{ old('travel_mode_enabled', $slab->travel_mode_enabled ?? 0) ? 'checked' : '' }}>
+                                            <label class="form-check-label" for="global_travel_mode_enabled">Travel Mode Enable</label>
+                                        </div>
+                                        <div class="ms-2" id="travel_mode_limit_container" style="display: none;">
+                                            <input type="number" step="0.01" name="travel_mode_limit" class="form-control form-control-sm travel-mode-limit" placeholder="Enter KM limit" value="{{ old('travel_mode_limit', $slab->travel_mode_limit) }}">
+                                        </div>
                                     </div>
-                                    <div class="form-check ms-4 mb-0 fw-normal">
-                                        <input class="form-check-input global-tour-type-checkbox" type="checkbox" name="tour_type_enabled" value="1" id="global_tour_type_enabled" {{ old('tour_type_enabled', $slab->tour_type_enabled ?? 0) ? 'checked' : '' }}>
-                                        <label class="form-check-label" for="global_tour_type_enabled">Tour Type Enable</label>
+
+                                    <div class="d-flex align-items-center ms-4">
+                                        <div class="form-check mb-0 fw-normal">
+                                            <input class="form-check-input global-tour-type-checkbox" type="checkbox" name="tour_type_enabled" value="1" id="global_tour_type_enabled" {{ old('tour_type_enabled', $slab->tour_type_enabled ?? 0) ? 'checked' : '' }}>
+                                            <label class="form-check-label" for="global_tour_type_enabled">Tour Type Enable</label>
+                                        </div>
+                                        <div class="ms-2" id="tour_type_limit_container" style="display: none;">
+                                            <input type="number" step="0.01" name="tour_type_limit" class="form-control form-control-sm tour-type-limit" placeholder="Enter amount limit" value="{{ old('tour_type_limit', $slab->tour_type_limit) }}">
+                                        </div>
                                     </div>
                                 </label>
 
@@ -199,9 +211,6 @@
                                                         <div class="d-flex align-items-center justify-content-between mb-2">
                                                             <span>Travel Mode ({{ $d->name }})</span>
                                                         </div>
-                                                        <div class="mb-2 fw-normal">
-                                                            <input type="number" step="0.01" name="travel_mode_limit" class="form-control form-control-sm travel-mode-limit" placeholder="Enter KM limit" value="{{ old('travel_mode_limit', $slab->travel_mode_limit) }}">
-                                                        </div>
                                                     </div>
                                                     <div class="card-body p-0">
                                                         <table class="table table-bordered mb-0 text-center">
@@ -237,9 +246,6 @@
                                                     <div class="card-header bg-light fw-bold">
                                                         <div class="d-flex align-items-center justify-content-between mb-2">
                                                             <span>Tour Type ({{ $d->name }})</span>
-                                                        </div>
-                                                        <div class="mb-2 fw-normal">
-                                                            <input type="number" step="0.01" name="tour_type_limit" class="form-control form-control-sm tour-type-limit" placeholder="Enter amount limit" value="{{ old('tour_type_limit', $slab->tour_type_limit) }}">
                                                         </div>
                                                     </div>
                                                     <div class="card-body p-0">
@@ -299,6 +305,11 @@ $(document).ready(function() {
     function syncTravelMode() {
         let isChecked = $('.global-travel-mode-checkbox').is(':checked');
         $('.travel-mode-limit').prop('disabled', !isChecked);
+        if (isChecked) {
+            $('#travel_mode_limit_container').show();
+        } else {
+            $('#travel_mode_limit_container').hide();
+        }
     }
     
     $(document).on('change', '.global-travel-mode-checkbox', function() {
@@ -313,6 +324,11 @@ $(document).ready(function() {
     function syncTourType() {
         let isChecked = $('.global-tour-type-checkbox').is(':checked');
         $('.tour-type-limit').prop('disabled', !isChecked);
+        if (isChecked) {
+            $('#tour_type_limit_container').show();
+        } else {
+            $('#tour_type_limit_container').hide();
+        }
     }
 
     $(document).on('change', '.global-tour-type-checkbox', function() {
