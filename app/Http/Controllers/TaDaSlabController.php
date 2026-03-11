@@ -124,6 +124,8 @@ class TaDaSlabController extends Controller
             'km' => 'nullable|numeric',
             'approved_bills_in_da' => 'nullable|array',
             'approved_bills_in_da_slab_wise' => 'nullable|array',
+            'travel_mode_limit' => 'nullable|numeric',
+            'tour_type_limit' => 'nullable|numeric',
         ]);
 
         $slab = TaDaSlab::whereNull('user_id')->first() ?? new TaDaSlab();
@@ -131,6 +133,12 @@ class TaDaSlabController extends Controller
         $slab->km = $request->km;
         $slab->approved_bills_in_da = $request->approved_bills_in_da ?? [];
         $slab->approved_bills_in_da_slab_wise = $request->approved_bills_in_da_slab_wise ?? [];
+        
+        $slab->travel_mode_enabled = $request->has('travel_mode_enabled') ? 1 : 0;
+        $slab->travel_mode_limit = $request->travel_mode_limit;
+        $slab->tour_type_enabled = $request->has('tour_type_enabled') ? 1 : 0;
+        $slab->tour_type_limit = $request->tour_type_limit;
+        
         $slab->save();
 
         // Clear existing slab-wise records

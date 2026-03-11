@@ -182,7 +182,18 @@
                                             {{-- Travel Mode --}}
                                             <div class="col-md-6">
                                                 <div class="card border shadow-sm h-100">
-                                                    <div class="card-header bg-light fw-bold">Travel Mode ({{ $d->name }})</div>
+                                                    <div class="card-header bg-light fw-bold">
+                                                        <div class="d-flex align-items-center justify-content-between mb-2">
+                                                            <span>Travel Mode ({{ $d->name }})</span>
+                                                            <div class="form-check mb-0 fw-normal">
+                                                                <input class="form-check-input travel-mode-checkbox" type="checkbox" name="travel_mode_enabled" value="1" id="travel_mode_enabled_{{ $d->id }}" {{ old('travel_mode_enabled', $slab->travel_mode_enabled) ? 'checked' : '' }}>
+                                                                <label class="form-check-label" for="travel_mode_enabled_{{ $d->id }}">Enable</label>
+                                                            </div>
+                                                        </div>
+                                                        <div class="mb-2 fw-normal">
+                                                            <input type="number" step="0.01" name="travel_mode_limit" class="form-control form-control-sm travel-mode-limit" placeholder="Enter KM limit" value="{{ old('travel_mode_limit', $slab->travel_mode_limit) }}">
+                                                        </div>
+                                                    </div>
                                                     <div class="card-body p-0">
                                                         <table class="table table-bordered mb-0 text-center">
                                                             <thead class="table-secondary">
@@ -214,7 +225,18 @@
                                             {{-- Tour Type --}}
                                             <div class="col-md-6">
                                                 <div class="card border shadow-sm h-100">
-                                                    <div class="card-header bg-light fw-bold">Tour Type ({{ $d->name }})</div>
+                                                    <div class="card-header bg-light fw-bold">
+                                                        <div class="d-flex align-items-center justify-content-between mb-2">
+                                                            <span>Tour Type ({{ $d->name }})</span>
+                                                            <div class="form-check mb-0 fw-normal">
+                                                                <input class="form-check-input tour-type-checkbox" type="checkbox" name="tour_type_enabled" value="1" id="tour_type_enabled_{{ $d->id }}" {{ old('tour_type_enabled', $slab->tour_type_enabled) ? 'checked' : '' }}>
+                                                                <label class="form-check-label" for="tour_type_enabled_{{ $d->id }}">Enable</label>
+                                                            </div>
+                                                        </div>
+                                                        <div class="mb-2 fw-normal">
+                                                            <input type="number" step="0.01" name="tour_type_limit" class="form-control form-control-sm tour-type-limit" placeholder="Enter amount limit" value="{{ old('tour_type_limit', $slab->tour_type_limit) }}">
+                                                        </div>
+                                                    </div>
                                                     <div class="card-body p-0">
                                                         <table class="table table-bordered mb-0 text-center">
                                                             <thead class="table-secondary">
@@ -266,6 +288,53 @@ $(document).ready(function() {
     $('.select2').select2({
         placeholder: "Select Approved Bills",
         width: '100%'
+    });
+
+    // Travel Mode Checkbox sync & disable limit logic
+    function syncTravelMode() {
+        if ($('.travel-mode-checkbox').length) {
+            let isChecked = $('.travel-mode-checkbox').first().is(':checked');
+            $('.travel-mode-checkbox').prop('checked', isChecked);
+            $('.travel-mode-limit').prop('disabled', !isChecked);
+        }
+    }
+    
+    $(document).on('change', '.travel-mode-checkbox', function() {
+        let isChecked = $(this).is(':checked');
+        $('.travel-mode-checkbox').prop('checked', isChecked);
+        $('.travel-mode-limit').prop('disabled', !isChecked);
+    });
+
+    $(document).on('input', '.travel-mode-limit', function() {
+        $('.travel-mode-limit').val($(this).val());
+    });
+
+    // Tour Type Checkbox sync & disable limit logic
+    function syncTourType() {
+        if ($('.tour-type-checkbox').length) {
+            let isChecked = $('.tour-type-checkbox').first().is(':checked');
+            $('.tour-type-checkbox').prop('checked', isChecked);
+            $('.tour-type-limit').prop('disabled', !isChecked);
+        }
+    }
+
+    $(document).on('change', '.tour-type-checkbox', function() {
+        let isChecked = $(this).is(':checked');
+        $('.tour-type-checkbox').prop('checked', isChecked);
+        $('.tour-type-limit').prop('disabled', !isChecked);
+    });
+
+    $(document).on('input', '.tour-type-limit', function() {
+        $('.tour-type-limit').val($(this).val());
+    });
+
+    // Initial sync
+    syncTravelMode();
+    syncTourType();
+
+    // Enable on submit so values are sent when dealing with possible disabled state
+    $('form').on('submit', function() {
+        $('.travel-mode-limit, .tour-type-limit').prop('disabled', false);
     });
 });
 </script>
