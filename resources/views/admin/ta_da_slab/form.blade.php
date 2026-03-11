@@ -360,6 +360,25 @@ $(document).ready(function() {
     $('form').on('submit', function() {
         $('.travel-mode-limit, .tour-type-limit').prop('disabled', false);
     });
+
+    // Prevent Arrow keys and negative values on number inputs
+    $(document).on('keydown', 'input[type="number"]', function(e) {
+        // Prevent Up Arrow (38) and Down Arrow (40)
+        if (e.which === 38 || e.which === 40) {
+            e.preventDefault();
+        }
+        // Prevent minus sign (-) which is key code 189 or 109 (numpad)
+        if (e.which === 189 || e.which === 109) {
+            e.preventDefault();
+        }
+    });
+
+    $(document).on('input', 'input[type="number"]', function(e) {
+        // If a negative value is pasted or entered, remove the negative sign
+        if ($(this).val() < 0) {
+            $(this).val(Math.abs($(this).val()));
+        }
+    });
 });
 </script>
 @endpush
