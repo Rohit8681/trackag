@@ -512,7 +512,7 @@
                         <div class="form-check me-3 mb-0">
                             <input class="form-check-input" type="checkbox" id="travelModeCheckbox" name="travel_mode_enabled" value="1">
                         </div>
-                        <input type="number" step="0.01" class="form-control form-control-sm w-auto d-none" id="travelModeInput" name="travel_mode_limit" placeholder="Amount" disabled>
+                        <input type="number" step="0.01" min="0" class="form-control form-control-sm w-auto d-none" id="travelModeInput" name="travel_mode_limit" placeholder="KM" disabled>
                     </div>
                     <table class="table table-bordered">
                         <thead>
@@ -530,7 +530,7 @@
                         <div class="form-check me-3 mb-0">
                             <input class="form-check-input" type="checkbox" id="tourTypeCheckbox" name="tour_type_enabled" value="1">
                         </div>
-                        <input type="number" step="0.01" class="form-control form-control-sm w-auto d-none" id="tourTypeInput" name="tour_type_limit" placeholder="Amount" disabled>
+                        <input type="number" step="0.01" min="0" class="form-control form-control-sm w-auto d-none" id="tourTypeInput" name="tour_type_limit" placeholder="KM" disabled>
                     </div>
                     <table class="table table-bordered">
                         <thead>
