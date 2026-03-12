@@ -36,7 +36,8 @@ class Trip extends Model
         'start_km_photo',
         'end_km_photo',
         'trip_type',
-        'pdf_status'
+        'pdf_status',
+        'trip_limit_override'
     ];
 
     // Relationships

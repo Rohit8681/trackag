@@ -510,6 +510,35 @@
                         </div>
 
                         <div class="modal-body">
+                            @php
+                                $travelled_km = max(0, (float)$trip->end_km - (float)$trip->starting_km);
+                                $userSlabType = $trip->user->slab ?? 'Slab Wise';
+                                $slabInfo = null;
+                                
+                                if ($userSlabType == 'Individual') {
+                                    $slabInfo = \App\Models\TaDaSlab::where('user_id', $trip->user->id)->first();
+                                } else {
+                                    $slabInfo = \App\Models\TaDaSlab::whereNull('user_id')->first();
+                                }
+                                
+                                $limitEnabled = $slabInfo ? $slabInfo->travel_mode_enabled : 0;
+                                $limitValue = $slabInfo ? $slabInfo->travel_mode_limit : 0;
+                                $showOverride = ($limitEnabled == 1 && $travelled_km < $limitValue);
+                            @endphp
+
+                            @if($showOverride)
+                                <div class="alert alert-warning py-2 px-3 mb-3">
+                                    <label class="form-label fw-semibold mb-1">
+                                        Trip KM ({{ $travelled_km }}) is below allowed limit ({{ $limitValue }}). Do you still want to approve?
+                                    </label>
+                                    <select name="trip_limit_override_confirm" class="form-select form-select-sm" required>
+                                        <option value="">-- Select --</option>
+                                        <option value="1">Yes</option>
+                                        <option value="0">No</option>
+                                    </select>
+                                </div>
+                            @endif
+
                             <p class="fw-semibold mb-2">Select Trip Type:</p>
 
                             <div class="trip-type-group">

@@ -391,6 +391,12 @@ class TripController extends Controller
 
         if ($status === 'approved') {
             $request->validate(['trip_type' => 'required|in:full,half']);
+            
+            if ($request->has('trip_limit_override_confirm')) {
+                if ($request->input('trip_limit_override_confirm') == '0') {
+                    return back()->with('error', 'Trip approval cancelled because KM was below the allowed limit.');
+                }
+            }
         }
 
         $calculatedDistance = $this->calculateDistanceFromLogs($trip->id);
@@ -407,6 +413,7 @@ class TripController extends Controller
             'approved_at'       => now(),
             'total_distance_km' => $calculatedDistance,
             'trip_type'         => $status === 'approved' ? $tripType : null,
+            'trip_limit_override' => ($status === 'approved' && $request->input('trip_limit_override_confirm') == '1') ? 1 : 0,
         ]);
 
         return redirect()->back()->with('success', 'Trip approval status updated successfully.');
