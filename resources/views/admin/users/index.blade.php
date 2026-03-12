@@ -3,6 +3,16 @@
 
 @section('content')
 <style>
+    /* Remove browser's native spinner from number inputs */
+    input[type=number]::-webkit-inner-spin-button, 
+    input[type=number]::-webkit-outer-spin-button { 
+        -webkit-appearance: none; 
+        margin: 0; 
+    }
+    input[type=number] {
+        -moz-appearance: textfield; /* Firefox */
+    }
+
     td small strong {
         color: #444;
         min-width: 80px;
@@ -512,7 +522,7 @@
                         <div class="form-check me-3 mb-0">
                             <input class="form-check-input" type="checkbox" id="travelModeCheckbox" name="travel_mode_enabled" value="1">
                         </div>
-                        <input type="number" step="0.01" min="0" class="form-control form-control-sm w-auto d-none" id="travelModeInput" name="travel_mode_limit" placeholder="KM" disabled>
+                        <input type="number" step="0.01" min="0" onkeydown="return event.keyCode !== 38 && event.keyCode !== 40" class="form-control form-control-sm w-auto d-none" id="travelModeInput" name="travel_mode_limit" placeholder="KM" disabled>
                     </div>
                     <table class="table table-bordered">
                         <thead>
@@ -530,7 +540,7 @@
                         <div class="form-check me-3 mb-0">
                             <input class="form-check-input" type="checkbox" id="tourTypeCheckbox" name="tour_type_enabled" value="1">
                         </div>
-                        <input type="number" step="0.01" min="0" class="form-control form-control-sm w-auto d-none" id="tourTypeInput" name="tour_type_limit" placeholder="KM" disabled>
+                        <input type="number" step="0.01" min="0" onkeydown="return event.keyCode !== 38 && event.keyCode !== 40" class="form-control form-control-sm w-auto d-none" id="tourTypeInput" name="tour_type_limit" placeholder="KM" disabled>
                     </div>
                     <table class="table table-bordered">
                         <thead>
@@ -599,6 +609,13 @@ $('#slabModal').on('shown.bs.modal', function () {
     });
 });
 $(document).ready(function() {
+    // Globally disable ArrowUp and ArrowDown keys for all number inputs
+    $(document).on('keydown', 'input[type="number"]', function(e) {
+        if (e.key === 'ArrowUp' || e.key === 'ArrowDown' || e.keyCode === 38 || e.keyCode === 40) {
+            e.preventDefault();
+        }
+    });
+
     $('#slabSelect, #designation_id_modal').on('change', function () {
         loadSlabData();
     });
