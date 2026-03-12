@@ -11,6 +11,7 @@ use App\Models\TaDaVehicleSlab;
 use App\Models\Trip;
 use App\Models\User;
 use App\Models\UserStateAccess;
+use App\Models\TaDaSlab;
 use Carbon\Carbon; 
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
