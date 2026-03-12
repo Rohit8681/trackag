@@ -162,7 +162,7 @@
                                     <div class="d-flex align-items-center ms-4">
                                         <div class="form-check mb-0 fw-normal">
                                             <input class="form-check-input global-travel-mode-checkbox" type="checkbox" name="travel_mode_enabled" value="1" id="global_travel_mode_enabled" {{ old('travel_mode_enabled', $slab->travel_mode_enabled ?? 0) ? 'checked' : '' }}>
-                                            <label class="form-check-label" for="global_travel_mode_enabled">Travel Mode Enable</label>
+                                            <label class="form-check-label" for="global_travel_mode_enabled">TA & DA minimum Travel KM</label>
                                         </div>
                                         <div class="ms-2" id="travel_mode_limit_container" style="display: none;">
                                             <input type="number" step="0.01" name="travel_mode_limit" class="form-control form-control-sm travel-mode-limit" placeholder="Enter KM limit" value="{{ old('travel_mode_limit', $slab->travel_mode_limit) }}">
