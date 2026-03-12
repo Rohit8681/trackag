@@ -519,6 +519,7 @@
                     <hr>
                     <div class="d-flex align-items-center mb-2">
                         <h6 class="mb-0 me-3">Travel Mode Allowance (Per KM)</h6>
+                        <h6 class="mb-0 me-3">TA & DA minimum Travel KM</h6>
                         <div class="form-check me-3 mb-0">
                             <input class="form-check-input" type="checkbox" id="travelModeCheckbox" name="travel_mode_enabled" value="1">
                         </div>
@@ -537,7 +538,7 @@
                     <hr>
                     <div class="d-flex align-items-center mb-2">
                         <h6 class="mb-0 me-3">Tour Type Allowance</h6>
-                        <h6 class="mb-0 me-3">TA & DA minimum Travel KM</h6>
+                        
                         <div class="form-check me-3 mb-0">
                             <input class="form-check-input" type="checkbox" id="tourTypeCheckbox" style="display: none;" name="tour_type_enabled" value="1">
                         </div>
