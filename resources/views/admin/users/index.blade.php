@@ -538,7 +538,7 @@
                     <div class="d-flex align-items-center mb-2">
                         <h6 class="mb-0 me-3">Tour Type Allowance</h6>
                         <div class="form-check me-3 mb-0">
-                            <input class="form-check-input" type="checkbox" id="tourTypeCheckbox" name="tour_type_enabled" value="1">
+                            <input class="form-check-input" type="checkbox" id="tourTypeCheckbox" style="display: none;" name="tour_type_enabled" value="1">
                         </div>
                         <input type="number" step="0.01" min="0" onkeydown="return event.keyCode !== 38 && event.keyCode !== 40" class="form-control form-control-sm w-auto d-none" id="tourTypeInput" name="tour_type_limit" placeholder="KM" disabled>
                     </div>

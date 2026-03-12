@@ -169,7 +169,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="d-flex align-items-center ms-4">
+                                    <div class="d-flex align-items-center ms-4" style="display: none;">
                                         <div class="form-check mb-0 fw-normal">
                                             <input class="form-check-input global-tour-type-checkbox" type="checkbox" name="tour_type_enabled" value="1" id="global_tour_type_enabled" {{ old('tour_type_enabled', $slab->tour_type_enabled ?? 0) ? 'checked' : '' }}>
                                             <label class="form-check-label" for="global_tour_type_enabled">Tour Type Enable</label>
