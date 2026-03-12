@@ -280,10 +280,26 @@ class ExpenseController extends Controller
                 ->where('approval_status', 'Approved')
                 ->sum('amount');
 
+            $slabInfo = null;
+            if ($slabType == 'Individual') {
+                $slabInfo = TaDaSlab::where('user_id', $item->user->id)->first();
+            } else {
+                $slabInfo = TaDaSlab::whereNull('user_id')->first();
+            }
+            $limitEnabled = $slabInfo ? $slabInfo->travel_mode_enabled : 0;
+            $limitValue = $slabInfo ? $slabInfo->travel_mode_limit : 0;
+
             $travelKm = ($item->end_km - $item->starting_km);
 
-            $ta = ($ta_amount->travelling_allow_per_km ?? 0) * $travelKm;
-            $da = $da_amount->da_amount ?? 0;
+            if ($limitEnabled == 1 && $travelKm < $limitValue && $item->trip_limit_override == 0) {
+                $ta = 0;
+                $da = 0;
+            } else {
+                $ta = ($ta_amount->travelling_allow_per_km ?? 0) * $travelKm;
+                $da = $da_amount->da_amount ?? 0;
+            }
+
+            
             $other = $expense ?? 0;
 
             $finalReport[$monthKey]['states'][$stateId]['ta'] += $ta;
@@ -415,10 +431,26 @@ class ExpenseController extends Controller
                 ->where('approval_status', 'Approved')
                 ->get();
 
+            $slabInfo = null;
+            if ($slabType == 'Individual') {
+                $slabInfo = TaDaSlab::where('user_id', $item->user->id)->first();
+            } else {
+                $slabInfo = \App\Models\TaDaSlab::whereNull('user_id')->first();
+            }
+            $limitEnabled = $slabInfo ? $slabInfo->travel_mode_enabled : 0;
+            $limitValue = $slabInfo ? $slabInfo->travel_mode_limit : 0;
+
             $total_km = ($item->end_km - $item->starting_km);
 
-            $item->ta_exp = ($ta_amount->travelling_allow_per_km ?? 0) * $total_km;
-            $item->da_exp = $da_amount->da_amount ?? 0;
+            if ($limitEnabled == 1 && $total_km < $limitValue && $item->trip_limit_override == 0) {
+                $item->ta_exp = 0;
+                $item->da_exp = 0;
+            } else {
+                $item->ta_exp = ($ta_amount->travelling_allow_per_km ?? 0) * $total_km;
+                $item->da_exp = $da_amount->da_amount ?? 0;
+            }
+
+            
             $item->other_exp = $expense->sum('amount') ?? 0;
 
             $item->total_exp =
@@ -546,10 +578,26 @@ class ExpenseController extends Controller
                 ->where('approval_status','Approved')
                 ->get();
 
+            $slabInfo = null;
+            if ($slabType == 'Individual') {
+                $slabInfo = TaDaSlab::where('user_id', $item->user->id)->first();
+            } else {
+                $slabInfo = TaDaSlab::whereNull('user_id')->first();
+            }
+            $limitEnabled = $slabInfo ? $slabInfo->travel_mode_enabled : 0;
+            $limitValue = $slabInfo ? $slabInfo->travel_mode_limit : 0;
+
             $total_km = ($item->end_km - $item->starting_km);
 
-            $item->ta_exp    = ($ta_amount->travelling_allow_per_km ?? 0) * $total_km;
-            $item->da_exp    = $da_amount->da_amount ?? 0;
+            if ($limitEnabled == 1 && $total_km < $limitValue && $item->trip_limit_override == 0) {
+                $item->ta_exp = 0;
+                $item->da_exp = 0;
+            } else {
+                $item->ta_exp = ($ta_amount->travelling_allow_per_km ?? 0) * $total_km;
+                $item->da_exp    = $da_amount->da_amount ?? 0;
+            }
+
+            
             $item->other_exp = $expense->sum('amount') ?? 0;
             $item->total_exp = $item->ta_exp + $item->da_exp + $item->other_exp;
         }
@@ -723,10 +771,26 @@ class ExpenseController extends Controller
                 ->where('approval_status', 'Approved')
                 ->get();
 
+            $slabInfo = null;
+            if ($slabType == 'Individual') {
+                $slabInfo = TaDaSlab::where('user_id', $item->user->id)->first();
+            } else {
+                $slabInfo = TaDaSlab::whereNull('user_id')->first();
+            }
+            $limitEnabled = $slabInfo ? $slabInfo->travel_mode_enabled : 0;
+            $limitValue = $slabInfo ? $slabInfo->travel_mode_limit : 0;
+
             $travelKm = ($item->end_km - $item->starting_km);
 
-            $ta = ($ta_amount->travelling_allow_per_km ?? 0) * $travelKm;
-            $da = $da_amount->da_amount ?? 0;
+            if ($limitEnabled == 1 && $travelKm < $limitValue && $item->trip_limit_override == 0) {
+                $ta = 0;
+                $da = 0;
+            } else {
+                $ta = ($ta_amount->travelling_allow_per_km ?? 0) * $travelKm;
+                $da = $da_amount->da_amount ?? 0;
+            }
+
+            
             $other = $expense->sum('amount') ?? 0;
 
             $report[$stateId]['ta'] += $ta;
