@@ -175,7 +175,7 @@
                                             <label class="form-check-label" for="global_tour_type_enabled" style="display: none;">Tour Type Enable</label>
                                         </div>
                                         <div class="ms-2" id="tour_type_limit_container" style="display: none;">
-                                            <input type="number" step="0.01" name="tour_type_limit" class="form-control form-control-sm tour-type-limit" placeholder="Enter amount limit" value="{{ old('tour_type_limit', $slab->tour_type_limit) }}">
+                                            <input type="number" step="0.01" style="display: none;" name="tour_type_limit" class="form-control form-control-sm tour-type-limit" placeholder="Enter amount limit" value="{{ old('tour_type_limit', $slab->tour_type_limit) }}">
                                         </div>
                                     </div>
                                 </label>
