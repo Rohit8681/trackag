@@ -171,8 +171,8 @@
 
                                     <div class="d-flex align-items-center ms-4" style="display: none;">
                                         <div class="form-check mb-0 fw-normal">
-                                            <input class="form-check-input global-tour-type-checkbox" type="checkbox" name="tour_type_enabled" value="1" id="global_tour_type_enabled" {{ old('tour_type_enabled', $slab->tour_type_enabled ?? 0) ? 'checked' : '' }}>
-                                            <label class="form-check-label" for="global_tour_type_enabled">Tour Type Enable</label>
+                                            <input class="form-check-input global-tour-type-checkbox" style="display: none;" type="checkbox" name="tour_type_enabled" value="1" id="global_tour_type_enabled" {{ old('tour_type_enabled', $slab->tour_type_enabled ?? 0) ? 'checked' : '' }}>
+                                            <label class="form-check-label" for="global_tour_type_enabled" style="display: none;">Tour Type Enable</label>
                                         </div>
                                         <div class="ms-2" id="tour_type_limit_container" style="display: none;">
                                             <input type="number" step="0.01" name="tour_type_limit" class="form-control form-control-sm tour-type-limit" placeholder="Enter amount limit" value="{{ old('tour_type_limit', $slab->tour_type_limit) }}">
