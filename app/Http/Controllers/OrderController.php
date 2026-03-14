@@ -305,17 +305,11 @@ class OrderController extends Controller
     {
         $request->validate([
             'item_id'  => 'required|exists:order_items,id',
-            'price'    => 'required|numeric|min:0',
-            'gst'      => 'required|numeric|min:0',
-            'discount' => 'required|numeric|min:0',
             'qty'      => 'required|integer|min:1',
         ]);
 
         $item = \App\Models\OrderItem::findOrFail($request->item_id);
 
-        $item->price = $request->price;
-        $item->gst = $request->gst;
-        $item->discount = $request->discount;
         $item->qty = $request->qty;
 
         $amount = $item->price * $item->qty;

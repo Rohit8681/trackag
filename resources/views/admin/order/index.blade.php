@@ -424,10 +424,10 @@
                     <td>
     ${item.packing_value && item.packing ? item.packing_value + ' ' + item.packing : '-'}
     </td>
-                    <td><input type="number" class="form-control form-control-sm edit-input item-price" value="${item.price}" disabled step="0.01" style="width: 80px;"></td>
-                    <td><input type="number" class="form-control form-control-sm edit-input item-gst" value="${item.gst}" disabled step="0.01" style="width: 70px;"></td>
-                    <td><input type="number" class="form-control form-control-sm edit-input item-discount" value="${item.discount}" disabled step="0.01" style="width: 80px;"></td>
-                    <td><input type="number" class="form-control form-control-sm edit-input item-qty" value="${item.qty}" disabled step="1" style="width: 70px;"></td>
+                    <td><input type="number" class="form-control form-control-sm item-price" value="${item.price}" readonly step="0.01" style="width: 80px; background-color: #e9ecef;"></td>
+                    <td><input type="number" class="form-control form-control-sm item-gst" value="${item.gst}" readonly step="0.01" style="width: 70px; background-color: #e9ecef;"></td>
+                    <td><input type="number" class="form-control form-control-sm item-discount" value="${item.discount}" readonly step="0.01" style="width: 80px; background-color: #e9ecef;"></td>
+                    <td><input type="number" class="form-control form-control-sm item-qty bg-white border-primary fw-bold" value="${item.qty}" disabled step="1" style="width: 70px;"></td>
                     <td class="item-grand-total align-middle font-weight-bold">₹ ${parseFloat(item.grand_total).toFixed(2)}</td>
                     <td class="align-middle">
                         <button class="btn btn-sm btn-primary edit-item-btn"><i class="fas fa-edit"></i></button>
@@ -444,29 +444,40 @@
 
         $(document).on('click', '.edit-item-btn', function () {
             let tr = $(this).closest('tr');
-            tr.find('.edit-input').prop('disabled', false);
+            tr.find('.item-qty').prop('disabled', false).focus();
             $(this).addClass('d-none');
             tr.find('.save-item-btn').removeClass('d-none');
             tr.find('.cancel-item-btn').removeClass('d-none');
 
             // Check if original data attributes are stored, if not, store them.
-            if (typeof tr.data('orig-price') === "undefined") {
-                tr.data('orig-price', tr.find('.item-price').val());
-                tr.data('orig-gst', tr.find('.item-gst').val());
-                tr.data('orig-discount', tr.find('.item-discount').val());
+            if (typeof tr.data('orig-qty') === "undefined") {
                 tr.data('orig-qty', tr.find('.item-qty').val());
+                tr.data('orig-grand-total', tr.find('.item-grand-total').text());
             }
+        });
+
+        $(document).on('input', '.item-qty', function () {
+            let tr = $(this).closest('tr');
+            let price = parseFloat(tr.find('.item-price').val()) || 0;
+            let gst = parseFloat(tr.find('.item-gst').val()) || 0;
+            let discount = parseFloat(tr.find('.item-discount').val()) || 0;
+            let qty = parseFloat($(this).val()) || 0;
+            
+            let amount = price * qty;
+            let amountAfterDiscount = amount - discount;
+            let gstAmount = (amountAfterDiscount * gst) / 100;
+            let grandTotal = amountAfterDiscount + gstAmount;
+            
+            tr.find('.item-grand-total').html('₹ ' + grandTotal.toFixed(2));
         });
 
         $(document).on('click', '.cancel-item-btn', function () {
             let tr = $(this).closest('tr');
-            tr.find('.edit-input').prop('disabled', true);
+            tr.find('.item-qty').prop('disabled', true);
 
             // Restore original values
-            tr.find('.item-price').val(tr.data('orig-price'));
-            tr.find('.item-gst').val(tr.data('orig-gst'));
-            tr.find('.item-discount').val(tr.data('orig-discount'));
             tr.find('.item-qty').val(tr.data('orig-qty'));
+            tr.find('.item-grand-total').text(tr.data('orig-grand-total'));
 
             tr.find('.save-item-btn').addClass('d-none');
             tr.find('.cancel-item-btn').addClass('d-none');
@@ -478,13 +489,10 @@
             let tr = btn.closest('tr');
 
             let itemId = tr.data('id');
-            let price = tr.find('.item-price').val();
-            let gst = tr.find('.item-gst').val();
-            let discount = tr.find('.item-discount').val();
             let qty = tr.find('.item-qty').val();
 
-            if (!price || !gst || !discount || !qty) {
-                alert('All fields are required!');
+            if (!qty) {
+                alert('Qty is required!');
                 return;
             }
 
@@ -496,9 +504,6 @@
                 data: {
                     _token: "{{ csrf_token() }}",
                     item_id: itemId,
-                    price: price,
-                    gst: gst,
-                    discount: discount,
                     qty: qty
                 },
                 beforeSend: function () {
@@ -509,13 +514,11 @@
                     if (res.success) {
                         // Update grand total
                         tr.find('.item-grand-total').html('₹ ' + res.data.grand_total);
-                        tr.find('.edit-input').prop('disabled', true);
+                        tr.find('.item-qty').prop('disabled', true);
 
                         // Update original data
-                        tr.data('orig-price', price);
-                        tr.data('orig-gst', gst);
-                        tr.data('orig-discount', discount);
                         tr.data('orig-qty', qty);
+                        tr.data('orig-grand-total', '₹ ' + res.data.grand_total);
 
                         btn.addClass('d-none');
                         tr.find('.cancel-item-btn').addClass('d-none');
