@@ -395,16 +395,66 @@ class CompanyController extends Controller
     }
 
 
+    // public function toggle($id)
+    // {
+    //     $company = Company::findOrFail($id);
+    //     $this->authorizeCompanyAccess($company);
+
+    //     $company->is_active = !$company->is_active;
+    //     $company->status = $company->is_active ? 'Active' : 'Inactive';
+    //     $company->save();
+
+    //     return redirect()->route('companies.index')->with('success', 'Company status updated.');
+    // }
+
     public function toggle($id)
     {
         $company = Company::findOrFail($id);
         $this->authorizeCompanyAccess($company);
 
+        // Toggle status
         $company->is_active = !$company->is_active;
         $company->status = $company->is_active ? 'Active' : 'Inactive';
         $company->save();
 
-        return redirect()->route('companies.index')->with('success', 'Company status updated.');
+        // 🔹 Get tenant info
+        $tenantId = $company->tenant_id;
+        $tenant = Tenant::where('id', $tenantId)->first();
+
+        if ($tenant && !empty($tenant->tenancy_db_name)) {
+
+            $tenancyDbName = $tenant->tenancy_db_name;
+
+            // 🔹 Configure tenant connection
+            $tenantConnection = config('database.connections.tenant');
+            $tenantConnection['database'] = $tenancyDbName;
+
+            config(['database.connections.tenant' => $tenantConnection]);
+
+            DB::purge('tenant');
+            DB::reconnect('tenant');
+
+            // 🔹 Update company status inside tenant DB
+            DB::connection('tenant')->table('companies')
+                ->where('tenant_id', $tenantId)
+                ->update([
+                    'is_active' => $company->is_active,
+                    'status' => $company->status,
+                    'updated_at' => now()
+                ]);
+
+            // (optional) deactivate all users if company inactive
+            if (!$company->is_active) {
+                DB::connection('tenant')->table('users')
+                    ->update([
+                        'is_active' => 0,
+                        'updated_at' => now()
+                    ]);
+            }
+        }
+
+        return redirect()->route('companies.index')
+            ->with('success', 'Company status updated in central & tenant database.');
     }
 
 
