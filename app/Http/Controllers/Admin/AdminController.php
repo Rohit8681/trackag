@@ -198,7 +198,7 @@ class AdminController extends Controller
             $companyCount = Company::count();
             $company = Company::first();
 
-            if(count($company) == 1){
+            if($companyCount == 1){
                 if ($company && $company->is_active == 0) {
                     Auth::logout();
                     return redirect()->back()->with('error_message', 'Your company account has been deactivated.');
