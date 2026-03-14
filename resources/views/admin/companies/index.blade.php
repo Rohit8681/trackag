@@ -52,7 +52,7 @@
                                                 <th>End Date</th>
                                                 <th>Assign User</th>
                                                 <th>Comapny Url</th>
-                                                <th>Password</th>
+                                                <th>Login Details</th>
                                                 <th>Status</th>
                                                 <th>Created At</th>
                                                 <th>Updated At</th>
@@ -70,7 +70,10 @@
 
                                                     <td>{{ $company->user_assigned ?? '-' }}</td>
                                                     <td>{{ $company->subdomain }}</td>
-                                                    <td>{{ $company->password }}</td>
+                                                    <td>
+                                                        <strong>User:</strong> {{ $company->contact_no }} <br>
+                                                        <strong>Password:</strong> {{ $company->password }}
+                                                    </td>
                                                     <td>
                                                         @if(auth()->user() && auth()->user()->hasRole('master_admin'))
                                                         <form action="{{ route('companies.toggle', $company->id) }}" method="POST">
