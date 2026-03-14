@@ -123,23 +123,102 @@ class AdminController extends Controller
         return view('admin.login',compact('company','apk'));
     }
 
+    // public function store(LoginRequest $request)
+    // {
+    //     $credentials = $request->only('mobile', 'password');
+
+    //     if (Auth::attempt($credentials)) {
+    //         $user = Auth::user();
+
+    //         if ($user->is_active == 0) {
+    //             Auth::logout();
+    //             return redirect()->back()->with('error_message', 'Your account is inactive. Please contact support.');
+    //         }
+
+    //         // if ($user->roles()->count() === 0) {
+    //         //     Auth::logout();
+    //         //     return redirect()->back()->with('error_message', 'You do not have any assigned role. Please contact the administrator.');
+    //         // }
+
+    //         if (!empty($request->remember)) {
+    //             setcookie("mobile", $credentials["mobile"], time() + 3600);
+    //             setcookie("password", $credentials["password"], time() + 3600);
+    //         } else {
+    //             setcookie("mobile", "", time() - 3600);
+    //             setcookie("password", "", time() - 3600);
+    //         }
+
+    //         $request->session()->regenerate();
+
+    //         // Log session logic...
+    //         $existingSession = \App\Models\UserSession::where('user_id', $user->id)
+    //             ->whereNull('logout_at')
+    //             ->where('platform', 'web')
+    //             ->latest()
+    //             ->first();
+
+    //         if ($existingSession) {
+    //             $existingSession->update([
+    //                 'logout_at'        => now(),
+    //                 'session_duration' => $existingSession->login_at->diffInSeconds(now()),
+    //             ]);
+    //         }
+
+    //         \App\Models\UserSession::create([
+    //             'user_id'    => $user->id,
+    //             'ip_address' => $request->ip(),
+    //             'user_agent' => $request->header('User-Agent'),
+    //             'platform'   => 'web',
+    //             'login_at'   => now(),
+    //         ]);
+
+    //         return redirect()->route('admin.dashboard');
+    //     } else {
+    //         return redirect()->back()->with('error_message', 'Invalid Email or Password.');
+    //     }
+    // }
+
+
+    
     public function store(LoginRequest $request)
     {
         $credentials = $request->only('mobile', 'password');
 
         if (Auth::attempt($credentials)) {
+
             $user = Auth::user();
 
+            // 1️⃣ User active check
             if ($user->is_active == 0) {
                 Auth::logout();
                 return redirect()->back()->with('error_message', 'Your account is inactive. Please contact support.');
             }
 
-            // if ($user->roles()->count() === 0) {
-            //     Auth::logout();
-            //     return redirect()->back()->with('error_message', 'You do not have any assigned role. Please contact the administrator.');
-            // }
+            // 2️⃣ Company check
+            $companyCount = Company::count();
+            $company = Company::first();
 
+            if(count($company) == 1){
+                if ($company && $company->is_active == 0) {
+                    Auth::logout();
+                    return redirect()->back()->with('error_message', 'Your company account has been deactivated.');
+                }
+
+                // 3️⃣ Validity expiry check
+                if ($company && !empty($company->validity_upto)) {
+
+                    if (now()->greaterThan($company->validity_upto)) {
+                        Auth::logout();
+                        return redirect()->back()->with(
+                            'error_message',
+                            'Your company subscription has expired. Please contact administrator.'
+                        );
+                    }
+                }
+            }
+            
+
+            // Remember me
             if (!empty($request->remember)) {
                 setcookie("mobile", $credentials["mobile"], time() + 3600);
                 setcookie("password", $credentials["password"], time() + 3600);
@@ -150,7 +229,7 @@ class AdminController extends Controller
 
             $request->session()->regenerate();
 
-            // Log session logic...
+            // Session logging
             $existingSession = \App\Models\UserSession::where('user_id', $user->id)
                 ->whereNull('logout_at')
                 ->where('platform', 'web')
@@ -173,11 +252,11 @@ class AdminController extends Controller
             ]);
 
             return redirect()->route('admin.dashboard');
+
         } else {
-            return redirect()->back()->with('error_message', 'Invalid Email or Password.');
+            return redirect()->back()->with('error_message', 'Invalid Mobile or Password.');
         }
     }
-
 
     public function edit(Admin $admin)
     {
