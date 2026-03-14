@@ -27,6 +27,7 @@ return new class extends Migration
             $table->decimal('grand_total', 10, 2);
             $table->integer('qty')->default(1);
 
+
             $table->timestamps();
 
             $table->foreign('order_id')->references('id')->on('orders')->onDelete('cascade');
