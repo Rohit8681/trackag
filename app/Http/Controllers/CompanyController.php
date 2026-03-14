@@ -443,14 +443,6 @@ class CompanyController extends Controller
                     'updated_at' => now()
                 ]);
 
-            // (optional) deactivate all users if company inactive
-            if (!$company->is_active) {
-                DB::connection('tenant')->table('users')
-                    ->update([
-                        'is_active' => 0,
-                        'updated_at' => now()
-                    ]);
-            }
         }
 
         return redirect()->route('companies.index')
