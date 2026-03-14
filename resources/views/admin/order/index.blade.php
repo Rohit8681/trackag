@@ -427,7 +427,7 @@
                     <td><input type="number" class="form-control form-control-sm item-price" value="${item.price}" readonly step="0.01" style="width: 80px; background-color: #e9ecef;"></td>
                     <td><input type="number" class="form-control form-control-sm item-gst" value="${item.gst}" readonly step="0.01" style="width: 70px; background-color: #e9ecef;"></td>
                     <td><input type="number" class="form-control form-control-sm item-discount" value="${item.discount}" readonly step="0.01" style="width: 80px; background-color: #e9ecef;"></td>
-                    <td><input type="number" class="form-control form-control-sm item-qty bg-white border-primary fw-bold" value="${item.qty}" disabled step="1" style="width: 70px;"></td>
+                    <td><input type="number" class="form-control form-control-sm item-qty bg-white border-primary fw-bold" value="${item.qty}" min="1" disabled step="1" style="width: 70px;"></td>
                     <td class="item-grand-total align-middle font-weight-bold">₹ ${parseFloat(item.grand_total).toFixed(2)}</td>
                     <td class="align-middle">
                         <button class="btn btn-sm btn-primary edit-item-btn"><i class="fas fa-edit"></i></button>
@@ -456,12 +456,32 @@
             }
         });
 
+        $(document).on('keydown', '.item-qty', function(e) {
+            // Prevent entering minus '-' or 'e' (scientific notation)
+            if (e.key === '-' || e.key === 'e' || e.key === 'E') {
+                e.preventDefault();
+            }
+        });
+
         $(document).on('input', '.item-qty', function () {
             let tr = $(this).closest('tr');
+            
+            // Validate and constrain quantity
+            let qtyVal = parseInt($(this).val());
+            if (isNaN(qtyVal) || qtyVal < 1) {
+                // To avoid resetting while typing normally, only coerce immediate negatives or 0.
+                if ($(this).val() !== "") {
+                    qtyVal = 1;
+                    $(this).val(qtyVal);
+                } else {
+                    qtyVal = 1; // Used for calculations while blank, but don't force '1' randomly
+                }
+            }
+
             let price = parseFloat(tr.find('.item-price').val()) || 0;
             let gst = parseFloat(tr.find('.item-gst').val()) || 0;
             let discount = parseFloat(tr.find('.item-discount').val()) || 0;
-            let qty = parseFloat($(this).val()) || 0;
+            let qty = qtyVal;
             
             let amount = price * qty;
             let amountAfterDiscount = amount - discount;
