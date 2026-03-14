@@ -72,7 +72,7 @@
                                                     <td>{{ $company->subdomain }}</td>
                                                     <td>{{ $company->password }}</td>
                                                     <td>
-                                                         @can('toggle_companies')
+                                                        @if(auth()->user() && auth()->user()->hasRole('master_admin'))
                                                         <form action="{{ route('companies.toggle', $company->id) }}" method="POST">
                                                             @csrf
                                                             @method('PATCH')
