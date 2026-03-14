@@ -132,6 +132,14 @@ class ApiAuthController extends BaseController
             return $this->sendError('Invalid Company Code.', null, 200);
         }
 
+        if (!$company->is_active) {
+            return $this->sendError('Your company account has been deactivated.', null, 200);
+        }
+
+        if ($company->validity_upto && now()->greaterThan($company->validity_upto)) {
+            return $this->sendError('Your company subscription has expired. Please contact administrator.', null, 200);
+        }
+
         // 2️⃣ Get tenant info
         $tenant = Tenant::find($company->tenant_id);
         
