@@ -112,7 +112,7 @@
                                         <option value="">All</option>
                                         @foreach($depos as $depo)
                                             <option value="{{ $depo->id }}" {{ request('depo_id') == $depo->id ? 'selected' : '' }}>
-                                                {{ $depo->name }}
+                                                {{ $depo->agro_name }}
                                             </option>
                                         @endforeach
                                     </select>
