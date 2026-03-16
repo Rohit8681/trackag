@@ -173,161 +173,139 @@ class ExpenseController extends Controller
     }
 
     public function show($id, Request $request)
-{
-    $user = auth()->user();
-    $roleName = $user->getRoleNames()->first();
+    {
+        $user = auth()->user();
+        $roleName = $user->getRoleNames()->first();
 
-    // 🔹 Year (default current year)
-    $year = $request->year ?? now()->year;
+        $year = $request->year ?? now()->year;
 
-    // 🔹 State access
-    $stateIds = [];
-    $userStateAccess = UserStateAccess::where('user_id', $user->id)->first();
-    if ($userStateAccess && !empty($userStateAccess->state_ids)) {
-        $stateIds = $userStateAccess->state_ids;
-    }
-
-    // 🔹 States (company logic)
-    $companyCount = Company::count();
-    if ($companyCount == 1) {
-        $company = Company::first();
-        $companyStates = array_map('intval', explode(',', $company->state));
-        $states = State::where('status', 1)
-            ->whereIn('id', $companyStates)
-            ->get();
-    } else {
-        $states = State::where('status', 1)->get();
-    }
-
-    // 🔹 Initialize final report (12 months)
-    $finalReport = [];
-
-    for ($m = 1; $m <= 12; $m++) {
-
-        $monthKey = Carbon::create($year, $m, 1)->format('Y-m');
-        $monthName = Carbon::create($year, $m, 1)->format('F');
-
-        $from = Carbon::create($year, $m, 1)->startOfMonth()->toDateString();
-        $to   = Carbon::create($year, $m, 1)->endOfMonth()->toDateString();
-
-        // Init month row
-        $finalReport[$monthKey] = [
-            'month' => $monthName,
-            'states' => []
-        ];
-
-        foreach ($states as $state) {
-            $finalReport[$monthKey]['states'][$state->id] = [
-                'ta' => 0,
-                'da' => 0,
-                'other' => 0,
-                'total' => 0,
-            ];
+        $stateIds = [];
+        $userStateAccess = UserStateAccess::where('user_id', $user->id)->first();
+        if ($userStateAccess && !empty($userStateAccess->state_ids)) {
+            $stateIds = $userStateAccess->state_ids;
         }
 
-        // 🔹 Trip query
-        $query = Trip::with('user')
-            ->where('approval_status', 'approved')
-            ->whereBetween('trip_date', [$from, $to]);
+        $companyCount = Company::count();
+        if ($companyCount == 1) {
+            $company = Company::first();
+            $companyStates = array_map('intval', explode(',', $company->state));
+            $states = State::where('status', 1)->whereIn('id', $companyStates)->get();
+        } else {
+            $states = State::where('status', 1)->get();
+        }
 
-        if (!in_array($roleName, ['master_admin', 'sub_admin'])) {
-            if (empty($stateIds)) {
-                $query->whereRaw('1 = 0');
-            } else {
-                $query->whereHas('user', function ($q) use ($stateIds, $user) {
-                    $q->whereIn('state_id', $stateIds)
-                      ->where('reporting_to', $user->id);
-                });
+        // 🔹 Initialize final report (12 months)
+        $finalReport = [];
+
+        for ($m = 1; $m <= 12; $m++) {
+
+            $monthKey = Carbon::create($year, $m, 1)->format('Y-m');
+            $monthName = Carbon::create($year, $m, 1)->format('F');
+
+            $from = Carbon::create($year, $m, 1)->startOfMonth()->toDateString();
+            $to   = Carbon::create($year, $m, 1)->endOfMonth()->toDateString();
+
+            // Init month row
+            $finalReport[$monthKey] = ['month' => $monthName,'states' => []];
+
+            foreach ($states as $state) {
+                $finalReport[$monthKey]['states'][$state->id] = ['ta' => 0,'da' => 0,'other' => 0,'total' => 0];
+            }
+
+            // 🔹 Trip query
+            $query = Trip::with('user')->where('approval_status', 'approved')->whereBetween('trip_date', [$from, $to]);
+
+            if (!in_array($roleName, ['master_admin', 'sub_admin'])) {
+                if (empty($stateIds)) {
+                    $query->whereRaw('1 = 0');
+                } else {
+                    $query->whereHas('user', function ($q) use ($stateIds, $user) {
+                        $q->whereIn('state_id', $stateIds)
+                        ->where('reporting_to', $user->id);
+                    });
+                }
+            }
+
+            $trips = $query->get();
+
+            // 🔹 Calculation (same logic)
+            foreach ($trips as $item) {
+
+                if (!$item->user || !$item->user->state_id) continue;
+
+                $stateId = $item->user->state_id;
+                $slabType = $item->user->slab ?? "";
+
+                $da_amount = null;
+                $ta_amount = null;
+
+                if ($slabType == "Slab Wise") {
+                    $da_amount = TaDaTourSlab::where('tour_type_id', $item->tour_type)->whereNull('user_id')->where('designation_id', $item->user->slab_designation_id)->first();
+
+                    $ta_amount = TaDaVehicleSlab::where('travel_mode_id', $item->travel_mode)->whereNull('user_id')->where('designation_id', $item->user->slab_designation_id)->first();
+                }
+
+                if ($slabType == "Individual") {
+                    $da_amount = TaDaTourSlab::where('tour_type_id', $item->tour_type)->where('user_id', $item->user->id)->first();
+
+                    $ta_amount = TaDaVehicleSlab::where('travel_mode_id', $item->travel_mode)->where('user_id', $item->user->id)->first();
+                }
+
+                $expense = Expense::where('user_id', $item->user_id)->whereDate('bill_date', $item->trip_date)->where('approval_status', 'Approved')->sum('amount');
+
+                $slabInfo = null;
+                if ($slabType == 'Individual') {
+                    $slabInfo = TaDaSlab::where('user_id', $item->user->id)->first();
+                } else {
+                    $slabInfo = TaDaSlab::whereNull('user_id')->first();
+                }
+                $limitEnabled = $slabInfo ? $slabInfo->travel_mode_enabled : 0;
+                $limitValue = $slabInfo ? $slabInfo->travel_mode_limit : 0;
+
+                $travelKm = ($item->end_km - $item->starting_km);
+
+                if ($limitEnabled == 1 && $travelKm < $limitValue && $item->trip_limit_override == 0) {
+                    $ta = 0;
+                    $da = 0;
+                } else if($limitEnabled == 1 && $travelKm < $limitValue && $item->trip_limit_override == 1){
+                    $ta = ($ta_amount->travelling_allow_per_km ?? 0) * $travelKm;
+                    $da = $da_amount->da_amount ?? 0;
+                } else if($limitEnabled == 1 && $travelKm < $limitValue && $item->trip_limit_override == 2){
+                    $ta = 0;
+                    $da = $da_amount->da_amount ?? 0;
+                } else if($limitEnabled == 1 && $travelKm < $limitValue && $item->trip_limit_override == 3){
+                    $ta = ($ta_amount->travelling_allow_per_km ?? 0) * $travelKm;
+                    $da = 0;
+                } else {
+                    $ta = ($ta_amount->travelling_allow_per_km ?? 0) * $travelKm;
+                    $da = $da_amount->da_amount ?? 0;
+                }
+
+                
+                $other = $expense ?? 0;
+
+                $finalReport[$monthKey]['states'][$stateId]['ta'] += $ta;
+                $finalReport[$monthKey]['states'][$stateId]['da'] += $da;
+                $finalReport[$monthKey]['states'][$stateId]['other'] += $other;
+                $finalReport[$monthKey]['states'][$stateId]['total'] += ($ta + $da + $other);
             }
         }
 
-        $trips = $query->get();
-
-        // 🔹 Calculation (same logic)
-        foreach ($trips as $item) {
-
-            if (!$item->user || !$item->user->state_id) continue;
-
-            $stateId = $item->user->state_id;
-            $slabType = $item->user->slab ?? "";
-
-            $da_amount = null;
-            $ta_amount = null;
-
-            if ($slabType == "Slab Wise") {
-                $da_amount = TaDaTourSlab::where('tour_type_id', $item->tour_type)
-                    ->whereNull('user_id')
-                    ->where('designation_id', $item->user->slab_designation_id)
-                    ->first();
-
-                $ta_amount = TaDaVehicleSlab::where('travel_mode_id', $item->travel_mode)
-                    ->whereNull('user_id')
-                    ->where('designation_id', $item->user->slab_designation_id)
-                    ->first();
-            }
-
-            if ($slabType == "Individual") {
-                $da_amount = TaDaTourSlab::where('tour_type_id', $item->tour_type)
-                    ->where('user_id', $item->user->id)
-                    ->first();
-
-                $ta_amount = TaDaVehicleSlab::where('travel_mode_id', $item->travel_mode)
-                    ->where('user_id', $item->user->id)
-                    ->first();
-            }
-
-            $expense = Expense::where('user_id', $item->user_id)
-                ->whereDate('bill_date', $item->trip_date)
-                ->where('approval_status', 'Approved')
-                ->sum('amount');
-
-            $slabInfo = null;
-            if ($slabType == 'Individual') {
-                $slabInfo = TaDaSlab::where('user_id', $item->user->id)->first();
-            } else {
-                $slabInfo = TaDaSlab::whereNull('user_id')->first();
-            }
-            $limitEnabled = $slabInfo ? $slabInfo->travel_mode_enabled : 0;
-            $limitValue = $slabInfo ? $slabInfo->travel_mode_limit : 0;
-
-            $travelKm = ($item->end_km - $item->starting_km);
-
-            if ($limitEnabled == 1 && $travelKm < $limitValue && $item->trip_limit_override == 0) {
-                $ta = 0;
-                $da = 0;
-            } else {
-                $ta = ($ta_amount->travelling_allow_per_km ?? 0) * $travelKm;
-                $da = $da_amount->da_amount ?? 0;
-            }
-
-            
-            $other = $expense ?? 0;
-
-            $finalReport[$monthKey]['states'][$stateId]['ta'] += $ta;
-            $finalReport[$monthKey]['states'][$stateId]['da'] += $da;
-            $finalReport[$monthKey]['states'][$stateId]['other'] += $other;
-            $finalReport[$monthKey]['states'][$stateId]['total'] += ($ta + $da + $other);
-        }
+        return view(
+            'admin.expense.state_wise_report',
+            compact('states', 'finalReport', 'year')
+        );
     }
-
-    return view(
-        'admin.expense.state_wise_report',
-        compact('states', 'finalReport', 'year')
-    );
-}
 
 
     public function destroy(string $id)
     {
         try {
             $expense = Expense::find($id);
-
             if (!$expense) {
                 return redirect()->back()->with('error', 'Expense not found.');
             }
-
             $expense->delete();
-
             return redirect()->back()->with('success', 'Expense deleted successfully.');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Something went wrong: ' . $e->getMessage());
@@ -406,31 +384,20 @@ class ExpenseController extends Controller
             $ta_amount = null;
 
             if ($slabType == "Slab Wise") {
-                $da_amount = TaDaTourSlab::where('tour_type_id', $item->tour_type)
-                    ->whereNull('user_id')
-                    ->where('designation_id', $item->user->slab_designation_id)
-                    ->first();
+                $da_amount = TaDaTourSlab::where('tour_type_id', $item->tour_type)->whereNull('user_id')->where('designation_id', $item->user->slab_designation_id)->first();
 
-                $ta_amount = TaDaVehicleSlab::where('travel_mode_id', $item->travel_mode)
-                    ->whereNull('user_id')
-                    ->where('designation_id', $item->user->slab_designation_id)
-                    ->first();
+                $ta_amount = TaDaVehicleSlab::where('travel_mode_id', $item->travel_mode)->whereNull('user_id')
+                    ->where('designation_id', $item->user->slab_designation_id)->first();
             }
 
             if ($slabType == "Individual") {
-                $da_amount = TaDaTourSlab::where('tour_type_id', $item->tour_type)
-                    ->where('user_id', $item->user->id)
-                    ->first();
+                $da_amount = TaDaTourSlab::where('tour_type_id', $item->tour_type)->where('user_id', $item->user->id)->first();
 
-                $ta_amount = TaDaVehicleSlab::where('travel_mode_id', $item->travel_mode)
-                    ->where('user_id', $item->user->id)
-                    ->first();
+                $ta_amount = TaDaVehicleSlab::where('travel_mode_id', $item->travel_mode)->where('user_id', $item->user->id)->first();
             }
 
-            $expense = Expense::where('user_id', $item->user_id)
-                ->whereDate('bill_date', $item->trip_date)
-                ->where('approval_status', 'Approved')
-                ->get();
+            $expense = Expense::where('user_id', $item->user_id)->whereDate('bill_date', $item->trip_date)
+                ->where('approval_status', 'Approved')->get();
 
             $slabInfo = null;
             if ($slabType == 'Individual') {
@@ -445,6 +412,15 @@ class ExpenseController extends Controller
 
             if ($limitEnabled == 1 && $total_km < $limitValue && $item->trip_limit_override == 0) {
                 $item->ta_exp = 0;
+                $item->da_exp = 0;
+            } else if($limitEnabled == 1 && $total_km < $limitValue && $item->trip_limit_override == 1){
+                $item->ta_exp = ($ta_amount->travelling_allow_per_km ?? 0) * $total_km;
+                $item->da_exp = $da_amount->da_amount ?? 0;
+            } else if($limitEnabled == 1 && $total_km < $limitValue && $item->trip_limit_override == 2){
+                $item->ta_exp = 0;
+                $item->da_exp = $da_amount->da_amount ?? 0;
+            } else if($limitEnabled == 1 && $total_km < $limitValue && $item->trip_limit_override == 3){
+                $item->ta_exp = ($ta_amount->travelling_allow_per_km ?? 0) * $total_km;
                 $item->da_exp = 0;
             } else {
                 $item->ta_exp = ($ta_amount->travelling_allow_per_km ?? 0) * $total_km;
@@ -534,11 +510,7 @@ class ExpenseController extends Controller
             return back()->with('error', 'No trips selected!');
         }
 
-        // 🔥 Only pending PDF trips
-        $trips = Trip::whereIn('id', $ids)
-            ->where('pdf_status', 0)
-            ->with(['user','company','approvedByUser','tripLogs','customers','travelMode','tourType'])
-            ->get();
+        $trips = Trip::whereIn('id', $ids)->where('pdf_status', 0)->with(['user','company','approvedByUser','tripLogs','customers','travelMode','tourType'])->get();
 
         if ($trips->isEmpty()) {
             return back()->with('error', 'All selected trips PDF already generated!');
@@ -593,9 +565,18 @@ class ExpenseController extends Controller
             if ($limitEnabled == 1 && $total_km < $limitValue && $item->trip_limit_override == 0) {
                 $item->ta_exp = 0;
                 $item->da_exp = 0;
+            } else if($limitEnabled == 1 && $total_km < $limitValue && $item->trip_limit_override == 1){
+                $item->ta_exp = ($ta_amount->travelling_allow_per_km ?? 0) * $total_km;
+                $item->da_exp = $da_amount->da_amount ?? 0;
+            } else if($limitEnabled == 1 && $total_km < $limitValue && $item->trip_limit_override == 2){
+                $item->ta_exp = 0;
+                $item->da_exp = $da_amount->da_amount ?? 0;
+            } else if($limitEnabled == 1 && $total_km < $limitValue && $item->trip_limit_override == 3){
+                $item->ta_exp = ($ta_amount->travelling_allow_per_km ?? 0) * $total_km;
+                $item->da_exp = 0;
             } else {
                 $item->ta_exp = ($ta_amount->travelling_allow_per_km ?? 0) * $total_km;
-                $item->da_exp    = $da_amount->da_amount ?? 0;
+                $item->da_exp = $da_amount->da_amount ?? 0;
             }
 
             
@@ -647,7 +628,6 @@ class ExpenseController extends Controller
 
         Storage::disk('public')->put($path, $pdf->output());
 
-        /* ================= DB ENTRIES ================= */
         ExpensePdf::create([
             'user_id' => $selected_user_id,
             'pdf_path'=> $path,
@@ -658,7 +638,6 @@ class ExpenseController extends Controller
             'pdf_status' => 1
         ]);
 
-        // return response()->download(storage_path('app/public/'.$path));
         return back()->with('success', 'Expense PDF generated successfully.');
     }
     public function expensePdfList(){
@@ -704,11 +683,6 @@ class ExpenseController extends Controller
 
         $trips = $query->get();
 
-        // 🔹 All active states (company logic same as before)
-        // $states = State::where('status', 1)
-        //     ->when(!in_array($roleName, ['master_admin', 'sub_admin']),
-        //         fn ($q) => $q->whereIn('id', $stateIds)
-        //     )->get();
         $companyCount = Company::count();
         $company = null;
         if ($companyCount == 1) {
@@ -721,7 +695,6 @@ class ExpenseController extends Controller
             $states = State::where('status', 1)->get();
         }
 
-        // 🔹 Initialize result array
         $report = [];
         foreach ($states as $state) {
             $report[$state->id] = [
@@ -733,7 +706,6 @@ class ExpenseController extends Controller
             ];
         }
 
-        // 🔹 SAME calculation logic (copied from your code)
         foreach ($trips as $item) {
 
             if (!$item->user || !$item->user->state_id) continue;
@@ -746,31 +718,21 @@ class ExpenseController extends Controller
             $ta_amount = null;
 
             if ($slabType == "Slab Wise") {
-                $da_amount = TaDaTourSlab::where('tour_type_id', $item->tour_type)
-                    ->whereNull('user_id')
-                    ->where('designation_id', $item->user->slab_designation_id)
-                    ->first();
+                $da_amount = TaDaTourSlab::where('tour_type_id', $item->tour_type)->whereNull('user_id')
+                    ->where('designation_id', $item->user->slab_designation_id)->first();
 
-                $ta_amount = TaDaVehicleSlab::where('travel_mode_id', $item->travel_mode)
-                    ->whereNull('user_id')
-                    ->where('designation_id', $item->user->slab_designation_id)
-                    ->first();
+                $ta_amount = TaDaVehicleSlab::where('travel_mode_id', $item->travel_mode)->whereNull('user_id')
+                    ->where('designation_id', $item->user->slab_designation_id)->first();
             }
 
             if ($slabType == "Individual") {
-                $da_amount = TaDaTourSlab::where('tour_type_id', $item->tour_type)
-                    ->where('user_id', $item->user->id)
-                    ->first();
+                $da_amount = TaDaTourSlab::where('tour_type_id', $item->tour_type)->where('user_id', $item->user->id)->first();
 
-                $ta_amount = TaDaVehicleSlab::where('travel_mode_id', $item->travel_mode)
-                    ->where('user_id', $item->user->id)
-                    ->first();
+                $ta_amount = TaDaVehicleSlab::where('travel_mode_id', $item->travel_mode)->where('user_id', $item->user->id)->first();
             }
 
-            $expense = Expense::where('user_id', $item->user_id)
-                ->whereDate('bill_date', $item->trip_date)
-                ->where('approval_status', 'Approved')
-                ->get();
+            $expense = Expense::where('user_id', $item->user_id)->whereDate('bill_date', $item->trip_date)
+                ->where('approval_status', 'Approved')->get();
 
             $slabInfo = null;
             if ($slabType == 'Individual') {
@@ -786,10 +748,20 @@ class ExpenseController extends Controller
             if ($limitEnabled == 1 && $travelKm < $limitValue && $item->trip_limit_override == 0) {
                 $ta = 0;
                 $da = 0;
+            } else if($limitEnabled == 1 && $travelKm < $limitValue && $item->trip_limit_override == 1){
+                $ta = ($ta_amount->travelling_allow_per_km ?? 0) * $travelKm;
+                $da = $da_amount->da_amount ?? 0;
+            } else if($limitEnabled == 1 && $travelKm < $limitValue && $item->trip_limit_override == 2){
+                $ta = 0;
+                $da = $da_amount->da_amount ?? 0;
+            } else if($limitEnabled == 1 && $travelKm < $limitValue && $item->trip_limit_override == 3){
+                $ta = ($ta_amount->travelling_allow_per_km ?? 0) * $travelKm;
+                $da = 0;
             } else {
                 $ta = ($ta_amount->travelling_allow_per_km ?? 0) * $travelKm;
                 $da = $da_amount->da_amount ?? 0;
             }
+            
 
             
             $other = $expense->sum('amount') ?? 0;
@@ -800,10 +772,7 @@ class ExpenseController extends Controller
             $report[$stateId]['total'] += ($ta + $da + $other);
         }
 
-        return view(
-            'admin.expense.state_wise_report',
-            compact('states', 'report', 'month')
-        );
+        return view('admin.expense.state_wise_report',compact('states', 'report', 'month'));
     }
 
 }

@@ -533,8 +533,10 @@
                                     </label>
                                     <select name="trip_limit_override_confirm" class="form-select form-select-sm" required>
                                         <option value="">-- Select --</option>
-                                        <option value="1">Yes</option>
-                                        <option value="0">No</option>
+                                        <option value="3">TA Only</option>
+                                        <option value="2">DA Only</option>
+                                        <option value="1">Both (Eligible for TA-DA)</option>
+                                        <option value="0">No (Not Eligible for TA-DA)</option>
                                     </select>
                                 </div>
                             @endif
