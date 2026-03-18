@@ -19,29 +19,32 @@ class FarmVisitController extends Controller
         'farmer.district:id,name',
         'farmer.taluka:id,name',
         'crop:id,name'
-    ])
-    ->where('user_id', Auth::id())
-    ->latest()
-    ->get();
+        ])->where('user_id', Auth::id())
+        ->latest()->get();
 
         $data = $visits->map(function ($visit) {
             $images = [];
+            $videos = [];
 
+            // 📸 Images
             if (is_array($visit->images)) {
                 foreach ($visit->images as $img) {
                     $images[] = asset('storage/' . $img);
                 }
             }
 
-            // ✅ VIDEO (single)
-            $video = null;
-            if (!empty($visit->video)) {
-                $video = asset('storage/' . $visit->video);
+            // 🎥 Videos (MULTIPLE)
+            if (is_array($visit->videos)) {
+                foreach ($visit->videos as $vid) {
+                    $videos[] = asset('storage/' . $vid);
+                }
             }
+
             return [
                 'id'                    => $visit->id,
                 'farmer_id'             => $visit->farmer_id,
                 'farmer_name'           => $visit->farmer->farmer_name ?? null,
+
                 'state_id'              => $visit->farmer->state_id ?? null,
                 'state_name'            => $visit->farmer->state->name ?? null,
 
@@ -50,15 +53,19 @@ class FarmVisitController extends Controller
 
                 'taluka_id'             => $visit->farmer->taluka_id ?? null,
                 'taluka_name'           => $visit->farmer->taluka->name ?? null,
+
                 'crop_id'               => $visit->crop_id,
                 'crop_name'             => $visit->crop->name ?? null,
+
                 'crop_days'             => $visit->crop_days,
                 'crop_sowing_land_area' => $visit->crop_sowing_land_area,
                 'land_area_size'        => $visit->land_area_size,
                 'crop_condition'        => $visit->crop_condition,
                 'pest_disease'          => $visit->pest_disease,
-                'images'            => $images,   // ARRAY of full URLs
-                'video'             => $video,
+
+                'images'                => $images,
+                'videos'                => $videos, // ✅ multiple videos
+
                 'remark'                => $visit->remark,
                 'next_visit_date'       => optional($visit->next_visit_date)->format('d-m-Y'),
                 'agronomist_remark'     => $visit->agronomist_remark,
@@ -84,7 +91,9 @@ class FarmVisitController extends Controller
             'crop_condition'          => 'nullable|string',
             'pest_disease'            => 'nullable|string',
             'images.*'                => 'nullable|image|mimes:jpg,jpeg,png|max:5120', // 5MB each
-            'video'                   => 'nullable|mimes:mp4,mov,avi|max:102400', // 100MB
+            // 'video'                   => 'nullable|mimes:mp4,mov,avi|max:102400', // 100MB
+            'videos'   => 'nullable|array',
+            'videos.*' => 'mimes:mp4,mov,avi|max:102400',
             'remark'                  => 'nullable|string',
             'next_visit_date'         => 'nullable|date',
             'agronomist_remark'       => 'nullable|string',
@@ -107,10 +116,18 @@ class FarmVisitController extends Controller
         }
 
         /* 🎥 Video Upload */
-        $videoPath = null;
-        if ($request->hasFile('video')) {
-            $videoPath = $request->file('video')
-                ->store('farm_visits/videos', 'public');
+        // $videoPath = null;
+        // if ($request->hasFile('video')) {
+        //     $videoPath = $request->file('video')
+        //         ->store('farm_visits/videos', 'public');
+        // }
+        $videoPaths = [];
+
+        if ($request->hasFile('videos')) {
+            foreach ($request->file('videos') as $video) {
+                $path = $video->store('farm_visits/videos', 'public');
+                $videoPaths[] = $path;
+            }
         }
 
         $visit = FarmVisit::create([
@@ -123,7 +140,7 @@ class FarmVisitController extends Controller
             'crop_condition'        => $request->crop_condition,
             'pest_disease'          => $request->pest_disease,
             'images'                => $imagePaths,
-            'video'                 => $videoPath,
+            'videos'                 => $videoPaths,
             'remark'                => $request->remark,
             'next_visit_date'       => $request->next_visit_date,
             'agronomist_remark'     => $request->agronomist_remark,
@@ -149,7 +166,8 @@ class FarmVisitController extends Controller
             'crop_condition'          => 'nullable|string',
             'pest_disease'            => 'nullable|string',
             'images.*'                => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
-            'video'                   => 'nullable|mimes:mp4,mov,avi|max:102400',
+            'videos'   => 'nullable|array',
+            'videos.*' => 'mimes:mp4,mov,avi|max:102400',
             'remark'                  => 'nullable|string',
             'next_visit_date'         => 'nullable|date',
             'agronomist_remark'       => 'nullable|string',
@@ -162,10 +180,8 @@ class FarmVisitController extends Controller
             ], 422);
         }
 
-        /* 📸 Existing Images */
         $imagePaths = $visit->images ?? [];
 
-        /* 📸 New Images Upload */
         if ($request->hasFile('images')) {
 
             foreach ($request->file('images') as $image) {
@@ -176,17 +192,16 @@ class FarmVisitController extends Controller
             }
         }
 
-        /* 🎥 Video Upload */
-        $videoPath = $visit->video;
+        $videoPaths = $visit->videos ?? [];
 
-        if ($request->hasFile('video')) {
+        if ($request->hasFile('videos')) {
 
-            if ($visit->video && Storage::disk('public')->exists($visit->video)) {
-                Storage::disk('public')->delete($visit->video);
+            foreach ($request->file('videos') as $video) {
+
+                $path = $video->store('farm_visits/videos', 'public');
+
+                $videoPaths[] = $path;
             }
-
-            $videoPath = $request->file('video')
-                ->store('farm_visits/videos', 'public');
         }
 
         $visit->update([
@@ -198,7 +213,7 @@ class FarmVisitController extends Controller
             'crop_condition'        => $request->crop_condition,
             'pest_disease'          => $request->pest_disease,
             'images'                => $imagePaths,
-            'video'                 => $videoPath,
+            'videos'                => $videoPaths, // ✅ updated
             'remark'                => $request->remark,
             'next_visit_date'       => $request->next_visit_date,
             'agronomist_remark'     => $request->agronomist_remark,

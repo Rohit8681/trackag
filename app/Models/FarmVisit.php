@@ -29,6 +29,7 @@ class FarmVisit extends Model
 
     protected $casts = [
         'images' => 'array',
+        'videos' => 'array',
         'next_visit_date' => 'date',
     ];
 

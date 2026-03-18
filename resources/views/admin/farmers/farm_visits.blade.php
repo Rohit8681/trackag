@@ -61,7 +61,8 @@
                                         <td>{{ $visit->created_at?->format('d-m-Y') }}</td>
                                         <td>{{ $visit->crop->name ?? '-' }}</td>
                                         <td>{{ $visit->crop_days ?? '-' }}</td>
-                                        <td>{{ $visit->crop_sowing_land_area ?? '-' }}</td>
+                                        {{-- <td>{{ $visit->crop_sowing_land_area ?? '-' }}</td> --}}
+                                        <td>{{ $visit->land_area_size . ' ' . $visit->crop_sowing_land_area ?? '-' }}</td>
                                         <td>{{ $visit->crop_condition ?? '-' }}</td>
                                         <td>{{ $visit->pest_disease ?? '-' }}</td>
                                         <td>{{ $visit->product_suggested ?? '-' }}</td>
@@ -81,7 +82,7 @@
 
                                         {{-- Video --}}
                                         <td class="text-center">
-                                            @if($visit->video)
+                                            @if(!empty($visit->videos))
                                                 <button class="btn btn-warning btn-sm"
                                                     data-bs-toggle="modal"
                                                     data-bs-target="#videoModal{{ $visit->id }}">
@@ -137,7 +138,7 @@
                                     @endif
 
                                     {{-- Video Modal --}}
-                                    @if($visit->video)
+                                    @if(!empty($visit->videos))
                                     <div class="modal fade" id="videoModal{{ $visit->id }}" tabindex="-1">
                                         <div class="modal-dialog modal-lg modal-dialog-centered">
                                             <div class="modal-content">
@@ -146,9 +147,15 @@
                                                     <button class="btn-close" data-bs-dismiss="modal"></button>
                                                 </div>
                                                 <div class="modal-body text-center">
-                                                    <video controls style="width:100%; max-height:400px;">
-                                                        <source src="{{ asset('storage/'.$visit->video) }}">
-                                                    </video>
+                                                    <div class="row">
+                                                    @foreach($visit->videos as $video)
+                                                        <div class="col-md-6 mb-3">
+                                                            <video controls style="width:100%; max-height:250px;">
+                                                                <source src="{{ asset('storage/'.$video) }}">
+                                                            </video>
+                                                        </div>
+                                                    @endforeach
+                                                </div>
                                                 </div>
                                             </div>
                                         </div>
