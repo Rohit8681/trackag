@@ -345,6 +345,33 @@ class PartyController extends Controller
         return view('admin.new-party.index', compact('customer', 'users', 'states', 'company'));
     }
 
+    public function updateParty(Request $request)
+    {
+        $request->validate([
+            'id' => 'required|exists:customers,id',
+            'agro_name' => 'required|string|max:255',
+            'phone' => 'required|string|max:20',
+            'address' => 'required|string',
+        ]);
+
+        Customer::where('id', $request->id)->update([
+            'agro_name' => $request->agro_name,
+            'phone' => $request->phone,
+            'address' => $request->address,
+        ]);
+
+        return back()->with('success', 'Party updated successfully');
+    }
+
+    public function deleteParty($id)
+    {
+        $customer = Customer::findOrFail($id);
+
+        $customer->delete();
+
+        return back()->with('success', 'Party deleted successfully');
+    }
+
     public function newPartyPdf(Request $request)
     {
         $user = auth()->user();

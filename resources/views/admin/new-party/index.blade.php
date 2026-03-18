@@ -179,6 +179,29 @@
                                                     Hold
                                                 </a>
                                             </li>
+                                            <li>
+                                                    <a href="#" class="dropdown-item"
+                                                    onclick="openEditModal(
+                                                        {{ $item->id }},
+                                                        '{{ $item->agro_name }}',
+                                                        '{{ $item->phone }}',
+                                                        `{{ $item->address }}`
+                                                    )">
+                                                        Edit
+                                                    </a>
+                                                </li>
+
+                                                <li>
+                                                    <form method="POST"
+                                                        action="{{ route('new-party.delete', $item->id) }}"
+                                                        onsubmit="return confirm('Are you sure you want to delete this record?')">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button class="dropdown-item text-danger">
+                                                            Delete
+                                                        </button>
+                                                    </form>
+                                                </li>
                                         </ul>
                                     </div>
                                 </td>
@@ -199,32 +222,73 @@
         </div>
     </div>
 
-    <div class="modal fade" id="statusModal" tabindex="-1">
-    <div class="modal-dialog">
-        <form method="POST" action="{{ route('new-party.update-status') }}">
-            @csrf
-            <input type="hidden" name="customer_id" id="customerId">
-            <input type="hidden" name="status" id="statusType">
+    <div class="modal fade" id="editModal" tabindex="-1">
+        <div class="modal-dialog">
+            <form method="POST" action="{{ route('new-party.update') }}">
+                @csrf
 
-            <div class="modal-content">
-                <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title">Update Status</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
+                <input type="hidden" name="id" id="editId">
 
-                <div class="modal-body" id="remarkWrapper">
-                    <label class="form-label">Remark <span class="text-danger">*</span></label>
-                    <textarea class="form-control" name="remark" rows="3" required></textarea>
-                </div>
+                <div class="modal-content">
+                    <div class="modal-header bg-warning">
+                        <h5 class="modal-title">Edit Party</h5>
+                        <button class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
 
-                <div class="modal-footer">
-                    <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button class="btn btn-success">Save</button>
+                    <div class="modal-body">
+
+                        <div class="mb-2">
+                            <label>Shop Name</label>
+                            <input type="text" name="agro_name" id="editAgroName" class="form-control" required>
+                        </div>
+
+                        <div class="mb-2">
+                            <label>Mobile No</label>
+                            <input type="text" name="phone" id="editPhone" class="form-control" required>
+                        </div>
+
+                        <div class="mb-2">
+                            <label>Address</label>
+                            <textarea name="address" id="editAddress" class="form-control" rows="3" required></textarea>
+                        </div>
+
+                    </div>
+
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button class="btn btn-success">Update</button>
+                    </div>
                 </div>
-            </div>
-        </form>
+            </form>
+        </div>
     </div>
-</div>
+
+    <div class="modal fade" id="statusModal" tabindex="-1">
+        <div class="modal-dialog">
+            <form method="POST" action="{{ route('new-party.update-status') }}">
+                @csrf
+                <input type="hidden" name="customer_id" id="customerId">
+                <input type="hidden" name="status" id="statusType">
+
+                <div class="modal-content">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title">Update Status</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+
+                    <div class="modal-body" id="remarkWrapper">
+                        <label class="form-label">Remark <span class="text-danger">*</span></label>
+                        <textarea class="form-control" name="remark" rows="3" required></textarea>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button class="btn btn-success">Save</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
 </main>
 @endsection
 @push('scripts')
@@ -249,6 +313,17 @@ function openStatusModal(id, status) {
     }
 
     var modal = new bootstrap.Modal(document.getElementById('statusModal'));
+    modal.show();
+}
+
+function openEditModal(id, agro_name, phone, address) {
+
+    document.getElementById('editId').value = id;
+    document.getElementById('editAgroName').value = agro_name;
+    document.getElementById('editPhone').value = phone;
+    document.getElementById('editAddress').value = address;
+
+    var modal = new bootstrap.Modal(document.getElementById('editModal'));
     modal.show();
 }
 

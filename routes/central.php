@@ -173,6 +173,8 @@ Route::middleware(['web'])->group(function () {
             Route::get('/admin/get-employees-by-state', [PartyController::class, 'getEmployeesByState'])->name('admin.getEmployeesByState');
             Route::get('/admin/get-party-visits', [PartyController::class, 'getPartyVisits'])->name('admin.get-party-visits');
             Route::get('new-party', [PartyController::class, 'newPartyList'])->name('new-party.list');
+            Route::post('new-party/update', [PartyController::class, 'updateParty'])->name('new-party.update');
+            Route::delete('new-party/delete/{id}', [PartyController::class, 'deleteParty'])->name('new-party.delete');
             Route::get('new-party/pdf', [PartyController::class, 'newPartyPdf'])->name('new-party.pdf');
             Route::post('new-party/status-update', [PartyController::class, 'updateStatus'])->name('new-party.update-status');
 
