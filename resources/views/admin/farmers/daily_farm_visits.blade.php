@@ -136,7 +136,7 @@
                                         <td>{{ optional($visit->next_visit_date)->format('d-m-Y') }}</td>
 
                                         {{-- Agronomist Remark --}}
-                                        <td>
+                                        {{-- <td>
                                             <form method="POST"
                                                   action="{{ route('farm-visits.agronomist-remark', $visit->id) }}">
                                                 @csrf
@@ -149,8 +149,51 @@
                                                     Save
                                                 </button>
                                             </form>
+                                        </td> --}}
+                                        <td class="text-center">
+                                            <button class="btn btn-success btn-sm"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#remarkModal{{ $visit->id }}">
+                                                {{ $visit->agronomist_remark ? 'Edit' : 'Add' }}
+                                            </button>
                                         </td>
                                     </tr>
+
+                                    <div class="modal fade" id="remarkModal{{ $visit->id }}" tabindex="-1">
+                                        <div class="modal-dialog modal-md modal-dialog-centered">
+                                            <div class="modal-content">
+
+                                                <form method="POST"
+                                                    action="{{ route('farm-visits.agronomist-remark', $visit->id) }}">
+                                                    @csrf
+
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title">
+                                                            Agronomist Remark - {{ $visit->farmer->farmer_name }}
+                                                        </h5>
+                                                        <button class="btn-close" data-bs-dismiss="modal"></button>
+                                                    </div>
+
+                                                    <div class="modal-body">
+                                                        <textarea name="agronomist_remark"
+                                                            class="form-control"
+                                                            rows="4">{{ $visit->agronomist_remark }}</textarea>
+                                                    </div>
+
+                                                    <div class="modal-footer">
+                                                        <button class="btn btn-secondary"
+                                                            data-bs-dismiss="modal">Cancel</button>
+
+                                                        <button type="submit" class="btn btn-success">
+                                                            Save
+                                                        </button>
+                                                    </div>
+
+                                                </form>
+
+                                            </div>
+                                        </div>
+                                    </div>
 
                                     {{-- Image Modal --}}
                                     @if($visit->images)
