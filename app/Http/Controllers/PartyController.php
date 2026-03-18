@@ -347,9 +347,8 @@ class PartyController extends Controller
 
     public function updateParty(Request $request)
     {
-        dd($request->all());
         $request->validate([
-            'id' => 'required|exists:customers,id',
+            'id' => 'required',
             'agro_name' => 'required|string|max:255',
             'phone' => 'required|string|max:20',
             'address' => 'required|string',
