@@ -405,7 +405,7 @@ class TripController extends Controller
         if (!is_finite($calculatedDistance) || $calculatedDistance < 0) {
             $calculatedDistance = 0;
         }
-        $overrideValue = $request->input('trip_limit_override_confirm');
+        $overrideValue = $request->input('trip_limit_override_confirm', 0);
 
         $trip->update([
             'approval_status'   => $status,
@@ -414,7 +414,7 @@ class TripController extends Controller
             'approved_at'       => now(),
             'total_distance_km' => $calculatedDistance,
             'trip_type'         => $status === 'approved' ? $tripType : null,
-            'trip_limit_override' => $status === 'approved' ? $overrideValue : 0,
+            'trip_limit_override' => $status === 'approved' ? ($overrideValue ?? 0) : 0,
         ]);
 
         return redirect()->back()->with('success', 'Trip approval status updated successfully.');
