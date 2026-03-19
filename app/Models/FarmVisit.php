@@ -21,7 +21,7 @@ class FarmVisit extends Model
         'crop_condition',
         'pest_disease',
         'images',
-        'video',
+        'videos',
         'remark',
         'next_visit_date',
         'agronomist_remark'
