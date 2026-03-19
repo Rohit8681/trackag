@@ -789,6 +789,7 @@ $(document).ready(function() {
     });
 
     $('.state_access').click(function() {
+        alert('hello');
         let userId = $(this).data('user-id');
         $('#stateModalUserId').val(userId);
 
