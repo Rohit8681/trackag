@@ -780,7 +780,7 @@ $(document).ready(function() {
     });
     
     // Open modal and set user id
-    $('.reset-password').click(function() {
+    $(document).on('click', '.reset-password', function() {
         let userId = $(this).data('user-id');
         $('#modalUserId').val(userId);
         $('#newPassword').val('');
@@ -811,7 +811,7 @@ $(document).ready(function() {
         });
     });
 
-    $('#saveStateBtn').click(function(){
+    $(document).on('click', '#saveStateBtn', function() {
         let formData = $('#stateAccessForm').serialize();
         $.ajax({
             url: '/admin/save-user-state-access',
@@ -827,7 +827,7 @@ $(document).ready(function() {
         });
     });
 
-    $('.depo_access').click(function () {
+    $(document).on('click', '.depo_access', function() {
         $('#depoAccessMessage').html('');
         let userId = $(this).data('user-id');
         $('#depoModalUserId').val(userId);
@@ -868,7 +868,7 @@ $(document).ready(function() {
         });
     });
 
-    $('#saveDepoAccessBtn').click(function() {
+    $(document).on('click', '#saveDepoAccessBtn', function() {
         let formData = $('#depoAccessForm').serialize();
         $.ajax({
             url: '{{ route("admin.save.depo.access") }}',
@@ -891,7 +891,7 @@ $(document).ready(function() {
     });
 
     // Handle reset password AJAX
-    $('#resetPasswordBtn').click(function() {
+    $(document).on('click', '#resetPasswordBtn', function() {
         let formData = $('#resetPasswordForm').serialize();
 
         $.ajax({
