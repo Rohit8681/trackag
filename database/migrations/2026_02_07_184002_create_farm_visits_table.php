@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('land_area_size')->nullable();
             $table->string('crop_condition')->nullable();
             $table->string('pest_disease')->nullable();
+            $table->string('product_suggested')->nullable();
 
             // store multiple images as JSON
             $table->json('images')->nullable();

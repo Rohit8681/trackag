@@ -63,7 +63,7 @@ class FarmVisitController extends Controller
                 'land_area_size'        => $visit->land_area_size,
                 'crop_condition'        => $visit->crop_condition,
                 'pest_disease'          => $visit->pest_disease,
-
+                'product_suggested'     => $visit->product_suggested,
                 'images'                => $images,
                 'videos'                => $videos, // ✅ multiple videos
 
@@ -94,6 +94,7 @@ class FarmVisitController extends Controller
             'land_area_size'   => 'nullable|string',
             'crop_condition'          => 'nullable|string',
             'pest_disease'            => 'nullable|string',
+            'product_suggested'            => 'nullable|string',
             'images.*'                => 'nullable|image|mimes:jpg,jpeg,png|max:5120', // 5MB each
             // 'video'                   => 'nullable|mimes:mp4,mov,avi|max:102400', // 100MB
             'videos'   => 'nullable|array',
@@ -119,12 +120,6 @@ class FarmVisitController extends Controller
             }
         }
 
-        /* 🎥 Video Upload */
-        // $videoPath = null;
-        // if ($request->hasFile('video')) {
-        //     $videoPath = $request->file('video')
-        //         ->store('farm_visits/videos', 'public');
-        // }
         $videoPaths = [];
 
         if ($request->hasFile('videos')) {
@@ -143,6 +138,7 @@ class FarmVisitController extends Controller
             'land_area_size'        => $request->land_area_size,
             'crop_condition'        => $request->crop_condition,
             'pest_disease'          => $request->pest_disease,
+            'product_suggested'     => $request->product_suggested,
             'images'                => $imagePaths,
             'videos'                 => $videoPaths,
             'remark'                => $request->remark,
@@ -169,6 +165,7 @@ class FarmVisitController extends Controller
             'land_area_size'   => 'nullable|string',
             'crop_condition'          => 'nullable|string',
             'pest_disease'            => 'nullable|string',
+            'product_suggested'     => 'nullable|string',
             'images.*'                => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
             'videos'   => 'nullable|array',
             'videos.*' => 'mimes:mp4,mov,avi|max:102400',
@@ -216,6 +213,7 @@ class FarmVisitController extends Controller
             'land_area_size'        => $request->land_area_size,
             'crop_condition'        => $request->crop_condition,
             'pest_disease'          => $request->pest_disease,
+            'product_suggested'     => $request->product_suggested,
             'images'                => $imagePaths,
             'videos'                => $videoPaths, // ✅ updated
             'remark'                => $request->remark,

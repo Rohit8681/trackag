@@ -20,6 +20,7 @@ class FarmVisit extends Model
         'land_area_size',
         'crop_condition',
         'pest_disease',
+        'product_suggested',
         'images',
         'videos',
         'remark',
