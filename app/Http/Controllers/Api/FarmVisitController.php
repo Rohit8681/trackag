@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
 class FarmVisitController extends Controller
 {
@@ -82,6 +83,9 @@ class FarmVisitController extends Controller
 
     public function store(Request $request)
     {
+        Log::info('Farm Visit Request Data:', $request->all());
+        Log::info('Images:', $request->file('images') ?? []);
+        Log::info('Videos:', $request->file('videos') ?? []);
         $validator = Validator::make($request->all(), [
             'farmer_id'               => 'required',
             'crop_id'                 => 'required',
