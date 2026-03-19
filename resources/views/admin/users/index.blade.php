@@ -788,8 +788,7 @@ $(document).ready(function() {
         $('#resetPasswordModal').modal('show');
     });
 
-    $('.state_access').click(function() {
-        alert('hello');
+    $(document).on('click', '.state_access', function() {
         let userId = $(this).data('user-id');
         $('#stateModalUserId').val(userId);
 
@@ -935,6 +934,27 @@ $(document).ready(function() {
             $('#tourTypeInput').addClass('d-none').prop('disabled', true);
             $('#tourTypeInput').val(''); // Clear value when hidden
         }
+    });
+
+    $('#stateAccessModal').on('shown.bs.modal', function () {
+        $('#stateIds').select2({
+            dropdownParent: $('#stateAccessModal'),
+            width: '100%'
+        });
+    });
+
+    $('#depoAccessModal').on('shown.bs.modal', function () {
+        $('#depoId').select2({
+            dropdownParent: $('#depoAccessModal'),
+            width: '100%'
+        });
+    });
+
+    // =========================================================
+    // ✅ 🔥 ARIA-HIDDEN ERROR FIX (MOST IMPORTANT)
+    // =========================================================
+    $('.modal').on('hidden.bs.modal', function () {
+        document.activeElement.blur(); // remove focus
     });
 });
 
