@@ -25,6 +25,12 @@ class TenantAuthenticate
         $company = Company::where('code', $companyCode)->first();
         if (!$company) return response()->json(['message'=>'Invalid company code'], 404);
 
+        if ($company->validity_upto && now()->greaterThan($company->validity_upto)) {
+            return response()->json([
+                'message' => 'Your company subscription has expired. Please contact administrator.'
+            ], 403);
+        }
+
         $tenant = Tenant::find($company->tenant_id);
         if (!$tenant) return response()->json(['message'=>'Tenant not found'], 404);
 

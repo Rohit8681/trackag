@@ -83,9 +83,6 @@ class FarmVisitController extends Controller
 
     public function store(Request $request)
     {
-        Log::info('Farm Visit Request Data:', $request->all());
-        Log::info('Images:', $request->file('images') ?? []);
-        Log::info('Videos:', $request->file('videos') ?? []);
         $validator = Validator::make($request->all(), [
             'farmer_id'               => 'required',
             'crop_id'                 => 'required',
