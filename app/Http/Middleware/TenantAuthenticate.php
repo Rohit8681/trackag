@@ -25,6 +25,12 @@ class TenantAuthenticate
         $company = Company::where('code', $companyCode)->first();
         if (!$company) return response()->json(['message'=>'Invalid company code'], 404);
 
+        if (!$company->is_active) {
+            return response()->json([
+                'message' => 'Your company account has been deactivated.'
+            ], 403);
+        }
+
         if ($company->validity_upto && now()->greaterThan($company->validity_upto)) {
             return response()->json([
                 'message' => 'Your company subscription has expired. Please contact administrator.'
