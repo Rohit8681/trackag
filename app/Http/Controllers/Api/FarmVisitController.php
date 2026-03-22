@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
+use FFMpeg;
 
 class FarmVisitController extends Controller
 {
@@ -119,10 +120,35 @@ class FarmVisitController extends Controller
 
         $videoPaths = [];
 
+        // if ($request->hasFile('videos')) {
+        //     foreach ($request->file('videos') as $video) {
+        //         $path = $video->store('farm_visits/videos', 'public');
+        //         $videoPaths[] = $path;
+        //     }
+        // }
         if ($request->hasFile('videos')) {
             foreach ($request->file('videos') as $video) {
-                $path = $video->store('farm_visits/videos', 'public');
-                $videoPaths[] = $path;
+
+                // original name
+                $fileName = time() . '_' . uniqid() . '.mp4';
+
+                // store temp
+                $tempPath = $video->store('temp');
+
+                $compressedPath = 'farm_visits/videos/' . $fileName;
+
+                // 🔥 Compress video
+                FFMpeg::fromDisk('public')
+                    ->open($tempPath)
+                    ->export()
+                    ->inFormat(new \FFMpeg\Format\Video\X264('aac', 'libx264'))
+                    ->resize(640, 480) // 👈 resolution reduce
+                    ->save($compressedPath);
+
+                // delete temp
+                Storage::disk('public')->delete($tempPath);
+
+                $videoPaths[] = $compressedPath;
             }
         }
 
@@ -192,13 +218,38 @@ class FarmVisitController extends Controller
 
         $videoPaths = $visit->videos ?? [];
 
-        if ($request->hasFile('videos')) {
+        // if ($request->hasFile('videos')) {
 
+        //     foreach ($request->file('videos') as $video) {
+
+        //         $path = $video->store('farm_visits/videos', 'public');
+
+        //         $videoPaths[] = $path;
+        //     }
+        // }
+        if ($request->hasFile('videos')) {
             foreach ($request->file('videos') as $video) {
 
-                $path = $video->store('farm_visits/videos', 'public');
+                // original name
+                $fileName = time() . '_' . uniqid() . '.mp4';
 
-                $videoPaths[] = $path;
+                // store temp
+                $tempPath = $video->store('temp');
+
+                $compressedPath = 'farm_visits/videos/' . $fileName;
+
+                // 🔥 Compress video
+                FFMpeg::fromDisk('public')
+                    ->open($tempPath)
+                    ->export()
+                    ->inFormat(new \FFMpeg\Format\Video\X264('aac', 'libx264'))
+                    ->resize(640, 480) // 👈 resolution reduce
+                    ->save($compressedPath);
+
+                // delete temp
+                Storage::disk('public')->delete($tempPath);
+
+                $videoPaths[] = $compressedPath;
             }
         }
 
