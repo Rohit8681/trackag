@@ -1,6 +1,23 @@
 @extends('admin.layout.layout')
 @section('title', 'Farm Visits | Trackag')
+@push('styles')
+<style>
+.remark-box {
+    max-height: 40px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    font-size: 13px;
+}
 
+.remark-box.expanded {
+    max-height: none;
+    -webkit-line-clamp: unset;
+}
+</style>
+@endpush
 @section('content')
 <main class="app-main">
 
@@ -102,12 +119,41 @@
                                         <td>{{ $visit->remark ?? '-' }}</td>
                                         <td>{{ optional($visit->next_visit_date)->format('d-m-Y') }}</td>
 
-                                        <td class="text-center">
+                                        {{-- <td class="text-center">
                                             <button class="btn btn-success btn-sm"
                                                 data-bs-toggle="modal"
                                                 data-bs-target="#remarkModal{{ $visit->id }}">
                                                 {{ $visit->agronomist_remark ? 'Edit' : 'Add' }}
                                             </button>
+                                        </td> --}}
+                                        <td style="max-width: 220px;">
+
+                                            {{-- Remark Text --}}
+                                            @if($visit->agronomist_remark)
+                                                <div class="remark-box" id="remark-{{ $visit->id }}">
+                                                    {{ $visit->agronomist_remark }}
+                                                </div>
+
+                                                @if(strlen($visit->agronomist_remark) > 80)
+                                                    <a href="javascript:void(0)" 
+                                                    class="text-primary read-more-btn"
+                                                    data-id="{{ $visit->id }}">
+                                                    Read More
+                                                    </a>
+                                                @endif
+                                            @else
+                                                <span class="text-muted">No Remark</span>
+                                            @endif
+
+                                            {{-- Button --}}
+                                            <div class="mt-1 text-center">
+                                                <button class="btn btn-success btn-sm"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#remarkModal{{ $visit->id }}">
+                                                    {{ $visit->agronomist_remark ? 'Edit' : 'Add' }}
+                                                </button>
+                                            </div>
+
                                         </td>
                                     </tr>
 
@@ -241,6 +287,19 @@ $(document).ready(function () {
             pageLength: 10,
             lengthMenu: [5, 10, 25, 50]
         });
+    }
+});
+
+$(document).on('click', '.read-more-btn', function () {
+    let id = $(this).data('id');
+    let box = $('#remark-' + id);
+
+    if (box.hasClass('expanded')) {
+        box.removeClass('expanded');
+        $(this).text('Read More');
+    } else {
+        box.addClass('expanded');
+        $(this).text('Read Less');
     }
 });
 </script>
