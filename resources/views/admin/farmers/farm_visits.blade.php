@@ -182,17 +182,17 @@
                                                 </div>
                                                 <div class="modal-body text-center">
                                                     @php
-                                                        $daysDiff = \Carbon\Carbon::parse($visit->created_at)->diffInDays(now());
+                                                        $daysDiff = (int) \Carbon\Carbon::parse($visit->created_at)->diffInDays(now());
+                                                        $remainingDays = 7 - $daysDiff;
                                                     @endphp
 
                                                     @if($daysDiff >= 7)
                                                         <div class="alert alert-danger text-center">
-                                                            ⚠️ This video will be deleted after 7 days from the upload date.
-                                                            Please download it if you need to keep a copy.
+                                                            This video is no longer available as it has exceeded 7 days from upload.
                                                         </div>
                                                     @else
                                                         <div class="alert alert-warning text-center">
-                                                            ⏳ This video will be deleted in {{ 7 - $daysDiff }} day(s).
+                                                            This video will be deleted in {{ $remainingDays }} day(s).
                                                             Please download it if needed.
                                                         </div>
                                                     @endif
