@@ -133,7 +133,7 @@ class FarmVisitController extends Controller
                 $fileName = time() . '_' . uniqid() . '.mp4';
 
                 // store temp
-                $tempPath = $video->store('temp');
+                $tempPath = $video->store('temp', 'public');
 
                 $compressedPath = 'farm_visits/videos/' . $fileName;
 
@@ -234,7 +234,7 @@ class FarmVisitController extends Controller
                 $fileName = time() . '_' . uniqid() . '.mp4';
 
                 // store temp
-                $tempPath = $video->store('temp');
+                $tempPath = $video->store('temp', 'public');
 
                 $compressedPath = 'farm_visits/videos/' . $fileName;
 
