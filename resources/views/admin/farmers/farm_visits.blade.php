@@ -82,12 +82,18 @@
 
                                         {{-- Video --}}
                                         <td class="text-center">
-                                            @if(!empty($visit->videos))
+                                            @php
+                                                $daysDiff = \Carbon\Carbon::parse($visit->created_at)->diffInDays(now());
+                                            @endphp
+
+                                            @if(!empty($visit->videos) && $daysDiff < 7)
                                                 <button class="btn btn-warning btn-sm"
                                                     data-bs-toggle="modal"
                                                     data-bs-target="#videoModal{{ $visit->id }}">
                                                     View
                                                 </button>
+                                            @elseif(!empty($visit->videos) && $daysDiff >= 7)
+                                                <span class="text-danger">Expired</span>
                                             @else
                                                 -
                                             @endif
@@ -96,21 +102,6 @@
                                         <td>{{ $visit->remark ?? '-' }}</td>
                                         <td>{{ optional($visit->next_visit_date)->format('d-m-Y') }}</td>
 
-                                        {{-- Agronomist Remark --}}
-                                        {{-- <td>
-                                            <form method="POST"
-                                                  action="{{ route('farm-visits.agronomist-remark', $visit->id) }}">
-                                                @csrf
-                                                <textarea
-                                                    name="agronomist_remark"
-                                                    class="form-control form-control-sm"
-                                                    rows="2"
-                                                    placeholder="Enter remark">{{ $visit->agronomist_remark }}</textarea>
-                                                <button class="btn btn-success btn-sm mt-1 w-100">
-                                                    Save
-                                                </button>
-                                            </form>
-                                        </td> --}}
                                         <td class="text-center">
                                             <button class="btn btn-success btn-sm"
                                                 data-bs-toggle="modal"
@@ -190,6 +181,21 @@
                                                     <button class="btn-close" data-bs-dismiss="modal"></button>
                                                 </div>
                                                 <div class="modal-body text-center">
+                                                    @php
+                                                        $daysDiff = \Carbon\Carbon::parse($visit->created_at)->diffInDays(now());
+                                                    @endphp
+
+                                                    @if($daysDiff >= 7)
+                                                        <div class="alert alert-danger text-center">
+                                                            ⚠️ This video will be deleted after 7 days from the upload date.
+                                                            Please download it if you need to keep a copy.
+                                                        </div>
+                                                    @else
+                                                        <div class="alert alert-warning text-center">
+                                                            ⏳ This video will be deleted in {{ 7 - $daysDiff }} day(s).
+                                                            Please download it if needed.
+                                                        </div>
+                                                    @endif
                                                     <div class="row">
                                                     @foreach($visit->videos as $video)
                                                         <div class="col-md-6 mb-3">
