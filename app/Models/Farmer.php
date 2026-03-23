@@ -26,6 +26,8 @@ class Farmer extends Model
         'land_acr',
         'irrigation_type',
         'land_acr_size',
+        'latitude',
+        'longitude'
     ];
 
     public function user()

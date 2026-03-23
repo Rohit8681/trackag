@@ -25,7 +25,9 @@ class FarmVisit extends Model
         'videos',
         'remark',
         'next_visit_date',
-        'agronomist_remark'
+        'agronomist_remark',
+        'latitude',
+        'longitude'
     ];
 
     protected $casts = [
