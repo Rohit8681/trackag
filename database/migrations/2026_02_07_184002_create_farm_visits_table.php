@@ -33,6 +33,8 @@ return new class extends Migration
             $table->longText('remark')->nullable();
             $table->date('next_visit_date')->nullable();
             $table->longText('agronomist_remark')->nullable();
+            $table->decimal('latitude', 10, 8)->nullable();
+            $table->decimal('longitude', 11, 8)->nullable();
 
             $table->timestamps();
         });

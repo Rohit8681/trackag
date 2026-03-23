@@ -100,6 +100,8 @@ class FarmVisitController extends Controller
             'remark'                  => 'nullable|string',
             'next_visit_date'         => 'nullable|date',
             'agronomist_remark'       => 'nullable|string',
+            'latitude' =>  'required|numeric',
+            'longitude' => 'required|numeric',
         ]);
 
         if ($validator->fails()) {
@@ -167,6 +169,8 @@ class FarmVisitController extends Controller
             'remark'                => $request->remark,
             'next_visit_date'       => $request->next_visit_date,
             'agronomist_remark'     => $request->agronomist_remark,
+            'latitude' => $request->latitude,
+            'longitude' => $request->longitude,
         ]);
 
         return response()->json([

@@ -57,9 +57,10 @@ class FarmerController extends Controller
             'district_id'     => 'required|integer',
             'taluka_id'       => 'required|integer',
             'crop_sowing_id'      => 'required|array',
-            // 'crop_sowing_id.*'    => 'integer|exists:crop_sowings,id',  
             'land_acr'        => 'nullable|string',
-            'irrigation_type' => 'nullable|string'
+            'irrigation_type' => 'nullable|string',
+            'latitude' =>  'required|numeric',
+            'longitude' => 'required|numeric',
         ]);
 
         if ($validator->fails()) {
@@ -79,6 +80,8 @@ class FarmerController extends Controller
             'land_acr'        => $request->land_acr,
             'land_acr_size'   => $request->land_acr_size,
             'irrigation_type' => $request->irrigation_type,
+            'latitude' => $request->latitude,
+            'longitude' => $request->longitude, 
         ]);
 
         foreach ($request->crop_sowing_id as $cropSowingId) {
