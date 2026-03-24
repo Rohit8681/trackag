@@ -27,25 +27,25 @@
 
                     <!-- LEGEND -->
                     <div class="route-legend">
-    <div class="legend-title">Route Time Legend</div>
+                        <div class="legend-title">Route Time Legend</div>
 
-    <div class="legend-row">
-        <div class="legend-item">
-            <span class="legend-dot green"></span>
-            <span>6:00 AM – 12:00 PM</span>
-        </div>
+                        <div class="legend-row">
+                            <div class="legend-item">
+                                <span class="legend-dot green"></span>
+                                <span>6:00 AM – 12:00 PM</span>
+                            </div>
 
-        <div class="legend-item">
-            <span class="legend-dot blue"></span>
-            <span>12:00 PM – 6:00 PM</span>
-        </div>
+                            <div class="legend-item">
+                                <span class="legend-dot blue"></span>
+                                <span>12:00 PM – 6:00 PM</span>
+                            </div>
 
-        <div class="legend-item">
-            <span class="legend-dot red"></span>
-            <span>6:00 PM – 11:59 PM</span>
-        </div>
-    </div>
-</div>
+                            <div class="legend-item">
+                                <span class="legend-dot red"></span>
+                                <span>6:00 PM – 11:59 PM</span>
+                            </div>
+                        </div>
+                    </div>
 
                     <!-- BACK BUTTON -->
                     <a href="{{ route('trips.index') }}"
@@ -71,6 +71,8 @@
         window.tripLogs   = @json($tripLogs);
         window.tripEnded = {{ $trip->end_time ? 'true' : 'false' }};
         window.partyVisits = @json($partyVisits);
+        window.farmers   = @json($farmers);
+        window.farmVisits = @json($farmVisits);
     </script>
 
     <!-- CSS -->

@@ -84,11 +84,161 @@
 </script>
 
 <script>
+// function initMap() {
+
+//     const tripLogs = window.tripLogs || [];
+//     const partyVisits = window.partyVisits || [];
+//     const tripEnded = window.tripEnded;
+
+//     if (!tripLogs.length) {
+//         console.warn("No trip logs found");
+//         return;
+//     }
+
+//     const pathCoordinates = tripLogs.map(l => ({
+//         lat: parseFloat(l.latitude),
+//         lng: parseFloat(l.longitude),
+//         recorded_at: l.recorded_at
+//     }));
+
+//     const map = new google.maps.Map(document.getElementById("map"), {
+//         zoom: 13,
+//         center: pathCoordinates[0],
+//     });
+
+//     // ---------- POLYLINE ----------
+//     if (pathCoordinates.length > 1) {
+//         new google.maps.Polyline({
+//             path: pathCoordinates,
+//             geodesic: true,
+//             strokeColor: "#007bff",
+//             strokeWeight: 4,
+//             map
+//         });
+//     }
+
+//     // ---------- ICONS ----------
+//     const startIcon = {
+//         url: "{{ asset('img/start-green.png') }}",
+//         scaledSize: new google.maps.Size(60, 60)
+//     };
+
+//     const middleIcon = {
+//         url: "{{ asset('img/mid-blue.png') }}",
+//         scaledSize: new google.maps.Size(20, 20)
+//     };
+
+//     const middleGreenIcon = {
+//         url: "{{ asset('img/start-green.png') }}",
+//         scaledSize: new google.maps.Size(20, 20)
+//     };
+
+//     const middleRedIcon = {
+//         url: "{{ asset('img/end-red.png') }}",
+//         scaledSize: new google.maps.Size(20, 20)
+//     };
+
+//     const endIcon = {
+//         url: "{{ asset('img/end-red.png') }}",
+//         scaledSize: new google.maps.Size(60, 60)
+//     };
+
+//     const partyIcon = {
+//         url: "{{ asset('img/yellow.png') }}",
+//         scaledSize: new google.maps.Size(60, 60)
+//     };
+
+//     // ---------- START ----------
+//     new google.maps.Marker({
+//         position: pathCoordinates[0],
+//         map,
+//         icon: startIcon,
+//         title: "Start: " + (pathCoordinates[0].recorded_at ?? '')
+//     });
+
+//     for (let i = 1; i < pathCoordinates.length - 1; i++) {
+
+//         let iconToUse = middleIcon; // default mid-blue
+
+//         if (pathCoordinates[i].recorded_at) {
+
+//             // recorded_at format: YYYY-MM-DD HH:mm:ss
+//             const date = new Date(pathCoordinates[i].recorded_at.replace(' ', 'T'));
+//             const hour = date.getHours(); // 0–23
+
+//             if (hour >= 6 && hour < 12) {
+//                 iconToUse = middleGreenIcon;   // 6 AM – 12 PM
+//             } 
+//             else if (hour >= 12 && hour < 18) {
+//                 iconToUse = middleIcon;        // 12 PM – 6 PM
+//             } 
+//             else {
+//                 iconToUse = middleRedIcon;     // 6 PM – 12 AM
+//             }
+//         }
+
+//         new google.maps.Marker({
+//             position: pathCoordinates[i],
+//             map,
+//             icon: iconToUse,
+//             title: pathCoordinates[i].recorded_at
+//         });
+//     }
+
+//     // ---------- END ----------
+//     if (tripEnded && pathCoordinates.length > 1) {
+//         const last = pathCoordinates[pathCoordinates.length - 1];
+
+//         new google.maps.Marker({
+//             position: last,
+//             map,
+//             icon: endIcon,
+//             title: "End: " + (last.recorded_at ?? '')
+//         });
+//     }
+
+//     // ---------- PARTY VISITS ----------
+//     const infoWindow = new google.maps.InfoWindow();
+
+//     partyVisits.forEach(party => {
+
+//         if (!party.latitude || !party.longitude) return;
+
+//         const agroName = party.customer?.agro_name ?? 'Customer';
+
+//         const marker = new google.maps.Marker({
+//             position: {
+//                 lat: parseFloat(party.latitude),
+//                 lng: parseFloat(party.longitude)
+//             },
+//             map,
+//             icon: partyIcon,
+
+//             // 👉 cursor hover tooltip
+//             title: agroName
+//         });
+
+//         // 👉 hover popup
+//         marker.addListener("mouseover", () => {
+//             infoWindow.setContent(`
+//                 <strong>${agroName}</strong><br>
+//                 Check-in Time: ${party.check_in_time ?? ''}
+//             `);
+//             infoWindow.open(map, marker);
+//         });
+
+//         marker.addListener("mouseout", () => {
+//             infoWindow.close();
+//         });
+//     });
+// }
 function initMap() {
 
-    const tripLogs = window.tripLogs || [];
-    const partyVisits = window.partyVisits || [];
-    const tripEnded = window.tripEnded;
+    const tripLogs     = window.tripLogs || [];
+    const partyVisits  = window.partyVisits || [];
+    const farmers      = window.farmers || [];
+    const farmVisits   = window.farmVisits || [];
+    const tripEnded    = window.tripEnded;
 
     if (!tripLogs.length) {
         console.warn("No trip logs found");
@@ -148,6 +298,16 @@ function initMap() {
         scaledSize: new google.maps.Size(60, 60)
     };
 
+    const farmerIcon = {
+        url: "{{ asset('img/farmer.png') }}",
+        scaledSize: new google.maps.Size(50, 50)
+    };
+
+    const farmVisitIcon = {
+        url: "{{ asset('img/farm-visit.png') }}",
+        scaledSize: new google.maps.Size(50, 50)
+    };
+
     // ---------- START ----------
     new google.maps.Marker({
         position: pathCoordinates[0],
@@ -156,33 +316,24 @@ function initMap() {
         title: "Start: " + (pathCoordinates[0].recorded_at ?? '')
     });
 
-    // ---------- MIDDLE ----------
-    // for (let i = 1; i < pathCoordinates.length - 1; i++) {
-    //     new google.maps.Marker({
-    //         position: pathCoordinates[i],
-    //         map,
-    //         icon: middleIcon,
-    //         title: pathCoordinates[i].recorded_at
-    //     });
-    // }
+    // ---------- MIDDLE POINTS ----------
     for (let i = 1; i < pathCoordinates.length - 1; i++) {
 
-        let iconToUse = middleIcon; // default mid-blue
+        let iconToUse = middleIcon;
 
         if (pathCoordinates[i].recorded_at) {
 
-            // recorded_at format: YYYY-MM-DD HH:mm:ss
             const date = new Date(pathCoordinates[i].recorded_at.replace(' ', 'T'));
-            const hour = date.getHours(); // 0–23
+            const hour = date.getHours();
 
             if (hour >= 6 && hour < 12) {
-                iconToUse = middleGreenIcon;   // 6 AM – 12 PM
+                iconToUse = middleGreenIcon;
             } 
             else if (hour >= 12 && hour < 18) {
-                iconToUse = middleIcon;        // 12 PM – 6 PM
+                iconToUse = middleIcon;
             } 
             else {
-                iconToUse = middleRedIcon;     // 6 PM – 12 AM
+                iconToUse = middleRedIcon;
             }
         }
 
@@ -222,12 +373,9 @@ function initMap() {
             },
             map,
             icon: partyIcon,
-
-            // 👉 cursor hover tooltip
             title: agroName
         });
 
-        // 👉 hover popup
         marker.addListener("mouseover", () => {
             infoWindow.setContent(`
                 <strong>${agroName}</strong><br>
@@ -240,6 +388,61 @@ function initMap() {
             infoWindow.close();
         });
     });
+
+    // ---------- FARMERS ----------
+    farmers.forEach(farmer => {
+
+        if (!farmer.latitude || !farmer.longitude) return;
+
+        const marker = new google.maps.Marker({
+            position: {
+                lat: parseFloat(farmer.latitude),
+                lng: parseFloat(farmer.longitude)
+            },
+            map,
+            icon: farmerIcon,
+            title: farmer.farmer_name ?? 'Farmer'
+        });
+
+        // 👉 CLICK POPUP
+        marker.addListener("click", () => {
+            infoWindow.setContent(`
+                <strong>Farmer</strong><br>
+                Name: ${farmer.farmer_name ?? 'N/A'}<br>
+                Date: ${farmer.created_at ?? ''}
+            `);
+            infoWindow.open(map, marker);
+        });
+
+    });
+
+    // ---------- FARM VISITS ----------
+    farmVisits.forEach(visit => {
+
+        if (!visit.latitude || !visit.longitude) return;
+
+        const marker = new google.maps.Marker({
+            position: {
+                lat: parseFloat(visit.latitude),
+                lng: parseFloat(visit.longitude)
+            },
+            map,
+            icon: farmVisitIcon,
+            title: visit.farmer_name ?? 'Farm Visit'
+        });
+
+        // 👉 CLICK POPUP
+        marker.addListener("click", () => {
+            infoWindow.setContent(`
+                <strong>Farm Visit</strong><br>
+                Farmer: ${visit.farmer_name ?? 'N/A'}<br>
+                Date: ${visit.created_at ?? ''}
+            `);
+            infoWindow.open(map, marker);
+        });
+
+    });
+
 }
 </script>
 

@@ -9,6 +9,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Models\Customer;
+use App\Models\Farmer;
+use App\Models\FarmVisit;
 use App\Models\PartyVisit;
 use App\Models\State;
 use App\Models\TourType;
@@ -262,9 +264,32 @@ class TripController extends Controller
             ];
         });
 
+        $farmers = Farmer::where('user_id', $trip->user_id)
+        ->whereDate('created_at', $trip->trip_date)
+        ->whereNotNull('latitude')
+        ->whereNotNull('longitude')
+        ->get(['latitude', 'longitude', 'created_at','farmer_name']);
+
+        $farmVisits = FarmVisit::with('farmer')
+            ->where('user_id', $trip->user_id)
+            ->whereDate('created_at', $trip->trip_date)
+            ->whereNotNull('latitude')
+            ->whereNotNull('longitude')
+            ->get()
+            ->map(function ($visit) {
+                return [
+                    'latitude' => $visit->latitude,
+                    'longitude' => $visit->longitude,
+                    'created_at' => $visit->created_at,
+
+                    // 👇 farmer name from relation
+                    'farmer_name' => $visit->farmer->farmer_name ?? 'Farmer',
+                ];
+            });
+
         // dd($partyVisits);
         
-        return view('admin.trips.show_new', compact('trip', 'tripLogs','partyVisits'));
+        return view('admin.trips.show_new', compact('trip', 'tripLogs','partyVisits','farmers','farmVisits'));
 
     }
 
@@ -391,12 +416,6 @@ class TripController extends Controller
 
         if ($status === 'approved') {
             $request->validate(['trip_type' => 'required|in:full,half']);
-            
-            // if ($request->has('trip_limit_override_confirm')) {
-            //     if ($request->input('trip_limit_override_confirm') == '0') {
-            //         return back()->with('error', 'Trip approval cancelled because KM was below the allowed limit.');
-            //     }
-            // }
         }
 
         $calculatedDistance = $this->calculateDistanceFromLogs($trip->id);
@@ -440,12 +459,6 @@ class TripController extends Controller
         return response()->json(['status' => 'success', 'log' => $log]);
     }
 
-    // public function logs(Trip $trip)
-    // {
-    //     return response()->json(
-    //         $trip->tripLogs()->select('latitude', 'longitude', 'recorded_at')->get()
-    //     );
-    // }
     public function logs(Trip $trip)
     {
         $logs = TripLog::where('trip_id', $trip->id)
@@ -515,16 +528,6 @@ class TripController extends Controller
     }
 
 
-    // private function calculateDistance($lat1, $lon1, $lat2, $lon2)
-    // {
-    //     $theta = $lon1 - $lon2;
-    //     $dist = sin(deg2rad($lat1)) * sin(deg2rad($lat2)) +
-    //         cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * cos(deg2rad($theta));
-    //     $dist = acos($dist);
-    //     $dist = rad2deg($dist);
-    //     $km   = $dist * 111.13384;
-    //     return round($km, 2);
-    // }
     private function calculateDistance($lat1, $lon1, $lat2, $lon2)
     {
         $theta = $lon1 - $lon2;
@@ -558,28 +561,4 @@ class TripController extends Controller
         return round($distance, 2);
     }
 
-    // public function getDropdownValues($type)
-    // {
-    //     $tableMap = [
-    //         'travel_mode' => 'travel_modes',
-    //         'purpose'     => 'purposes',
-    //         'tour_type'   => 'tour_types'
-    //     ];
-
-    //     if (!array_key_exists($type, $tableMap)) {
-    //         return response()->json(['status' => 'error', 'message' => 'Invalid type'], 400);
-    //     }
-
-    //     $user = Auth::user();
-    //     $query = DB::table($tableMap[$type])->orderBy('name');
-
-    //     if (!$user->hasRole('master_admin')) {
-    //         $query->where('company_id', $user->company_id);
-    //     }
-
-    //     // $values = $query->pluck('name');
-    //     $values = $query->get(['id', 'name']);
-
-    //     return response()->json(['status' => 'success', 'values' => $values]);
-    // }
 }
