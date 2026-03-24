@@ -35,6 +35,8 @@ return new class extends Migration
             $table->json('party_documents')->nullable();
             $table->enum('status', ['pending', 'approved', 'rejected', 'hold'])->default('pending');
             $table->text('remarks')->nullable();
+            $table->decimal('latitude', 10, 8)->nullable();
+            $table->decimal('longitude', 11, 8)->nullable();
             $table->timestamps();
         });
     }

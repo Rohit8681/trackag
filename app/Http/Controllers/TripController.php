@@ -286,10 +286,25 @@ class TripController extends Controller
                     'farmer_name' => $visit->farmer->farmer_name ?? 'Farmer',
                 ];
             });
+        $customers = Customer::where('user_id', $trip->user_id)
+        ->whereDate('created_at', $trip->trip_date)
+        ->whereNotNull('latitude')
+        ->whereNotNull('longitude')
+        ->get()
+        ->map(function ($customer) {
+            return [
+                'latitude' => $customer->latitude,
+                'longitude' => $customer->longitude,
+                'created_at' => $customer->created_at,
+
+                // 👇 agro name
+                'agro_name' => $customer->agro_name ?? 'Customer',
+            ];
+        });
 
         // dd($partyVisits);
         
-        return view('admin.trips.show_new', compact('trip', 'tripLogs','partyVisits','farmers','farmVisits'));
+        return view('admin.trips.show_new', compact('trip', 'tripLogs','partyVisits','farmers','farmVisits','customers'));
 
     }
 

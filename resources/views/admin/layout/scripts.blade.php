@@ -238,6 +238,7 @@ function initMap() {
     const partyVisits  = window.partyVisits || [];
     const farmers      = window.farmers || [];
     const farmVisits   = window.farmVisits || [];
+    const customers    = window.customers || []; // ✅ NEW
     const tripEnded    = window.tripEnded;
 
     if (!tripLogs.length) {
@@ -305,6 +306,11 @@ function initMap() {
 
     const farmVisitIcon = {
         url: "{{ asset('img/farm-visit.png') }}",
+        scaledSize: new google.maps.Size(50, 50)
+    };
+
+    const customerIcon = {
+        url: "{{ asset('img/customer.png') }}",
         scaledSize: new google.maps.Size(50, 50)
     };
 
@@ -404,7 +410,6 @@ function initMap() {
             title: farmer.farmer_name ?? 'Farmer'
         });
 
-        // 👉 CLICK POPUP
         marker.addListener("click", () => {
             infoWindow.setContent(`
                 <strong>Farmer</strong><br>
@@ -431,12 +436,37 @@ function initMap() {
             title: visit.farmer_name ?? 'Farm Visit'
         });
 
-        // 👉 CLICK POPUP
         marker.addListener("click", () => {
             infoWindow.setContent(`
                 <strong>Farm Visit</strong><br>
                 Farmer: ${visit.farmer_name ?? 'N/A'}<br>
                 Date: ${visit.created_at ?? ''}
+            `);
+            infoWindow.open(map, marker);
+        });
+
+    });
+
+    // ---------- CUSTOMERS (🆕 NEW) ----------
+    customers.forEach(customer => {
+
+        if (!customer.latitude || !customer.longitude) return;
+
+        const marker = new google.maps.Marker({
+            position: {
+                lat: parseFloat(customer.latitude),
+                lng: parseFloat(customer.longitude)
+            },
+            map,
+            icon: customerIcon,
+            title: customer.agro_name ?? 'Customer'
+        });
+
+        marker.addListener("click", () => {
+            infoWindow.setContent(`
+                <strong>Customer</strong><br>
+                Name: ${customer.agro_name ?? 'N/A'}<br>
+                Date: ${customer.created_at ?? ''}
             `);
             infoWindow.open(map, marker);
         });

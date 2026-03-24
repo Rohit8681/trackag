@@ -73,6 +73,7 @@
         window.partyVisits = @json($partyVisits);
         window.farmers   = @json($farmers);
         window.farmVisits = @json($farmVisits);
+        window.customers = @json($customers);
     </script>
 
     <!-- CSS -->

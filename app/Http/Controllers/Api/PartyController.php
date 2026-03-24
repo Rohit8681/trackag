@@ -127,6 +127,8 @@ class PartyController extends BaseController
             'visit_card_image'      => 'nullable|image|mimes:jpg,jpeg,png|max:10240',
             'party_documents.*'     => 'nullable|image|mimes:jpg,jpeg,png|max:10240',
             'user_id'               => 'nullable|integer',
+            'latitude' =>  'nullable|numeric',
+            'longitude' => 'nullable|numeric',
         ]);
 
         if ($request->hasFile('visit_card_image')) {
@@ -195,42 +197,6 @@ class PartyController extends BaseController
 
         return $this->sendResponse($customers, "Party list fetched successfully!");
     }
-
-        
-    // public function newPartyStore(Request $request)
-    // {
-
-    //     $validated = $request->validate([
-    //         'agro_name' => 'required|string',
-    //         'contact_person_name' => 'nullable|string',
-    //         'phone' => 'required|string|max:20',
-    //         'mobil_no_2' => 'required|string|max:20',
-    //         'state_id' => 'required|integer',
-    //         'district_id' => 'required|integer',
-    //         'tehsil_id' => 'required|integer',
-    //         'city' => 'required|integer',
-    //         'address' => 'required|string',
-    //         'gst_no' => 'required|string',
-    //         'working_with' => 'nullable|string',
-    //         'visit_card_image' => 'nullable|image|mimes:jpg,jpeg,png|max:10240',
-    //         'party_documents.*' => 'nullable|image|mimes:jpg,jpeg,png|max:10240',
-    //         'user_id' => 'nullable|integer',
-    //     ]);
-
-    //     $paths = [];
-    //     if ($request->hasFile('party_documents')) {
-    //         foreach ($request->file('party_documents') as $file) {
-    //             $paths[] = $file->store('party_documents', 'public');
-    //         }
-    //     }
-
-    //     $validated['party_documents'] = $paths;
-    //     $validated['visit_date'] = Carbon::now();
-    //     $validated['type'] = "mobile";
-
-    //     $customer = Customer::create($validated);
-
-    //     return $this->sendResponse($customer, "Customer saved successfully!");
-    // }
+    
 }
 

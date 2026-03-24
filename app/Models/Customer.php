@@ -36,6 +36,8 @@ class Customer extends Model
         'city',
         'mobil_no_2',
         'visit_card_image',
+        'latitude',
+        'longitude',
     ];
 
     protected $casts = [
