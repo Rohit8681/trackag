@@ -83,9 +83,5 @@ Route::middleware([TenantAuthenticate::class])->group(function () {
     Route::post('orders-store', [OrderController::class, 'store']);
     Route::post('orders-update/{id}', [OrderController::class, 'update']);
     Route::delete('orders-delete/{id}', [OrderController::class, 'destroy']);
-    
-
-
-
 
 });
