@@ -134,6 +134,7 @@ class ApiTripController extends BaseController
             'location.*.gps_status' => 'nullable',
             'location.*.battery_percentage' => 'nullable',
             'location.*.recorded_at' => 'nullable|date',
+            'location.*.mobile_status' => 'nullable|numeric',
         ]);
 
         $locations = $validated['location'];
@@ -155,10 +156,6 @@ class ApiTripController extends BaseController
         $logs = DB::transaction(function () use ($locations) {
             return collect($locations)->map(function ($loc) {
                 // if($loc['latitude'] != 0 && $loc['longitude'] != 0){
-                Log::info('Mobile Status Data:', [
-                        'tripId' => $loc['tripId'],
-                        'mobile_status' => $loc['mobile_status'] ?? 'not coming'
-                    ]);
                     return TripLog::create([
                         'trip_id' => $loc['tripId'],
                         'latitude' => $loc['latitude'],
