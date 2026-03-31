@@ -125,6 +125,7 @@ class ApiTripController extends BaseController
     
     public function logPoint(Request $request)
     {
+        Log::info('Full Request Data:', $request->all());
         $validated = $request->validate([
             'location' => 'required|array|min:1',
             'location.*.tripId' => 'required',
@@ -155,9 +156,9 @@ class ApiTripController extends BaseController
             return collect($locations)->map(function ($loc) {
                 // if($loc['latitude'] != 0 && $loc['longitude'] != 0){
                 Log::info('Mobile Status Data:', [
-            'tripId' => $loc['tripId'],
-            'mobile_status' => $loc['mobile_status'] ?? 'not coming'
-        ]);
+                        'tripId' => $loc['tripId'],
+                        'mobile_status' => $loc['mobile_status'] ?? 'not coming'
+                    ]);
                     return TripLog::create([
                         'trip_id' => $loc['tripId'],
                         'latitude' => $loc['latitude'],
