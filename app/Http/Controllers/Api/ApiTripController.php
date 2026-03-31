@@ -490,7 +490,7 @@ class ApiTripController extends BaseController
             ->latest()
             ->get()
             ->map(function ($data) {
-
+                dd($data);
                 return [
                     'id' => $data->id,
                     'trip_date' => $data->trip_date,
