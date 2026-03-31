@@ -72,6 +72,11 @@ class Trip extends Model
     {
         return $this->belongsTo(Purpose::class, 'purpose');
     }
+
+    public function purposeData()
+    {
+        return $this->belongsTo(Purpose::class, 'purpose');
+    }
     public function tourType(): BelongsTo
     {
         return $this->belongsTo(TourType::class, 'tour_type');

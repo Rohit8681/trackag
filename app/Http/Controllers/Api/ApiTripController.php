@@ -485,6 +485,7 @@ class ApiTripController extends BaseController
                 'tourType',
                 'travelMode',
                 'purpose',
+                'purposeData'
             ])
             ->where('user_id', $user->id)
             ->latest()
@@ -496,7 +497,7 @@ class ApiTripController extends BaseController
                     'trip_date' => $data->trip_date,
                     'tour_type' => optional($data->tourType)->name,
                     'travel_mode' => optional($data->travelMode)->name,
-                    'tour_purpose' => optional($data->purpose)->name,
+                    'tour_purpose' => optional($data->purposeData)->name,
                     'start_time' => $data->start_time,
                     'end_time' => $data->end_time,
                     'visit_place' => $data->place_to_visit,
