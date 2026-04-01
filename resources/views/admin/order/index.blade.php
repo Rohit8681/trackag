@@ -515,6 +515,7 @@
         ----------------------- */
 
         $(document).on('click', '.view-items-btn', function (e) {
+        alert('hello');
             e.preventDefault();
             let items = $(this).data('items');
             let status = $(this).data('status');
