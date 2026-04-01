@@ -14,121 +14,6 @@ use Illuminate\Support\Facades\Auth;
 
 class OrderController extends Controller
 {
-    // public function index(Request $request)
-    // {
-    //     $user = Auth::user();
-    //     $roleName = $user->getRoleNames()->first();
-    //     $query = Order::with([
-    //         'user.state',
-    //         'customer',
-    //         'depo',
-    //         'items.product',
-    //         'items.packing'
-    //     ])->latest();
-
-    //     if ($request->filled('state_id')) {
-    //         $query->whereHas('user', function ($q) use ($request) {
-    //             $q->where('state_id', $request->state_id);
-    //         });
-    //     }
-
-    //     if ($request->filled('user_id')) {
-    //         $query->where('user_id', $request->user_id);
-    //     }
-
-    //     if ($request->filled('party_id')) {
-    //         $query->where('party_id', $request->party_id);
-    //     }
-
-    //     if ($request->filled('product')) {
-    //         $query->whereHas('items.product', function ($q) use ($request) {
-    //             $q->where('name', 'like', "%{$request->product}%");
-    //         });
-    //     }
-
-    //     if ($request->filled('packing')) {
-    //         $query->whereHas('items.packing', function ($q) use ($request) {
-    //             $q->where('packing_size', 'like', "%{$request->packing}%");
-    //         });
-    //     }
-
-    //     if ($request->filled('order_type')) {
-    //         $query->where('order_type', $request->order_type);
-    //     }
-
-    //     if ($request->filled('order_no')) {
-    //         $query->where('order_no', 'like', "%{$request->order_no}%");
-    //     }
-
-    //     if ($request->filled('depo_id')) {
-    //         $query->where('depo_id', $request->depo_id);
-    //     }
-
-    //     if ($request->filled('status')) {
-    //         $query->where('status', $request->status);
-    //     }
-
-    //     $orders = $query->get();
-
-    //     $companyCount = Company::count();
-    //     $company = null;
-
-    //     if ($companyCount == 1) {
-    //         $company = Company::first();
-
-    //         if ($company && !empty($company->state)) {
-    //             $companyStates = array_map('intval', explode(',', $company->state));
-
-    //             if ($roleName === 'sub_admin') {
-    //                 $states = State::where('status', 1)
-    //                     ->whereIn('id', $companyStates)
-    //                     ->get();
-    //             } else {
-    //                 $states = empty($stateIds)
-    //                     ? collect()
-    //                     : State::where('status', 1)
-    //                         ->whereIn('id', $stateIds)
-    //                         ->get();
-    //             }
-    //         } else {
-    //             $states = in_array($roleName, ['master_admin', 'sub_admin'])
-    //                 ? State::where('status', 1)->get()
-    //                 : (empty($stateIds)
-    //                     ? collect()
-    //                     : State::where('status', 1)->whereIn('id', $stateIds)->get());
-    //         }
-    //     } else {
-    //         $states = in_array($roleName, ['master_admin', 'sub_admin'])
-    //             ? State::where('status', 1)->get()
-    //             : (empty($stateIds)
-    //                 ? collect()
-    //                 : State::where('status', 1)->whereIn('id', $stateIds)->get());
-    //     }
-    //     // $employees = User::select('id', 'name')->get();
-    //     if (in_array($roleName, ['master_admin', 'sub_admin'])) {
-    //         $employees = User::where('status', 'Active')->where('id', '!=', 1)->get();
-    //     } else {
-    //         $employees = empty($stateIds)
-    //             ? collect()
-    //             : User::where('status', 'Active')->where('id', '!=', 1)
-    //                 ->whereIn('state_id', $stateIds)
-    //                 ->where('reporting_to', $user->id)
-    //                 ->get();
-    //     }
-
-    //     $customer = Customer::where('is_active', true)->get();
-    //     $depos = Depo::where('status',1)->get();
-
-
-    //     return view('admin.order.index', [
-    //         'orders' => $orders,
-    //         'states' => $states,
-    //         'users' => $employees,
-    //         'customers' => $customer,
-    //         'depos' => $depos,
-    //     ]);
-    // }
-
     public function index(Request $request)
     {
         $user = Auth::user();
@@ -328,48 +213,104 @@ class OrderController extends Controller
         ]);
     }
 
-    public function create()
+    public function getDispatchData(Order $order)
     {
-        //
+        $order->load(['items.product', 'items.packing', 'customer', 'dispatches', 'items.dispatches']);
+        
+        $itemsData = $order->items->map(function ($item) {
+            $totalDispatched = $item->dispatches->sum('dispatch_qty');
+            $pendingQty = $item->qty - $totalDispatched;
+            
+            return [
+                'id' => $item->id,
+                'product' => optional($item->product)->product_name,
+                'packing_value' => optional($item->packing)->packing_value,
+                'packing' => optional($item->packing)->packing_size,
+                'price' => $item->price,
+                'gst' => $item->gst,
+                'discount' => $item->discount,
+                'order_qty' => $item->qty,
+                'dispatched_qty' => $totalDispatched,
+                'pending_qty' => $pendingQty,
+                'shipper_size' => $item->shipper_size,
+                'grand_total' => $item->grand_total
+            ];
+        });
+
+        return response()->json([
+            'status' => true,
+            'order' => [
+                'id' => $order->id,
+                'order_no' => $order->order_no,
+                'status' => $order->status
+            ],
+            'items' => $itemsData,
+            'dispatches' => $order->dispatches
+        ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function storeDispatch(Request $request)
     {
-        //
+        $request->validate([
+            'order_id'       => 'required|exists:orders,id',
+            'dispatch_items' => 'required|array',
+            'dispatch_items.*.item_id' => 'required|exists:order_items,id',
+            'dispatch_items.*.dispatch_qty' => 'required|integer|min:0',
+            'lr_number'      => 'nullable|string',
+            'transport_name' => 'nullable|string',
+            'vehicle_no'     => 'nullable|string',
+            'dispatch_image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
+        ]);
+
+        $order = Order::with('items')->findOrFail($request->order_id);
+        
+        $imagePath = null;
+        if ($request->hasFile('dispatch_image')) {
+            $imagePath = $request->file('dispatch_image')->store('dispatch_images', 'public');
+        }
+
+        $totalItemsPendingAfterDispatch = 0;
+        $anyDispatched = false;
+
+        foreach ($request->dispatch_items as $dispatchItem) {
+            if ($dispatchItem['dispatch_qty'] > 0) {
+                \App\Models\OrderDispatch::create([
+                    'order_id' => $order->id,
+                    'order_item_id' => $dispatchItem['item_id'],
+                    'dispatch_qty' => $dispatchItem['dispatch_qty'],
+                    'lr_number' => $request->lr_number,
+                    'transport_name' => $request->transport_name,
+                    'vehicle_no' => $request->vehicle_no,
+                    'dispatch_date' => now(),
+                    'dispatch_image' => $imagePath
+                ]);
+                $anyDispatched = true;
+            }
+            // Check remaining qty for this item
+            $item = $order->items->where('id', $dispatchItem['item_id'])->first();
+            if ($item) {
+                // Total previously dispatched + this dispatch
+                $totalDispatched = \App\Models\OrderDispatch::where('order_item_id', $item->id)->sum('dispatch_qty');
+                $pending = $item->qty - $totalDispatched;
+                if ($pending > 0) {
+                    $totalItemsPendingAfterDispatch += $pending;
+                }
+            }
+        }
+
+        if ($anyDispatched) {
+            if ($totalItemsPendingAfterDispatch == 0) {
+                $order->status = 'dispatched';
+            } else {
+                $order->status = 'part_dispatched';
+            }
+            $order->save();
+        }
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Dispatch saved successfully'
+        ]);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
-    }
 }

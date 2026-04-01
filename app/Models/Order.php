@@ -31,6 +31,11 @@ class Order extends Model
         return $this->hasMany(OrderItem::class);
     }
 
+    public function dispatches()
+    {
+        return $this->hasMany(OrderDispatch::class);
+    }
+
     public function customer()
     {
         return $this->belongsTo(Customer::class, 'party_id', 'id');
