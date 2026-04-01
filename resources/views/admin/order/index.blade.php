@@ -176,20 +176,9 @@
                                                                     <tr>
 
                                                                         <td>
-                                                                            <button class="btn btn-sm btn-info view-items-btn" data-bs-toggle="modal"
-                                                                                data-bs-target="#orderItemsModal" data-items="{{ json_encode($order->items->map(function ($item) {
-                                            return [
-                                                'id' => $item->id,
-                                                'product' => optional($item->product)->product_name,
-                                                'packing_value' => optional($item->packing)->packing_value,
-                                                'packing' => optional($item->packing)->packing_size,
-                                                'price' => $item->price,
-                                                'gst' => $item->gst,
-                                                'discount' => $item->discount,
-                                                                                'qty' => $item->qty,
-                                                                                'grand_total' => $item->grand_total
-                                                                            ];
-                                                                        })) }}" data-status="{{ $order->status }}">
+                                                                            <button class="btn btn-sm btn-info view-items-btn"
+                                                                                data-id="{{ $order->id }}"
+                                                                                data-status="{{ $order->status }}">
                                                                                 <i class="fas fa-plus"></i>
                                                                             </button>
                                                                         </td>
@@ -515,36 +504,52 @@
         ----------------------- */
 
         $(document).on('click', '.view-items-btn', function (e) {
-        alert('hello');
             e.preventDefault();
-            let items = $(this).data('items');
+            let order_id = $(this).data('id');
             let status = $(this).data('status');
+            console.log("View Items clicked! Order ID:", order_id, "Status:", status);
             let isEditable = (status === 'pending' || status === 'hold');
+            
+            $('#orderItemsModal').modal('show');
             let tbody = $('#modalItemsBody');
-            tbody.empty();
+            tbody.html('<tr><td colspan="8" class="text-center py-4"><i class="fas fa-spinner fa-spin fa-2x text-primary"></i> Loading items...</td></tr>');
 
-            if (items.length > 0) {
-                $.each(items, function (index, item) {
-                    let row = `
-                <tr data-id="${item.id}" data-price="${item.price}" data-gst="${item.gst}" data-discount="${item.discount}">
-                    <td>${item.product ? item.product : '-'}</td>
-                    <td>
-    ${item.packing_value && item.packing ? item.packing_value + ' ' + item.packing : '-'}
-    </td>
-                    <td><input type="number" class="form-control form-control-sm item-price" value="${item.price}" readonly step="0.01" style="width: 80px; background-color: #e9ecef;"></td>
-                    <td><input type="number" class="form-control form-control-sm item-gst" value="${item.gst}" readonly step="0.01" style="width: 70px; background-color: #e9ecef;"></td>
-                    <td><input type="number" class="form-control form-control-sm item-discount" value="${item.discount}" readonly step="0.01" style="width: 80px; background-color: #e9ecef;"></td>
-                    <td><input type="number" class="form-control form-control-sm item-qty bg-white border-primary fw-bold" value="${item.qty}" min="1" step="1" style="width: 70px;" ${!isEditable ? 'disabled' : ''}></td>
-                    <td class="item-grand-total align-middle font-weight-bold">₹ ${parseFloat(item.grand_total).toFixed(2)}</td>
-                    <td class="align-middle">
-                        ${isEditable ? \`<button class="btn btn-sm btn-primary update-item-btn"><i class="fas fa-save"></i> Save</button>\` : \`<span class="badge bg-secondary">Readonly</span>\`}
-                    </td>
-                </tr>`;
-                    tbody.append(row);
-                });
-            } else {
-                tbody.append('<tr><td colspan="8" class="text-center">No items found.</td></tr>');
-            }
+            $.ajax({
+                url: `/admin/order/${order_id}/dispatch-data`,
+                type: 'GET',
+                success: function(res) {
+                    if (res.status && res.items) {
+                        tbody.empty();
+                        let items = res.items;
+                        if (items.length > 0) {
+                            $.each(items, function (index, item) {
+                                let packing = (item.packing_value && item.packing) ? item.packing_value + ' ' + item.packing : '-';
+                                let row = `
+                            <tr data-id="${item.id}" data-price="${item.price}" data-gst="${item.gst}" data-discount="${item.discount}">
+                                <td>${item.product ? item.product : '-'}</td>
+                                <td>${packing}</td>
+                                <td><input type="number" class="form-control form-control-sm item-price" value="${item.price}" readonly step="0.01" style="width: 80px; background-color: #e9ecef;"></td>
+                                <td><input type="number" class="form-control form-control-sm item-gst" value="${item.gst}" readonly step="0.01" style="width: 70px; background-color: #e9ecef;"></td>
+                                <td><input type="number" class="form-control form-control-sm item-discount" value="${item.discount}" readonly step="0.01" style="width: 80px; background-color: #e9ecef;"></td>
+                                <td><input type="number" class="form-control form-control-sm item-qty bg-white border-primary fw-bold" value="${item.order_qty}" min="1" step="1" style="width: 70px;" ${!isEditable ? 'disabled' : ''}></td>
+                                <td class="item-grand-total align-middle font-weight-bold">₹ ${parseFloat(item.grand_total).toFixed(2)}</td>
+                                <td class="align-middle">
+                                    ${isEditable ? \`<button class="btn btn-sm btn-primary update-item-btn"><i class="fas fa-save"></i></button>\` : \`<span class="badge bg-secondary">Readonly</span>\`}
+                                </td>
+                            </tr>`;
+                                tbody.append(row);
+                            });
+                        } else {
+                            tbody.append('<tr><td colspan="8" class="text-center">No items found.</td></tr>');
+                        }
+                    } else {
+                        tbody.html('<tr><td colspan="8" class="text-center text-danger">Failed to load data.</td></tr>');
+                    }
+                },
+                error: function() {
+                    tbody.html('<tr><td colspan="8" class="text-center text-danger">Error loading details.</td></tr>');
+                }
+            });
         });
 
         // Recalculate on qty change
@@ -706,18 +711,21 @@
         ----------------------- */
 
         function openDispatchModal(orderId) {
+            console.log("Opening Dispatch Modal for Order ID:", orderId);
             $('#dispatch_order_id').val(orderId);
             $('#dispatchForm')[0].reset();
-            $('#dispatchItemsBody').html('<tr><td colspan="10" class="text-center py-4"><i class="fas fa-spinner fa-spin fa-2x text-primary"></i></td></tr>');
+            $('#dispatchItemsBody').html('<tr><td colspan="10" class="text-center py-4"><i class="fas fa-spinner fa-spin fa-2x text-primary"></i> Loading...</td></tr>');
             $('#previousDispatchesCard').hide();
             $('#btnPartDispatch, #btnFullDispatch').addClass('d-none');
             
             $('#dispatchModal').modal('show');
 
+            console.log("Fetching dispatch data via AJAX...");
             $.ajax({
                 url: `/admin/order/${orderId}/dispatch-data`,
                 type: 'GET',
                 success: function(res) {
+                    console.log("Dispatch data response:", res);
                     if (res.status) {
                         renderDispatchItems(res.items);
                         renderDispatchHistory(res.dispatches, res.items);
