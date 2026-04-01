@@ -16,11 +16,6 @@ return new class extends Migration
             $table->unsignedBigInteger('order_id');
             $table->unsignedBigInteger('order_item_id');
             $table->integer('dispatch_qty');
-            $table->string('lr_number')->nullable();
-            $table->string('transport_name')->nullable();
-            $table->string('vehicle_no')->nullable();
-            $table->dateTime('dispatch_date')->nullable();
-            $table->string('dispatch_image')->nullable();
             
             $table->foreign('order_id')->references('id')->on('orders')->onDelete('cascade');
             $table->foreign('order_item_id')->references('id')->on('order_items')->onDelete('cascade');

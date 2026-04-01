@@ -186,10 +186,10 @@
                                                 'price' => $item->price,
                                                 'gst' => $item->gst,
                                                 'discount' => $item->discount,
-                                                'qty' => $item->qty,
-                                                'grand_total' => $item->grand_total
-                                            ];
-                                        })) }}">
+                                                                                'qty' => $item->qty,
+                                                                                'grand_total' => $item->grand_total
+                                                                            ];
+                                                                        })) }}" data-status="{{ $order->status }}">
                                                                                 <i class="fas fa-plus"></i>
                                                                             </button>
                                                                         </td>
@@ -276,12 +276,6 @@
         DISPATCHED
     </option>
 
-    {{-- Edit / Dispatch (Trigger) --}}
-    <option value="edit"
-        {{ !in_array($order->status, ['approved', 'part_dispatched']) ? 'disabled' : '' }}>
-        EDIT
-    </option>
-
 </select>
                                                                         </td>
 
@@ -323,6 +317,7 @@
                                     <th>Discount</th>
                                     <th>Qty</th>
                                     <th>Total</th>
+                                    <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody id="modalItemsBody">
@@ -522,13 +517,15 @@
         $(document).on('click', '.view-items-btn', function (e) {
             e.preventDefault();
             let items = $(this).data('items');
+            let status = $(this).data('status');
+            let isEditable = (status === 'pending' || status === 'hold');
             let tbody = $('#modalItemsBody');
             tbody.empty();
 
             if (items.length > 0) {
                 $.each(items, function (index, item) {
                     let row = `
-                <tr data-id="${item.id}">
+                <tr data-id="${item.id}" data-price="${item.price}" data-gst="${item.gst}" data-discount="${item.discount}">
                     <td>${item.product ? item.product : '-'}</td>
                     <td>
     ${item.packing_value && item.packing ? item.packing_value + ' ' + item.packing : '-'}
@@ -536,15 +533,74 @@
                     <td><input type="number" class="form-control form-control-sm item-price" value="${item.price}" readonly step="0.01" style="width: 80px; background-color: #e9ecef;"></td>
                     <td><input type="number" class="form-control form-control-sm item-gst" value="${item.gst}" readonly step="0.01" style="width: 70px; background-color: #e9ecef;"></td>
                     <td><input type="number" class="form-control form-control-sm item-discount" value="${item.discount}" readonly step="0.01" style="width: 80px; background-color: #e9ecef;"></td>
-                    <td><input type="number" class="form-control form-control-sm item-qty bg-white border-primary fw-bold" value="${item.qty}" min="1" disabled step="1" style="width: 70px;"></td>
+                    <td><input type="number" class="form-control form-control-sm item-qty bg-white border-primary fw-bold" value="${item.qty}" min="1" step="1" style="width: 70px;" ${!isEditable ? 'disabled' : ''}></td>
                     <td class="item-grand-total align-middle font-weight-bold">₹ ${parseFloat(item.grand_total).toFixed(2)}</td>
-                    <td class="item-grand-total align-middle font-weight-bold">₹ ${parseFloat(item.grand_total).toFixed(2)}</td>
+                    <td class="align-middle">
+                        ${isEditable ? \`<button class="btn btn-sm btn-primary update-item-btn"><i class="fas fa-save"></i> Save</button>\` : \`<span class="badge bg-secondary">Readonly</span>\`}
+                    </td>
                 </tr>`;
                     tbody.append(row);
                 });
             } else {
                 tbody.append('<tr><td colspan="8" class="text-center">No items found.</td></tr>');
             }
+        });
+
+        // Recalculate on qty change
+        $(document).on('input', '.item-qty', function() {
+            let tr = $(this).closest('tr');
+            let qty = parseInt($(this).val()) || 1;
+            if (qty < 1) {
+                qty = 1;
+                $(this).val(qty);
+            }
+            let price = parseFloat(tr.data('price')) || 0;
+            let gst = parseFloat(tr.data('gst')) || 0;
+            let discount = parseFloat(tr.data('discount')) || 0;
+
+            let total = price * qty;
+            let totalAfterDiscount = total - discount;
+            if(totalAfterDiscount < 0) totalAfterDiscount = 0;
+
+            let gstAmount = (totalAfterDiscount * gst) / 100;
+            let grandTotal = totalAfterDiscount + gstAmount;
+
+            tr.find('.item-grand-total').text('₹ ' + grandTotal.toFixed(2));
+        });
+
+        // Save Edit Qty
+        $(document).on('click', '.update-item-btn', function (e) {
+            e.preventDefault();
+            let btn = $(this);
+            let tr = btn.closest('tr');
+            let item_id = tr.data('id');
+            let qty = tr.find('.item-qty').val();
+
+            let originalHtml = btn.html();
+            btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i>');
+
+            $.ajax({
+                url: "{{ route('order.item.update') }}",
+                type: "POST",
+                data: {
+                    _token: "{{ csrf_token() }}",
+                    item_id: item_id,
+                    qty: qty
+                },
+                success: function (res) {
+                    if (res.success) {
+                        alert('Quantity updated successfully! Page will refresh to update totals.');
+                        location.reload();
+                    } else {
+                        btn.prop('disabled', false).html(originalHtml);
+                        alert(res.message);
+                    }
+                },
+                error: function () {
+                    btn.prop('disabled', false).html(originalHtml);
+                    alert('Failed to update quantity.');
+                }
+            });
         });
 
         /* -----------------------
@@ -558,36 +614,21 @@
 
             console.log("status change", order_id, status);
 
-            if (status === 'edit') {
+            if (status === 'part_dispatched' || status === 'dispatched') {
                 $(this).val($(this).find('option[selected]').val() || $(this).find('option:first').val());
                 openDispatchModal(order_id);
                 return;
             }
 
             $('#modal_order_id').val(order_id);
-
             $('#remark_box').hide();
             $('#dispatch_box').hide();
 
-
             if (status === 'hold' || status === 'rejected') {
-
                 $('#remark_box').show();
                 $('#statusModal').modal('show');
-
-            }
-
-            else if (status === 'part_dispatched' || status === 'dispatched') {
-
-                $('#dispatch_box').show();
-                $('#statusModal').modal('show');
-
-            }
-
-            else {
-
+            } else {
                 updateStatus(order_id, status);
-
             }
 
         });
@@ -771,20 +812,21 @@
 
                 $.each(dispatches, function(index, d) {
                     let itemName = map[d.order_item_id] || 'Unknown';
+                    let detail = d.detail || {};
                     let imgHtml = '-';
-                    if (d.dispatch_image) {
-                        imgHtml = `<a href="/storage/${d.dispatch_image}" target="_blank" class="btn btn-sm btn-outline-primary"><i class="fas fa-image"></i> View</a>`;
+                    if (detail.dispatch_image) {
+                        imgHtml = `<a href="/storage/${detail.dispatch_image}" target="_blank" class="btn btn-sm btn-outline-primary"><i class="fas fa-image"></i> View</a>`;
                     }
-                    let dateStr = d.dispatch_date ? d.dispatch_date.substring(0, 10) : '-';
+                    let dateStr = detail.dispatch_date ? detail.dispatch_date.substring(0, 10) : '-';
                     
                     let row = `
                     <tr>
                         <td>${dateStr}</td>
                         <td class="fw-bold">${itemName}</td>
                         <td><span class="badge bg-secondary font-monospace fs-6">${d.dispatch_qty}</span></td>
-                        <td>${d.lr_number || '-'}</td>
-                        <td>${d.transport_name || '-'}</td>
-                        <td>${d.vehicle_no || '-'}</td>
+                        <td>${detail.lr_number || '-'}</td>
+                        <td>${detail.transport_name || '-'}</td>
+                        <td>${detail.vehicle_no || '-'}</td>
                         <td>${imgHtml}</td>
                     </tr>`;
                     tbody.append(row);

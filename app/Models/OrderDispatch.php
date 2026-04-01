@@ -12,12 +12,7 @@ class OrderDispatch extends Model
     protected $fillable = [
         'order_id',
         'order_item_id',
-        'dispatch_qty',
-        'lr_number',
-        'transport_name',
-        'vehicle_no',
-        'dispatch_date',
-        'dispatch_image'
+        'dispatch_qty'
     ];
 
     public function order()
@@ -28,5 +23,10 @@ class OrderDispatch extends Model
     public function orderItem()
     {
         return $this->belongsTo(OrderItem::class);
+    }
+
+    public function detail()
+    {
+        return $this->hasOne(OrderDispatchDetail::class);
     }
 }

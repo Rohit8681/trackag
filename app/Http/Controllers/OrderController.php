@@ -215,7 +215,7 @@ class OrderController extends Controller
 
     public function getDispatchData(Order $order)
     {
-        $order->load(['items.product', 'items.packing', 'customer', 'dispatches', 'items.dispatches']);
+        $order->load(['items.product', 'items.packing', 'customer', 'dispatches.detail', 'items.dispatches']);
         
         $itemsData = $order->items->map(function ($item) {
             $totalDispatched = $item->dispatches->sum('dispatch_qty');
@@ -274,10 +274,13 @@ class OrderController extends Controller
 
         foreach ($request->dispatch_items as $dispatchItem) {
             if ($dispatchItem['dispatch_qty'] > 0) {
-                \App\Models\OrderDispatch::create([
+                $disp = \App\Models\OrderDispatch::create([
                     'order_id' => $order->id,
                     'order_item_id' => $dispatchItem['item_id'],
-                    'dispatch_qty' => $dispatchItem['dispatch_qty'],
+                    'dispatch_qty' => $dispatchItem['dispatch_qty']
+                ]);
+                \App\Models\OrderDispatchDetail::create([
+                    'order_dispatch_id' => $disp->id,
                     'lr_number' => $request->lr_number,
                     'transport_name' => $request->transport_name,
                     'vehicle_no' => $request->vehicle_no,
