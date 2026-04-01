@@ -534,7 +534,7 @@
                                 <td><input type="number" class="form-control form-control-sm item-qty bg-white border-primary fw-bold" value="${item.order_qty}" min="1" step="1" style="width: 70px;" ${!isEditable ? 'disabled' : ''}></td>
                                 <td class="item-grand-total align-middle font-weight-bold">₹ ${parseFloat(item.grand_total).toFixed(2)}</td>
                                 <td class="align-middle">
-                                    ${isEditable ? \`<button class="btn btn-sm btn-primary update-item-btn"><i class="fas fa-save"></i></button>\` : \`<span class="badge bg-secondary">Readonly</span>\`}
+                                    ${isEditable ? `<button class="btn btn-sm btn-primary update-item-btn"><i class="fas fa-save"></i></button>` : `<span class="badge bg-secondary">Readonly</span>`}
                                 </td>
                             </tr>`;
                                 tbody.append(row);
