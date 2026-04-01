@@ -183,6 +183,8 @@ Route::middleware(['web'])->group(function () {
             
             Route::post('order-status-update', [OrderController::class, 'updateStatus'])->name('order.status.update');
             Route::post('order/item/update', [OrderController::class, 'updateItem'])->name('order.item.update');
+            Route::get('order/{order}/dispatch-data', [OrderController::class, 'getDispatchData'])->name('order.dispatch.data');
+            Route::post('order/dispatch/store', [OrderController::class, 'storeDispatch'])->name('order.dispatch.store');
             Route::resource('order', OrderController::class);
             Route::resource('stock', StockController::class);
 

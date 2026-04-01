@@ -276,6 +276,12 @@
         DISPATCHED
     </option>
 
+    {{-- Edit / Dispatch (Trigger) --}}
+    <option value="edit"
+        {{ !in_array($order->status, ['approved', 'part_dispatched']) ? 'disabled' : '' }}>
+        EDIT
+    </option>
+
 </select>
                                                                         </td>
 
@@ -317,13 +323,116 @@
                                     <th>Discount</th>
                                     <th>Qty</th>
                                     <th>Total</th>
-                                    <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody id="modalItemsBody">
                             </tbody>
                         </table>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- DISPATCH MODAL -->
+    <div class="modal fade" id="dispatchModal" tabindex="-1" aria-labelledby="dispatchModalLabel" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="dispatchModalLabel">Dispatch Management Panel</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body bg-light">
+                    <form id="dispatchForm" enctype="multipart/form-data">
+                        <input type="hidden" id="dispatch_order_id" name="order_id">
+                        
+                        <!-- Top LR Details Section -->
+                        <div class="card mb-3 shadow-sm border-0">
+                            <div class="card-header bg-white">
+                                <h6 class="mb-0 fw-bold">Dispatch Information</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    <div class="col-md-3">
+                                        <label class="form-label text-muted small fw-bold">LR Number</label>
+                                        <input type="text" name="lr_number" id="dispatch_lr_number" class="form-control" placeholder="Enter LR No">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label text-muted small fw-bold">Transport Name</label>
+                                        <input type="text" name="transport_name" id="dispatch_transport_name" class="form-control" placeholder="Enter Transport">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label text-muted small fw-bold">Vehicle Number</label>
+                                        <input type="text" name="vehicle_no" id="dispatch_vehicle_no" class="form-control" placeholder="Enter Vehicle No">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label text-muted small fw-bold">Dispatch Image</label>
+                                        <input type="file" name="dispatch_image" id="dispatch_img_upload" class="form-control" accept="image/jpeg,image/png,image/jpg">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Items Table -->
+                        <div class="card mb-3 shadow-sm border-0">
+                            <div class="card-header bg-white">
+                                <h6 class="mb-0 fw-bold">Order Items</h6>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-hover align-middle mb-0" id="dispatchItemsTable">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Product</th>
+                                            <th>Packing</th>
+                                            <th>Price</th>
+                                            <th>Shipper Size</th>
+                                            <th>Order Qty</th>
+                                            <th class="bg-primary text-white" style="width: 120px;">Dispatch Qty</th>
+                                            <th>Pending Qty</th>
+                                            <th>Total Price</th>
+                                            <th>GST (%)</th>
+                                            <th>Grand Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="dispatchItemsBody">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Previous Dispatches -->
+                        <div class="card shadow-sm border-0" id="previousDispatchesCard" style="display:none;">
+                            <div class="card-header bg-white">
+                                <h6 class="mb-0 fw-bold"><i class="fas fa-history text-secondary me-2"></i>Dispatch History</h6>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-striped mb-0">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Date</th>
+                                                <th>Item</th>
+                                                <th>Qty</th>
+                                                <th>LR Number</th>
+                                                <th>Transport</th>
+                                                <th>Vehicle</th>
+                                                <th>Image</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="previousDispatchesBody">
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+                <div class="modal-footer bg-white">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-warning d-none text-dark fw-bold" id="btnPartDispatch">Part Dispatch</button>
+                    <button type="button" class="btn btn-success d-none fw-bold" id="btnFullDispatch">Dispatch</button>
                 </div>
             </div>
         </div>
@@ -429,11 +538,7 @@
                     <td><input type="number" class="form-control form-control-sm item-discount" value="${item.discount}" readonly step="0.01" style="width: 80px; background-color: #e9ecef;"></td>
                     <td><input type="number" class="form-control form-control-sm item-qty bg-white border-primary fw-bold" value="${item.qty}" min="1" disabled step="1" style="width: 70px;"></td>
                     <td class="item-grand-total align-middle font-weight-bold">₹ ${parseFloat(item.grand_total).toFixed(2)}</td>
-                    <td class="align-middle">
-                        <button class="btn btn-sm btn-primary edit-item-btn"><i class="fas fa-edit"></i></button>
-                        <button class="btn btn-sm btn-success save-item-btn d-none"><i class="fas fa-save"></i></button>
-                        <button class="btn btn-sm btn-secondary cancel-item-btn d-none"><i class="fas fa-times"></i></button>
-                    </td>
+                    <td class="item-grand-total align-middle font-weight-bold">₹ ${parseFloat(item.grand_total).toFixed(2)}</td>
                 </tr>`;
                     tbody.append(row);
                 });
@@ -441,119 +546,6 @@
                 tbody.append('<tr><td colspan="8" class="text-center">No items found.</td></tr>');
             }
         });
-
-        $(document).on('click', '.edit-item-btn', function () {
-            let tr = $(this).closest('tr');
-            tr.find('.item-qty').prop('disabled', false).focus();
-            $(this).addClass('d-none');
-            tr.find('.save-item-btn').removeClass('d-none');
-            tr.find('.cancel-item-btn').removeClass('d-none');
-
-            // Check if original data attributes are stored, if not, store them.
-            if (typeof tr.data('orig-qty') === "undefined") {
-                tr.data('orig-qty', tr.find('.item-qty').val());
-                tr.data('orig-grand-total', tr.find('.item-grand-total').text());
-            }
-        });
-
-        $(document).on('keydown', '.item-qty', function(e) {
-            // Prevent entering minus '-' or 'e' (scientific notation)
-            if (e.key === '-' || e.key === 'e' || e.key === 'E') {
-                e.preventDefault();
-            }
-        });
-
-        $(document).on('input', '.item-qty', function () {
-            let tr = $(this).closest('tr');
-            
-            // Validate and constrain quantity
-            let qtyVal = parseInt($(this).val());
-            if (isNaN(qtyVal) || qtyVal < 1) {
-                // To avoid resetting while typing normally, only coerce immediate negatives or 0.
-                if ($(this).val() !== "") {
-                    qtyVal = 1;
-                    $(this).val(qtyVal);
-                } else {
-                    qtyVal = 1; // Used for calculations while blank, but don't force '1' randomly
-                }
-            }
-
-            let price = parseFloat(tr.find('.item-price').val()) || 0;
-            let gst = parseFloat(tr.find('.item-gst').val()) || 0;
-            let discount = parseFloat(tr.find('.item-discount').val()) || 0;
-            let qty = qtyVal;
-            
-            let amount = price * qty;
-            let amountAfterDiscount = amount - discount;
-            let gstAmount = (amountAfterDiscount * gst) / 100;
-            let grandTotal = amountAfterDiscount + gstAmount;
-            
-            tr.find('.item-grand-total').html('₹ ' + grandTotal.toFixed(2));
-        });
-
-        $(document).on('click', '.cancel-item-btn', function () {
-            let tr = $(this).closest('tr');
-            tr.find('.item-qty').prop('disabled', true);
-
-            // Restore original values
-            tr.find('.item-qty').val(tr.data('orig-qty'));
-            tr.find('.item-grand-total').text(tr.data('orig-grand-total'));
-
-            tr.find('.save-item-btn').addClass('d-none');
-            tr.find('.cancel-item-btn').addClass('d-none');
-            tr.find('.edit-item-btn').removeClass('d-none');
-        });
-
-        $(document).on('click', '.save-item-btn', function () {
-            let btn = $(this);
-            let tr = btn.closest('tr');
-
-            let itemId = tr.data('id');
-            let qty = tr.find('.item-qty').val();
-
-            if (!qty) {
-                alert('Qty is required!');
-                return;
-            }
-
-            let originalHtml = btn.html();
-
-            $.ajax({
-                url: "{{ route('order.item.update') }}",
-                type: "POST",
-                data: {
-                    _token: "{{ csrf_token() }}",
-                    item_id: itemId,
-                    qty: qty
-                },
-                beforeSend: function () {
-                    btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i>');
-                },
-                success: function (res) {
-                    btn.prop('disabled', false).html(originalHtml);
-                    if (res.success) {
-                        // Update grand total
-                        tr.find('.item-grand-total').html('₹ ' + res.data.grand_total);
-                        tr.find('.item-qty').prop('disabled', true);
-
-                        // Update original data
-                        tr.data('orig-qty', qty);
-                        tr.data('orig-grand-total', '₹ ' + res.data.grand_total);
-
-                        btn.addClass('d-none');
-                        tr.find('.cancel-item-btn').addClass('d-none');
-                        tr.find('.edit-item-btn').removeClass('d-none');
-                    } else {
-                        alert(res.message || 'Error occurred');
-                    }
-                },
-                error: function (xhr) {
-                    btn.prop('disabled', false).html(originalHtml);
-                    alert('An error occurred during update. Please try again.');
-                }
-            });
-        });
-
 
         /* -----------------------
            STATUS CHANGE
@@ -565,6 +557,12 @@
             let order_id = $(this).data('id');
 
             console.log("status change", order_id, status);
+
+            if (status === 'edit') {
+                $(this).val($(this).find('option[selected]').val() || $(this).find('option:first').val());
+                openDispatchModal(order_id);
+                return;
+            }
 
             $('#modal_order_id').val(order_id);
 
@@ -660,6 +658,201 @@
 
         });
 
+
+        /* -----------------------
+           DISPATCH MODAL & AJAX
+        ----------------------- */
+
+        function openDispatchModal(orderId) {
+            $('#dispatch_order_id').val(orderId);
+            $('#dispatchForm')[0].reset();
+            $('#dispatchItemsBody').html('<tr><td colspan="10" class="text-center py-4"><i class="fas fa-spinner fa-spin fa-2x text-primary"></i></td></tr>');
+            $('#previousDispatchesCard').hide();
+            $('#btnPartDispatch, #btnFullDispatch').addClass('d-none');
+            
+            $('#dispatchModal').modal('show');
+
+            $.ajax({
+                url: `/admin/order/${orderId}/dispatch-data`,
+                type: 'GET',
+                success: function(res) {
+                    if (res.status) {
+                        renderDispatchItems(res.items);
+                        renderDispatchHistory(res.dispatches, res.items);
+                    } else {
+                        alert('Failed to load dispatch data');
+                        $('#dispatchModal').modal('hide');
+                    }
+                },
+                error: function() {
+                    alert('Error loading dispatch data');
+                    $('#dispatchModal').modal('hide');
+                }
+            });
+        }
+
+        function renderDispatchItems(items) {
+            let tbody = $('#dispatchItemsBody');
+            tbody.empty();
+            let totalPendingGlobally = 0;
+
+            if (items.length > 0) {
+                $.each(items, function (index, item) {
+                    totalPendingGlobally += item.pending_qty;
+                    let row = `
+                    <tr data-id="${item.id}" data-price="${item.price}" data-gst="${item.gst}" data-discount="${item.discount}" data-pending="${item.pending_qty}">
+                        <td class="fw-bold">${item.product || '-'}</td>
+                        <td>${item.packing_value && item.packing ? item.packing_value + ' ' + item.packing : '-'}</td>
+                        <td>₹${parseFloat(item.price).toFixed(2)}</td>
+                        <td>${item.shipper_size || '-'}</td>
+                        <td class="text-center"><span class="badge bg-secondary px-2 py-1">${item.order_qty}</span></td>
+                        <td class="bg-primary bg-opacity-10 p-2">
+                            <input type="number" class="form-control form-control-sm dispatch-qty-input fw-bold text-center border-primary shadow-sm" 
+                                value="0" min="0" max="${item.pending_qty}" ${item.pending_qty === 0 ? 'disabled' : ''}>
+                        </td>
+                        <td class="text-center"><span class="badge bg-${item.pending_qty > 0 ? 'warning text-dark' : 'success'} px-2 py-1 item-pending-text">${item.pending_qty}</span></td>
+                        <td class="item-total-price">₹0.00</td>
+                        <td>${item.gst}%</td>
+                        <td class="item-grand-total fw-bold text-success">₹0.00</td>
+                    </tr>`;
+                    tbody.append(row);
+                });
+
+                if (totalPendingGlobally > 0) {
+                    $('#btnPartDispatch').removeClass('d-none');
+                    $('#btnFullDispatch').removeClass('d-none');
+                }
+            } else {
+                tbody.append('<tr><td colspan="10" class="text-center">No items found.</td></tr>');
+            }
+        }
+
+        $(document).on('input', '.dispatch-qty-input', function() {
+            let tr = $(this).closest('tr');
+            let pendingQty = parseInt(tr.data('pending')) || 0;
+            let qty = parseInt($(this).val()) || 0;
+
+            if (qty > pendingQty) {
+                qty = pendingQty;
+                $(this).val(qty);
+            }
+            if (qty < 0) {
+                qty = 0;
+                $(this).val(qty);
+            }
+
+            let price = parseFloat(tr.data('price')) || 0;
+            let gst = parseFloat(tr.data('gst')) || 0;
+            let discount = parseFloat(tr.data('discount')) || 0;
+
+            let total = price * qty;
+            let totalAfterDiscount = total;
+            if(qty > 0) {
+                totalAfterDiscount = total - discount;
+                if(totalAfterDiscount < 0) totalAfterDiscount = 0;
+            } else {
+                totalAfterDiscount = 0;
+            }
+
+            let gstAmount = (totalAfterDiscount * gst) / 100;
+            let grandTotal = totalAfterDiscount + gstAmount;
+
+            tr.find('.item-total-price').text('₹' + total.toFixed(2));
+            tr.find('.item-grand-total').text('₹' + grandTotal.toFixed(2));
+        });
+
+        function renderDispatchHistory(dispatches, itemsMap) {
+            let tbody = $('#previousDispatchesBody');
+            tbody.empty();
+            if (dispatches && dispatches.length > 0) {
+                $('#previousDispatchesCard').show();
+                let map = {};
+                itemsMap.forEach(i => { map[i.id] = (i.product || 'Item') + ' (' + (i.packing || '') + ')'; });
+
+                $.each(dispatches, function(index, d) {
+                    let itemName = map[d.order_item_id] || 'Unknown';
+                    let imgHtml = '-';
+                    if (d.dispatch_image) {
+                        imgHtml = `<a href="/storage/${d.dispatch_image}" target="_blank" class="btn btn-sm btn-outline-primary"><i class="fas fa-image"></i> View</a>`;
+                    }
+                    let dateStr = d.dispatch_date ? d.dispatch_date.substring(0, 10) : '-';
+                    
+                    let row = `
+                    <tr>
+                        <td>${dateStr}</td>
+                        <td class="fw-bold">${itemName}</td>
+                        <td><span class="badge bg-secondary font-monospace fs-6">${d.dispatch_qty}</span></td>
+                        <td>${d.lr_number || '-'}</td>
+                        <td>${d.transport_name || '-'}</td>
+                        <td>${d.vehicle_no || '-'}</td>
+                        <td>${imgHtml}</td>
+                    </tr>`;
+                    tbody.append(row);
+                });
+            } else {
+                $('#previousDispatchesCard').hide();
+            }
+        }
+
+        $('#btnPartDispatch, #btnFullDispatch').on('click', function() {
+            let btn = $(this);
+            let form = $('#dispatchForm')[0];
+            let formData = new FormData(form);
+
+            let hasQty = false;
+            let totalInputs = 0;
+            $('#dispatchItemsBody tr').each(function(index, tr) {
+                let itemId = $(tr).data('id');
+                let qty = parseInt($(tr).find('.dispatch-qty-input').val()) || 0;
+                if (qty > 0) {
+                    hasQty = true;
+                }
+                formData.append(`dispatch_items[${totalInputs}][item_id]`, itemId);
+                formData.append(`dispatch_items[${totalInputs}][dispatch_qty]`, qty);
+                totalInputs++;
+            });
+
+            if (!hasQty) {
+                alert('Please enter dispatch quantity for at least one item.');
+                return;
+            }
+
+            let originalHtml = btn.html();
+            
+            $.ajax({
+                url: "{{ route('order.dispatch.store') }}",
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                beforeSend: function() {
+                    $('#btnPartDispatch, #btnFullDispatch').prop('disabled', true);
+                    btn.html('<i class="fas fa-spinner fa-spin"></i> Saving...');
+                },
+                success: function(res) {
+                    if (res.status) {
+                        $('#dispatchModal').modal('hide');
+                        location.reload();
+                    } else {
+                        alert(res.message);
+                    }
+                },
+                error: function(xhr) {
+                    let errors = xhr.responseJSON?.errors;
+                    if (errors) {
+                        let eMsg = '';
+                        $.each(errors, function(k, v) { eMsg += v[0] + '\\n'; });
+                        alert(eMsg);
+                    } else {
+                        alert('Failed to save dispatch.');
+                    }
+                },
+                complete: function() {
+                    $('#btnPartDispatch, #btnFullDispatch').prop('disabled', false);
+                    btn.html(originalHtml);
+                }
+            });
+        });
 
         /* -----------------------
            SIMPLE STATUS UPDATE

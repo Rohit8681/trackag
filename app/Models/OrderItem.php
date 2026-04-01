@@ -26,6 +26,11 @@ class OrderItem extends Model
         return $this->belongsTo(Order::class);
     }
 
+    public function dispatches()
+    {
+        return $this->hasMany(OrderDispatch::class);
+    }
+
     public function product()
     {
         return $this->belongsTo(Product::class);
