@@ -330,6 +330,7 @@
                 </div>
                 <div class="modal-body bg-light">
                     <form id="dispatchForm" enctype="multipart/form-data">
+                        @csrf
                         <input type="hidden" id="dispatch_order_id" name="order_id">
                         
                         <!-- Top LR Details Section -->
