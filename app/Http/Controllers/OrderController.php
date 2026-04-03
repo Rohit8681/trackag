@@ -195,7 +195,14 @@ class OrderController extends Controller
             'qty'      => 'required|integer|min:1',
         ]);
 
-        $item = \App\Models\OrderItem::findOrFail($request->item_id);
+        $item = \App\Models\OrderItem::with('order')->findOrFail($request->item_id);
+
+        if ($item->order->status === 'approved' || !in_array($item->order->status, ['pending', 'hold'])) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Approved orders cannot be edited'
+            ]);
+        }
 
         $item->qty = $request->qty;
 
