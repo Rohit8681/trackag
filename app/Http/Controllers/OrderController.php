@@ -261,9 +261,9 @@ class OrderController extends Controller
     public function storeDispatch(Request $request)
     {
         $request->validate([
-            'order_id'       => 'required|exists:orders,id',
+            'order_id'       => 'required',
             'dispatch_items' => 'required|array',
-            'dispatch_items.*.item_id' => 'required|exists:order_items,id',
+            'dispatch_items.*.item_id' => 'required',
             'dispatch_items.*.dispatch_qty' => 'required|integer|min:0',
             'lr_number'      => 'nullable|string',
             'transport_name' => 'nullable|string',
