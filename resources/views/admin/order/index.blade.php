@@ -306,7 +306,6 @@
                                     <th>Discount</th>
                                     <th>Qty</th>
                                     <th>Total</th>
-                                    <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody id="modalItemsBody">
@@ -508,11 +507,10 @@
             let order_id = $(this).data('id');
             let status = $(this).data('status');
             console.log("View Items clicked! Order ID:", order_id, "Status:", status);
-            let isEditable = (status === 'pending' || status === 'hold');
             
             $('#orderItemsModal').modal('show');
             let tbody = $('#modalItemsBody');
-            tbody.html('<tr><td colspan="8" class="text-center py-4"><i class="fas fa-spinner fa-spin fa-2x text-primary"></i> Loading items...</td></tr>');
+            tbody.html('<tr><td colspan="7" class="text-center py-4"><i class="fas fa-spinner fa-spin fa-2x text-primary"></i> Loading items...</td></tr>');
 
             $.ajax({
                 url: `/admin/order/${order_id}/dispatch-data`,
@@ -525,89 +523,31 @@
                             $.each(items, function (index, item) {
                                 let packing = (item.packing_value && item.packing) ? item.packing_value + ' ' + item.packing : '-';
                                 let row = `
-                            <tr data-id="${item.id}" data-price="${item.price}" data-gst="${item.gst}" data-discount="${item.discount}">
+                            <tr>
                                 <td>${item.product ? item.product : '-'}</td>
                                 <td>${packing}</td>
-                                <td><input type="number" class="form-control form-control-sm item-price" value="${item.price}" readonly step="0.01" style="width: 80px; background-color: #e9ecef;"></td>
-                                <td><input type="number" class="form-control form-control-sm item-gst" value="${item.gst}" readonly step="0.01" style="width: 70px; background-color: #e9ecef;"></td>
-                                <td><input type="number" class="form-control form-control-sm item-discount" value="${item.discount}" readonly step="0.01" style="width: 80px; background-color: #e9ecef;"></td>
-                                <td><input type="number" class="form-control form-control-sm item-qty bg-white border-primary fw-bold" value="${item.order_qty}" min="1" step="1" style="width: 70px;" ${!isEditable ? 'disabled' : ''}></td>
-                                <td class="item-grand-total align-middle font-weight-bold">₹ ${parseFloat(item.grand_total).toFixed(2)}</td>
-                                <td class="align-middle">
-                                    ${isEditable ? `<button class="btn btn-sm btn-primary update-item-btn"><i class="fas fa-save"></i></button>` : `<span class="badge bg-secondary">Readonly</span>`}
-                                </td>
+                                <td>₹${parseFloat(item.price).toFixed(2)}</td>
+                                <td>${item.gst}%</td>
+                                <td>₹${parseFloat(item.discount).toFixed(2)}</td>
+                                <td><span class="badge bg-secondary p-2 fs-6">${item.order_qty}</span></td>
+                                <td class="align-middle fw-bold">₹${parseFloat(item.grand_total).toFixed(2)}</td>
                             </tr>`;
                                 tbody.append(row);
                             });
                         } else {
-                            tbody.append('<tr><td colspan="8" class="text-center">No items found.</td></tr>');
+                            tbody.append('<tr><td colspan="7" class="text-center">No items found.</td></tr>');
                         }
                     } else {
-                        tbody.html('<tr><td colspan="8" class="text-center text-danger">Failed to load data.</td></tr>');
+                        tbody.html('<tr><td colspan="7" class="text-center text-danger">Failed to load data.</td></tr>');
                     }
                 },
                 error: function() {
-                    tbody.html('<tr><td colspan="8" class="text-center text-danger">Error loading details.</td></tr>');
+                    tbody.html('<tr><td colspan="7" class="text-center text-danger">Error loading details.</td></tr>');
                 }
             });
         });
 
-        // Recalculate on qty change
-        $(document).on('input', '.item-qty', function() {
-            let tr = $(this).closest('tr');
-            let qty = parseInt($(this).val()) || 1;
-            if (qty < 1) {
-                qty = 1;
-                $(this).val(qty);
-            }
-            let price = parseFloat(tr.data('price')) || 0;
-            let gst = parseFloat(tr.data('gst')) || 0;
-            let discount = parseFloat(tr.data('discount')) || 0;
-
-            let total = price * qty;
-            let totalAfterDiscount = total - discount;
-            if(totalAfterDiscount < 0) totalAfterDiscount = 0;
-
-            let gstAmount = (totalAfterDiscount * gst) / 100;
-            let grandTotal = totalAfterDiscount + gstAmount;
-
-            tr.find('.item-grand-total').text('₹ ' + grandTotal.toFixed(2));
-        });
-
-        // Save Edit Qty
-        $(document).on('click', '.update-item-btn', function (e) {
-            e.preventDefault();
-            let btn = $(this);
-            let tr = btn.closest('tr');
-            let item_id = tr.data('id');
-            let qty = tr.find('.item-qty').val();
-
-            let originalHtml = btn.html();
-            btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i>');
-
-            $.ajax({
-                url: "{{ route('order.item.update') }}",
-                type: "POST",
-                data: {
-                    _token: "{{ csrf_token() }}",
-                    item_id: item_id,
-                    qty: qty
-                },
-                success: function (res) {
-                    if (res.success) {
-                        alert('Quantity updated successfully! Page will refresh to update totals.');
-                        location.reload();
-                    } else {
-                        btn.prop('disabled', false).html(originalHtml);
-                        alert(res.message);
-                    }
-                },
-                error: function () {
-                    btn.prop('disabled', false).html(originalHtml);
-                    alert('Failed to update quantity.');
-                }
-            });
-        });
+        // (Editing features removed per read-only requirement)
 
         /* -----------------------
            STATUS CHANGE

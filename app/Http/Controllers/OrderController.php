@@ -6,6 +6,8 @@ use App\Models\Company;
 use App\Models\Customer;
 use App\Models\Depo;
 use App\Models\Order;
+use App\Models\OrderDispatch;
+use App\Models\OrderDispatchDetail;
 use App\Models\State;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -274,12 +276,12 @@ class OrderController extends Controller
 
         foreach ($request->dispatch_items as $dispatchItem) {
             if ($dispatchItem['dispatch_qty'] > 0) {
-                $disp = \App\Models\OrderDispatch::create([
+                $disp = OrderDispatch::create([
                     'order_id' => $order->id,
                     'order_item_id' => $dispatchItem['item_id'],
                     'dispatch_qty' => $dispatchItem['dispatch_qty']
                 ]);
-                \App\Models\OrderDispatchDetail::create([
+                OrderDispatchDetail::create([
                     'order_dispatch_id' => $disp->id,
                     'lr_number' => $request->lr_number,
                     'transport_name' => $request->transport_name,
@@ -293,7 +295,7 @@ class OrderController extends Controller
             $item = $order->items->where('id', $dispatchItem['item_id'])->first();
             if ($item) {
                 // Total previously dispatched + this dispatch
-                $totalDispatched = \App\Models\OrderDispatch::where('order_item_id', $item->id)->sum('dispatch_qty');
+                $totalDispatched = OrderDispatch::where('order_item_id', $item->id)->sum('dispatch_qty');
                 $pending = $item->qty - $totalDispatched;
                 if ($pending > 0) {
                     $totalItemsPendingAfterDispatch += $pending;
