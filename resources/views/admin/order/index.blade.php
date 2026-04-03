@@ -302,6 +302,7 @@
                                     <th>Product</th>
                                     <th>Packing</th>
                                     <th>Price</th>
+                                    <th>Shipper Size</th>
                                     <th>GST (%)</th>
                                     <th>Discount</th>
                                     <th>Qty</th>
@@ -510,7 +511,7 @@
             
             $('#orderItemsModal').modal('show');
             let tbody = $('#modalItemsBody');
-            tbody.html('<tr><td colspan="7" class="text-center py-4"><i class="fas fa-spinner fa-spin fa-2x text-primary"></i> Loading items...</td></tr>');
+            tbody.html('<tr><td colspan="8" class="text-center py-4"><i class="fas fa-spinner fa-spin fa-2x text-primary"></i> Loading items...</td></tr>');
 
             $.ajax({
                 url: `/admin/order/${order_id}/dispatch-data`,
@@ -527,6 +528,7 @@
                                 <td>${item.product ? item.product : '-'}</td>
                                 <td>${packing}</td>
                                 <td>₹${parseFloat(item.price).toFixed(2)}</td>
+                                <td>${item.shipper_size ? item.shipper_size : '-'}</td>
                                 <td>${item.gst}%</td>
                                 <td>₹${parseFloat(item.discount).toFixed(2)}</td>
                                 <td><span class="badge bg-secondary p-2 fs-6">${item.order_qty}</span></td>
@@ -535,14 +537,14 @@
                                 tbody.append(row);
                             });
                         } else {
-                            tbody.append('<tr><td colspan="7" class="text-center">No items found.</td></tr>');
+                            tbody.append('<tr><td colspan="8" class="text-center">No items found.</td></tr>');
                         }
                     } else {
-                        tbody.html('<tr><td colspan="7" class="text-center text-danger">Failed to load data.</td></tr>');
+                        tbody.html('<tr><td colspan="8" class="text-center text-danger">Failed to load data.</td></tr>');
                     }
                 },
                 error: function() {
-                    tbody.html('<tr><td colspan="7" class="text-center text-danger">Error loading details.</td></tr>');
+                    tbody.html('<tr><td colspan="8" class="text-center text-danger">Error loading details.</td></tr>');
                 }
             });
         });
