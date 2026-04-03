@@ -191,7 +191,7 @@ class OrderController extends Controller
     public function updateItem(Request $request)
     {
         $request->validate([
-            'item_id'  => 'required|exists:order_items,id',
+            'item_id'  => 'required',
             'qty'      => 'required|integer|min:1',
         ]);
 
