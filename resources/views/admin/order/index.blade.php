@@ -357,27 +357,8 @@
                         </div>
                     </div>
 
-                    <!-- Dispatch Item Details -->
-                    <div class="card mb-3 shadow-sm border-0">
-                        <div class="card-header bg-light">
-                            <h6 class="mb-0 fw-bold">Dispatch Item Details</h6>
-                        </div>
-                        <div class="table-responsive">
-                            <table class="table table-bordered table-striped" id="modalItemsTable">
-                                <thead class="table-secondary">
-                                    <tr>
-                                        <th>Product Name</th>
-                                        <th>Packing</th>
-                                        <th>Total Qty</th>
-                                        <th>Dispatched Qty</th>
-                                        <th>Pending Qty</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="modalItemsBody">
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+                    <!-- Dispatch Detailed Breakdown -->
+                    <div id="dispatch_breakdown_container"></div>
                 </div>
             </div>
         </div>
@@ -572,11 +553,9 @@
         $(document).on('click', '.view-items-btn', function (e) {
             e.preventDefault();
             let order_id = $(this).data('id');
-            let status = $(this).data('status');
             
             $('#orderItemsModal').modal('show');
-            let tbody = $('#modalItemsBody');
-            tbody.html('<tr><td colspan="5" class="text-center py-4"><i class="fas fa-spinner fa-spin fa-2x text-primary"></i> Loading details...</td></tr>');
+            $('#dispatch_breakdown_container').html('<div class="text-center py-4"><i class="fas fa-spinner fa-spin fa-2x text-primary"></i> Loading details...</div>');
             $('#summaryHistoryBody').empty();
             $('#summaryHistoryCard').hide();
 
@@ -585,33 +564,21 @@
                 type: 'GET',
                 success: function(res) {
                     if (res.status && res.items) {
-                        tbody.empty();
+                        $('#dispatch_breakdown_container').empty();
                         let items = res.items;
                         let order = res.order;
                         let dispatches = res.dispatches;
                         
                         let totalQty = 0;
                         let totalDisp = 0;
-
+                        
+                        let itemMap = {};
                         if (items.length > 0) {
                             $.each(items, function (index, item) {
-                                let packing = (item.packing_value && item.packing) ? item.packing_value + ' ' + item.packing : '-';
-                                
                                 totalQty += item.order_qty;
                                 totalDisp += item.dispatched_qty;
-
-                                let row = `
-                            <tr>
-                                <td class="fw-bold">${item.product ? item.product : '-'}</td>
-                                <td>${packing}</td>
-                                <td><span class="badge bg-secondary p-2 fs-6">${item.order_qty}</span></td>
-                                <td><span class="badge bg-info p-2 fs-6">${item.dispatched_qty}</span></td>
-                                <td><span class="badge bg-warning text-dark p-2 fs-6">${item.pending_qty}</span></td>
-                            </tr>`;
-                                tbody.append(row);
+                                itemMap[item.id] = item;
                             });
-                        } else {
-                            tbody.append('<tr><td colspan="5" class="text-center">No items found.</td></tr>');
                         }
 
                         // Set order summary
@@ -625,17 +592,24 @@
                         $('#summary_disp_qty').html(`<span class="badge bg-info p-2 fs-6">${totalDisp}</span>`);
                         $('#summary_pend_qty').html(`<span class="badge bg-warning text-dark p-2 fs-6">${totalQty - totalDisp}</span>`);
 
-                        // Set dispatch history
+                        // Group dispatches
                         if (dispatches && dispatches.length > 0) {
                             $('#summaryHistoryCard').show();
-                            // Group dispatches if needed, or list all detailed
+                            
+                            // Sort chronologically
+                            dispatches.sort((a,b) => new Date(a.created_at) - new Date(b.created_at));
+                            
                             let grouped = {};
+                            let currentPending = {};
+                            // copy initial qtys
+                            Object.values(itemMap).forEach(i => { currentPending[i.id] = i.order_qty; });
+                            
                             $.each(dispatches, function (index, d) {
-                                let key = d.created_at; // group by date roughly
                                 let type = d.dispatch_type ? d.dispatch_type.toUpperCase() : 'PARTIAL';
                                 let detail = d.detail || {};
                                 let date = detail.dispatch_date ? detail.dispatch_date.substring(0, 10) : (d.created_at ? d.created_at.substring(0, 10) : '-');
-                                let groupKey = `${date}_${detail.lr_number}_${detail.transport_name}`;
+                                // Determine unique group by time loosely or exact match of created_at string
+                                let groupKey = date + '_' + d.created_at;
 
                                 if (!grouped[groupKey]) {
                                     grouped[groupKey] = {
@@ -643,38 +617,146 @@
                                         date: date,
                                         lr_number: detail.lr_number || '-',
                                         transport_name: detail.transport_name || '-',
-                                        dispatch_image: detail.dispatch_image
+                                        vehicle_no: detail.vehicle_no || '-',
+                                        dispatch_image: detail.dispatch_image,
+                                        details: []
                                     };
-                                } else {
-                                    if(type === 'FINAL') grouped[groupKey].type = 'FINAL';
                                 }
+                                if(type === 'FINAL') grouped[groupKey].type = 'FINAL';
+                                grouped[groupKey].details.push(d);
                             });
 
                             let histBody = $('#summaryHistoryBody');
                             histBody.empty();
+                            let breakdownHtml = '';
+                            
+                            let dispatchCount = 1;
                             $.each(grouped, function(key, g) {
                                 let imgHtml = '-';
+                                let btnImgHtml = '';
                                 if (g.dispatch_image) {
                                     imgHtml = `<a href="/storage/${g.dispatch_image}" target="_blank" class="badge bg-primary">View Image</a>`;
+                                    btnImgHtml = `<a href="/storage/${g.dispatch_image}" target="_blank" class="btn btn-sm btn-outline-primary shadow-sm"><i class="fas fa-image me-1"></i> View LR</a>`;
                                 }
                                 let typeBadge = g.type === 'FINAL' ? 'badge bg-success' : 'badge bg-warning text-dark';
+                                
                                 histBody.append(`
                                     <tr>
                                         <td><span class="${typeBadge}">${g.type}</span></td>
                                         <td>${g.date}</td>
-                                        <td>${g.transport_name} / ${g.lr_number}</td>
+                                        <td>${g.transport_name} <br> <small class="text-muted">LR: ${g.lr_number}</small></td>
                                         <td>${imgHtml}</td>
                                     </tr>
                                 `);
+
+                                // Process breakdown items
+                                let tableRows = '';
+                                let groupTotalAmt = 0;
+                                let groupTotalGST = 0;
+                                let groupGrandTotal = 0;
+                                
+                                $.each(g.details, function(idx, drow) {
+                                    let itemObj = itemMap[drow.order_item_id];
+                                    if(!itemObj) return;
+                                    
+                                    // Update progressive pending quantity logic
+                                    currentPending[itemObj.id] -= drow.dispatch_qty;
+                                    let thisPending = currentPending[itemObj.id];
+                                    
+                                    let price = parseFloat(itemObj.price) || 0;
+                                    let gstPercent = parseFloat(itemObj.gst) || 0;
+                                    
+                                    let total_price = drow.dispatch_qty * price;
+                                    let gst_amount = (total_price * gstPercent) / 100;
+                                    let grand_total = total_price + gst_amount;
+                                    
+                                    groupTotalAmt += total_price;
+                                    groupTotalGST += gst_amount;
+                                    groupGrandTotal += grand_total;
+
+                                    let packingStr = (itemObj.packing_value && itemObj.packing) ? itemObj.packing_value + ' ' + itemObj.packing : '-';
+                                    
+                                    tableRows += `
+                                        <tr>
+                                            <td class="fw-bold">${itemObj.product || '-'}</td>
+                                            <td>${packingStr}</td>
+                                            <td>₹${price.toFixed(2)}</td>
+                                            <td>${itemObj.shipper_size || '-'}</td>
+                                            <td class="text-center"><span class="badge bg-secondary p-2">${itemObj.order_qty}</span></td>
+                                            <td class="text-center"><span class="badge bg-info p-2">${drow.dispatch_qty}</span></td>
+                                            <td class="text-center"><span class="badge bg-warning text-dark p-2">${thisPending}</span></td>
+                                            <td>₹${total_price.toFixed(2)}</td>
+                                            <td>${gstPercent}% (₹${gst_amount.toFixed(2)})</td>
+                                            <td class="fw-bold text-success">₹${grand_total.toFixed(2)}</td>
+                                        </tr>
+                                    `;
+                                });
+
+                                breakdownHtml += `
+                                <div class="card mb-4 shadow-sm border border-secondary border-opacity-25 invoice-card">
+                                    <div class="card-header bg-white border-bottom pb-2 pt-3">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <h5 class="mb-0 fw-bold text-primary"><i class="fas fa-truck-loading me-2"></i>Dispatch #${dispatchCount}</h5>
+                                            <span class="${typeBadge} px-3 py-2 fs-6 rounded-pill shadow-sm">${g.type} DISPATCH</span>
+                                        </div>
+                                        <div class="row text-muted small mt-3">
+                                            <div class="col-md-3"><strong>Date:</strong> <span class="text-dark">${g.date}</span></div>
+                                            <div class="col-md-3"><strong>Transport:</strong> <span class="text-dark">${g.transport_name}</span></div>
+                                            <div class="col-md-3"><strong>LR No:</strong> <span class="text-dark">${g.lr_number}</span></div>
+                                            <div class="col-md-3"><strong>Vehicle No:</strong> <span class="text-dark">${g.vehicle_no}</span></div>
+                                        </div>
+                                        <div class="mt-2 text-end">
+                                            ${btnImgHtml}
+                                        </div>
+                                    </div>
+                                    <div class="card-body p-0">
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered table-striped mb-0 align-middle text-sm">
+                                                <thead class="table-light">
+                                                    <tr>
+                                                        <th>Product</th>
+                                                        <th>Packing</th>
+                                                        <th>Price</th>
+                                                        <th>Shipper Size</th>
+                                                        <th class="text-center">Order Qty</th>
+                                                        <th class="text-center">Dispatch Qty</th>
+                                                        <th class="text-center">Pending Qty</th>
+                                                        <th>Total Price</th>
+                                                        <th>GST</th>
+                                                        <th>Grand Total</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    ${tableRows}
+                                                </tbody>
+                                                <tfoot class="table-light">
+                                                    <tr>
+                                                        <td colspan="7" class="text-end fw-bold">TOTALS:</td>
+                                                        <td class="fw-bold">₹${groupTotalAmt.toFixed(2)}</td>
+                                                        <td class="fw-bold text-danger">₹${groupTotalGST.toFixed(2)}</td>
+                                                        <td class="fw-bold text-success fs-5">₹${groupGrandTotal.toFixed(2)}</td>
+                                                    </tr>
+                                                </tfoot>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                                `;
+                                dispatchCount++;
                             });
+                            
+                            $('#dispatch_breakdown_container').html(breakdownHtml);
+
+                        } else {
+                            $('#dispatch_breakdown_container').html('<div class="alert alert-info">No dispatches found for this order.</div>');
                         }
 
                     } else {
-                        tbody.html('<tr><td colspan="5" class="text-center text-danger">Failed to load data.</td></tr>');
+                        $('#dispatch_breakdown_container').html('<div class="text-center text-danger">Failed to load data.</div>');
                     }
                 },
                 error: function() {
-                    tbody.html('<tr><td colspan="5" class="text-center text-danger">Error loading details.</td></tr>');
+                    $('#dispatch_breakdown_container').html('<div class="text-center text-danger">Error loading details.</div>');
                 }
             });
         });
