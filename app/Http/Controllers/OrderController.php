@@ -210,6 +210,7 @@ class OrderController extends Controller
 
         $amount = $item->price * $item->qty;
         $amountAfterDiscount = $amount - $item->discount;
+        if ($amountAfterDiscount < 0) $amountAfterDiscount = 0;
         $gstAmount = ($amountAfterDiscount * $item->gst) / 100;
 
         $item->grand_total = round($amountAfterDiscount + $gstAmount, 2);
@@ -221,6 +222,47 @@ class OrderController extends Controller
             'data'    => [
                 'grand_total' => number_format($item->grand_total, 2, '.', '')
             ]
+        ]);
+    }
+
+    public function updateOrderItemsQty(Request $request)
+    {
+        $request->validate([
+            'order_id'       => 'required',
+            'items'          => 'required|array',
+            'items.*.id'     => 'required',
+            'items.*.qty'    => 'required|integer|min:1',
+        ]);
+
+        $order = Order::findOrFail($request->order_id);
+
+        if ($order->status !== 'pending') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Items can only be edited when the order is pending.'
+            ]);
+        }
+
+        foreach ($request->items as $itemData) {
+            $item = \App\Models\OrderItem::where('order_id', $order->id)
+                ->where('id', $itemData['id'])
+                ->first();
+
+            if ($item) {
+                $item->qty = $itemData['qty'];
+                $amount = $item->price * $item->qty;
+                $amountAfterDiscount = $amount - $item->discount;
+                if ($amountAfterDiscount < 0) $amountAfterDiscount = 0;
+                $gstAmount = ($amountAfterDiscount * $item->gst) / 100;
+                
+                $item->grand_total = round($amountAfterDiscount + $gstAmount, 2);
+                $item->save();
+            }
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Order items updated successfully'
         ]);
     }
 

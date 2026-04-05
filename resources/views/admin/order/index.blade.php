@@ -334,6 +334,37 @@
                         </div>
                     </div>
 
+                    <!-- Base Order Items (Editable if pending) -->
+                    <div class="card mb-3 shadow-sm border-0" id="orderItemsTableCard" style="display:none;">
+                        <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                            <h6 class="mb-0 fw-bold"><i class="fas fa-list text-secondary me-2"></i>Order Items</h6>
+                            <button class="btn btn-sm btn-primary" id="saveOrderItemsBtn" style="display:none;" data-order-id="">
+                                <i class="fas fa-save me-1"></i> Save Changes
+                            </button>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-striped mb-0 align-middle text-sm" id="baseItemsTable">
+                                    <thead class="table-secondary">
+                                        <tr>
+                                            <th>Product Name</th>
+                                            <th>Packing</th>
+                                            <th>Price</th>
+                                            <th>Shipper Size</th>
+                                            <th class="text-center" style="width: 120px;">Qty</th>
+                                            <th>Total Price</th>
+                                            <th>GST</th>
+                                            <th>Grand Total</th>
+                                            <th class="text-center">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="baseItemsBody">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Dispatch History -->
                     <div class="card mb-3 shadow-sm border-0" id="summaryHistoryCard" style="display:none;">
                         <div class="card-header bg-light">
@@ -573,12 +604,60 @@
                         let totalDisp = 0;
                         
                         let itemMap = {};
+                        let baseBody = $('#baseItemsBody');
+                        baseBody.empty();
+                        
+                        let isPending = (order.status === 'pending');
+                        if (isPending) {
+                            $('#saveOrderItemsBtn').show().data('order-id', order.id);
+                        } else {
+                            $('#saveOrderItemsBtn').hide();
+                        }
+
                         if (items.length > 0) {
+                            $('#orderItemsTableCard').show();
                             $.each(items, function (index, item) {
                                 totalQty += item.order_qty;
                                 totalDisp += item.dispatched_qty;
                                 itemMap[item.id] = item;
+                                
+                                let packingStr = (item.packing_value && item.packing) ? item.packing_value + ' ' + item.packing : '-';
+                                let price = parseFloat(item.price) || 0;
+                                let gst = parseFloat(item.gst) || 0;
+                                let discount = parseFloat(item.discount) || 0;
+                                let amount = price * item.order_qty;
+                                let afterDiscount = amount - discount;
+                                if (afterDiscount < 0) afterDiscount = 0;
+                                let gstAmount = (afterDiscount * gst) / 100;
+                                let grandTotal = afterDiscount + gstAmount;
+
+                                let qtyHtml = '';
+                                let actionHtml = '';
+
+                                if (isPending) {
+                                    qtyHtml = `<input type="number" class="form-control form-control-sm text-center fw-bold text-primary border-primary bg-primary bg-opacity-10 live-item-qty" data-id="${item.id}" data-price="${price}" data-gst="${gst}" data-discount="${discount}" value="${item.order_qty}" min="1">`;
+                                    actionHtml = `<span class="badge bg-primary">Editable</span>`;
+                                } else {
+                                    qtyHtml = `<span class="badge bg-secondary px-3 py-2 fs-6 shadow-sm">${item.order_qty}</span>`;
+                                    actionHtml = `<span class="badge bg-secondary">Readonly</span>`;
+                                }
+
+                                baseBody.append(`
+                                    <tr id="base-row-${item.id}">
+                                        <td class="fw-bold">${item.product || '-'}</td>
+                                        <td>${packingStr}</td>
+                                        <td>₹${price.toFixed(2)}</td>
+                                        <td>${item.shipper_size || '-'}</td>
+                                        <td>${qtyHtml}</td>
+                                        <td class="base-total-price">₹${amount.toFixed(2)}</td>
+                                        <td>${gst}% (<span class="base-gst-amt">₹${gstAmount.toFixed(2)}</span>)</td>
+                                        <td class="fw-bold text-success fs-6 base-grand-total">₹${grandTotal.toFixed(2)}</td>
+                                        <td class="text-center">${actionHtml}</td>
+                                    </tr>
+                                `);
                             });
+                        } else {
+                            $('#orderItemsTableCard').hide();
                         }
 
                         // Set order summary
@@ -757,6 +836,85 @@
                 },
                 error: function() {
                     $('#dispatch_breakdown_container').html('<div class="text-center text-danger">Error loading details.</div>');
+                }
+            });
+        });
+
+        /* -----------------------
+           LIVE QTY CALCULATION
+        ----------------------- */
+        $(document).on('input', '.live-item-qty', function() {
+            let val = parseInt($(this).val()) || 1;
+            if (val < 1) {
+                val = 1;
+                $(this).val(val);
+            }
+            
+            let price = parseFloat($(this).data('price')) || 0;
+            let gst = parseFloat($(this).data('gst')) || 0;
+            let discount = parseFloat($(this).data('discount')) || 0;
+
+            let amount = price * val;
+            let afterDiscount = amount - discount;
+            if(afterDiscount < 0) afterDiscount = 0;
+            
+            let gstAmount = (afterDiscount * gst) / 100;
+            let grandTotal = afterDiscount + gstAmount;
+
+            let tr = $(this).closest('tr');
+            tr.find('.base-total-price').text('₹' + amount.toFixed(2));
+            tr.find('.base-gst-amt').text('₹' + gstAmount.toFixed(2));
+            tr.find('.base-grand-total').text('₹' + grandTotal.toFixed(2));
+        });
+
+        /* -----------------------
+           SAVE ORDER ITEMS QTY
+        ----------------------- */
+        $(document).on('click', '#saveOrderItemsBtn', function(e) {
+            e.preventDefault();
+            let btn = $(this);
+            let order_id = btn.data('order-id');
+            
+            let items = [];
+            $('.live-item-qty').each(function() {
+                items.push({
+                    id: $(this).data('id'),
+                    qty: parseInt($(this).val()) || 1
+                });
+            });
+
+            if (items.length === 0) {
+                alert('No items to save.');
+                return;
+            }
+
+            let originalHtml = btn.html();
+            btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i> Saving...');
+
+            $.ajax({
+                url: "{{ route('order.items.update_qty') }}",
+                type: "POST",
+                data: {
+                    _token: "{{ csrf_token() }}",
+                    order_id: order_id,
+                    items: items
+                },
+                success: function(res) {
+                    if (res.success) {
+                        alert('Order items updated successfully!');
+                        // Refresh the modal content to recalibrate summary logic
+                        btn.prop('disabled', false).html(originalHtml);
+                        openDispatchModal(order_id); // we have it defined below, or we re-trigger view-items manually
+                        location.reload(); // Hard reload better ensures base table synchronizes
+                    } else {
+                        alert(res.message || 'Error occurred');
+                        btn.prop('disabled', false).html(originalHtml);
+                    }
+                },
+                error: function(xhr) {
+                    let msg = xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : 'Failed to update items.';
+                    alert(msg);
+                    btn.prop('disabled', false).html(originalHtml);
                 }
             });
         });
