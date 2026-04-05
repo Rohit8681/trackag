@@ -169,7 +169,7 @@
                                         <th>Pending</th>
                                         <th>Amount</th>
                                         <th width="160">Status</th>
-                                        <th>Action</th>
+                                        <!-- <th>Action</th> -->
                                     </tr>
                                 </thead>
 
@@ -177,106 +177,100 @@
 
                                     @foreach($orders as $order)
 
-                                                                    <tr>
+                                    <tr>
 
-                                                                        <td>
-                                                                            <button class="btn btn-sm btn-info view-items-btn"
-                                                                                data-id="{{ $order->id }}"
-                                                                                data-status="{{ $order->status }}">
-                                                                                <i class="fas fa-plus"></i>
-                                                                            </button>
-                                                                        </td>
+                                        <td>
+                                            <button class="btn btn-sm btn-info view-items-btn"
+                                                data-id="{{ $order->id }}"
+                                                data-status="{{ $order->status }}">
+                                                <i class="fas fa-plus"></i>
+                                            </button>
+                                        </td>
 
-                                                                        <td>{{ $order->created_at->format('d-m-Y') }}</td>
+                                        <td>{{ $order->created_at->format('d-m-Y') }}</td>
 
-                                                                        <td>{{ $order->user->state->name ?? '-' }}</td>
+                                        <td>{{ $order->user->state->name ?? '-' }}</td>
 
-                                                                        <td>{{ $order->order_type }}</td>
+                                        <td>{{ $order->order_type }}</td>
 
-                                                                        <td><strong>{{ $order->order_no }}</strong></td>
+                                        <td><strong>{{ $order->order_no }}</strong></td>
 
-                                                                        <td>{{ $order->customer->agro_name ?? '-' }}</td>
+                                        <td>{{ $order->customer->agro_name ?? '-' }}</td>
 
-                                                                        <td>{{ $order->user->name ?? '-' }}</td>
+                                        <td>{{ $order->user->name ?? '-' }}</td>
 
-                                                                        @php
-                                                                            $totQty = $order->items->sum('qty');
-                                                                            $dispQty = $order->items->reduce(function($carry, $item) {
-                                                                                return $carry + $item->dispatches->sum('dispatch_qty');
-                                                                            }, 0);
-                                                                            $pendQty = $totQty - $dispQty;
-                                                                        @endphp
-                                                                        <td><span class="badge bg-secondary">{{ $totQty }}</span></td>
-                                                                        <td><span class="badge bg-info">{{ $dispQty }}</span></td>
-                                                                        <td><span class="badge bg-warning text-dark">{{ $pendQty }}</span></td>
+                                        @php
+                                            $totQty = $order->items->sum('qty');
+                                            $dispQty = $order->items->reduce(function($carry, $item) {
+                                                return $carry + $item->dispatches->sum('dispatch_qty');
+                                            }, 0);
+                                            $pendQty = $totQty - $dispQty;
+                                        @endphp
+                                        <td><span class="badge bg-secondary">{{ $totQty }}</span></td>
+                                        <td><span class="badge bg-info">{{ $dispQty }}</span></td>
+                                        <td><span class="badge bg-warning text-dark">{{ $pendQty }}</span></td>
 
-                                                                        <td>
-                                                                            <span class="badge bg-success">
-                                                                                ₹ {{ $order->items->sum('grand_total') }}
-                                                                            </span>
-                                                                        </td>
+                                        <td>
+                                            <span class="badge bg-success">
+                                                ₹ {{ $order->items->sum('grand_total') }}
+                                            </span>
+                                        </td>
 
-                                                                        <td>
+                                        <td>
 
-                                                                            <select class="form-select form-select-sm status-change"
-    data-id="{{ $order->id }}"
-    {{ $order->status == 'rejected' ? 'disabled' : '' }}>
+                                            <select class="form-select form-select-sm status-change"
+                                                data-id="{{ $order->id }}"
+                                                {{ $order->status == 'rejected' ? 'disabled' : '' }}>
 
-    {{-- Pending --}}
-    @if($order->status == 'pending')
-        <option value="pending" selected>PENDING</option>
-    @endif
+                                                {{-- Pending --}}
+                                                @if($order->status == 'pending')
+                                                    <option value="pending" selected>PENDING</option>
+                                                @endif
 
-    {{-- Hold --}}
-    @if($order->status != 'approved' || $order->status == 'hold')
-        <option value="hold"
-            {{ $order->status == 'hold' ? 'selected' : '' }}
-            {{ $order->status != 'pending' ? 'disabled' : '' }}>
-            HOLD
-        </option>
-    @endif
+                                                {{-- Hold --}}
+                                                @if($order->status != 'approved' || $order->status == 'hold')
+                                                    <option value="hold"
+                                                        {{ $order->status == 'hold' ? 'selected' : '' }}
+                                                        {{ $order->status != 'pending' ? 'disabled' : '' }}>
+                                                        HOLD
+                                                    </option>
+                                                @endif
 
-    {{-- Approved --}}
-    <option value="approved"
-        {{ $order->status == 'approved' ? 'selected' : '' }}
-        {{ !in_array($order->status,['pending','hold']) ? 'disabled' : '' }}>
-        APPROVED
-    </option>
+                                                {{-- Approved --}}
+                                                <option value="approved"
+                                                    {{ $order->status == 'approved' ? 'selected' : '' }}
+                                                    {{ !in_array($order->status,['pending','hold']) ? 'disabled' : '' }}>
+                                                    APPROVED
+                                                </option>
 
-    {{-- Rejected --}}
-    <option value="rejected"
-        {{ $order->status == 'rejected' ? 'selected' : '' }}
-        {{ $order->status != 'pending' ? 'disabled' : '' }}>
-        REJECTED
-    </option>
+                                                {{-- Rejected --}}
+                                                <option value="rejected"
+                                                    {{ $order->status == 'rejected' ? 'selected' : '' }}
+                                                    {{ $order->status != 'pending' ? 'disabled' : '' }}>
+                                                    REJECTED
+                                                </option>
 
-    {{-- Part Dispatch --}}
-    <option value="part_dispatched"
-        {{ $order->status == 'part_dispatched' ? 'selected' : '' }}
-        {{ !in_array($order->status, ['approved', 'part_dispatched']) ? 'disabled' : '' }}>
-        PART DISPATCHED
-    </option>
+                                                {{-- Part Dispatch --}}
+                                                <option value="part_dispatched"
+                                                    {{ $order->status == 'part_dispatched' ? 'selected' : '' }}
+                                                    {{ !in_array($order->status, ['approved', 'part_dispatched']) ? 'disabled' : '' }}>
+                                                    PART DISPATCHED
+                                                </option>
 
-    {{-- Dispatch --}}
-    <option value="dispatched"
-        {{ $order->status == 'dispatched' ? 'selected' : '' }}
-        {{ !in_array($order->status, ['approved', 'part_dispatched']) ? 'disabled' : '' }}>
-        DISPATCHED
-    </option>
+                                                {{-- Dispatch --}}
+                                                <option value="dispatched"
+                                                    {{ $order->status == 'dispatched' ? 'selected' : '' }}
+                                                    {{ !in_array($order->status, ['approved', 'part_dispatched']) ? 'disabled' : '' }}>
+                                                    DISPATCHED
+                                                </option>
 
-</select>
-                       
-</td>
+                                                </select>
+                                                                    
+                                        </td>
 
-                                                                        <td>
-                                                                            @if(in_array($order->status, ['approved', 'part_dispatched']))
-                                                                                <button class="btn btn-sm btn-primary w-100 open-dispatch-btn" data-id="{{ $order->id }}">Dispatch</button>
-                                                                            @else
-                                                                                <span class="text-muted small">-</span>
-                                                                            @endif
-                                                                        </td>
+                                                                       
 
-                                                                    </tr>
+                                    </tr>
 
                                     @endforeach
 
