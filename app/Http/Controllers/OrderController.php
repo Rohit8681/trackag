@@ -26,7 +26,9 @@ class OrderController extends Controller
             'customer',
             'depo',
             'items.product',
-            'items.packing'
+            'items.packing',
+            'items.dispatches',
+            'dispatches.detail'
         ])->latest();
 
         // NEW DATE FILTER
@@ -283,10 +285,17 @@ class OrderController extends Controller
 
         foreach ($request->dispatch_items as $dispatchItem) {
             if ($dispatchItem['dispatch_qty'] > 0) {
+                // Determine remaining pending qty locally for the type
+                $item = $order->items->where('id', $dispatchItem['item_id'])->first();
+                $totalDispatchedBefore = OrderDispatch::where('order_item_id', $dispatchItem['item_id'])->sum('dispatch_qty');
+                $pendingBefore = $item ? ($item->qty - $totalDispatchedBefore) : 0;
+                $willBeZero = ($pendingBefore - $dispatchItem['dispatch_qty']) <= 0;
+
                 $disp = OrderDispatch::create([
                     'order_id' => $order->id,
                     'order_item_id' => $dispatchItem['item_id'],
-                    'dispatch_qty' => $dispatchItem['dispatch_qty']
+                    'dispatch_qty' => $dispatchItem['dispatch_qty'],
+                    'dispatch_type' => $willBeZero ? 'final' : 'partial',
                 ]);
                 OrderDispatchDetail::create([
                     'order_dispatch_id' => $disp->id,

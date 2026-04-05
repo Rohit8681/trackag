@@ -12,7 +12,8 @@ class OrderDispatch extends Model
     protected $fillable = [
         'order_id',
         'order_item_id',
-        'dispatch_qty'
+        'dispatch_qty',
+        'dispatch_type'
     ];
 
     public function order()

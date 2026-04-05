@@ -164,8 +164,12 @@
                                         <th>Order No</th>
                                         <th>Party</th>
                                         <th>Employee</th>
+                                        <th>Total Qty</th>
+                                        <th>Dispatched</th>
+                                        <th>Pending</th>
                                         <th>Amount</th>
                                         <th width="160">Status</th>
+                                        <th>Action</th>
                                     </tr>
                                 </thead>
 
@@ -195,6 +199,17 @@
 
                                                                         <td>{{ $order->user->name ?? '-' }}</td>
 
+                                                                        @php
+                                                                            $totQty = $order->items->sum('qty');
+                                                                            $dispQty = $order->items->reduce(function($carry, $item) {
+                                                                                return $carry + $item->dispatches->sum('dispatch_qty');
+                                                                            }, 0);
+                                                                            $pendQty = $totQty - $dispQty;
+                                                                        @endphp
+                                                                        <td><span class="badge bg-secondary">{{ $totQty }}</span></td>
+                                                                        <td><span class="badge bg-info">{{ $dispQty }}</span></td>
+                                                                        <td><span class="badge bg-warning text-dark">{{ $pendQty }}</span></td>
+
                                                                         <td>
                                                                             <span class="badge bg-success">
                                                                                 ₹ {{ $order->items->sum('grand_total') }}
@@ -202,22 +217,6 @@
                                                                         </td>
 
                                                                         <td>
-
-                                                                            <!-- <select class="form-select form-select-sm status-change"
-                                                                                data-id="{{ $order->id }}">
-
-                                                                                <option value="pending" {{ $order->status == 'pending' ? 'selected' : '' }}>
-                                                                                    PENDING</option>
-                                                                                <option value="hold" {{ $order->status == 'hold' ? 'selected' : '' }}>HOLD
-                                                                                </option>
-                                                                                <option value="approved" {{ $order->status == 'approved' ? 'selected' : '' }}>
-                                                                                    APPROVED</option>
-                                                                                <option value="rejected" {{ $order->status == 'rejected' ? 'selected' : '' }}>
-                                                                                    REJECTED</option>
-                                                                                <option value="part_dispatched" {{ $order->status == 'part_dispatched' ? 'selected' : '' }}>PART DISPATCHED</option>
-                                                                                <option value="dispatched" {{ $order->status == 'dispatched' ? 'selected' : '' }}>DISPATCHED</option>
-
-                                                                            </select> -->
 
                                                                             <select class="form-select form-select-sm status-change"
     data-id="{{ $order->id }}"
@@ -229,7 +228,7 @@
     @endif
 
     {{-- Hold --}}
-    @if($order->status != 'approved')
+    @if($order->status != 'approved' || $order->status == 'hold')
         <option value="hold"
             {{ $order->status == 'hold' ? 'selected' : '' }}
             {{ $order->status != 'pending' ? 'disabled' : '' }}>
@@ -254,18 +253,27 @@
     {{-- Part Dispatch --}}
     <option value="part_dispatched"
         {{ $order->status == 'part_dispatched' ? 'selected' : '' }}
-        {{ $order->status != 'approved' ? 'disabled' : '' }}>
+        {{ !in_array($order->status, ['approved', 'part_dispatched']) ? 'disabled' : '' }}>
         PART DISPATCHED
     </option>
 
     {{-- Dispatch --}}
     <option value="dispatched"
         {{ $order->status == 'dispatched' ? 'selected' : '' }}
-        {{ $order->status != 'approved' ? 'disabled' : '' }}>
+        {{ !in_array($order->status, ['approved', 'part_dispatched']) ? 'disabled' : '' }}>
         DISPATCHED
     </option>
 
 </select>
+                       
+</td>
+
+                                                                        <td>
+                                                                            @if(in_array($order->status, ['approved', 'part_dispatched']))
+                                                                                <button class="btn btn-sm btn-primary w-100 open-dispatch-btn" data-id="{{ $order->id }}">Dispatch</button>
+                                                                            @else
+                                                                                <span class="text-muted small">-</span>
+                                                                            @endif
                                                                         </td>
 
                                                                     </tr>
@@ -286,33 +294,89 @@
     </main>
 
 
-    <!-- ORDER ITEMS MODAL -->
+    <!-- ORDER SUMMARY MODAL (Read Only) -->
     <div class="modal fade" id="orderItemsModal" tabindex="-1" aria-labelledby="orderItemsModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="orderItemsModalLabel">Order Items</h5>
+                    <h5 class="modal-title" id="orderItemsModalLabel">Order Summary & Dispatch History</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="table-responsive">
-                        <table class="table table-bordered table-striped" id="modalItemsTable">
-                            <thead class="table-secondary">
-                                <tr>
-                                    <th>Product</th>
-                                    <th>Packing</th>
-                                    <th>Price</th>
-                                    <th>Shipper Size</th>
-                                    <th>GST (%)</th>
-                                    <th>Discount</th>
-                                    <th>Qty</th>
-                                    <th>Total</th>
-                                    <th class="text-center">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody id="modalItemsBody">
-                            </tbody>
-                        </table>
+                    <!-- Order Summary -->
+                    <div class="card mb-3 shadow-sm border-0">
+                        <div class="card-header bg-light">
+                            <h6 class="mb-0 fw-bold">Order Summary</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-md-2">
+                                    <label class="form-label text-muted small fw-bold">Order ID</label>
+                                    <div id="summary_order_no" class="fw-bold"></div>
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label text-muted small fw-bold">Status</label>
+                                    <div id="summary_status"></div>
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label text-muted small fw-bold">Total Qty</label>
+                                    <div id="summary_total_qty" class="fw-bold"></div>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label text-muted small fw-bold">Dispatched Qty</label>
+                                    <div id="summary_disp_qty" class="text-info fw-bold"></div>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label text-muted small fw-bold">Pending Qty</label>
+                                    <div id="summary_pend_qty" class="text-warning text-dark fw-bold"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dispatch History -->
+                    <div class="card mb-3 shadow-sm border-0" id="summaryHistoryCard" style="display:none;">
+                        <div class="card-header bg-light">
+                            <h6 class="mb-0 fw-bold"><i class="fas fa-history text-secondary me-2"></i>Dispatch History</h6>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-sm table-striped mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Type</th>
+                                            <th>Date</th>
+                                            <th>Transport / LR Number</th>
+                                            <th>Image</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="summaryHistoryBody">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dispatch Item Details -->
+                    <div class="card mb-3 shadow-sm border-0">
+                        <div class="card-header bg-light">
+                            <h6 class="mb-0 fw-bold">Dispatch Item Details</h6>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-striped" id="modalItemsTable">
+                                <thead class="table-secondary">
+                                    <tr>
+                                        <th>Product Name</th>
+                                        <th>Packing</th>
+                                        <th>Total Qty</th>
+                                        <th>Dispatched Qty</th>
+                                        <th>Pending Qty</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="modalItemsBody">
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -502,19 +566,19 @@
 
 
         /* -----------------------
-           ORDER ITEMS MODAL & EDIT
+           ORDER ITEMS MODAL (READ ONLY)
         ----------------------- */
 
         $(document).on('click', '.view-items-btn', function (e) {
             e.preventDefault();
             let order_id = $(this).data('id');
             let status = $(this).data('status');
-            console.log("View Items clicked! Order ID:", order_id, "Status:", status);
-            let isEditable = (status === 'pending');
             
             $('#orderItemsModal').modal('show');
             let tbody = $('#modalItemsBody');
-            tbody.html('<tr><td colspan="9" class="text-center py-4"><i class="fas fa-spinner fa-spin fa-2x text-primary"></i> Loading items...</td></tr>');
+            tbody.html('<tr><td colspan="5" class="text-center py-4"><i class="fas fa-spinner fa-spin fa-2x text-primary"></i> Loading details...</td></tr>');
+            $('#summaryHistoryBody').empty();
+            $('#summaryHistoryCard').hide();
 
             $.ajax({
                 url: `/admin/order/${order_id}/dispatch-data`,
@@ -523,106 +587,107 @@
                     if (res.status && res.items) {
                         tbody.empty();
                         let items = res.items;
+                        let order = res.order;
+                        let dispatches = res.dispatches;
+                        
+                        let totalQty = 0;
+                        let totalDisp = 0;
+
                         if (items.length > 0) {
                             $.each(items, function (index, item) {
                                 let packing = (item.packing_value && item.packing) ? item.packing_value + ' ' + item.packing : '-';
                                 
-                                let qtyInput = isEditable 
-                                    ? `<input type="number" class="form-control form-control-sm item-qty bg-white border-primary fw-bold" value="${item.order_qty}" min="1" step="1" style="width: 70px;">`
-                                    : `<span class="badge bg-secondary p-2 fs-6">${item.order_qty}</span>`;
-
-                                let actionBtn = isEditable 
-                                    ? `<button class="btn btn-sm btn-primary update-item-btn" title="Save Qty"><i class="fas fa-save"></i> Save</button>`
-                                    : `<span class="badge bg-secondary">Readonly</span>`;
+                                totalQty += item.order_qty;
+                                totalDisp += item.dispatched_qty;
 
                                 let row = `
-                            <tr data-id="${item.id}" data-price="${item.price}" data-gst="${item.gst}" data-discount="${item.discount}">
-                                <td>${item.product ? item.product : '-'}</td>
+                            <tr>
+                                <td class="fw-bold">${item.product ? item.product : '-'}</td>
                                 <td>${packing}</td>
-                                <td>₹${parseFloat(item.price).toFixed(2)}</td>
-                                <td>${item.shipper_size ? item.shipper_size : '-'}</td>
-                                <td>${item.gst}%</td>
-                                <td>₹${parseFloat(item.discount).toFixed(2)}</td>
-                                <td>${qtyInput}</td>
-                                <td class="item-grand-total align-middle fw-bold">₹${parseFloat(item.grand_total).toFixed(2)}</td>
-                                <td class="align-middle text-center">${actionBtn}</td>
+                                <td><span class="badge bg-secondary p-2 fs-6">${item.order_qty}</span></td>
+                                <td><span class="badge bg-info p-2 fs-6">${item.dispatched_qty}</span></td>
+                                <td><span class="badge bg-warning text-dark p-2 fs-6">${item.pending_qty}</span></td>
                             </tr>`;
                                 tbody.append(row);
                             });
                         } else {
-                            tbody.append('<tr><td colspan="9" class="text-center">No items found.</td></tr>');
+                            tbody.append('<tr><td colspan="5" class="text-center">No items found.</td></tr>');
                         }
+
+                        // Set order summary
+                        let badgeClass = 'bg-primary';
+                        if(order.status === 'dispatched') badgeClass = 'bg-success';
+                        else if(order.status === 'rejected') badgeClass = 'bg-danger';
+                        
+                        $('#summary_order_no').text(order.order_no);
+                        $('#summary_status').html(`<span class="badge ${badgeClass}">${order.status.toUpperCase()}</span>`);
+                        $('#summary_total_qty').html(`<span class="badge bg-secondary p-2 fs-6">${totalQty}</span>`);
+                        $('#summary_disp_qty').html(`<span class="badge bg-info p-2 fs-6">${totalDisp}</span>`);
+                        $('#summary_pend_qty').html(`<span class="badge bg-warning text-dark p-2 fs-6">${totalQty - totalDisp}</span>`);
+
+                        // Set dispatch history
+                        if (dispatches && dispatches.length > 0) {
+                            $('#summaryHistoryCard').show();
+                            // Group dispatches if needed, or list all detailed
+                            let grouped = {};
+                            $.each(dispatches, function (index, d) {
+                                let key = d.created_at; // group by date roughly
+                                let type = d.dispatch_type ? d.dispatch_type.toUpperCase() : 'PARTIAL';
+                                let detail = d.detail || {};
+                                let date = detail.dispatch_date ? detail.dispatch_date.substring(0, 10) : (d.created_at ? d.created_at.substring(0, 10) : '-');
+                                let groupKey = `${date}_${detail.lr_number}_${detail.transport_name}`;
+
+                                if (!grouped[groupKey]) {
+                                    grouped[groupKey] = {
+                                        type: type,
+                                        date: date,
+                                        lr_number: detail.lr_number || '-',
+                                        transport_name: detail.transport_name || '-',
+                                        dispatch_image: detail.dispatch_image
+                                    };
+                                } else {
+                                    if(type === 'FINAL') grouped[groupKey].type = 'FINAL';
+                                }
+                            });
+
+                            let histBody = $('#summaryHistoryBody');
+                            histBody.empty();
+                            $.each(grouped, function(key, g) {
+                                let imgHtml = '-';
+                                if (g.dispatch_image) {
+                                    imgHtml = `<a href="/storage/${g.dispatch_image}" target="_blank" class="badge bg-primary">View Image</a>`;
+                                }
+                                let typeBadge = g.type === 'FINAL' ? 'badge bg-success' : 'badge bg-warning text-dark';
+                                histBody.append(`
+                                    <tr>
+                                        <td><span class="${typeBadge}">${g.type}</span></td>
+                                        <td>${g.date}</td>
+                                        <td>${g.transport_name} / ${g.lr_number}</td>
+                                        <td>${imgHtml}</td>
+                                    </tr>
+                                `);
+                            });
+                        }
+
                     } else {
-                        tbody.html('<tr><td colspan="9" class="text-center text-danger">Failed to load data.</td></tr>');
+                        tbody.html('<tr><td colspan="5" class="text-center text-danger">Failed to load data.</td></tr>');
                     }
                 },
                 error: function() {
-                    tbody.html('<tr><td colspan="9" class="text-center text-danger">Error loading details.</td></tr>');
-                }
-            });
-        });
-
-        // Recalculate on qty change
-        $(document).on('input', '.item-qty', function() {
-            let tr = $(this).closest('tr');
-            let qty = parseInt($(this).val()) || 1;
-            if (qty < 1) {
-                qty = 1;
-                $(this).val(qty);
-            }
-            let price = parseFloat(tr.data('price')) || 0;
-            let gst = parseFloat(tr.data('gst')) || 0;
-            let discount = parseFloat(tr.data('discount')) || 0;
-
-            let total = price * qty;
-            let totalAfterDiscount = total - discount;
-            if(totalAfterDiscount < 0) totalAfterDiscount = 0;
-
-            let gstAmount = (totalAfterDiscount * gst) / 100;
-            let grandTotal = totalAfterDiscount + gstAmount;
-
-            tr.find('.item-grand-total').text('₹' + grandTotal.toFixed(2));
-        });
-
-        // Save Edit Qty
-        $(document).on('click', '.update-item-btn', function (e) {
-            e.preventDefault();
-            let btn = $(this);
-            let tr = btn.closest('tr');
-            let item_id = tr.data('id');
-            let qty = tr.find('.item-qty').val();
-
-            let originalHtml = btn.html();
-            btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i>');
-
-            $.ajax({
-                url: "{{ route('order.item.update') }}",
-                type: "POST",
-                data: {
-                    _token: "{{ csrf_token() }}",
-                    item_id: item_id,
-                    qty: qty
-                },
-                success: function (res) {
-                    if (res.success) {
-                        alert('Quantity updated successfully! Page will refresh to update totals.');
-                        location.reload();
-                    } else {
-                        btn.prop('disabled', false).html(originalHtml);
-                        alert(res.message);
-                    }
-                },
-                error: function (xhr) {
-                    btn.prop('disabled', false).html(originalHtml);
-                    let msg = xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : 'Failed to update quantity.';
-                    alert(msg);
+                    tbody.html('<tr><td colspan="5" class="text-center text-danger">Error loading details.</td></tr>');
                 }
             });
         });
 
         /* -----------------------
-           STATUS CHANGE
+           STATUS CHANGE & DISPATCH INIT
         ----------------------- */
+
+        $(document).on('click', '.open-dispatch-btn', function(e) {
+            e.preventDefault();
+            let order_id = $(this).data('id');
+            openDispatchModal(order_id);
+        });
 
         $(document).on('change', '.status-change', function () {
 

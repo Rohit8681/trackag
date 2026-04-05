@@ -261,7 +261,8 @@ class OrderController extends Controller
         $orders = Order::with([
             'customer:id,agro_name',
             'items.product:id,product_name',
-            'items.packing:id,packing_value,packing_size'
+            'items.packing:id,packing_value,packing_size',
+            'items.dispatches'
         ])
         ->where('user_id', auth()->id())
         ->latest()
@@ -284,6 +285,8 @@ class OrderController extends Controller
                 'created_at' => $order->created_at->format('d-m-Y'),
 
                 'products' => $order->items->map(function ($item) {
+                    $dispatched_qty = $item->dispatches->sum('dispatch_qty');
+                    $pending_qty = $item->qty - $dispatched_qty;
                     return [
                         'product_id' => $item->product_id,
                         'packing_id' => $item->packing_id,
@@ -296,7 +299,9 @@ class OrderController extends Controller
                         'gst' => $item->gst,
                         'discount' => $item->discount,
                         'grand_total' => $item->grand_total,
-                        'qty' => $item->qty
+                        'qty' => $item->qty,
+                        'dispatched_qty' => $dispatched_qty,
+                        'pending_qty' => $pending_qty
                     ];
                 })
             ];
