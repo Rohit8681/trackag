@@ -51,24 +51,32 @@
                             <div class="legend-title">Map Icon Legend</div>
                             <div class="legend-row">
                                 <div class="legend-item">
-                                    <div class="legend-mini-marker" style="border-color: #10b981; color: #10b981;"><i class="fas fa-play"></i></div>
-                                    <span>Start</span>
-                                </div>
-                                <div class="legend-item">
                                     <span class="legend-dot blue"></span>
-                                    <span>Path</span>
+                                    <span>Route Path</span>
                                 </div>
                                 <div class="legend-item">
-                                    <div class="legend-mini-marker" style="border-color: #ef4444; color: #ef4444;"><i class="fas fa-store"></i></div>
-                                    <span>Customer</span>
+                                    <div class="legend-mini-marker lm-party"><i class="fas fa-building"></i></div>
+                                    <span>Party Visit</span>
                                 </div>
                                 <div class="legend-item">
-                                    <div class="legend-agent-pulse"></div>
-                                    <span>Agent</span>
+                                    <div class="legend-mini-marker lm-farmer"><i class="fas fa-user-tie"></i></div>
+                                    <span>Farmer Location</span>
                                 </div>
                                 <div class="legend-item">
-                                    <div class="legend-mini-marker" style="border-color: #ef4444; color: #ef4444;"><i class="fas fa-flag-checkered"></i></div>
-                                    <span>End</span>
+                                    <div class="legend-mini-marker lm-farm-visit"><i class="fas fa-leaf"></i></div>
+                                    <span>Farm Visit</span>
+                                </div>
+                                <div class="legend-item">
+                                    <div class="legend-mini-marker lm-customer"><i class="fas fa-store"></i></div>
+                                    <span>Customer Visit</span>
+                                </div>
+                                <div class="legend-item">
+                                    <div class="legend-mini-marker lm-start"><i class="fas fa-play"></i></div>
+                                    <span>Trip Start</span>
+                                </div>
+                                <div class="legend-item">
+                                    <div class="legend-mini-marker lm-end"><i class="fas fa-flag-checkered"></i></div>
+                                    <span>Trip End</span>
                                 </div>
                             </div>
                         </div>
@@ -311,6 +319,14 @@
 .legend-agent-pulse {
     width: 12px; height: 12px; background: #3b82f6; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.4); margin: 0 4px;
 }
+
+/* Marker Legend Specific Colors */
+.lm-start { border-color: #10b981; color: #10b981; }
+.lm-end { border-color: #ef4444; color: #ef4444; }
+.lm-party { border-color: #f59e0b; color: #f59e0b; }
+.lm-farmer { border-color: #10b981; color: #10b981; }
+.lm-farm-visit { border-color: #3b82f6; color: #3b82f6; }
+.lm-customer { border-color: #ef4444; color: #ef4444; }
 
 
         .legend-title {

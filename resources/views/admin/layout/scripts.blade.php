@@ -232,9 +232,10 @@ async function initMap() {
         setupHoverInfoWindow(marker, `
             <div class="iw-header">
                 <i class="fas fa-building text-warning"></i>
-                <strong>${agroName}</strong>
+                <strong>Party Visit</strong>
             </div>
             <div class="iw-body">
+                <div><span>Name:</span> ${agroName}</div>
                 <div><span>Check-in:</span> ${party.check_in_time ?? 'N/A'}</div>
             </div>
         `);
@@ -254,7 +255,7 @@ async function initMap() {
         setupHoverInfoWindow(marker, `
             <div class="iw-header">
                 <i class="fas fa-user-tie text-success"></i>
-                <strong>Farmer</strong>
+                <strong>Farmer Location</strong>
             </div>
             <div class="iw-body">
                 <div><span>Name:</span> ${farmer.farmer_name ?? 'N/A'}</div>
@@ -300,7 +301,7 @@ async function initMap() {
         setupHoverInfoWindow(marker, `
             <div class="iw-header">
                 <i class="fas fa-store text-danger"></i>
-                <strong>Customer</strong>
+                <strong>Customer Visit</strong>
             </div>
             <div class="iw-body">
                 <div><span>Name:</span> ${customer.agro_name ?? 'N/A'}</div>
