@@ -36,7 +36,7 @@
 {{-- <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB_-uOyQimLqBkDW_Vr8d88GX6Qk0lyksI&libraries=places"> --}}
 {{-- <script src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_MAPS_API_KEY') }}&libraries=places" ></script> --}}
 <script
-    src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_MAPS_API_KEY') }}&libraries=places&callback=initMap"
+    src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_MAPS_API_KEY') }}&libraries=places,marker&callback=initMap"
     async defer>
 </script>
 
@@ -84,161 +84,14 @@
 </script>
 
 <script>
-// function initMap() {
 
-//     const tripLogs = window.tripLogs || [];
-//     const partyVisits = window.partyVisits || [];
-//     const tripEnded = window.tripEnded;
-
-//     if (!tripLogs.length) {
-//         console.warn("No trip logs found");
-//         return;
-//     }
-
-//     const pathCoordinates = tripLogs.map(l => ({
-//         lat: parseFloat(l.latitude),
-//         lng: parseFloat(l.longitude),
-//         recorded_at: l.recorded_at
-//     }));
-
-//     const map = new google.maps.Map(document.getElementById("map"), {
-//         zoom: 13,
-//         center: pathCoordinates[0],
-//     });
-
-//     // ---------- POLYLINE ----------
-//     if (pathCoordinates.length > 1) {
-//         new google.maps.Polyline({
-//             path: pathCoordinates,
-//             geodesic: true,
-//             strokeColor: "#007bff",
-//             strokeWeight: 4,
-//             map
-//         });
-//     }
-
-//     // ---------- ICONS ----------
-//     const startIcon = {
-//         url: "{{ asset('img/start-green.png') }}",
-//         scaledSize: new google.maps.Size(60, 60)
-//     };
-
-//     const middleIcon = {
-//         url: "{{ asset('img/mid-blue.png') }}",
-//         scaledSize: new google.maps.Size(20, 20)
-//     };
-
-//     const middleGreenIcon = {
-//         url: "{{ asset('img/start-green.png') }}",
-//         scaledSize: new google.maps.Size(20, 20)
-//     };
-
-//     const middleRedIcon = {
-//         url: "{{ asset('img/end-red.png') }}",
-//         scaledSize: new google.maps.Size(20, 20)
-//     };
-
-//     const endIcon = {
-//         url: "{{ asset('img/end-red.png') }}",
-//         scaledSize: new google.maps.Size(60, 60)
-//     };
-
-//     const partyIcon = {
-//         url: "{{ asset('img/yellow.png') }}",
-//         scaledSize: new google.maps.Size(60, 60)
-//     };
-
-//     // ---------- START ----------
-//     new google.maps.Marker({
-//         position: pathCoordinates[0],
-//         map,
-//         icon: startIcon,
-//         title: "Start: " + (pathCoordinates[0].recorded_at ?? '')
-//     });
-
-//     for (let i = 1; i < pathCoordinates.length - 1; i++) {
-
-//         let iconToUse = middleIcon; // default mid-blue
-
-//         if (pathCoordinates[i].recorded_at) {
-
-//             // recorded_at format: YYYY-MM-DD HH:mm:ss
-//             const date = new Date(pathCoordinates[i].recorded_at.replace(' ', 'T'));
-//             const hour = date.getHours(); // 0–23
-
-//             if (hour >= 6 && hour < 12) {
-//                 iconToUse = middleGreenIcon;   // 6 AM – 12 PM
-//             } 
-//             else if (hour >= 12 && hour < 18) {
-//                 iconToUse = middleIcon;        // 12 PM – 6 PM
-//             } 
-//             else {
-//                 iconToUse = middleRedIcon;     // 6 PM – 12 AM
-//             }
-//         }
-
-//         new google.maps.Marker({
-//             position: pathCoordinates[i],
-//             map,
-//             icon: iconToUse,
-//             title: pathCoordinates[i].recorded_at
-//         });
-//     }
-
-//     // ---------- END ----------
-//     if (tripEnded && pathCoordinates.length > 1) {
-//         const last = pathCoordinates[pathCoordinates.length - 1];
-
-//         new google.maps.Marker({
-//             position: last,
-//             map,
-//             icon: endIcon,
-//             title: "End: " + (last.recorded_at ?? '')
-//         });
-//     }
-
-//     // ---------- PARTY VISITS ----------
-//     const infoWindow = new google.maps.InfoWindow();
-
-//     partyVisits.forEach(party => {
-
-//         if (!party.latitude || !party.longitude) return;
-
-//         const agroName = party.customer?.agro_name ?? 'Customer';
-
-//         const marker = new google.maps.Marker({
-//             position: {
-//                 lat: parseFloat(party.latitude),
-//                 lng: parseFloat(party.longitude)
-//             },
-//             map,
-//             icon: partyIcon,
-
-//             // 👉 cursor hover tooltip
-//             title: agroName
-//         });
-
-//         // 👉 hover popup
-//         marker.addListener("mouseover", () => {
-//             infoWindow.setContent(`
-//                 <strong>${agroName}</strong><br>
-//                 Check-in Time: ${party.check_in_time ?? ''}
-//             `);
-//             infoWindow.open(map, marker);
-//         });
-
-//         marker.addListener("mouseout", () => {
-//             infoWindow.close();
-//         });
-//     });
-// }
-function initMap() {
+async function initMap() {
 
     const tripLogs     = window.tripLogs || [];
     const partyVisits  = window.partyVisits || [];
     const farmers      = window.farmers || [];
     const farmVisits   = window.farmVisits || [];
-    const customers    = window.customers || []; // ✅ NEW
+    const customers    = window.customers || []; 
     const tripEnded    = window.tripEnded;
 
     if (!tripLogs.length) {
@@ -246,231 +99,214 @@ function initMap() {
         return;
     }
 
+    // Dynamic library import for Advanced Markers
+    const { Map } = await google.maps.importLibrary("maps");
+    const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
+
     const pathCoordinates = tripLogs.map(l => ({
         lat: parseFloat(l.latitude),
         lng: parseFloat(l.longitude),
         recorded_at: l.recorded_at
     }));
 
-    const map = new google.maps.Map(document.getElementById("map"), {
+    const map = new Map(document.getElementById("map"), {
         zoom: 13,
         center: pathCoordinates[0],
+        mapId: "DEMO_MAP_ID", // Required for AdvancedMarkerElement
     });
 
-    // ---------- POLYLINE ----------
+    // ---------- GLOW POLYLINE ----------
     if (pathCoordinates.length > 1) {
+        // Outer glow
         new google.maps.Polyline({
             path: pathCoordinates,
             geodesic: true,
-            strokeColor: "#007bff",
-            strokeWeight: 4,
+            strokeColor: "#3b82f6",
+            strokeOpacity: 0.3,
+            strokeWeight: 10,
+            map
+        });
+        // Inner actual line
+        new google.maps.Polyline({
+            path: pathCoordinates,
+            geodesic: true,
+            strokeColor: "#2563eb",
+            strokeOpacity: 1.0,
+            strokeWeight: 3,
             map
         });
     }
 
-    // ---------- ICONS ----------
-    const startIcon = {
-        url: "{{ asset('img/start-green.png') }}",
-        scaledSize: new google.maps.Size(60, 60)
-    };
+    // ---------- HELPER TO CREATE HTML MARKERS ----------
+    function createCustomMarker(type, iconClass) {
+        const el = document.createElement("div");
+        el.className = `modern-marker ${type}`;
+        
+        let innerHtml = '';
+        if (type === 'start') innerHtml = '<i class="fas fa-play"></i>';
+        else if (type === 'end') innerHtml = '<i class="fas fa-flag-checkered"></i>';
+        else if (type === 'middle-green') innerHtml = '<div class="dot green-dot"></div>';
+        else if (type === 'middle-blue') innerHtml = '<div class="dot blue-dot"></div>';
+        else if (type === 'middle-red') innerHtml = '<div class="dot red-dot"></div>';
+        else if (iconClass) innerHtml = `<i class="${iconClass}"></i>`;
 
-    const middleIcon = {
-        url: "{{ asset('img/mid-blue.png') }}",
-        scaledSize: new google.maps.Size(20, 20)
-    };
+        // Active/Pulse marker for current agent position
+        if (type === 'pulse') {
+            el.className += ' pulse-marker';
+            innerHtml = '<div class="pulse-ring"></div><div class="pulse-core"></div>';
+        }
 
-    const middleGreenIcon = {
-        url: "{{ asset('img/start-green.png') }}",
-        scaledSize: new google.maps.Size(20, 20)
-    };
-
-    const middleRedIcon = {
-        url: "{{ asset('img/end-red.png') }}",
-        scaledSize: new google.maps.Size(20, 20)
-    };
-
-    const endIcon = {
-        url: "{{ asset('img/end-red.png') }}",
-        scaledSize: new google.maps.Size(60, 60)
-    };
-
-    const partyIcon = {
-        url: "{{ asset('img/yellow.png') }}",
-        scaledSize: new google.maps.Size(60, 60)
-    };
-
-    const farmerIcon = {
-        url: "{{ asset('img/farmer.png') }}",
-        scaledSize: new google.maps.Size(50, 50)
-    };
-
-    const farmVisitIcon = {
-        url: "{{ asset('img/farm-visit.png') }}",
-        scaledSize: new google.maps.Size(50, 50)
-    };
-
-    const customerIcon = {
-        url: "{{ asset('img/customer.png') }}",
-        scaledSize: new google.maps.Size(50, 50)
-    };
+        el.innerHTML = innerHtml;
+        return el;
+    }
 
     // ---------- START ----------
-    new google.maps.Marker({
+    new AdvancedMarkerElement({
         position: pathCoordinates[0],
         map,
-        icon: startIcon,
+        content: createCustomMarker('start'),
         title: "Start: " + (pathCoordinates[0].recorded_at ?? '')
     });
 
     // ---------- MIDDLE POINTS ----------
     for (let i = 1; i < pathCoordinates.length - 1; i++) {
-
-        let iconToUse = middleIcon;
+        let type = 'middle-blue';
 
         if (pathCoordinates[i].recorded_at) {
-
             const date = new Date(pathCoordinates[i].recorded_at.replace(' ', 'T'));
             const hour = date.getHours();
 
             if (hour >= 6 && hour < 12) {
-                iconToUse = middleGreenIcon;
-            } 
-            else if (hour >= 12 && hour < 18) {
-                iconToUse = middleIcon;
-            } 
-            else {
-                iconToUse = middleRedIcon;
+                type = 'middle-green';
+            } else if (hour >= 12 && hour < 18) {
+                type = 'middle-blue';
+            } else {
+                type = 'middle-red';
             }
         }
 
-        new google.maps.Marker({
+        new AdvancedMarkerElement({
             position: pathCoordinates[i],
             map,
-            icon: iconToUse,
+            content: createCustomMarker(type),
             title: pathCoordinates[i].recorded_at
         });
     }
 
-    // ---------- END ----------
-    if (tripEnded && pathCoordinates.length > 1) {
+    // ---------- END OR CURRENT LOCATION ----------
+    if (pathCoordinates.length > 1) {
         const last = pathCoordinates[pathCoordinates.length - 1];
-
-        new google.maps.Marker({
+        
+        new AdvancedMarkerElement({
             position: last,
             map,
-            icon: endIcon,
-            title: "End: " + (last.recorded_at ?? '')
+            content: tripEnded ? createCustomMarker('end') : createCustomMarker('pulse'),
+            title: tripEnded ? ("End: " + (last.recorded_at ?? '')) : ("Current Location: " + (last.recorded_at ?? '')),
+            zIndex: 999
+        });
+    }
+
+    // ---------- MODERN INFOWINDOW ----------
+    const infoWindow = new google.maps.InfoWindow();
+
+    function setupHoverInfoWindow(marker, content) {
+        marker.addListener("click", () => {
+             const wrapper = `<div class="modern-iw-content">${content}</div>`;
+             infoWindow.setContent(wrapper);
+             infoWindow.open(map, marker);
         });
     }
 
     // ---------- PARTY VISITS ----------
-    const infoWindow = new google.maps.InfoWindow();
-
     partyVisits.forEach(party => {
-
         if (!party.latitude || !party.longitude) return;
-
         const agroName = party.customer?.agro_name ?? 'Customer';
-
-        const marker = new google.maps.Marker({
-            position: {
-                lat: parseFloat(party.latitude),
-                lng: parseFloat(party.longitude)
-            },
+        
+        const marker = new AdvancedMarkerElement({
+            position: { lat: parseFloat(party.latitude), lng: parseFloat(party.longitude) },
             map,
-            icon: partyIcon,
+            content: createCustomMarker('party-visit', 'fas fa-building'),
             title: agroName
         });
 
-        marker.addListener("mouseover", () => {
-            infoWindow.setContent(`
-                <strong>${agroName}</strong><br>
-                Check-in Time: ${party.check_in_time ?? ''}
-            `);
-            infoWindow.open(map, marker);
-        });
-
-        marker.addListener("mouseout", () => {
-            infoWindow.close();
-        });
+        setupHoverInfoWindow(marker, `
+            <div class="iw-header">
+                <i class="fas fa-building text-warning"></i>
+                <strong>${agroName}</strong>
+            </div>
+            <div class="iw-body">
+                <div><span>Check-in:</span> ${party.check_in_time ?? 'N/A'}</div>
+            </div>
+        `);
     });
 
     // ---------- FARMERS ----------
     farmers.forEach(farmer => {
-
         if (!farmer.latitude || !farmer.longitude) return;
-
-        const marker = new google.maps.Marker({
-            position: {
-                lat: parseFloat(farmer.latitude),
-                lng: parseFloat(farmer.longitude)
-            },
+        
+        const marker = new AdvancedMarkerElement({
+            position: { lat: parseFloat(farmer.latitude), lng: parseFloat(farmer.longitude) },
             map,
-            icon: farmerIcon,
+            content: createCustomMarker('farmer', 'fas fa-user-tie'),
             title: farmer.farmer_name ?? 'Farmer'
         });
 
-        marker.addListener("click", () => {
-            infoWindow.setContent(`
-                <strong>Farmer</strong><br>
-                Name: ${farmer.farmer_name ?? 'N/A'}<br>
-                Date: ${farmer.created_at ?? ''}
-            `);
-            infoWindow.open(map, marker);
-        });
-
+        setupHoverInfoWindow(marker, `
+            <div class="iw-header">
+                <i class="fas fa-user-tie text-success"></i>
+                <strong>Farmer</strong>
+            </div>
+            <div class="iw-body">
+                <div><span>Name:</span> ${farmer.farmer_name ?? 'N/A'}</div>
+                <div><span>Date:</span> ${farmer.created_at ?? 'N/A'}</div>
+            </div>
+        `);
     });
 
     // ---------- FARM VISITS ----------
     farmVisits.forEach(visit => {
-
         if (!visit.latitude || !visit.longitude) return;
-
-        const marker = new google.maps.Marker({
-            position: {
-                lat: parseFloat(visit.latitude),
-                lng: parseFloat(visit.longitude)
-            },
+        
+        const marker = new AdvancedMarkerElement({
+            position: { lat: parseFloat(visit.latitude), lng: parseFloat(visit.longitude) },
             map,
-            icon: farmVisitIcon,
+            content: createCustomMarker('farm-visit', 'fas fa-leaf'),
             title: visit.farmer_name ?? 'Farm Visit'
         });
 
-        marker.addListener("click", () => {
-            infoWindow.setContent(`
-                <strong>Farm Visit</strong><br>
-                Farmer: ${visit.farmer_name ?? 'N/A'}<br>
-                Date: ${visit.created_at ?? ''}
-            `);
-            infoWindow.open(map, marker);
-        });
-
+        setupHoverInfoWindow(marker, `
+            <div class="iw-header">
+                <i class="fas fa-leaf text-success"></i>
+                <strong>Farm Visit</strong>
+            </div>
+            <div class="iw-body">
+                <div><span>Farmer:</span> ${visit.farmer_name ?? 'N/A'}</div>
+                <div><span>Date:</span> ${visit.created_at ?? 'N/A'}</div>
+            </div>
+        `);
     });
 
-    // ---------- CUSTOMERS (🆕 NEW) ----------
+    // ---------- CUSTOMERS ----------
     customers.forEach(customer => {
-
         if (!customer.latitude || !customer.longitude) return;
-
-        const marker = new google.maps.Marker({
-            position: {
-                lat: parseFloat(customer.latitude),
-                lng: parseFloat(customer.longitude)
-            },
+        
+        const marker = new AdvancedMarkerElement({
+            position: { lat: parseFloat(customer.latitude), lng: parseFloat(customer.longitude) },
             map,
-            icon: customerIcon,
+            content: createCustomMarker('customer', 'fas fa-store'),
             title: customer.agro_name ?? 'Customer'
         });
 
-        marker.addListener("click", () => {
-            infoWindow.setContent(`
-                <strong>Customer</strong><br>
-                Name: ${customer.agro_name ?? 'N/A'}<br>
-                Date: ${customer.created_at ?? ''}
-            `);
-            infoWindow.open(map, marker);
-        });
-
+        setupHoverInfoWindow(marker, `
+            <div class="iw-header">
+                <i class="fas fa-store text-danger"></i>
+                <strong>Customer</strong>
+            </div>
+            <div class="iw-body">
+                <div><span>Name:</span> ${customer.agro_name ?? 'N/A'}</div>
+                <div><span>Date:</span> ${customer.created_at ?? 'N/A'}</div>
+            </div>
+        `);
     });
 
 }

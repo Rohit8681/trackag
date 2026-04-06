@@ -123,6 +123,144 @@
             display: none !important;
         }
 
+        /* ---------- CUSTOM HTML MARKERS ---------- */
+        .modern-marker {
+            width: 40px;
+            height: 40px;
+            background: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            border: 2px solid #e5e7eb;
+            font-size: 16px;
+            color: #4b5563;
+            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        .modern-marker:hover {
+            transform: scale(1.15) translateY(-4px);
+            box-shadow: 0 8px 18px rgba(0,0,0,0.2);
+            z-index: 100;
+        }
+
+        .modern-marker.start { border-color: #10b981; color: #10b981; }
+        .modern-marker.end { border-color: #ef4444; color: #ef4444; }
+        .modern-marker.party-visit { border-color: #f59e0b; color: #f59e0b; }
+        .modern-marker.farmer { border-color: #10b981; color: #10b981; }
+        .modern-marker.farm-visit { border-color: #3b82f6; color: #3b82f6; }
+        .modern-marker.customer { border-color: #ef4444; color: #ef4444; }
+
+        /* Small Dots for Path */
+        .modern-marker.middle-green, 
+        .modern-marker.middle-blue, 
+        .modern-marker.middle-red {
+            width: 16px;
+            height: 16px;
+            background: transparent;
+            border: none;
+            box-shadow: none;
+        }
+
+        .modern-marker .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: 2px solid #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            transition: transform 0.2s ease;
+        }
+        
+        .modern-marker:hover .dot {
+            transform: scale(1.5);
+        }
+
+        .green-dot { background: #10b981; }
+        .blue-dot  { background: #3b82f6; }
+        .red-dot   { background: #ef4444; }
+
+        /* Pulse Animation */
+        .pulse-marker {
+            width: 24px;
+            height: 24px;
+            background: transparent;
+            border: none;
+            box-shadow: none;
+            position: relative;
+        }
+        .pulse-marker:hover {
+            transform: none;
+            box-shadow: none;
+        }
+        .pulse-core {
+            width: 16px;
+            height: 16px;
+            background: #3b82f6;
+            border-radius: 50%;
+            border: 2px solid #fff;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            z-index: 2;
+        }
+        .pulse-ring {
+            width: 40px;
+            height: 40px;
+            background: rgba(59, 130, 246, 0.4);
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation: pulse-animation 2s infinite cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1;
+        }
+        @keyframes pulse-animation {
+            0% { transform: translate(-50%, -50%) scale(0.5); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(2); opacity: 0; }
+        }
+
+        /* ---------- INFOWINDOW OVERRIDES ---------- */
+        /* Hides default padding and borders to allow our custom card to shine */
+        .gm-style-iw-c {
+            padding: 0 !important;
+            border-radius: 12px !important;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15) !important;
+        }
+        .gm-style-iw-d {
+            overflow: hidden !important;
+        }
+        .modern-iw-content {
+            font-family: 'Inter', -apple-system, sans-serif;
+            min-width: 200px;
+            color: #1f2937;
+        }
+        .modern-iw-content .iw-header {
+            background: #f8fafc;
+            padding: 12px 16px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 15px;
+        }
+        .modern-iw-content .iw-body {
+            padding: 12px 16px;
+            font-size: 13px;
+        }
+        .modern-iw-content .iw-body div {
+            margin-bottom: 4px;
+        }
+        .modern-iw-content .iw-body span {
+            color: #64748b;
+            font-weight: 500;
+        }
+
         /* ---------- LEGEND ---------- */
         .route-legend {
     background: #ffffff;
