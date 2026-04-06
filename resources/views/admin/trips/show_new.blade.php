@@ -25,24 +25,51 @@
                 <!-- RIGHT SIDE (LEGEND + BACK) -->
                 <div class="d-flex gap-3 align-items-start flex-wrap">
 
-                    <!-- LEGEND -->
-                    <div class="route-legend">
-                        <div class="legend-title">Route Time Legend</div>
-
-                        <div class="legend-row">
-                            <div class="legend-item">
-                                <span class="legend-dot green"></span>
-                                <span>6:00 AM – 12:00 PM</span>
+                    <!-- LEGENDS WRAPPER -->
+                    <div class="d-flex flex-wrap gap-3">
+                        <!-- ROUTE TIME LEGEND -->
+                        <div class="route-legend">
+                            <div class="legend-title">Route Time Legend</div>
+                            <div class="legend-row">
+                                <div class="legend-item">
+                                    <span class="legend-dot green"></span>
+                                    <span>6 AM – 12 PM</span>
+                                </div>
+                                <div class="legend-item">
+                                    <span class="legend-dot blue"></span>
+                                    <span>12 PM – 6 PM</span>
+                                </div>
+                                <div class="legend-item">
+                                    <span class="legend-dot red"></span>
+                                    <span>6 PM – 12 AM</span>
+                                </div>
                             </div>
+                        </div>
 
-                            <div class="legend-item">
-                                <span class="legend-dot blue"></span>
-                                <span>12:00 PM – 6:00 PM</span>
-                            </div>
-
-                            <div class="legend-item">
-                                <span class="legend-dot red"></span>
-                                <span>6:00 PM – 11:59 PM</span>
+                        <!-- MAP ICON LEGEND -->
+                        <div class="route-legend">
+                            <div class="legend-title">Map Icon Legend</div>
+                            <div class="legend-row">
+                                <div class="legend-item">
+                                    <div class="legend-mini-marker" style="border-color: #10b981; color: #10b981;"><i class="fas fa-play"></i></div>
+                                    <span>Start</span>
+                                </div>
+                                <div class="legend-item">
+                                    <span class="legend-dot blue"></span>
+                                    <span>Path</span>
+                                </div>
+                                <div class="legend-item">
+                                    <div class="legend-mini-marker" style="border-color: #ef4444; color: #ef4444;"><i class="fas fa-store"></i></div>
+                                    <span>Customer</span>
+                                </div>
+                                <div class="legend-item">
+                                    <div class="legend-agent-pulse"></div>
+                                    <span>Agent</span>
+                                </div>
+                                <div class="legend-item">
+                                    <div class="legend-mini-marker" style="border-color: #ef4444; color: #ef4444;"><i class="fas fa-flag-checkered"></i></div>
+                                    <span>End</span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -266,9 +293,23 @@
     background: #ffffff;
     border-radius: 12px;
     padding: 14px 16px;
-    min-width: 420px;
     box-shadow: 0 6px 18px rgba(0,0,0,0.08);
     border: 1px solid #e5e7eb;
+}
+
+.legend-mini-marker {
+    width: 22px;
+    height: 22px;
+    background: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    border: 2px solid #e5e7eb;
+}
+.legend-agent-pulse {
+    width: 12px; height: 12px; background: #3b82f6; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.4); margin: 0 4px;
 }
 
 
