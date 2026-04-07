@@ -30,7 +30,10 @@ class PartyController extends BaseController
                     'name' => $visit->customer->agro_name,
                 ] : null,
                 'visit_purpose' => $visit->visit_purpose,
-                'visited_date' => $visit->visited_date ? $visit->visited_date : null,
+                // 'visited_date' => $visit->visited_date ? $visit->visited_date : null,
+                'visited_date' => \Carbon\Carbon::parse($visit->visited_date)
+                    ->timezone('Asia/Kolkata')
+                    ->format('d M Y'),
                 'check_in_time' => $visit->check_in_time ? $visit->check_in_time : null,
                 'check_out_time' => $visit->check_out_time ? $visit->check_out_time : null,
                 'followup_date' => $visit->followup_date ? $visit->followup_date : null,
