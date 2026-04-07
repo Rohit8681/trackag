@@ -33,7 +33,7 @@ class PartyController extends BaseController
                 // 'visited_date' => $visit->visited_date ? $visit->visited_date : null,
                 'visited_date' => Carbon::parse($visit->visited_date)
                     ->timezone('Asia/Kolkata')
-                    ->format('d M Y'),
+                     ->format('Y-m-d'),
                 'check_in_time' => $visit->check_in_time ? $visit->check_in_time : null,
                 'check_out_time' => $visit->check_out_time ? $visit->check_out_time : null,
                 'followup_date' => $visit->followup_date ? $visit->followup_date : null,
