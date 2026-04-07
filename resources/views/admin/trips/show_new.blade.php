@@ -8,86 +8,81 @@
         <div class="container-fluid">
 
             <!-- Page Header -->
-            <div class="d-flex justify-content-between align-items-start flex-wrap mb-4">
-
+            <!-- Page Header Row: Title & Subtitle + Back Button -->
+            <div class="d-flex justify-content-between align-items-center flex-wrap mb-3">
                 <!-- LEFT INFO -->
                 <div>
                     <h3 class="fw-bold text-dark mb-1 d-flex align-items-center">
                         <i class="fas fa-map-marked-alt text-primary me-2"></i> Trip Route Map
                     </h3>
-                    <div class="text-muted">
+                    <div class="text-muted d-flex flex-wrap align-items-center gap-3 mt-1" style="font-size: 14px;">
                         <div><strong>Agent:</strong> {{ $trip->user->name ?? 'N/A' }}</div>
                         <div><strong>Place to Visit:</strong> {{ $trip->place_to_visit ?? 'N/A' }}</div>
                         <div><strong>Date:</strong> {{ \Carbon\Carbon::parse($trip->trip_date)->format('d-m-Y') }}</div>
                     </div>
                 </div>
 
-                <!-- RIGHT SIDE (LEGEND + BACK) -->
-                <div class="d-flex gap-3 align-items-start flex-wrap">
+                <!-- RIGHT SIDE: BACK BUTTON -->
+                <a href="{{ route('trips.index') }}"
+                   class="btn btn-outline-secondary d-flex align-items-center shadow-sm">
+                    <i class="fas fa-arrow-left me-2"></i> Back to Trips
+                </a>
+            </div>
 
-                    <!-- LEGENDS WRAPPER -->
-                    <div class="d-flex flex-wrap gap-3">
-                        <!-- ROUTE TIME LEGEND -->
-                        <div class="route-legend">
-                            <div class="legend-title">Route Time Legend</div>
-                            <div class="legend-row">
-                                <div class="legend-item">
-                                    <span class="legend-dot green"></span>
-                                    <span>6 AM – 12 PM</span>
-                                </div>
-                                <div class="legend-item">
-                                    <span class="legend-dot blue"></span>
-                                    <span>12 PM – 6 PM</span>
-                                </div>
-                                <div class="legend-item">
-                                    <span class="legend-dot red"></span>
-                                    <span>6 PM – 12 AM</span>
-                                </div>
-                            </div>
+            <!-- Legends Row -->
+            <div class="d-flex flex-wrap gap-3 mb-4">
+                <!-- ROUTE TIME LEGEND -->
+                <div class="route-legend">
+                    <div class="legend-title">Route Time Legend</div>
+                    <div class="legend-row">
+                        <div class="legend-item">
+                            <span class="legend-dot green"></span>
+                            <span>6 AM – 12 PM</span>
                         </div>
-
-                        <!-- MAP ICON LEGEND -->
-                        <div class="route-legend">
-                            <div class="legend-title">Map Icon Legend</div>
-                            <div class="legend-row">
-                                <div class="legend-item">
-                                    <span class="legend-dot blue"></span>
-                                    <span>Route Path</span>
-                                </div>
-                                <div class="legend-item">
-                                    <div class="legend-mini-marker lm-party"><i class="fas fa-building"></i></div>
-                                    <span>Party Visit</span>
-                                </div>
-                                <div class="legend-item">
-                                    <div class="legend-mini-marker lm-farmer"><i class="fas fa-user-tie"></i></div>
-                                    <span>Farmer Location</span>
-                                </div>
-                                <div class="legend-item">
-                                    <div class="legend-mini-marker lm-farm-visit"><i class="fas fa-leaf"></i></div>
-                                    <span>Farm Visit</span>
-                                </div>
-                                <div class="legend-item">
-                                    <div class="legend-mini-marker lm-customer"><i class="fas fa-store"></i></div>
-                                    <span>Customer Visit</span>
-                                </div>
-                                <div class="legend-item">
-                                    <div class="legend-mini-marker lm-start"><i class="fas fa-play"></i></div>
-                                    <span>Trip Start</span>
-                                </div>
-                                <div class="legend-item">
-                                    <div class="legend-mini-marker lm-end"><i class="fas fa-flag-checkered"></i></div>
-                                    <span>Trip End</span>
-                                </div>
-                            </div>
+                        <div class="legend-item">
+                            <span class="legend-dot blue"></span>
+                            <span>12 PM – 6 PM</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-dot red"></span>
+                            <span>6 PM – 12 AM</span>
                         </div>
                     </div>
+                </div>
 
-                    <!-- BACK BUTTON -->
-                    <a href="{{ route('trips.index') }}"
-                       class="btn btn-outline-secondary d-flex align-items-center shadow-sm">
-                        <i class="fas fa-arrow-left me-2"></i> Back to Trips
-                    </a>
-
+                <!-- MAP ICON LEGEND -->
+                <div class="route-legend flex-grow-1">
+                    <div class="legend-title">Map Icon Legend</div>
+                    <div class="legend-row">
+                        <div class="legend-item">
+                            <span class="legend-dot blue"></span>
+                            <span>Route Path</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-mini-marker lm-party"><i class="fas fa-building"></i></div>
+                            <span>Party Visit</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-mini-marker lm-farmer"><i class="fas fa-user-tie"></i></div>
+                            <span>Farmer Location</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-mini-marker lm-farm-visit"><i class="fas fa-leaf"></i></div>
+                            <span>Farm Visit</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-mini-marker lm-customer"><i class="fas fa-store"></i></div>
+                            <span>Customer Visit</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-mini-marker lm-start"><i class="fas fa-play"></i></div>
+                            <span>Trip Start</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-mini-marker lm-end"><i class="fas fa-flag-checkered"></i></div>
+                            <span>Trip End</span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
