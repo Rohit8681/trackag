@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\PartyController;
 use App\Http\Controllers\Api\PartyPaymentController;
 use App\Http\Controllers\Api\FarmVisitController;
 use App\Http\Controllers\Api\OrderController;
+use App\Http\Controllers\Api\StockController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\TenantAuthenticate;
 
@@ -83,5 +84,9 @@ Route::middleware([TenantAuthenticate::class])->group(function () {
     Route::post('orders-store', [OrderController::class, 'store']);
     Route::post('orders-update/{id}', [OrderController::class, 'update']);
     Route::delete('orders-delete/{id}', [OrderController::class, 'destroy']);
+
+    Route::get('/stock/packing-list', [StockController::class, 'getProductPackingList']);
+    Route::get('/stock/list', [StockController::class, 'getStockList']);
+    Route::post('/stock/bulk-store', [StockController::class, 'bulkStoreStock']);
 
 });

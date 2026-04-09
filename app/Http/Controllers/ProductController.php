@@ -296,56 +296,35 @@ class ProductController extends Controller
         $product->delete();
         return back()->with('success', 'Product deleted');
     }
-
-    // public function priceList()
-    // {
-    //     $companyCount = Company::count();
-    //     $company = null;
-    //     if ($companyCount == 1) {
-    //         $company = Company::first();
-
-    //         if ($company && !empty($company->state)) {
-    //             $companyStates = array_map('intval', explode(',', $company->state));
-    //                 $states = State::where('status', 1)
-    //                     ->whereIn('id', $companyStates)
-    //                     ->get();
-    //         } 
-    //     }else{
-    //         $states = State::where('status', 1)->get();
-    //     }
-
-    //     $products = Product::with(['packings.prices','productStates'])->get();
-
-    //     return view('admin.products.price_list', compact('products', 'states'));
-    // }
+    
 
     public function priceList()
-{
-    $companyCount = Company::count();
-    $company = null;
+    {
+        $companyCount = Company::count();
+        $company = null;
 
-    if ($companyCount == 1) {
-        $company = Company::first();
+        if ($companyCount == 1) {
+            $company = Company::first();
 
-        if ($company && !empty($company->state)) {
-            $companyStates = array_map('intval', explode(',', $company->state));
+            if ($company && !empty($company->state)) {
+                $companyStates = array_map('intval', explode(',', $company->state));
 
-            $states = State::where('status', 1)
-                ->whereIn('id', $companyStates)
-                ->get();
+                $states = State::where('status', 1)
+                    ->whereIn('id', $companyStates)
+                    ->get();
+            }
+        } else {
+            $states = State::where('status', 1)->get();
         }
-    } else {
-        $states = State::where('status', 1)->get();
+
+        $products = Product::with([
+            'packings.prices',
+            'packings.packingStates',
+            'productStates'
+        ])->get();
+
+        return view('admin.products.price_list', compact('products', 'states'));
     }
-
-    $products = Product::with([
-        'packings.prices',
-        'packings.packingStates',
-        'productStates'
-    ])->get();
-
-    return view('admin.products.price_list', compact('products', 'states'));
-}
 
     public function priceStore(Request $request)
     {
