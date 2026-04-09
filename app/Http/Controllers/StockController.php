@@ -21,8 +21,8 @@ class StockController extends Controller
 
         $states = State::where('status', 1)->get();
         // Adjust based on your User role/status conventions
-        $employees = User::where('status', 1)->get(); 
-        $parties = Customer::all();
+        $employees = User::where('status', 'Active')->get(); 
+        $parties = Customer::where('is_active', true)->get();
 
         $startOfMonth = Carbon::parse($month)->startOfMonth();
         $endOfMonth = Carbon::parse($month)->endOfMonth();

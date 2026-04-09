@@ -28,7 +28,7 @@ return new class extends Migration
             $table->json('images')->nullable();
 
             // single video
-            $table->json('video')->nullable();
+            $table->json('videos')->nullable();
 
             $table->longText('remark')->nullable();
             $table->date('next_visit_date')->nullable();

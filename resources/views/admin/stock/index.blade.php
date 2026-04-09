@@ -61,7 +61,7 @@
                                             <select name="party_id" class="form-control select2">
                                                 <option value="">All Parties</option>
                                                 @foreach($parties as $party)
-                                                    <option value="{{ $party->id }}" {{ $party_id == $party->id ? 'selected' : '' }}>{{ $party->name ?? $party->firm_name }}</option>
+                                                    <option value="{{ $party->id }}" {{ $party_id == $party->id ? 'selected' : '' }}>{{ $party->agro_name ?? $party->agro_name }}</option>
                                                 @endforeach
                                             </select>
                                         </div>

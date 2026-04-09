@@ -87,9 +87,9 @@ class StockController extends Controller
         $request->validate([
             'customer_id' => 'nullable|integer',
             'products' => 'required|array',
-            'products.*.product_id' => 'required|exists:products,id',
+            'products.*.product_id' => 'required',
             'products.*.packings' => 'required|array',
-            'products.*.packings.*.packing_id' => 'required|exists:product_packings,id',
+            'products.*.packings.*.packing_id' => 'required',
             'products.*.packings.*.quantity' => 'required|integer|min:0',
         ]);
 
