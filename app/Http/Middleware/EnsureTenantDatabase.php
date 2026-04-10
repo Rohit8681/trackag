@@ -37,6 +37,21 @@ class EnsureTenantDatabase
 
                 try {
                     $currentDb = DB::connection()->getDatabaseName(); // now points to tenant
+                    
+                    // ✅ Prevent Cross-Tenant Login Leak
+                    if ($request->hasSession()) {
+                        $session = $request->session();
+                        if ($session->has('logged_in_tenant_id') && $session->get('logged_in_tenant_id') !== $tenant->id) {
+                            if (auth()->guard('web')->check()) {
+                                auth()->guard('web')->logout();
+                            }
+                            $session->flush();
+                            $session->invalidate();
+                            $session->regenerateToken();
+                        }
+                        $session->put('logged_in_tenant_id', $tenant->id);
+                    }
+                    
                     //\Log::info("✅ Tenant DB connected: {$currentDb} for domain: {$domain}");
                 } catch (\Exception $e) {
                     //\Log::error("❌ Tenant DB connection failed for {$databaseName}: " . $e->getMessage());

@@ -70,12 +70,6 @@ class TenancyServiceProvider extends ServiceProvider
             Events\InitializingTenancy::class => [],
             Events\TenancyInitialized::class => [
                 Listeners\BootstrapTenancy::class,
-                function (\Stancl\Tenancy\Events\TenancyInitialized $event) {
-                    config([
-                        'session.connection' => 'tenant',
-                        'session.cookie' => 'trackag_session_' . $event->tenant->id,
-                    ]);
-                }
             ],
 
             Events\EndingTenancy::class => [],
