@@ -8,6 +8,7 @@ use App\Models\Brochure;
 use App\Models\Depo;
 use App\Models\Holiday;
 use App\Models\Message;
+use App\Models\Leave;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Models\PriceList;
@@ -139,10 +140,15 @@ class CommanController extends Controller
         $summary = [
             'P'  => 0,
             'A'  => 0,
-            'PL' => 0,
-            'CL' => 0,
-            'SL' => 0,
+            'H'  => 0,
         ];
+        
+        $leaves = Leave::where('status', 1)->get();
+        foreach ($leaves as $leave) {
+            if (!empty($leave->leave_code)) {
+                $summary[$leave->leave_code] = 0;
+            }
+        }
 
         /* -------- Calendar -------- */
         $calendar = [];
