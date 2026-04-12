@@ -194,10 +194,10 @@ class OrderController extends Controller
     {
         $request->validate([
             'item_id'  => 'required',
-            'qty'      => 'required|integer|min:1',
+            'shipper_size' => 'required|integer|min:0',
         ]);
 
-        $item = \App\Models\OrderItem::with('order')->findOrFail($request->item_id);
+        $item = \App\Models\OrderItem::with(['order', 'product'])->findOrFail($request->item_id);
 
         if ($item->order->status === 'approved' || !in_array($item->order->status, ['pending', 'hold'])) {
             return response()->json([
@@ -206,13 +206,17 @@ class OrderController extends Controller
             ]);
         }
 
-        $item->qty = $request->qty;
+        $productGst = $item->product ? $item->product->gst : 0;
 
-        $amount = $item->price * $item->qty;
+        $item->shipper_size = $request->shipper_size;
+
+        $amount = $item->price * $item->shipper_size;
         $amountAfterDiscount = $amount - $item->discount;
         if ($amountAfterDiscount < 0) $amountAfterDiscount = 0;
-        $gstAmount = ($amountAfterDiscount * $item->gst) / 100;
+        $gstAmount = ($amountAfterDiscount * $productGst) / 100;
 
+        $item->gst = $gstAmount;
+        $item->total_price = $amount;
         $item->grand_total = round($amountAfterDiscount + $gstAmount, 2);
         $item->save();
 
@@ -231,7 +235,7 @@ class OrderController extends Controller
             'order_id'       => 'required',
             'items'          => 'required|array',
             'items.*.id'     => 'required',
-            'items.*.qty'    => 'required|integer|min:1',
+            'items.*.shipper_size' => 'required|integer|min:0',
         ]);
 
         $order = Order::findOrFail($request->order_id);
@@ -244,17 +248,21 @@ class OrderController extends Controller
         }
 
         foreach ($request->items as $itemData) {
-            $item = \App\Models\OrderItem::where('order_id', $order->id)
+            $item = \App\Models\OrderItem::with('product')->where('order_id', $order->id)
                 ->where('id', $itemData['id'])
                 ->first();
 
             if ($item) {
-                $item->qty = $itemData['qty'];
-                $amount = $item->price * $item->qty;
+                $productGst = $item->product ? $item->product->gst : 0;
+
+                $item->shipper_size = $itemData['shipper_size'];
+                $amount = $item->price * $item->shipper_size;
                 $amountAfterDiscount = $amount - $item->discount;
                 if ($amountAfterDiscount < 0) $amountAfterDiscount = 0;
-                $gstAmount = ($amountAfterDiscount * $item->gst) / 100;
+                $gstAmount = ($amountAfterDiscount * $productGst) / 100;
                 
+                $item->gst = $gstAmount;
+                $item->total_price = $amount;
                 $item->grand_total = round($amountAfterDiscount + $gstAmount, 2);
                 $item->save();
             }
@@ -272,7 +280,7 @@ class OrderController extends Controller
         
         $itemsData = $order->items->map(function ($item) {
             $totalDispatched = $item->dispatches->sum('dispatch_qty');
-            $pendingQty = $item->qty - $totalDispatched;
+            $pendingQty = $item->shipper_size - $totalDispatched;
             
             return [
                 'id' => $item->id,
@@ -280,6 +288,7 @@ class OrderController extends Controller
                 'packing_value' => optional($item->packing)->packing_value,
                 'packing' => optional($item->packing)->packing_size,
                 'price' => $item->price,
+                'gst_percent' => optional($item->product)->gst ?? 0,
                 'gst' => $item->gst,
                 'discount' => $item->discount,
                 'order_qty' => $item->qty,
@@ -330,7 +339,7 @@ class OrderController extends Controller
                 // Determine remaining pending qty locally for the type
                 $item = $order->items->where('id', $dispatchItem['item_id'])->first();
                 $totalDispatchedBefore = OrderDispatch::where('order_item_id', $dispatchItem['item_id'])->sum('dispatch_qty');
-                $pendingBefore = $item ? ($item->qty - $totalDispatchedBefore) : 0;
+                $pendingBefore = $item ? ($item->shipper_size - $totalDispatchedBefore) : 0;
                 $willBeZero = ($pendingBefore - $dispatchItem['dispatch_qty']) <= 0;
 
                 $disp = OrderDispatch::create([
@@ -354,7 +363,7 @@ class OrderController extends Controller
             if ($item) {
                 // Total previously dispatched + this dispatch
                 $totalDispatched = OrderDispatch::where('order_item_id', $item->id)->sum('dispatch_qty');
-                $pending = $item->qty - $totalDispatched;
+                $pending = $item->shipper_size - $totalDispatched;
                 if ($pending > 0) {
                     $totalItemsPendingAfterDispatch += $pending;
                 }

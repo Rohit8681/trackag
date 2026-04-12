@@ -200,7 +200,7 @@
                                         <td>{{ $order->user->name ?? '-' }}</td>
 
                                         @php
-                                            $totQty = $order->items->sum('qty');
+                                            $totQty = $order->items->sum('shipper_size');
                                             $dispQty = $order->items->reduce(function($carry, $item) {
                                                 return $carry + $item->dispatches->sum('dispatch_qty');
                                             }, 0);
@@ -344,8 +344,8 @@
                                             <th>Product Name</th>
                                             <th>Packing</th>
                                             <th>Price</th>
-                                            <th>Shipper Size</th>
                                             <th class="text-center" style="width: 120px;">Qty</th>
+                                            <th>Shipper Size</th>
                                             <th>Total Price</th>
                                             <th>GST</th>
                                             <th>Grand Total</th>
@@ -442,8 +442,8 @@
                                             <th>Product</th>
                                             <th>Packing</th>
                                             <th>Price</th>
-                                            <th>Shipper Size</th>
                                             <th>Order Qty</th>
+                                            <th>Shipper Size</th>
                                             <th class="bg-primary text-white" style="width: 120px;">Dispatch Qty</th>
                                             <th>Pending Qty</th>
                                             <th>Total Price</th>
@@ -469,7 +469,7 @@
                                             <tr>
                                                 <th>Date</th>
                                                 <th>Item</th>
-                                                <th>Qty</th>
+                                                <th>Dispatch Qty</th>
                                                 <th>LR Number</th>
                                                 <th>Transport</th>
                                                 <th>Vehicle</th>
@@ -611,27 +611,30 @@
                         if (items.length > 0) {
                             $('#orderItemsTableCard').show();
                             $.each(items, function (index, item) {
-                                totalQty += item.order_qty;
+                                totalQty += parseInt(item.shipper_size) || 0;
                                 totalDisp += item.dispatched_qty;
                                 itemMap[item.id] = item;
                                 
                                 let packingStr = (item.packing_value && item.packing) ? item.packing_value + ' ' + item.packing : '-';
                                 let price = parseFloat(item.price) || 0;
-                                let gst = parseFloat(item.gst) || 0;
+                                let gstPercent = parseFloat(item.gst_percent) || parseFloat(item.gst) || 0;
                                 let discount = parseFloat(item.discount) || 0;
-                                let amount = price * item.order_qty;
+                                let amount = price * item.shipper_size; // calculated with shipper_size
                                 let afterDiscount = amount - discount;
                                 if (afterDiscount < 0) afterDiscount = 0;
-                                let gstAmount = (afterDiscount * gst) / 100;
+                                let gstAmount = (afterDiscount * gstPercent) / 100;
                                 let grandTotal = afterDiscount + gstAmount;
 
                                 let qtyHtml = '';
                                 let actionHtml = '';
+                                let shipperSizeHtml = '';
 
                                 if (isPending) {
-                                    qtyHtml = `<input type="number" class="form-control form-control-sm text-center fw-bold text-primary border-primary bg-primary bg-opacity-10 live-item-qty" data-id="${item.id}" data-price="${price}" data-gst="${gst}" data-discount="${discount}" value="${item.order_qty}" min="1">`;
+                                    shipperSizeHtml = `<input type="number" class="form-control form-control-sm text-center fw-bold text-primary border-primary bg-primary bg-opacity-10 live-item-shipper-size" data-id="${item.id}" data-price="${price}" data-gst-percent="${gstPercent}" data-discount="${discount}" value="${item.shipper_size || 0}" min="0">`;
+                                    qtyHtml = `<span class="badge bg-secondary px-3 py-2 fs-6 shadow-sm">${item.order_qty}</span>`;
                                     actionHtml = `<span class="badge bg-primary">Editable</span>`;
                                 } else {
+                                    shipperSizeHtml = `<span class="badge bg-secondary px-3 py-2 fs-6 shadow-sm">${item.shipper_size || '-'}</span>`;
                                     qtyHtml = `<span class="badge bg-secondary px-3 py-2 fs-6 shadow-sm">${item.order_qty}</span>`;
                                     actionHtml = `<span class="badge bg-secondary">Readonly</span>`;
                                 }
@@ -641,10 +644,10 @@
                                         <td class="fw-bold">${item.product || '-'}</td>
                                         <td>${packingStr}</td>
                                         <td>₹${price.toFixed(2)}</td>
-                                        <td>${item.shipper_size || '-'}</td>
                                         <td>${qtyHtml}</td>
+                                        <td>${shipperSizeHtml}</td>
                                         <td class="base-total-price">₹${amount.toFixed(2)}</td>
-                                        <td>${gst}% (<span class="base-gst-amt">₹${gstAmount.toFixed(2)}</span>)</td>
+                                        <td>${gstPercent}% (<span class="base-gst-amt">₹${gstAmount.toFixed(2)}</span>)</td>
                                         <td class="fw-bold text-success fs-6 base-grand-total">₹${grandTotal.toFixed(2)}</td>
                                         <td class="text-center">${actionHtml}</td>
                                     </tr>
@@ -675,7 +678,7 @@
                             let grouped = {};
                             let currentPending = {};
                             // copy initial qtys
-                            Object.values(itemMap).forEach(i => { currentPending[i.id] = i.order_qty; });
+                            Object.values(itemMap).forEach(i => { currentPending[i.id] = parseInt(i.shipper_size) || 0; });
                             
                             $.each(dispatches, function (index, d) {
                                 let type = d.dispatch_type ? d.dispatch_type.toUpperCase() : 'PARTIAL';
@@ -737,7 +740,7 @@
                                     let thisPending = currentPending[itemObj.id];
                                     
                                     let price = parseFloat(itemObj.price) || 0;
-                                    let gstPercent = parseFloat(itemObj.gst) || 0;
+                                    let gstPercent = parseFloat(itemObj.gst_percent) || parseFloat(itemObj.gst) || 0;
                                     
                                     let total_price = drow.dispatch_qty * price;
                                     let gst_amount = (total_price * gstPercent) / 100;
@@ -754,8 +757,8 @@
                                             <td class="fw-bold">${itemObj.product || '-'}</td>
                                             <td>${packingStr}</td>
                                             <td>₹${price.toFixed(2)}</td>
-                                            <td>${itemObj.shipper_size || '-'}</td>
                                             <td class="text-center"><span class="badge bg-secondary p-2">${itemObj.order_qty}</span></td>
+                                            <td>${itemObj.shipper_size || '-'}</td>
                                             <td class="text-center"><span class="badge bg-info p-2">${drow.dispatch_qty}</span></td>
                                             <td class="text-center"><span class="badge bg-warning text-dark p-2">${thisPending}</span></td>
                                             <td>₹${total_price.toFixed(2)}</td>
@@ -790,8 +793,8 @@
                                                         <th>Product</th>
                                                         <th>Packing</th>
                                                         <th>Price</th>
-                                                        <th>Shipper Size</th>
                                                         <th class="text-center">Order Qty</th>
+                                                        <th>Shipper Size</th>
                                                         <th class="text-center">Dispatch Qty</th>
                                                         <th class="text-center">Pending Qty</th>
                                                         <th>Total Price</th>
@@ -837,22 +840,22 @@
         /* -----------------------
            LIVE QTY CALCULATION
         ----------------------- */
-        $(document).on('input', '.live-item-qty', function() {
-            let val = parseInt($(this).val()) || 1;
-            if (val < 1) {
-                val = 1;
+        $(document).on('input', '.live-item-shipper-size', function() {
+            let val = parseInt($(this).val()) || 0;
+            if (val < 0) {
+                val = 0;
                 $(this).val(val);
             }
             
             let price = parseFloat($(this).data('price')) || 0;
-            let gst = parseFloat($(this).data('gst')) || 0;
+            let gstPercent = parseFloat($(this).data('gst-percent')) || 0;
             let discount = parseFloat($(this).data('discount')) || 0;
 
             let amount = price * val;
             let afterDiscount = amount - discount;
             if(afterDiscount < 0) afterDiscount = 0;
             
-            let gstAmount = (afterDiscount * gst) / 100;
+            let gstAmount = (afterDiscount * gstPercent) / 100;
             let grandTotal = afterDiscount + gstAmount;
 
             let tr = $(this).closest('tr');
@@ -870,10 +873,10 @@
             let order_id = btn.data('order-id');
             
             let items = [];
-            $('.live-item-qty').each(function() {
+            $('.live-item-shipper-size').each(function() {
                 items.push({
                     id: $(this).data('id'),
-                    qty: parseInt($(this).val()) || 1
+                    shipper_size: parseInt($(this).val()) || 0
                 });
             });
 
@@ -1059,20 +1062,21 @@
             if (items.length > 0) {
                 $.each(items, function (index, item) {
                     totalPendingGlobally += item.pending_qty;
+                    let gstPercent = parseFloat(item.gst_percent) || 0;
                     let row = `
-                    <tr data-id="${item.id}" data-price="${item.price}" data-gst="${item.gst}" data-discount="${item.discount}" data-pending="${item.pending_qty}">
+                    <tr data-id="${item.id}" data-price="${item.price}" data-gst-percent="${gstPercent}" data-discount="${item.discount}" data-pending="${item.pending_qty}">
                         <td class="fw-bold">${item.product || '-'}</td>
                         <td>${item.packing_value && item.packing ? item.packing_value + ' ' + item.packing : '-'}</td>
                         <td>₹${parseFloat(item.price).toFixed(2)}</td>
-                        <td>${item.shipper_size || '-'}</td>
                         <td class="text-center"><span class="badge bg-secondary px-2 py-1">${item.order_qty}</span></td>
+                        <td>${item.shipper_size || '-'}</td>
                         <td class="bg-primary bg-opacity-10 p-2">
                             <input type="number" class="form-control form-control-sm dispatch-qty-input fw-bold text-center border-primary shadow-sm" 
                                 value="0" min="0" max="${item.pending_qty}" ${item.pending_qty === 0 ? 'disabled' : ''}>
                         </td>
                         <td class="text-center"><span class="badge bg-${item.pending_qty > 0 ? 'warning text-dark' : 'success'} px-2 py-1 item-pending-text">${item.pending_qty}</span></td>
                         <td class="item-total-price">₹0.00</td>
-                        <td>${item.gst}%</td>
+                        <td>${parseFloat(item.gst_percent) || 0}% (<span class="gst-amount-text">₹0.00</span>)</td>
                         <td class="item-grand-total fw-bold text-success">₹0.00</td>
                     </tr>`;
                     tbody.append(row);
@@ -1102,7 +1106,7 @@
             }
 
             let price = parseFloat(tr.data('price')) || 0;
-            let gst = parseFloat(tr.data('gst')) || 0;
+            let gstPercent = parseFloat(tr.data('gst-percent')) || 0;
             let discount = parseFloat(tr.data('discount')) || 0;
 
             let total = price * qty;
@@ -1114,10 +1118,11 @@
                 totalAfterDiscount = 0;
             }
 
-            let gstAmount = (totalAfterDiscount * gst) / 100;
+            let gstAmount = (totalAfterDiscount * gstPercent) / 100;
             let grandTotal = totalAfterDiscount + gstAmount;
 
             tr.find('.item-total-price').text('₹' + total.toFixed(2));
+            tr.find('.gst-amount-text').text('₹' + gstAmount.toFixed(2));
             tr.find('.item-grand-total').text('₹' + grandTotal.toFixed(2));
         });
 
