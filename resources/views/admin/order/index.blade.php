@@ -344,8 +344,8 @@
                                             <th>Product Name</th>
                                             <th>Packing</th>
                                             <th>Price</th>
-                                            <th class="text-center" style="width: 120px;">Qty</th>
-                                            <th>Shipper Size</th>
+                                            <th class="text-center" style="width: 120px;">Shipper Size</th>
+                                            <th>Qty</th>
                                             <th>Total Price</th>
                                             <th>GST</th>
                                             <th>Grand Total</th>
