@@ -187,86 +187,86 @@ class OrderController extends Controller
     }
         
     public function store(Request $request)
-{
-    Log::info('Order Store API Called', ['request' => $request->all()]);
+    {
+        Log::info('Order Store API Called', ['request' => $request->all()]);
 
-    $request->validate([
-        'party_id' => 'required',
-        'order_type' => 'required|in:cash,debit',
-        'products' => 'required|array|min:1',
-    ]);
+        $request->validate([
+            'party_id' => 'required',
+            'order_type' => 'required|in:cash,debit',
+            'products' => 'required|array|min:1',
+        ]);
 
-    $user = Auth::user();
-    Log::info('Authenticated User', ['user_id' => $user->id]);
+        $user = Auth::user();
+        Log::info('Authenticated User', ['user_id' => $user->id]);
 
-    // 🔹 Get State Code
-    $state = State::find($user->state_id); 
-    $stateCode = $state ? $state->state_code : 'ORD';
+        // 🔹 Get State Code
+        $state = State::find($user->state_id); 
+        $stateCode = $state ? $state->state_code : 'ORD';
 
-    Log::info('State Code', ['state_code' => $stateCode]);
+        Log::info('State Code', ['state_code' => $stateCode]);
 
-    // 🔹 Get Last Order
-    $lastOrder = Order::where('order_no', 'like', $stateCode . '-%')
-        ->latest()
-        ->first();
+        // 🔹 Get Last Order
+        $lastOrder = Order::where('order_no', 'like', $stateCode . '-%')
+            ->latest()
+            ->first();
 
-    Log::info('Last Order', ['last_order' => $lastOrder]);
+        Log::info('Last Order', ['last_order' => $lastOrder]);
 
-    $nextNumber = 1;
+        $nextNumber = 1;
 
-    if ($lastOrder) {
-        $lastNumber = (int) substr($lastOrder->order_no, -4);
-        $nextNumber = $lastNumber + 1;
-    }
+        if ($lastOrder) {
+            $lastNumber = (int) substr($lastOrder->order_no, -4);
+            $nextNumber = $lastNumber + 1;
+        }
 
-    // 🔹 Generate Order Number
-    $orderNo = $stateCode . '-ORD-' . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+        // 🔹 Generate Order Number
+        $orderNo = $stateCode . '-ORD-' . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
 
-    Log::info('Generated Order No', ['order_no' => $orderNo]);
+        Log::info('Generated Order No', ['order_no' => $orderNo]);
 
-    // 🔹 Create Order
-    $order = Order::create([
-        'order_no' => $orderNo,
-        'user_id' => $user->id,
-        'party_id' => $request->party_id,
-        'order_type' => $request->order_type,
-        'depo_id' => $request->depo_id,
-        'delivery_place' => $request->delivery_place,
-        'preferred_transport' => $request->preferred_transport,
-        'remark' => $request->remark,
-        'status' => 'pending'
-    ]);
+        // 🔹 Create Order
+        $order = Order::create([
+            'order_no' => $orderNo,
+            'user_id' => $user->id,
+            'party_id' => $request->party_id,
+            'order_type' => $request->order_type,
+            'depo_id' => $request->depo_id,
+            'delivery_place' => $request->delivery_place,
+            'preferred_transport' => $request->preferred_transport,
+            'remark' => $request->remark,
+            'status' => 'pending'
+        ]);
 
-    Log::info('Order Created', ['order_id' => $order->id]);
+        Log::info('Order Created', ['order_id' => $order->id]);
 
-    // 🔹 Store Products
-    foreach ($request->products as $item) {
+        // 🔹 Store Products
+        foreach ($request->products as $item) {
 
-        Log::info('Processing Product', ['item' => $item]);
+            Log::info('Processing Product', ['item' => $item]);
 
-        OrderItem::create([
+            OrderItem::create([
+                'order_id' => $order->id,
+                'product_id' => $item['product_id'],
+                'packing_id' => $item['packing_id'] ?? null,
+                'shipper_size' => $item['shipper_size'] ?? null,
+                'price' => $item['price'],
+                'total_price' => $item['total_price'],
+                'gst' => $item['gst'] ?? 0,
+                'discount' => $item['discount'] ?? 0,
+                'grand_total' => $item['grand_total'],
+                'qty' => $item['qty'] ?? 1
+            ]);
+        }
+
+        Log::info('All Products Stored Successfully');
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Order Created Successfully',
             'order_id' => $order->id,
-            'product_id' => $item['product_id'],
-            'packing_id' => $item['packing_id'] ?? null,
-            'shipper_size' => $item['shipper_size'] ?? null,
-            'price' => $item['price'],
-            'total_price' => $item['total_price'],
-            'gst' => $item['gst'] ?? 0,
-            'discount' => $item['discount'] ?? 0,
-            'grand_total' => $item['grand_total'],
-            'qty' => $item['qty'] ?? 1
+            'order_no' => $orderNo
         ]);
     }
-
-    Log::info('All Products Stored Successfully');
-
-    return response()->json([
-        'status' => true,
-        'message' => 'Order Created Successfully',
-        'order_id' => $order->id,
-        'order_no' => $orderNo
-    ]);
-}
     public function update(Request $request, $id)
     {
         $request->validate([
@@ -313,7 +313,6 @@ class OrderController extends Controller
             'order_id' => $order->id
         ]);
     }
-
     public function destroy($id)
     {
         $order = Order::where('id', $id)
