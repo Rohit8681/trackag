@@ -11,6 +11,7 @@ use App\Models\ProductPacking;
 use App\Models\State;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class OrderController extends Controller
 {
@@ -70,44 +71,6 @@ class OrderController extends Controller
             'data' => $packings
         ]);
     }
-
-    // public function getPackingDetails(Request $request)
-    // {
-    //     $request->validate([
-    //         'packing_id' => 'required',
-    //         'order_type' => 'required|in:cash,debit',
-    //         'qty' => 'required|numeric|min:1',
-    //     ]);
-
-    //     $user = Auth::user();
-    //     $stateId = $user->state_id;
-    //     $orderType = $request->order_type;
-
-    //     $packing = ProductPacking::with(['prices' => function ($q) use ($stateId) {
-    //             $q->where('state_id', $stateId);
-    //         }])
-    //         ->where('id', $request->packing_id)
-    //         ->where('status', 1)
-    //         ->firstOrFail();
-
-    //     $priceData = $packing->prices->first();
-
-    //     return response()->json([
-    //         'status' => true,
-    //         'data' => [
-    //             'packing_id' => $packing->id,
-    //             'packing_value' => $packing->packing_value,
-    //             'packing_size' => $packing->packing_size,
-    //             'shipper_type' => $packing->shipper_type,
-    //             'shipper_size' => $packing->shipper_size,
-    //             'unit_in_shipper' => $packing->unit_in_shipper,
-    //             'qty' => $qty,
-    //             'price' => $orderType == 'cash'
-    //                 ? optional($priceData)->cash_price ?? 0
-    //                 : optional($priceData)->credit_price ?? 0
-    //         ]
-    //     ]);
-    // }
 
     public function getPackingDetails(Request $request)
     {
@@ -222,127 +185,88 @@ class OrderController extends Controller
             'data' => $data
         ]);
     }
-    // public function store(Request $request)
-    // {
-    //     $request->validate([
-    //         'party_id' => 'required',
-    //         'order_type' => 'required|in:cash,debit',
-    //         'products' => 'required|array|min:1',
-    //     ]);
-    //     $lastOrder = Order::latest()->first();
-    //     $nextNumber = 1;
-
-    //     if ($lastOrder) {
-    //         $lastNumber = (int) substr($lastOrder->order_no, -4);
-    //         $nextNumber = $lastNumber + 1;
-    //     }
-
-    //     $orderNo = 'ORD-' . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
-
-    //     // 🔹 Create Order (Common fields)
-    //     $order = Order::create([
-    //         'order_no' => $orderNo,
-    //         'user_id' => Auth::id(),
-    //         'party_id' => $request->party_id,
-    //         'order_type' => $request->order_type,
-    //         'depo_id' => $request->depo_id,
-    //         'delivery_place' => $request->delivery_place,
-    //         'preferred_transport' => $request->preferred_transport,
-    //         'remark' => $request->remark,
-    //         'status' => 'pending'
-    //     ]);
-
-    //     // 🔹 Store Multiple Products
-    //     foreach ($request->products as $item) {
-
-    //         OrderItem::create([
-    //             'order_id' => $order->id,
-    //             'product_id' => $item['product_id'],
-    //             'packing_id' => $item['packing_id'] ?? null,
-    //             'shipper_size' => $item['shipper_size'] ?? null,
-    //             'price' => $item['price'],
-    //             'total_price' => $item['total_price'],
-    //             'gst' => $item['gst'] ?? 0,
-    //             'discount' => $item['discount'] ?? 0,
-    //             'grand_total' => $item['grand_total'],
-    //             'qty' => $item['qty'] ?? 1
-    //         ]);
-    //     }
-
-    //     return response()->json([
-    //         'status' => true,
-    //         'message' => 'Order Created Successfully',
-    //         'order_id' => $order->id
-    //     ]);
-    // }
-
-    
+        
     public function store(Request $request)
-    {
-        $request->validate([
-            'party_id' => 'required',
-            'order_type' => 'required|in:cash,debit',
-            'products' => 'required|array|min:1',
-        ]);
+{
+    Log::info('Order Store API Called', ['request' => $request->all()]);
 
-        $user = Auth::user();
+    $request->validate([
+        'party_id' => 'required',
+        'order_type' => 'required|in:cash,debit',
+        'products' => 'required|array|min:1',
+    ]);
 
-        // 🔹 Get State Code
-        $state = State::find($user->state_id); 
-        $stateCode = $state ? $state->state_code : 'ORD';
+    $user = Auth::user();
+    Log::info('Authenticated User', ['user_id' => $user->id]);
 
-        // 🔹 Get Last Order
-        $lastOrder = Order::where('order_no', 'like', $stateCode . '-%')
-            ->latest()
-            ->first();
+    // 🔹 Get State Code
+    $state = State::find($user->state_id); 
+    $stateCode = $state ? $state->state_code : 'ORD';
 
-        $nextNumber = 1;
+    Log::info('State Code', ['state_code' => $stateCode]);
 
-        if ($lastOrder) {
-            $lastNumber = (int) substr($lastOrder->order_no, -4);
-            $nextNumber = $lastNumber + 1;
-        }
+    // 🔹 Get Last Order
+    $lastOrder = Order::where('order_no', 'like', $stateCode . '-%')
+        ->latest()
+        ->first();
 
-        // 🔹 Generate Order Number
-        $orderNo = $stateCode . '-ORD-' . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+    Log::info('Last Order', ['last_order' => $lastOrder]);
 
-        // 🔹 Create Order
-        $order = Order::create([
-            'order_no' => $orderNo,
-            'user_id' => $user->id,
-            'party_id' => $request->party_id,
-            'order_type' => $request->order_type,
-            'depo_id' => $request->depo_id,
-            'delivery_place' => $request->delivery_place,
-            'preferred_transport' => $request->preferred_transport,
-            'remark' => $request->remark,
-            'status' => 'pending'
-        ]);
+    $nextNumber = 1;
 
-        // 🔹 Store Products
-        foreach ($request->products as $item) {
+    if ($lastOrder) {
+        $lastNumber = (int) substr($lastOrder->order_no, -4);
+        $nextNumber = $lastNumber + 1;
+    }
 
-            OrderItem::create([
-                'order_id' => $order->id,
-                'product_id' => $item['product_id'],
-                'packing_id' => $item['packing_id'] ?? null,
-                'shipper_size' => $item['shipper_size'] ?? null,
-                'price' => $item['price'],
-                'total_price' => $item['total_price'],
-                'gst' => $item['gst'] ?? 0,
-                'discount' => $item['discount'] ?? 0,
-                'grand_total' => $item['grand_total'],
-                'qty' => $item['qty'] ?? 1
-            ]);
-        }
+    // 🔹 Generate Order Number
+    $orderNo = $stateCode . '-ORD-' . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
 
-        return response()->json([
-            'status' => true,
-            'message' => 'Order Created Successfully',
+    Log::info('Generated Order No', ['order_no' => $orderNo]);
+
+    // 🔹 Create Order
+    $order = Order::create([
+        'order_no' => $orderNo,
+        'user_id' => $user->id,
+        'party_id' => $request->party_id,
+        'order_type' => $request->order_type,
+        'depo_id' => $request->depo_id,
+        'delivery_place' => $request->delivery_place,
+        'preferred_transport' => $request->preferred_transport,
+        'remark' => $request->remark,
+        'status' => 'pending'
+    ]);
+
+    Log::info('Order Created', ['order_id' => $order->id]);
+
+    // 🔹 Store Products
+    foreach ($request->products as $item) {
+
+        Log::info('Processing Product', ['item' => $item]);
+
+        OrderItem::create([
             'order_id' => $order->id,
-            'order_no' => $orderNo
+            'product_id' => $item['product_id'],
+            'packing_id' => $item['packing_id'] ?? null,
+            'shipper_size' => $item['shipper_size'] ?? null,
+            'price' => $item['price'],
+            'total_price' => $item['total_price'],
+            'gst' => $item['gst'] ?? 0,
+            'discount' => $item['discount'] ?? 0,
+            'grand_total' => $item['grand_total'],
+            'qty' => $item['qty'] ?? 1
         ]);
     }
+
+    Log::info('All Products Stored Successfully');
+
+    return response()->json([
+        'status' => true,
+        'message' => 'Order Created Successfully',
+        'order_id' => $order->id,
+        'order_no' => $orderNo
+    ]);
+}
     public function update(Request $request, $id)
     {
         $request->validate([
