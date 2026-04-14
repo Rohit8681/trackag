@@ -64,7 +64,7 @@ class CustomersImport implements ToModel, WithHeadingRow, WithValidation, SkipsO
                         : Carbon::parse($row['party_active_since'])->format('Y-m-d')
                 )
                 : now()->format('Y-m-d'),
-            'is_active' => (strtolower($row['status'] ?? '') === 'active' ? 1 : 0),
+            'is_active' => 1,
             'type' => 'web'
         ]);
     }
