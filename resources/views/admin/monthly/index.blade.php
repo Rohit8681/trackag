@@ -32,7 +32,7 @@
                                             <label>Select Month</label>
                                             <select name="month" class="form-control select2">
                                                 @for($i = 1; $i <= 12; $i++)
-                                                    <option value="{{ $i }}" {{ current($month) == $i || $month == $i ? 'selected' : '' }}>
+                                                    <option value="{{ $i }}" {{ $month == $i ? 'selected' : '' }}>
                                                         {{ date("F", mktime(0, 0, 0, $i, 10)) }}
                                                     </option>
                                                 @endfor
