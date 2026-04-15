@@ -89,4 +89,7 @@ Route::middleware([TenantAuthenticate::class])->group(function () {
     Route::get('/stock/list', [StockController::class, 'getStockList']);
     Route::post('/stock/bulk-store', [StockController::class, 'bulkStoreStock']);
 
+    Route::get('/monthly-plan/packing-list', [\App\Http\Controllers\Api\MonthlyPlanApiController::class, 'getProductPackingList']);
+    Route::get('/monthly-plan/list', [\App\Http\Controllers\Api\MonthlyPlanApiController::class, 'getPlanList']);
+    Route::post('/monthly-plan/bulk-store', [\App\Http\Controllers\Api\MonthlyPlanApiController::class, 'bulkStorePlan']);
 });

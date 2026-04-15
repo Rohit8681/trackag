@@ -168,6 +168,7 @@ Route::middleware(['web'])->group(function () {
 
             Route::resource('budget', BudgetController::class);
             Route::resource('monthly', MonthlyController::class);
+            Route::get('monthly-state-employees', [MonthlyController::class, 'getEmployeesByState'])->name('monthly.state.employees');
             Route::resource('achievement', AchievementController::class);
             Route::resource('party', PartyController::class);
             
