@@ -171,6 +171,9 @@ Route::middleware(['web'])->group(function () {
             Route::get('monthly-state-employees', [MonthlyController::class, 'getEmployeesByState'])->name('monthly.state.employees');
             Route::resource('achievement', AchievementController::class);
             Route::resource('party', PartyController::class);
+            Route::get('party-visit-report', [PartyController::class, 'partyVisitReport'])->name('party-visit-report');
+            Route::get('party-visit-report-data', [PartyController::class, 'getPartyVisitReportData'])->name('party-visit-report.data');
+            Route::get('party-visit-report-details', [PartyController::class, 'getPartyVisitDetails'])->name('party-visit-report.details');
             
             Route::get('/admin/get-employees-by-state', [PartyController::class, 'getEmployeesByState'])->name('admin.getEmployeesByState');
             Route::get('/admin/get-party-visits', [PartyController::class, 'getPartyVisits'])->name('admin.get-party-visits');

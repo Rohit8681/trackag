@@ -66,6 +66,7 @@
                     $partyActive = request()->is(
                         'admin/party',
                         'admin/party/*',
+                        'admin/party-visit-report*',
                         'admin/new-party*',
                         'admin/party-payment*',
                         'admin/party-performance*',
@@ -88,6 +89,15 @@
                             class="nav-link {{ (request()->is('admin/party') || request()->is('admin/party/*')) ? 'active' : '' }}">
                                 <i class="bi bi-cash-stack me-2"></i>
                                 <p>Party Visit</p>
+                            </a>
+                        </li>
+
+                        {{-- Party Visit Report --}}
+                        <li class="nav-item">
+                            <a href="{{ route('party-visit-report') }}"
+                            class="nav-link {{ request()->routeIs('party-visit-report') ? 'active' : '' }}">
+                                <i class="bi bi-file-earmark-bar-graph me-2"></i>
+                                <p>Party Visit Report</p>
                             </a>
                         </li>
 

@@ -455,4 +455,196 @@ class PartyController extends Controller
 
         return back()->with('success', 'Status updated successfully!');
     }
+
+    public function partyVisitReport()
+    {
+        $user = auth()->user();
+        $roleName = $user->getRoleNames()->first();
+        
+        $stateIds = [];
+        $userStateAccess = UserStateAccess::where('user_id', $user->id)->first();
+        if ($userStateAccess && !empty($userStateAccess->state_ids)) {
+            $stateIds = $userStateAccess->state_ids;
+        }
+
+        if (in_array($roleName, ['master_admin', 'sub_admin'])) {
+            $employees = User::where('status', 'Active')->where('id', '!=', 1)->get();
+            $states = State::where('status', 1)->get();
+        } else {
+            $employees = empty($stateIds)
+                ? collect()
+                : User::where('status', 'Active')->where('id', '!=', 1)
+                    ->whereIn('state_id', $stateIds)
+                    ->where('reporting_to', $user->id)
+                    ->get();
+            $states = empty($stateIds)
+                ? collect()
+                : State::where('status', 1)->whereIn('id', $stateIds)->get();
+        }
+
+        // Generate Financial Years for Dropdown (e.g., 2024-2025, 2025-2026, 2026-2027)
+        $currentYear = (int)date('Y');
+        $currentMonth = (int)date('n');
+        $startYear = $currentMonth >= 4 ? $currentYear : $currentYear - 1;
+        
+        $financialYears = [];
+        for ($i = -2; $i <= 1; $i++) {
+            $y = $startYear + $i;
+            $financialYears[] = $y . '-' . ($y + 1);
+        }
+
+        $currentFinancialYear = $startYear . '-' . ($startYear + 1);
+
+        return view('admin.party.report', compact('states', 'employees', 'financialYears', 'currentFinancialYear'));
+    }
+
+    public function getPartyVisitReportData(Request $request)
+    {
+        $user = auth()->user();
+        $roleName = $user->getRoleNames()->first();
+        
+        $stateId = $request->get('state_id');
+        $employeeId = $request->get('employee_id');
+        $financialYear = $request->get('financial_year');
+
+        // Parse Financial Year
+        if ($financialYear) {
+            $parts = explode('-', $financialYear);
+            $startYear = $parts[0];
+            $endYear = $parts[1] ?? ($startYear + 1);
+        } else {
+            $currentMonth = (int)date('n');
+            $startYear = $currentMonth >= 4 ? (int)date('Y') : (int)date('Y') - 1;
+            $endYear = $startYear + 1;
+        }
+
+        $startDate = $startYear . '-04-01';
+        $endDate = $endYear . '-03-31';
+
+        $stateIds = [];
+        if (!in_array($roleName, ['master_admin', 'sub_admin'])) {
+            $userStateAccess = UserStateAccess::where('user_id', $user->id)->first();
+            if ($userStateAccess && !empty($userStateAccess->state_ids)) {
+                $stateIds = $userStateAccess->state_ids;
+            } else {
+                return response()->json(['data' => []]);
+            }
+        }
+
+        // Fetch visible customers based on role/filters
+        $customerQuery = Customer::with('user')->where('is_active', 1)->where('type', 'mobile');
+
+        if (!in_array($roleName, ['master_admin', 'sub_admin'])) {
+            $customerQuery->whereHas('user', function ($q) use ($user, $stateIds) {
+                $q->whereIn('state_id', $stateIds)->where('reporting_to', $user->id);
+            });
+        }
+
+        if ($stateId) {
+            $customerQuery->whereHas('user', function ($q) use ($stateId) {
+                $q->where('state_id', $stateId);
+            });
+        }
+
+        if ($employeeId) {
+            $customerQuery->where('user_id', $employeeId);
+        }
+
+        $customers = $customerQuery->orderBy('agro_name')->get();
+        if ($customers->isEmpty()) {
+            return response()->json(['data' => []]);
+        }
+        $customerIds = $customers->pluck('id')->toArray();
+
+        // Fetch Visits
+        $visits = PartyVisit::whereIn('customer_id', $customerIds)
+            ->whereNotNull('check_in_time')
+            ->whereNotNull('check_out_time')
+            ->whereBetween('visited_date', [$startDate, $endDate])
+            ->get();
+
+        // Build columns strictly based on FY
+        $months = [];
+        for ($i = 4; $i <= 12; $i++) {
+            $months[] = ['year' => $startYear, 'month' => $i];
+        }
+        for ($i = 1; $i <= 3; $i++) {
+            $months[] = ['year' => $endYear, 'month' => $i];
+        }
+
+        $data = [];
+        foreach ($customers as $customer) {
+            $customerVisits = $visits->where('customer_id', $customer->id);
+            
+            // Format months keys
+            $monthData = [];
+            foreach ($months as $idx => $m) {
+                $count = $customerVisits->filter(function($v) use ($m) {
+                    $d = Carbon::parse($v->visited_date);
+                    return $d->year == $m['year'] && $d->month == $m['month'];
+                })->count();
+                
+                $monthKey = Carbon::create($m['year'], $m['month'], 1)->format('M-2y'); // e.g. Apr-26
+                $monthData['month_' . $idx] = [
+                    'label' => $monthKey,
+                    'count' => $count,
+                    'year' => $m['year'],
+                    'month' => $m['month']
+                ];
+            }
+
+            $data[] = array_merge([
+                'party_name' => $customer->agro_name,
+                'customer_id' => $customer->id,
+            ], $monthData);
+        }
+
+        // Return columns config and data row
+        $columns = [
+            ['data' => 'party_name', 'name' => 'party_name', 'title' => 'Party Name']
+        ];
+        
+        foreach ($months as $idx => $m) {
+            $monthKey = Carbon::create($m['year'], $m['month'], 1)->format('M-y'); // e.g. Apr-26
+            $columns[] = [
+                'data' => 'month_' . $idx,
+                'name' => 'month_' . $idx,
+                'title' => $monthKey
+            ];
+        }
+
+        return response()->json(['data' => $data, 'columns' => $columns]);
+    }
+
+    public function getPartyVisitDetails(Request $request)
+    {
+        $customerId = $request->get('customer_id');
+        $year = $request->get('year');
+        $month = $request->get('month');
+
+        if (!$customerId || !$year || !$month) {
+            return response()->json(['data' => []]);
+        }
+
+        $visits = PartyVisit::with(['customer', 'user'])
+            ->where('customer_id', $customerId)
+            ->whereNotNull('check_in_time')
+            ->whereNotNull('check_out_time')
+            ->whereYear('visited_date', $year)
+            ->whereMonth('visited_date', $month)
+            ->orderBy('visited_date', 'asc')
+            ->get();
+
+        $data = $visits->map(function ($v) {
+            return [
+                'date' => $v->visited_date ? Carbon::parse($v->visited_date)->format('d-m-Y') : '-',
+                'check_in' => $v->check_in_time ? Carbon::parse($v->check_in_time)->format('H:i') : '-',
+                'check_out' => $v->check_out_time ? Carbon::parse($v->check_out_time)->format('H:i') : '-',
+                'visit_purpose' => $v->visit_purpose ?? '-',
+                'remarks' => $v->remarks ?? '-',
+            ];
+        });
+
+        return response()->json(['data' => $data]);
+    }
 }
