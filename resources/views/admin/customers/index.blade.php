@@ -30,6 +30,11 @@
 
                         @can('create_customers')
                             <div class="d-flex ms-auto">
+                                <!-- Set Visit Target Button -->
+                                <button class="btn btn-sm btn-info me-2 text-white" data-bs-toggle="modal" data-bs-target="#targetModal">
+                                    <i class="fas fa-bullseye me-1"></i> Set Target
+                                </button>
+
                                 <!-- Add Customer Button -->
                                 <a href="{{ route('customers.create') }}" class="btn btn-sm btn-primary me-2">
                                     Add Customer
@@ -46,88 +51,73 @@
                     <!-- Card Body -->
                     <div class="card-body table-responsive">
 
-                        <!-- 🔍 Filter Form and Party Visit Target -->
-                        <div class="row g-3 mb-3">
-                            <div class="col-md-9">
-                                <form action="{{ route('customers.index') }}" method="GET" class="row g-3">
-                                    <div class="col-md-3">
-                                        <label class="form-label">Financial Year</label>
-                                        <select name="financial_year" class="form-select form-select-sm">
-                                            <option value="">All</option>
-                                            <option value="2025-2026" {{ request('financial_year')=='2025-2026'?'selected':'' }}>2025-2026</option>
-                                        </select>
-                                    </div>
-
-                                    <div class="col-md-3">
-                                        <label class="form-label">Party Code</label>
-                                        <input type="text" name="party_code" value="{{ request('party_code') }}"
-                                            class="form-control form-control-sm" placeholder="Enter Party Code">
-                                    </div>
-
-                                    <div class="col-md-3">
-                                        <label class="form-label">Agro Name</label>
-                                        <input type="text" name="agro_name" value="{{ request('agro_name') }}"
-                                            class="form-control form-control-sm" placeholder="Enter Agro Name">
-                                    </div>
-
-                                    <div class="col-md-3">
-                                        <label class="form-label">State</label>
-                                        <select name="state_id" class="form-select form-select-sm">
-                                            <option value="">All States</option>
-                                            @foreach($states as $state)
-                                                <option value="{{ $state->id }}" {{ request('state_id') == $state->id ? 'selected' : '' }}>
-                                                    {{ $state->name }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-
-                                    <div class="col-md-3">
-                                        <label class="form-label">Contact Person</label>
-                                        <input type="text" name="contact_person" value="{{ request('contact_person') }}"
-                                            class="form-control form-control-sm" placeholder="Enter Name">
-                                    </div>
-
-                                    <div class="col-md-3">
-                                        <label class="form-label">Status</label>
-                                        <select name="status" class="form-select form-select-sm">
-                                            <option value="">All</option>
-                                            <option value="1" {{ request('status') === '1' ? 'selected' : '' }}>Active</option>
-                                            <option value="0" {{ request('status') === '0' ? 'selected' : '' }}>Inactive</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label class="form-label fw-semibold">Pending Party Mapping</label>
-                                        <select name="pending_party_mapping" class="form-select form-select-sm">
-                                            <option value="">All</option>
-                                            <option value="1" {{ request('pending_party_mapping') == '1' ? 'selected' : '' }}>
-                                                Pending Party Mapping
-                                            </option>
-                                        </select>
-                                    </div>
-
-                                     <div class="col-md-2 d-flex gap-2 align-items-end">
-                                            <button type="submit" class="btn btn-sm btn-primary px-3 py-2">
-                                                <i class="fas fa-filter me-1"></i> Filter
-                                            </button>
-                                            <a href="{{ route('customers.index') }}" class="btn btn-sm btn-secondary px-3 py-2">
-                                                <i class="fas fa-sync me-1"></i> Reset
-                                            </a>
-                                     </div>
-                                </form>
+                        <!-- 🔍 Filter Form -->
+                        <form action="{{ route('customers.index') }}" method="GET" class="row g-3 mb-3">
+                            <div class="col-md-2">
+                                <label class="form-label">Financial Year</label>
+                                <select name="financial_year" class="form-select form-select-sm">
+                                    <option value="">All</option>
+                                    <option value="2025-2026" {{ request('financial_year')=='2025-2026'?'selected':'' }}>2025-2026</option>
+                                </select>
                             </div>
-                            <!-- Party Visit Target Form -->
-                            <div class="col-md-3 d-flex align-items-end">
-                                <form action="{{ route('customers.party-visit-target') }}" method="POST" class="w-100">
-                                    @csrf
-                                    <label class="form-label text-danger fw-bold">Party Visit Target</label>
-                                    <div class="input-group input-group-sm">
-                                        <input type="number" name="target" class="form-control" placeholder="Target" value="{{ $partyVisitTarget->target ?? '' }}" min="0" required>
-                                        <button class="btn btn-success" type="submit">Save</button>
-                                    </div>
-                                </form>
+
+                            <div class="col-md-2">
+                                <label class="form-label">Party Code</label>
+                                <input type="text" name="party_code" value="{{ request('party_code') }}"
+                                    class="form-control form-control-sm" placeholder="Enter Party Code">
                             </div>
-                        </div>
+
+                            <div class="col-md-2">
+                                <label class="form-label">Agro Name</label>
+                                <input type="text" name="agro_name" value="{{ request('agro_name') }}"
+                                    class="form-control form-control-sm" placeholder="Enter Agro Name">
+                            </div>
+
+                            <div class="col-md-2">
+                                <label class="form-label">State</label>
+                                <select name="state_id" class="form-select form-select-sm">
+                                    <option value="">All States</option>
+                                    @foreach($states as $state)
+                                        <option value="{{ $state->id }}" {{ request('state_id') == $state->id ? 'selected' : '' }}>
+                                            {{ $state->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div class="col-md-2">
+                                <label class="form-label">Contact Person</label>
+                                <input type="text" name="contact_person" value="{{ request('contact_person') }}"
+                                    class="form-control form-control-sm" placeholder="Enter Name">
+                            </div>
+
+                            <div class="col-md-2">
+                                <label class="form-label">Status</label>
+                                <select name="status" class="form-select form-select-sm">
+                                    <option value="">All</option>
+                                    <option value="1" {{ request('status') === '1' ? 'selected' : '' }}>Active</option>
+                                    <option value="0" {{ request('status') === '0' ? 'selected' : '' }}>Inactive</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label fw-semibold">Pending Party Mapping</label>
+                                <select name="pending_party_mapping" class="form-select form-select-sm">
+                                    <option value="">All</option>
+                                    <option value="1" {{ request('pending_party_mapping') == '1' ? 'selected' : '' }}>
+                                        Pending Party Mapping
+                                    </option>
+                                </select>
+                            </div>
+
+                             <div class="col-md-2 d-flex gap-2 align-items-end">
+                                    <button type="submit" class="btn btn-sm btn-primary px-3 py-2">
+                                        <i class="fas fa-filter me-1"></i> Filter
+                                    </button>
+                                    <a href="{{ route('customers.index') }}" class="btn btn-sm btn-secondary px-3 py-2">
+                                        <i class="fas fa-sync me-1"></i> Reset
+                                    </a>
+                                </div>
+                        </form>
                         <!-- 🔍 End Filter Form -->
 
                         @can('view_customers')
@@ -181,7 +171,7 @@
                                             @endcan
 
                                             {{-- @can('delete_customers') --}}
-                                            @if(auth()->check() && auth()->user()->hasRole('master_admin') && auth()->check() && auth()->user()->hasRole('sub_admin'))
+                                            @if(auth()->check() && auth()->user()->hasRole('master_admin') || auth()->check() && auth()->user()->hasRole('sub_admin'))
                                                 <form action="{{ route('customers.destroy', $customer) }}" method="POST" class="d-inline"
                                                     onsubmit="return confirm('Are you sure you want to delete this customer?')">
                                                     @csrf
@@ -235,6 +225,30 @@
                 <i class="fas fa-download"></i> Download Sample
             </a>
             <button type="submit" class="btn btn-success">Import</button>
+        </div>
+    </form>
+  </div>
+</div>
+
+<!-- Target Modal -->
+<div class="modal fade" id="targetModal" tabindex="-1" aria-labelledby="targetModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <form action="{{ route('customers.party-visit-target') }}" method="POST" class="modal-content">
+        @csrf
+        <div class="modal-header">
+            <h5 class="modal-title" id="targetModalLabel">Set Party Visit Target</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <div class="mb-3">
+                <label class="form-label">Common Target Visits (Per Month)</label>
+                <input type="number" name="target" class="form-control" placeholder="Enter target (e.g. 3)" value="{{ $partyVisitTarget->target ?? '' }}" min="0" required>
+                <small class="text-muted">This target will be globally applied to all customers for the Party Visit Report.</small>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-success">Save Target</button>
         </div>
     </form>
   </div>
