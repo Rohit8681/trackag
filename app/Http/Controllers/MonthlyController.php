@@ -21,12 +21,72 @@ class MonthlyController extends Controller
         $state_filter = $request->input('state_id');
         $product_filter = $request->input('product_id');
 
-        $employees = User::all();
-        $states = State::all();
+        $user = auth()->user();
+        $roleName = $user->getRoleNames()->first();
+        
+        $stateIds = [];
+        $userStateAccess = \App\Models\UserStateAccess::where('user_id', $user->id)->first();
+        if ($userStateAccess && !empty($userStateAccess->state_ids)) {
+            $stateIds = $userStateAccess->state_ids;
+        }
+
+        $companyCount = \App\Models\Company::count();
+        $company = null;
+        $companyStates = [];
+
+        if (in_array($roleName, ['master_admin', 'sub_admin'])) {
+            $employees = User::where('status', 'Active')->where('id', '!=', 1)->get();
+        } else {
+            $employees = empty($stateIds)
+                ? collect()
+                : User::where('status', 'Active')->where('id', '!=', 1)
+                    ->whereIn('state_id', $stateIds)
+                    ->where('reporting_to', $user->id)
+                    ->get();
+        }
+
+        if ($companyCount == 1) {
+            $company = \App\Models\Company::first();
+
+            if ($company && !empty($company->state)) {
+                $companyStates = array_map('intval', explode(',', $company->state));
+                if (in_array($roleName, ['sub_admin'])) {
+                    $states = State::where('status', 1)
+                    ->whereIn('id', $companyStates)
+                    ->get();
+                } else {
+                    $states = empty($stateIds)
+                        ? collect()
+                        : State::where('status', 1)
+                        ->whereIn('id', $stateIds)
+                        ->get();
+                }
+            } else {
+                $states = in_array($roleName, ['master_admin', 'sub_admin']) 
+                        ? State::where('status', 1)->get()
+                        : (empty($stateIds) ? collect() : State::where('status', 1)->whereIn('id', $stateIds)->get());
+            }
+        } else {
+            $states = in_array($roleName, ['master_admin', 'sub_admin']) 
+                    ? State::where('status', 1)->get()
+                    : (empty($stateIds) ? collect() : State::where('status', 1)->whereIn('id', $stateIds)->get());
+        }
+
         $products = Product::all();
 
         $query = MonthlyPlan::with(['user', 'product', 'packing', 'state'])
             ->where('month', $month);
+
+        if (!in_array($roleName, ['master_admin', 'sub_admin'])) {
+            if (empty($stateIds)) {
+                $query->whereRaw('1 = 0');
+            } else {
+                $query->whereHas('user', function ($q) use ($user, $stateIds) {
+                    $q->whereIn('state_id', $stateIds)
+                      ->where('reporting_to', $user->id);
+                });
+            }
+        }
 
         if ($employee_id) $query->where('user_id', $employee_id);
         if ($state_filter) $query->where('state_id', $state_filter);

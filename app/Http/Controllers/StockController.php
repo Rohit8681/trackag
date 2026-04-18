@@ -19,10 +19,68 @@ class StockController extends Controller
         $user_id = $request->input('employee_id');
         $party_id = $request->input('party_id');
 
-        $states = State::where('status', 1)->get();
-        // Adjust based on your User role/status conventions
-        $employees = User::where('status', 'Active')->get(); 
-        $parties = Customer::where('is_active', true)->get();
+        $user = auth()->user();
+        $roleName = $user->getRoleNames()->first();
+        
+        $stateIds = [];
+        $userStateAccess = \App\Models\UserStateAccess::where('user_id', $user->id)->first();
+        if ($userStateAccess && !empty($userStateAccess->state_ids)) {
+            $stateIds = $userStateAccess->state_ids;
+        }
+
+        $companyCount = \App\Models\Company::count();
+        $company = null;
+        $companyStates = [];
+
+        if (in_array($roleName, ['master_admin', 'sub_admin'])) {
+            $employees = User::where('status', 'Active')->where('id', '!=', 1)->get();
+        } else {
+            $employees = empty($stateIds)
+                ? collect()
+                : User::where('status', 'Active')->where('id', '!=', 1)
+                    ->whereIn('state_id', $stateIds)
+                    ->where('reporting_to', $user->id)
+                    ->get();
+        }
+
+        if ($companyCount == 1) {
+            $company = \App\Models\Company::first();
+
+            if ($company && !empty($company->state)) {
+                $companyStates = array_map('intval', explode(',', $company->state));
+                if (in_array($roleName, ['sub_admin'])) {
+                    $states = State::where('status', 1)
+                    ->whereIn('id', $companyStates)
+                    ->get();
+                } else {
+                    $states = empty($stateIds)
+                        ? collect()
+                        : State::where('status', 1)
+                        ->whereIn('id', $stateIds)
+                        ->get();
+                }
+            } else {
+                $states = in_array($roleName, ['master_admin', 'sub_admin']) 
+                        ? State::where('status', 1)->get()
+                        : (empty($stateIds) ? collect() : State::where('status', 1)->whereIn('id', $stateIds)->get());
+            }
+        } else {
+            $states = in_array($roleName, ['master_admin', 'sub_admin']) 
+                    ? State::where('status', 1)->get()
+                    : (empty($stateIds) ? collect() : State::where('status', 1)->whereIn('id', $stateIds)->get());
+        }
+
+        $partyQuery = Customer::where('is_active', true);
+        if (!in_array($roleName, ['master_admin', 'sub_admin'])) {
+            if (empty($stateIds)) {
+                $partyQuery->whereRaw('1 = 0');
+            } else {
+                $partyQuery->whereHas('user', function ($q) use ($user, $stateIds) {
+                    $q->whereIn('state_id', $stateIds)->where('reporting_to', $user->id);
+                });
+            }
+        }
+        $parties = $partyQuery->get();
 
         $startOfMonth = Carbon::parse($month)->startOfMonth();
         $endOfMonth = Carbon::parse($month)->endOfMonth();
@@ -30,6 +88,16 @@ class StockController extends Controller
 
         $query = Stock::with(['product', 'packing'])
             ->whereBetween('created_at', [$startOfMonth, $endOfMonth]);
+
+        if (!in_array($roleName, ['master_admin', 'sub_admin'])) {
+            if (empty($stateIds)) {
+                $query->whereRaw('1 = 0');
+            } else {
+                $query->whereHas('user', function ($q) use ($user, $stateIds) {
+                    $q->whereIn('state_id', $stateIds)->where('reporting_to', $user->id);
+                });
+            }
+        }
 
         if ($user_id) {
             $query->where('user_id', $user_id);

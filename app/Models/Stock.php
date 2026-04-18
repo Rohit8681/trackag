@@ -23,6 +23,16 @@ class Stock extends Model
         return $this->belongsTo(Product::class);
     }
 
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function customer()
+    {
+        return $this->belongsTo(Customer::class);
+    }
+
     public function packing()
     {
         return $this->belongsTo(ProductPacking::class, 'packing_id');
