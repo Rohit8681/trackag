@@ -19,56 +19,8 @@ class StockController extends Controller
         $user_id = $request->input('employee_id');
         $party_id = $request->input('party_id');
 
-        $user = auth()->user();
-        $roleName = $user->getRoleNames()->first();
-        
-        $stateIds = [];
-        $userStateAccess = \App\Models\UserStateAccess::where('user_id', $user->id)->first();
-        if ($userStateAccess && !empty($userStateAccess->state_ids)) {
-            $stateIds = $userStateAccess->state_ids;
-        }
-
-        $companyCount = \App\Models\Company::count();
-        $company = null;
-        $companyStates = [];
-
-        if (in_array($roleName, ['master_admin', 'sub_admin'])) {
-            $employees = User::where('status', 'Active')->where('id', '!=', 1)->get();
-        } else {
-            $employees = empty($stateIds)
-                ? collect()
-                : User::where('status', 'Active')->where('id', '!=', 1)
-                    ->whereIn('state_id', $stateIds)
-                    ->where('reporting_to', $user->id)
-                    ->get();
-        }
-
-        if ($companyCount == 1) {
-            $company = \App\Models\Company::first();
-
-            if ($company && !empty($company->state)) {
-                $companyStates = array_map('intval', explode(',', $company->state));
-                if (in_array($roleName, ['sub_admin'])) {
-                    $states = State::where('status', 1)
-                    ->whereIn('id', $companyStates)
-                    ->get();
-                } else {
-                    $states = empty($stateIds)
-                        ? collect()
-                        : State::where('status', 1)
-                        ->whereIn('id', $stateIds)
-                        ->get();
-                }
-            } else {
-                $states = in_array($roleName, ['master_admin', 'sub_admin']) 
-                        ? State::where('status', 1)->get()
-                        : (empty($stateIds) ? collect() : State::where('status', 1)->whereIn('id', $stateIds)->get());
-            }
-        } else {
-            $states = in_array($roleName, ['master_admin', 'sub_admin']) 
-                    ? State::where('status', 1)->get()
-                    : (empty($stateIds) ? collect() : State::where('status', 1)->whereIn('id', $stateIds)->get());
-        }
+        $filters = $this->getRoleBasedStateAndEmployeeFilters();
+        extract($filters);
 
         $partyQuery = Customer::where('is_active', true);
         if (!in_array($roleName, ['master_admin', 'sub_admin'])) {

@@ -32,11 +32,8 @@ class ExpenseController extends Controller
         $user = auth()->user();
         $roleName = $user->getRoleNames()->first();
 
-        $stateIds = [];
-        $userStateAccess = UserStateAccess::where('user_id', $user->id)->first();
-        if ($userStateAccess && !empty($userStateAccess->state_ids)) {
-            $stateIds = $userStateAccess->state_ids; 
-        }
+        $filters = $this->getRoleBasedStateAndEmployeeFilters();
+        extract($filters);
 
         $query = Expense::with(['user', 'travelMode']);
 
@@ -81,51 +78,7 @@ class ExpenseController extends Controller
             $expenses = $query->latest()->get();
         }
 
-        if (in_array($roleName, ['master_admin', 'sub_admin'])) {
-            $employees = User::where('status', 'Active')->where('id', '!=', 1)->get();
-        } else {
-            $employees = empty($stateIds)
-                ? collect()
-                : User::where('status', 'Active')->where('id', '!=', 1)
-                    ->whereIn('state_id', $stateIds)
-                    ->where('reporting_to', $user->id)
-                    ->get();
-        }
 
-        $companyCount = Company::count();
-        $company = null;
-
-        if ($companyCount == 1) {
-            $company = Company::first();
-
-            if ($company && !empty($company->state)) {
-                $companyStates = array_map('intval', explode(',', $company->state));
-
-                if ($roleName === 'sub_admin') {
-                    $states = State::where('status', 1)
-                        ->whereIn('id', $companyStates)
-                        ->get();
-                } else {
-                    $states = empty($stateIds)
-                        ? collect()
-                        : State::where('status', 1)
-                            ->whereIn('id', $stateIds)
-                            ->get();
-                }
-            } else {
-                $states = in_array($roleName, ['master_admin', 'sub_admin'])
-                    ? State::where('status', 1)->get()
-                    : (empty($stateIds)
-                        ? collect()
-                        : State::where('status', 1)->whereIn('id', $stateIds)->get());
-            }
-        } else {
-            $states = in_array($roleName, ['master_admin', 'sub_admin'])
-                ? State::where('status', 1)->get()
-                : (empty($stateIds)
-                    ? collect()
-                    : State::where('status', 1)->whereIn('id', $stateIds)->get());
-        }
 
         return view('admin.expense.index', compact('expenses', 'states', 'employees'));
     }
