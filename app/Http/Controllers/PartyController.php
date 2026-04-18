@@ -613,7 +613,10 @@ class PartyController extends Controller
             ];
         }
 
-        return response()->json(['data' => $data, 'columns' => $columns]);
+        $targetObj = \App\Models\PartyVisitTarget::first();
+        $target = $targetObj ? $targetObj->target : 0;
+
+        return response()->json(['data' => $data, 'columns' => $columns, 'target' => $target]);
     }
 
     public function getPartyVisitDetails(Request $request)

@@ -232,7 +232,7 @@ $(document).ready(function () {
                 financial_year: financialYear
             },
             success: function (response) {
-                renderTable(response.columns, response.data);
+                renderTable(response.columns, response.data, response.target);
             },
             error: function () {
                 alert('Error loading report data');
@@ -243,7 +243,8 @@ $(document).ready(function () {
         });
     }
 
-    function renderTable(columnsParam, dataParam) {
+    function renderTable(columnsParam, dataParam, targetParam) {
+        let target = targetParam || 0;
         const $table = $('#reportTableData');
 
         // Destroy existing table if exists
@@ -268,10 +269,12 @@ $(document).ready(function () {
             if (col.data.startsWith('month_')) {
                 columnDef.render = function(data, type, row) {
                     if (type === 'display') {
-                        if (data && data.count > 0) {
-                            return `<span class="clickable-count" title="Click to view details" data-customer="${row.customer_id}" data-year="${data.year}" data-month="${data.month}">${data.count}</span>`;
+                        let count = data ? data.count : 0;
+                        let colorClass = count < target ? 'text-danger' : 'text-success';
+                        if (count > 0) {
+                            return `<span class="clickable-count ${colorClass}" title="Click to view details" data-customer="${row.customer_id}" data-year="${data.year}" data-month="${data.month}">${count}</span>`;
                         } else {
-                            return '0';
+                            return `<span class="${colorClass} fw-bold">0</span>`;
                         }
                     }
                     return data ? data.count : 0;

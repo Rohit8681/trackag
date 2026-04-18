@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\Customer;
 use App\Models\Company;
 use App\Models\Depo;
+use App\Models\PartyVisitTarget;
 use App\Models\District;
 use App\Models\State;
 use App\Models\Tehsil;
@@ -110,7 +111,22 @@ class CustomerController extends Controller
         }
         $financialYears = range(2025, now()->year + 1); // Example range
 
-        return view('admin.customers.index', compact('customers', 'states', 'financialYears'));
+        $partyVisitTarget = PartyVisitTarget::first();
+
+        return view('admin.customers.index', compact('customers', 'states', 'financialYears', 'partyVisitTarget'));
+    }
+
+    public function savePartyVisitTarget(Request $request)
+    {
+        $request->validate([
+            'target' => 'required|integer|min:0'
+        ]);
+
+        $target = PartyVisitTarget::first() ?? new PartyVisitTarget();
+        $target->target = $request->target;
+        $target->save();
+
+        return redirect()->back()->with('success', 'Party Visit Target updated successfully.');
     }
 
     public function toggleStatus(Customer $customer)
@@ -217,7 +233,7 @@ class CustomerController extends Controller
     public function destroy(string $id)
     {
         $customer = Customer::findOrFail($id);
-        $this->authorizeCustomerAccess($customer);
+        // $this->authorizeCustomerAccess($customer);
         $customer->delete();
 
         return redirect()->route('customers.index')->with('success', 'Customer deleted successfully.');

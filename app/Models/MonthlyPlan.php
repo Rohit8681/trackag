@@ -3,9 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\TenantConnectionTrait;
+
 
 class MonthlyPlan extends Model
 {
+    use TenantConnectionTrait;
+
     protected $fillable = [
         'user_id',
         'product_id',
