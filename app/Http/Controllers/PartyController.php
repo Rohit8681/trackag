@@ -467,9 +467,12 @@ class PartyController extends Controller
             $stateIds = $userStateAccess->state_ids;
         }
 
+        $companyCount = Company::count();
+        $company = null;
+        $companyStates = [];
+
         if (in_array($roleName, ['master_admin', 'sub_admin'])) {
             $employees = User::where('status', 'Active')->where('id', '!=', 1)->get();
-            $states = State::where('status', 1)->get();
         } else {
             $employees = empty($stateIds)
                 ? collect()
@@ -477,9 +480,33 @@ class PartyController extends Controller
                     ->whereIn('state_id', $stateIds)
                     ->where('reporting_to', $user->id)
                     ->get();
-            $states = empty($stateIds)
-                ? collect()
-                : State::where('status', 1)->whereIn('id', $stateIds)->get();
+        }
+
+        if ($companyCount == 1) {
+            $company = Company::first();
+
+            if ($company && !empty($company->state)) {
+                $companyStates = array_map('intval', explode(',', $company->state));
+                if (in_array($roleName, ['sub_admin'])) {
+                    $states = State::where('status', 1)
+                    ->whereIn('id', $companyStates)
+                    ->get();
+                } else {
+                    $states = empty($stateIds)
+                        ? collect()
+                        : State::where('status', 1)
+                        ->whereIn('id', $stateIds)
+                        ->get();
+                }
+            } else {
+                $states = in_array($roleName, ['master_admin', 'sub_admin']) 
+                        ? State::where('status', 1)->get()
+                        : (empty($stateIds) ? collect() : State::where('status', 1)->whereIn('id', $stateIds)->get());
+            }
+        } else {
+            $states = in_array($roleName, ['master_admin', 'sub_admin']) 
+                    ? State::where('status', 1)->get()
+                    : (empty($stateIds) ? collect() : State::where('status', 1)->whereIn('id', $stateIds)->get());
         }
 
         // Generate Financial Years for Dropdown (e.g., 2024-2025, 2025-2026, 2026-2027)
