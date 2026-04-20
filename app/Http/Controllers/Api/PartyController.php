@@ -165,7 +165,10 @@ class PartyController extends BaseController
                 return [
                     'id' => $customer->id,
                     'type' => $customer->type,
-                    'visit_date' => $customer->visit_date,
+                    // 'visit_date' => $customer->visit_date,
+                    'visit_date' => Carbon::parse($customer->visited_date)
+                    ->timezone('Asia/Kolkata')
+                     ->format('Y-m-d'),
                     'agro_name' => $customer->agro_name,
                     'contact_person_name' => $customer->contact_person_name,
                     'phone' => $customer->phone,
