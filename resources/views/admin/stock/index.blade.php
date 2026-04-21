@@ -1,4 +1,35 @@
 @extends('admin.layout.layout')
+@push('styles')
+<style>
+    .table-container {
+        overflow-x: auto;
+    }
+    .sticky-table td {
+        position: sticky !important;
+        z-index: 5;
+        background-color: inherit;
+    }
+    .sticky-col-1 { left: 0; min-width: 200px; width: 200px; }
+    .sticky-col-2 { left: 200px; min-width: 100px; width: 100px; }
+    .sticky-col-3 { left: 300px; min-width: 100px; width: 100px; }
+    .sticky-col-4 { left: 400px; min-width: 100px; width: 100px; }
+
+    /* Fix background colors for sticky cells */
+    .sticky-table tbody tr {
+        background-color: white;
+    }
+    .sticky-table tbody tr:nth-of-type(odd) {
+        background-color: #f9f9f9;
+    }
+    .sticky-table tr.product-header {
+        background-color: #fce4d6 !important;
+        z-index: 6;
+    }
+    .sticky-table tr.product-header td {
+        background-color: #fce4d6 !important;
+    }
+</style>
+@endpush
 
 @section('content')
 <main class="app-main">
@@ -72,25 +103,25 @@
                                 </div>
                             </form>
 
-                            <div class="table-responsive">
-                                <table class="table table-bordered table-striped text-center text-nowrap">
+                            <div class="table-responsive table-container">
+                                <table class="table table-bordered table-striped text-center text-nowrap sticky-table">
                                     <tbody>
                                         @foreach($reportData as $product)
-                                            <tr style="background-color: #fce4d6; font-weight: bold;">
-                                                <td class="text-start">{{ $product['name'] }}</td>
-                                                <td>Opening</td>
-                                                <td>Closing</td>
-                                                <td>Total</td>
+                                            <tr class="product-header" style="background-color: #fce4d6; font-weight: bold;">
+                                                <td class="text-start sticky-col-1">{{ $product['name'] }}</td>
+                                                <td class="sticky-col-2">Opening</td>
+                                                <td class="sticky-col-3">Closing</td>
+                                                <td class="sticky-col-4">Total</td>
                                                 @for($i = 1; $i <= $daysInMonth; $i++)
                                                     <td>{{ sprintf('%02d', $i) }}-{{ $startOfMonth->format('M') }}</td>
                                                 @endfor
                                             </tr>
                                             @foreach($product['packings'] as $packing)
                                                 <tr>
-                                                    <td class="text-start">{{ $packing['name'] }}</td>
-                                                    <td>{{ $packing['opening'] }}</td>
-                                                    <td>{{ $packing['closing'] }}</td>
-                                                    <td>{{ $packing['total'] }}</td>
+                                                    <td class="text-start sticky-col-1">{{ $packing['name'] }}</td>
+                                                    <td class="sticky-col-2">{{ $packing['opening'] }}</td>
+                                                    <td class="sticky-col-3">{{ $packing['closing'] }}</td>
+                                                    <td class="sticky-col-4">{{ $packing['total'] }}</td>
                                                     @for($i = 1; $i <= $daysInMonth; $i++)
                                                         @php $day = sprintf('%02d', $i); @endphp
                                                         <td>{{ $packing['daily'][$day] ?? '' }}</td>
