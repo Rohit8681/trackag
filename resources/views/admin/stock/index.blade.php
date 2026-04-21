@@ -3,30 +3,49 @@
 <style>
     .table-container {
         overflow-x: auto;
+        position: relative;
+    }
+    .sticky-table {
+        border-collapse: separate !important;
+        border-spacing: 0 !important;
     }
     .sticky-table td {
+        background-color: white; /* Default background */
+        border: 1px solid #dee2e6 !important;
+    }
+    .sticky-table td[class*="sticky-col-"] {
         position: sticky !important;
-        z-index: 5;
-        background-color: inherit;
-    }
-    .sticky-col-1 { left: 0; min-width: 200px; width: 200px; }
-    .sticky-col-2 { left: 200px; min-width: 100px; width: 100px; }
-    .sticky-col-3 { left: 300px; min-width: 100px; width: 100px; }
-    .sticky-col-4 { left: 400px; min-width: 100px; width: 100px; }
-
-    /* Fix background colors for sticky cells */
-    .sticky-table tbody tr {
+        z-index: 10 !important;
         background-color: white;
+        border-right: 1px solid #dee2e6 !important;
     }
-    .sticky-table tbody tr:nth-of-type(odd) {
+    
+    .sticky-col-1 { left: 0; min-width: 180px; width: 180px; }
+    .sticky-col-2 { left: 180px; min-width: 80px; width: 80px; }
+    .sticky-col-3 { left: 260px; min-width: 80px; width: 80px; }
+    .sticky-col-4 { left: 340px; min-width: 80px; width: 80px; }
+
+    /* Shadow to separate sticky area */
+    .sticky-col-4 {
+        box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+    }
+
+    /* Striped row fix for sticky cells */
+    .sticky-table tbody tr:nth-of-type(odd) td[class*="sticky-col-"] {
         background-color: #f9f9f9;
     }
+
+    /* Product Header fixes */
     .sticky-table tr.product-header {
         background-color: #fce4d6 !important;
-        z-index: 6;
     }
     .sticky-table tr.product-header td {
         background-color: #fce4d6 !important;
+        font-weight: bold;
+        z-index: 12 !important;
+    }
+    .sticky-table tr.product-header td[class*="sticky-col-"] {
+        z-index: 15 !important;
     }
 </style>
 @endpush
