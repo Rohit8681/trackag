@@ -1,5 +1,6 @@
 @extends('admin.layout.layout')
 @push('styles')
+<link rel="stylesheet" href="https://cdn.datatables.net/fixedcolumns/4.3.0/css/fixedColumns.dataTables.min.css">
 <style>
 /* ---------- CLEAN TABLE DESIGN ---------- */
 
@@ -180,6 +181,7 @@
 @endsection
 
 @push('scripts')
+<script src="https://cdn.datatables.net/fixedcolumns/4.3.0/js/dataTables.fixedColumns.min.js"></script>
 <script>
 $(document).ready(function () {
 
@@ -287,7 +289,12 @@ $(document).ready(function () {
         $table.DataTable({
             data: dataParam,
             columns: dtColumns,
-            responsive: true,
+            responsive: false,
+            scrollX: true,
+            scrollCollapse: true,
+            fixedColumns: {
+                leftColumns: 2
+            },
             autoWidth: false,
             pageLength: 25,
             lengthMenu: [10, 25, 50, 100],

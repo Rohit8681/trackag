@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\LocationApiController;
 use App\Http\Controllers\Api\PartyController;
 use App\Http\Controllers\Api\PartyPaymentController;
 use App\Http\Controllers\Api\FarmVisitController;
+use App\Http\Controllers\Api\MonthlyPlanApiController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\StockController;
 use Illuminate\Support\Facades\Route;
@@ -89,7 +90,7 @@ Route::middleware([TenantAuthenticate::class])->group(function () {
     Route::get('/stock/list', [StockController::class, 'getStockList']);
     Route::post('/stock/bulk-store', [StockController::class, 'bulkStoreStock']);
 
-    Route::get('/monthly-plan/packing-list', [\App\Http\Controllers\Api\MonthlyPlanApiController::class, 'getProductPackingList']);
-    Route::get('/monthly-plan/list', [\App\Http\Controllers\Api\MonthlyPlanApiController::class, 'getPlanList']);
-    Route::post('/monthly-plan/bulk-store', [\App\Http\Controllers\Api\MonthlyPlanApiController::class, 'bulkStorePlan']);
+    Route::get('/monthly-plan/packing-list', [MonthlyPlanApiController::class, 'getProductPackingList']);
+    Route::get('/monthly-plan/list', [MonthlyPlanApiController::class, 'getPlanList']);
+    Route::post('/monthly-plan/bulk-store', [MonthlyPlanApiController::class, 'bulkStorePlan']);
 });

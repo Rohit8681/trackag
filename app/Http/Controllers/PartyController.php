@@ -529,13 +529,15 @@ class PartyController extends Controller
 
             $data[] = array_merge([
                 'party_name' => $customer->agro_name,
+                'employee_name' => $customer->user->name ?? '-',
                 'customer_id' => $customer->id,
             ], $monthData);
         }
 
         // Return columns config and data row
         $columns = [
-            ['data' => 'party_name', 'name' => 'party_name', 'title' => 'Party Name']
+            ['data' => 'party_name', 'name' => 'party_name', 'title' => 'Party Name'],
+            ['data' => 'employee_name', 'name' => 'employee_name', 'title' => 'Employee Name']
         ];
         
         foreach ($months as $idx => $m) {
