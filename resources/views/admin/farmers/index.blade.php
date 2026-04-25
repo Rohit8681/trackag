@@ -20,8 +20,11 @@
         <div class="container-fluid">
 
             <div class="card card-primary card-outline">
-                <div class="card-header d-flex align-items-center">
+                <div class="card-header d-flex align-items-center justify-content-between">
                     <h3 class="card-title mb-0">Farmer List</h3>
+                    <button type="button" class="btn btn-info btn-sm text-white" data-bs-toggle="modal" data-bs-target="#targetModal">
+                        <i class="fas fa-bullseye me-1"></i> Set Target
+                    </button>
                 </div>
 
                 <div class="card-body">
@@ -186,6 +189,32 @@
                 </div>
             </div>
 
+        </div>
+    </div>
+
+    <!-- 🎯 Target Modal -->
+    <div class="modal fade" id="targetModal" tabindex="-1" aria-labelledby="targetModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-info text-white">
+                    <h5 class="modal-title" id="targetModalLabel"><i class="fas fa-bullseye me-2"></i> Set Farmer Visit Target</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="{{ route('farmers.farmer-visit-target') }}" method="POST">
+                    @csrf
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="target" class="form-label fw-bold">Target Count (Visits per month)</label>
+                            <input type="number" name="target" class="form-control" id="target" value="{{ $farmerVisitTarget->target ?? 0 }}" required min="0">
+                            <div class="form-text">This target will be used to color the counts in Farmer Visit Report.</div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-info text-white">Save Target</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </main>

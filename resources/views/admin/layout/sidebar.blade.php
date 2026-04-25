@@ -362,9 +362,9 @@
                 @endcanany
 
                 {{-- Filed Demo --}}
-                <li class="nav-item {{ request()->routeIs('farmers.*') ? 'menu-open' : '' }}">
+                <li class="nav-item {{ request()->routeIs('farmers.*') || request()->routeIs('farmer-visit-report*') ? 'menu-open' : '' }}">
                     {{-- Parent --}}
-                    <a href="#" class="nav-link {{ request()->routeIs('farmers.*') ? 'active' : '' }}">
+                    <a href="#" class="nav-link {{ request()->routeIs('farmers.*') || request()->routeIs('farmer-visit-report*') ? 'active' : '' }}">
                         <i class="bi bi-clipboard-check me-2"></i>
                         <p>Field Demo<i class="bi bi-chevron-right ms-auto"></i></p>
                     </a>
@@ -385,6 +385,15 @@
                             class="nav-link {{ request()->routeIs('farmers.daily-farm-visits') ? 'active' : '' }}">
                                 <i class="bi bi-calendar-check me-2"></i>
                                 <p>Daily Farm Demo</p>
+                            </a>
+                        </li>
+
+                        {{-- Farmer Visit Report --}}
+                        <li class="nav-item">
+                            <a href="{{ route('farmer-visit-report') }}"
+                            class="nav-link {{ request()->routeIs('farmer-visit-report') ? 'active' : '' }}">
+                                <i class="bi bi-file-earmark-bar-graph me-2"></i>
+                                <p>Farmer Visit Report</p>
                             </a>
                         </li>
 

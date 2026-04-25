@@ -124,4 +124,47 @@ class StockController extends Controller
             'message' => 'Stock updated successfully.'
         ]);
     }
+
+    public function bulkUpdateStock(Request $request)
+    {
+        $request->validate([
+            'customer_id' => 'nullable|integer',
+            'products' => 'required|array',
+            'products.*.product_id' => 'required',
+            'products.*.packings' => 'required|array',
+            'products.*.packings.*.packing_id' => 'required',
+            'products.*.packings.*.quantity' => 'required|integer|min:0',
+        ]);
+
+        $userId = Auth::id() ?? $request->user()->id ?? null;
+        $customerId = $request->input('customer_id');
+
+        if (!$userId) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized user.'
+            ], 401);
+        }
+
+        foreach ($request->products as $product) {
+            foreach ($product['packings'] as $packing) {
+                Stock::updateOrCreate(
+                    [
+                        'user_id' => $userId,
+                        'customer_id' => $customerId,
+                        'product_id' => $product['product_id'],
+                        'packing_id' => $packing['packing_id'],
+                    ],
+                    [
+                        'quantity' => $packing['quantity'],
+                    ]
+                );
+            }
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Stock updated successfully.'
+        ]);
+    }
 }

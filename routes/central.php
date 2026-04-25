@@ -234,7 +234,13 @@ Route::middleware(['web'])->group(function () {
             Route::get('daily-farm-visits', [FarmerController::class, 'dailyFarmVisits'])->name('farmers.daily-farm-visits');
             Route::get('farmers/{farmer}/farm-visits', [FarmerController::class, 'farmerWiseList'])->name('farmers.farm-visits');
             Route::post('farm-visits/{visit}/agronomist-remark', [FarmerController::class, 'saveAgronomistRemark'])->name('farm-visits.agronomist-remark');
+            Route::post('farmers/farmer-visit-target', [FarmerController::class, 'saveFarmerVisitTarget'])->name('farmers.farmer-visit-target');
             Route::get('/farmers/pdf', [FarmerController::class, 'downloadPdf'])->name('farmers.pdf');
+            
+            // Farmer Visit Report
+            Route::get('farmer-visit-report', [FarmerController::class, 'farmerVisitReport'])->name('farmer-visit-report');
+            Route::get('farmer-visit-report-data', [FarmerController::class, 'getFarmerVisitReportData'])->name('farmer-visit-report.data');
+            Route::get('farmer-visit-report-details', [FarmerController::class, 'getFarmerVisitDetails'])->name('farmer-visit-report.details');
             
         });
     });
