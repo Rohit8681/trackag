@@ -493,7 +493,6 @@ class PartyController extends Controller
         // Fetch Visits
         $visits = PartyVisit::whereIn('customer_id', $customerIds)
             ->whereNotNull('check_in_time')
-            ->whereNotNull('check_out_time')
             ->whereBetween('visited_date', [$startDate, $endDate])
             ->get();
 
@@ -568,7 +567,6 @@ class PartyController extends Controller
         $visits = PartyVisit::with(['customer', 'user'])
             ->where('customer_id', $customerId)
             ->whereNotNull('check_in_time')
-            ->whereNotNull('check_out_time')
             ->whereYear('visited_date', $year)
             ->whereMonth('visited_date', $month)
             ->orderBy('visited_date', 'asc')
