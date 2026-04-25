@@ -466,7 +466,7 @@ class PartyController extends Controller
         }
 
         // Fetch visible customers based on role/filters
-        $customerQuery = Customer::with('user')->where('is_active', 1)->where('type', 'mobile');
+        $customerQuery = Customer::with('user')->where('is_active', 1)->where('type', 'web');
 
         if (!in_array($roleName, ['master_admin', 'sub_admin'])) {
             $customerQuery->whereHas('user', function ($q) use ($user, $stateIds) {
