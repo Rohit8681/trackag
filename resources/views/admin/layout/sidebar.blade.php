@@ -500,7 +500,10 @@
                 || request()->is('admin/ta-da-bill-master*')
                 || request()->is('admin/crop-categories*')
                 || request()->is('admin/crop-sub-categories*')
-                || request()->is('admin/product-price-list*');
+                || request()->is('admin/product-price-list*')
+                || request()->routeIs('party.sync')
+                || request()->routeIs('sales.bill.register')
+                || request()->routeIs('party.opening.closing');
                 @endphp
                 <li class="nav-item {{ $masterActive ? 'menu-open' : '' }}">
                         
@@ -954,6 +957,39 @@
                                     </a>
                                 </li>
 
+                            </ul>
+                        </li>
+
+                        {{-- Integration Menu --}}
+                        @php
+                            $isIntegrationMenu = request()->routeIs('party.sync') || request()->routeIs('sales.bill.register') || request()->routeIs('party.opening.closing');
+                        @endphp
+                        <li class="nav-item {{ $isIntegrationMenu ? 'menu-open' : '' }}">
+                            <a href="#" class="nav-link {{ $isIntegrationMenu ? 'active' : '' }}">
+                                <i class="bi bi-link-45deg me-2"></i><p>Integration<i class="bi bi-chevron-right ms-auto"></i></p>
+                            </a>
+
+                            <ul class="nav nav-treeview">
+                                {{-- Party Sync --}}
+                                <li class="nav-item">
+                                    <a href="{{ route('party.sync') }}" class="nav-link {{ request()->routeIs('party.sync') ? 'active' : '' }}">
+                                        <i class="bi bi-circle me-2"></i><p>Party Sync</p>
+                                    </a>
+                                </li>
+
+                                {{-- Sales Bill Register --}}
+                                <li class="nav-item">
+                                    <a href="{{ route('sales.bill.register') }}" class="nav-link {{ request()->routeIs('sales.bill.register') ? 'active' : '' }}">
+                                        <i class="bi bi-circle me-2"></i><p>Sales Bill Register</p>
+                                    </a>
+                                </li>
+
+                                {{-- Partywise Opening & Closing --}}
+                                <li class="nav-item">
+                                    <a href="{{ route('party.opening.closing') }}" class="nav-link {{ request()->routeIs('party.opening.closing') ? 'active' : '' }}">
+                                        <i class="bi bi-circle me-2"></i><p>Party Opening/Closing</p>
+                                    </a>
+                                </li>
                             </ul>
                         </li>
                         

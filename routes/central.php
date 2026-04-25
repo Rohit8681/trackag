@@ -186,12 +186,16 @@ Route::middleware(['web'])->group(function () {
             Route::get('party-payment', [PartyPaymentController::class, 'index'])->name('party-payment');
             Route::post('/party-payment/clear-return', [PartyPaymentController::class, 'clearReturn'])->name('party-payment.clear-return');
             
+            Route::view('party-sync', 'admin.party.party_sync')->name('party.sync');
+            Route::view('party-opening-closing', 'admin.party.opening_closing')->name('party.opening.closing');
+            
             Route::post('order-status-update', [OrderController::class, 'updateStatus'])->name('order.status.update');
             Route::post('order/item/update', [OrderController::class, 'updateItem'])->name('order.item.update');
             Route::post('order/update-items-qty', [OrderController::class, 'updateOrderItemsQty'])->name('order.items.update_qty');
             Route::get('order/{order}/dispatch-data', [OrderController::class, 'getDispatchData'])->name('order.dispatch.data');
             Route::post('order/dispatch/store', [OrderController::class, 'storeDispatch'])->name('order.dispatch.store');
             Route::resource('order', OrderController::class);
+            Route::view('sales-bill-register', 'admin.order.sales_bill_register')->name('sales.bill.register');
             Route::resource('stock', StockController::class);
 
             Route::get('tracking/live-data', [TrackingController::class, 'liveData'])->name('tracking.liveData');
