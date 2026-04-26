@@ -318,4 +318,21 @@ class ApiAuthController extends BaseController
             'data' => $apks
         ]);
     }
+
+    public function updateToken(Request $request)
+    {
+        $request->validate([
+            'fcm_token' => 'required'
+        ]);
+
+        $user = auth()->user(); // user login હોવો જોઈએ
+
+        $user->fcm_token = $request->fcm_token;
+        $user->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Token updated'
+        ]);
+    }
 }

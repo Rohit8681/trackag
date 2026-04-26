@@ -11,22 +11,6 @@ return new class extends Migration
      */
     public function up(): void
     {
-        //Previous Table
-        // Schema::create('users', function (Blueprint $table) {
-        //     $table->id();
-        //     $table->string('name');
-        //     $table->string('role')->nullable();
-        //     $table->string('mobile', 20)->nullable();
-        //     $table->string('email')->unique();
-        //     $table->timestamp('email_verified_at')->nullable();
-        //     $table->string('password');
-        //     $table->boolean('is_active')->default(true);
-        //     $table->string('image')->nullable();
-        //     $table->rememberToken();
-        //     $table->timestamps();
-        // });
-
-
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('name'); // Already present
@@ -87,6 +71,8 @@ return new class extends Migration
 
             // Status (extra status, different from is_active)
             $table->string('status')->default('Active');
+
+            $table->text('fcm_token')->nullable();
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {

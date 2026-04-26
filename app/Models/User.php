@@ -78,7 +78,8 @@ class User extends Authenticatable
         'passport_no',
         'passport_expiry',
         'cancel_cheque_photos',
-        'slab_designation_id'
+        'slab_designation_id',
+        'fcm_token'
     ];
 
     /**

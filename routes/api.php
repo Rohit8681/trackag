@@ -94,4 +94,5 @@ Route::middleware([TenantAuthenticate::class])->group(function () {
     Route::get('/monthly-plan/packing-list', [MonthlyPlanApiController::class, 'getProductPackingList']);
     Route::get('/monthly-plan/list', [MonthlyPlanApiController::class, 'getPlanList']);
     Route::post('/monthly-plan/bulk-store', [MonthlyPlanApiController::class, 'bulkStorePlan']);
+    Route::post('/update-fcm-token', [ApiAuthController::class, 'updateToken']);
 });
