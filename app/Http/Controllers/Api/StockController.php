@@ -51,6 +51,7 @@ class StockController extends Controller
                   ->where('status', 1);
             },
             'packings.stock' => function ($query) use ($userId, $customerId) {
+                $query->with('customer');
                 $query->where('user_id', $userId);
                 if ($customerId) {
                     $query->where('customer_id', $customerId);
@@ -70,7 +71,13 @@ class StockController extends Controller
                     return [
                         'packing_id' => $packing->id,
                         'packing' => $packing->packing_value . ' ' . $packing->packing_size,
-                        'stock' => $packing->stock->quantity ?? 0
+                        'stock' => $packing->stock->quantity ?? 0,
+                        'stock_date' => $packing->stock ? $packing->stock->created_at->format('Y-m-d') : null,
+                        'customer_details' => $packing->stock && $packing->stock->customer ? [
+                            'contact_person_name' => $packing->stock->customer->contact_person_name,
+                            'address' => $packing->stock->customer->address,
+                            'phone' => $packing->stock->customer->phone,
+                        ] : null,
                     ];
                 })
             ];
