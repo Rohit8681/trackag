@@ -183,6 +183,36 @@ class OrderController extends Controller
 
         $order->save();
 
+        // Send Push Notification
+        // try {
+        //     $order->loadMissing('user');
+        //     if ($order->user && !empty($order->user->fcm_token)) {
+        //         $firebaseService = app(\App\Services\FirebaseService::class);
+        //         $title = "Order #{$order->order_no} Status Updated";
+                
+        //         $statusMessage = "Your order status has been updated to {$order->status}.";
+        //         if ($order->status === 'part_dispatched') {
+        //             $statusMessage = "Your order is partially dispatched.";
+        //         } elseif ($order->status === 'dispatched') {
+        //             $statusMessage = "Your order is now fully dispatched.";
+        //         } elseif ($order->status === 'hold') {
+        //             $statusMessage = "Your order has been placed on hold.";
+        //         } elseif ($order->status === 'rejected') {
+        //             $statusMessage = "Your order has been rejected.";
+        //         } elseif ($order->status === 'approved') {
+        //             $statusMessage = "Your order has been approved.";
+        //         } elseif ($order->status === 'delivered') {
+        //             $statusMessage = "Your order has been delivered.";
+        //         }
+
+        //         $firebaseService->sendNotification($order->user->fcm_token, $title, $statusMessage, [
+        //             'order_id' => (string) $order->id,
+        //             'status' => $order->status
+        //         ]);
+        //     }
+        // } catch (\Exception $e) {
+        //     \Illuminate\Support\Facades\Log::error('Failed to send push notification: ' . $e->getMessage());
+        // }
 
         return response()->json([
             'status'  => true,
@@ -377,6 +407,26 @@ class OrderController extends Controller
                 $order->status = 'part_dispatched';
             }
             $order->save();
+
+            // Send Push Notification
+            // try {
+            //     $order->loadMissing('user');
+            //     if ($order->user && !empty($order->user->fcm_token)) {
+            //         $firebaseService = app(\App\Services\FirebaseService::class);
+            //         $title = "Order #{$order->order_no} Status Updated";
+                    
+            //         $statusMessage = $order->status === 'dispatched' 
+            //             ? "Your order is now fully dispatched." 
+            //             : "Your order is partially dispatched.";
+
+            //         $firebaseService->sendNotification($order->user->fcm_token, $title, $statusMessage, [
+            //             'order_id' => (string) $order->id,
+            //             'status' => $order->status
+            //         ]);
+            //     }
+            // } catch (\Exception $e) {
+            //     \Illuminate\Support\Facades\Log::error('Failed to send push notification on dispatch: ' . $e->getMessage());
+            // }
         }
 
         return response()->json([
