@@ -118,7 +118,7 @@ class StockController extends Controller
 
         // 👉 first packing mathi stock levu
         $firstPacking = $product->packings->first();
-        $stock = $firstPacking && $firstPacking->stock ? $firstPacking->stock->first() : null;
+        $stock = optional($packing->stock)->first();
         $customer = $stock ? $stock->customer : null;
 
         return [
