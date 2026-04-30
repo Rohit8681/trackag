@@ -47,51 +47,37 @@ class StockController extends Controller
         $userId = Auth::id() ?? $request->user()->id ?? null;
         $customerId = $request->input('customer_id');
 
-        $products = Product::with([
-            'packings' => function ($q) {
-                $q->select('id', 'product_id', 'packing_value', 'packing_size')
-                ->where('status', 1);
-            },
-            'packings.stock' => function ($query) use ($userId) {
-                $query->with('customer')
-                    ->where('user_id', $userId);
-            }
-        ])
-        ->where('status', 1)
-        ->get();
+        $query = Stock::with(['product', 'packing', 'customer'])
+            ->where('user_id', $userId);
 
-        $data = $products->map(function ($product) {
+        if (!empty($customerId)) {
+            $query->where('customer_id', $customerId);
+        }
 
-        // 👉 first packing mathi data levu
-        $firstPacking = $product->packings->first();
-        $stock = $firstPacking ? $firstPacking->stock : null;
+        $stocks = $query->orderByDesc('updated_at')->get();
 
-        $customer = $stock ? $stock->customer : null;
+        $data = $stocks->map(function ($stock) {
+            $customer = $stock->customer;
+            $product = $stock->product;
+            $packing = $stock->packing;
 
-        return [
-            'product_id' => $product->id,
-            'product_name' => $product->product_name,
-
-            // ✅ product level data
-            'stock_date' => $stock ? $stock->created_at : null,
-            'contact_person_name' => $customer ? $customer->contact_person_name : null,
-            'address' => $customer ? $customer->address : null,
-            'phone' => $customer ? $customer->phone : null,
-
-            'packings' => $product->packings->map(function ($packing) {
-
-                $stock = $packing->stock;
-
-                return [
-                    'packing_id' => $packing->id,
-                    'packing' => $packing->packing_value . ' ' . $packing->packing_size,
-                    'stock' => $stock ? $stock->quantity : 0,
-                    'stock_date' => $stock ? $stock->created_at->format('Y-m-d') : null,
-                    
-                ];
-            })
-        ];
-    });
+            return [
+                'product_id' => $stock->product_id,
+                'product_name' => $product->product_name ?? null,
+                'stock_date' => $stock->created_at->format('Y-m-d'),
+                'contact_person_name' => $customer->contact_person_name ?? null,
+                'address' => $customer->address ?? null,
+                'phone' => $customer->phone ?? null,
+                'packings' => [
+                    [
+                        'packing_id' => $stock->packing_id,
+                        'packing' => $packing ? ($packing->packing_value . ' ' . $packing->packing_size) : null,
+                        'stock' => $stock->quantity,
+                        'stock_date' => $stock->created_at->format('Y-m-d'),
+                    ]
+                ]
+            ];
+        });
 
         return response()->json([
             'success' => true,
