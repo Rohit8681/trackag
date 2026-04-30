@@ -40,57 +40,7 @@ class StockController extends Controller
         ]);
     }
 
-    // public function getStockList(Request $request)
-    // {
-    //     $userId = Auth::id() ?? $request->user()->id ?? null;
-    //     $customerId = $request->input('customer_id');
-
-    //     $products = Product::with([
-    //         'packings' => function ($q) {
-    //             $q->select('id', 'product_id', 'packing_value', 'packing_size')
-    //               ->where('status', 1);
-    //         },
-    //         'packings.stock' => function ($query) use ($userId, $customerId) {
-    //             $query->with('customer');
-    //             $query->where('user_id', $userId);
-    //             // if ($customerId) {
-    //             //     $query->where('customer_id', $customerId);
-    //             // } else {
-    //             //     $query->whereNull('customer_id');
-    //             // }
-    //         }
-    //     ])
-    //     ->where('status', 1)
-    //     ->get();
-
-    //     $data = $products->map(function ($product) {
-    //         return [
-    //             'product_id' => $product->id,
-    //             'product_name' => $product->product_name,
-    //             'contact_person_name' => $packing->stock->customer->contact_person_name,
-    //             'address' => $packing->stock->customer->address,
-    //             'phone' => $packing->stock->customer->phone,
-    //             'packings' => $product->packings->map(function ($packing) {
-    //                 return [
-    //                     'packing_id' => $packing->id,
-    //                     'packing' => $packing->packing_value . ' ' . $packing->packing_size,
-    //                     'stock' => $packing->stock->quantity ?? 0,
-    //                     'stock_date' => $packing->stock ? $packing->stock->created_at->format('Y-m-d') : null,
-    //                     // 'customer_details' => $packing->stock && $packing->stock->customer ? [
-    //                     //     'contact_person_name' => $packing->stock->customer->contact_person_name,
-    //                     //     'address' => $packing->stock->customer->address,
-    //                     //     'phone' => $packing->stock->customer->phone,
-    //                     // ] : null,
-    //                 ];
-    //             })
-    //         ];
-    //     });
-
-    //     return response()->json([
-    //         'success' => true,
-    //         'data' => $data
-    //     ]);
-    // }
+    
 
     public function getStockList(Request $request)
     {
@@ -106,8 +56,10 @@ class StockController extends Controller
                 $query->with('customer')
                     ->where('user_id', $userId);
 
-                if ($customerId) {
+                if (!empty($customerId)) {
                     $query->where('customer_id', $customerId);
+                } else {
+                    $query->whereNull('customer_id');
                 }
             }
         ])
@@ -243,84 +195,84 @@ class StockController extends Controller
     // }
 
     public function bulkUpdateStock(Request $request)
-{
-    \Log::info('Bulk Stock API Hit', [
-        'request_data' => $request->all()
-    ]);
-
-    $request->validate([
-        'customer_id' => 'nullable|integer',
-        'products' => 'required|array',
-        'products.*.product_id' => 'required',
-        'products.*.packings' => 'required|array',
-        'products.*.packings.*.packing_id' => 'required',
-        'products.*.packings.*.quantity' => 'required|integer|min:0',
-    ]);
-
-    $userId = Auth::id() ?? $request->user()->id ?? null;
-    $customerId = $request->input('customer_id');
-
-    \Log::info('User & Customer Info', [
-        'user_id' => $userId,
-        'customer_id' => $customerId
-    ]);
-
-    if (!$userId) {
-        \Log::error('Unauthorized user tried to update stock');
-
-        return response()->json([
-            'success' => false,
-            'message' => 'Unauthorized user.'
-        ], 401);
-    }
-
-    foreach ($request->products as $product) {
-
-        \Log::info('Processing Product', [
-            'product_id' => $product['product_id']
+    {
+        \Log::info('Bulk Stock API Hit', [
+            'request_data' => $request->all()
         ]);
 
-        foreach ($product['packings'] as $packing) {
+        $request->validate([
+            'customer_id' => 'nullable|integer',
+            'products' => 'required|array',
+            'products.*.product_id' => 'required',
+            'products.*.packings' => 'required|array',
+            'products.*.packings.*.packing_id' => 'required',
+            'products.*.packings.*.quantity' => 'required|integer|min:0',
+        ]);
 
-            \Log::info('Processing Packing', [
-                'product_id' => $product['product_id'],
-                'packing_id' => $packing['packing_id'],
-                'quantity' => $packing['quantity']
+        $userId = Auth::id() ?? $request->user()->id ?? null;
+        $customerId = $request->input('customer_id');
+
+        \Log::info('User & Customer Info', [
+            'user_id' => $userId,
+            'customer_id' => $customerId
+        ]);
+
+        if (!$userId) {
+            \Log::error('Unauthorized user tried to update stock');
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized user.'
+            ], 401);
+        }
+
+        foreach ($request->products as $product) {
+
+            \Log::info('Processing Product', [
+                'product_id' => $product['product_id']
             ]);
 
-            try {
-                $stock = Stock::updateOrCreate(
-                    [
-                        'user_id' => $userId,
-                        'customer_id' => $customerId,
-                        'product_id' => $product['product_id'],
-                        'packing_id' => $packing['packing_id'],
-                    ],
-                    [
-                        'quantity' => $packing['quantity'],
-                    ]
-                );
+            foreach ($product['packings'] as $packing) {
 
-                \Log::info('Stock Updated/Created', [
-                    'stock_id' => $stock->id,
-                    'data' => $stock
-                ]);
-
-            } catch (\Exception $e) {
-                \Log::error('Stock Update Failed', [
-                    'error' => $e->getMessage(),
+                \Log::info('Processing Packing', [
                     'product_id' => $product['product_id'],
-                    'packing_id' => $packing['packing_id']
+                    'packing_id' => $packing['packing_id'],
+                    'quantity' => $packing['quantity']
                 ]);
+
+                try {
+                    $stock = Stock::updateOrCreate(
+                        [
+                            'user_id' => $userId,
+                            'customer_id' => $customerId,
+                            'product_id' => $product['product_id'],
+                            'packing_id' => $packing['packing_id'],
+                        ],
+                        [
+                            'quantity' => $packing['quantity'],
+                        ]
+                    );
+
+                    \Log::info('Stock Updated/Created', [
+                        'stock_id' => $stock->id,
+                        'data' => $stock
+                    ]);
+
+                } catch (\Exception $e) {
+                    \Log::error('Stock Update Failed', [
+                        'error' => $e->getMessage(),
+                        'product_id' => $product['product_id'],
+                        'packing_id' => $packing['packing_id']
+                    ]);
+                }
             }
         }
+
+        \Log::info('Bulk Stock Update Completed');
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Stock updated successfully.'
+        ]);
     }
-
-    \Log::info('Bulk Stock Update Completed');
-
-    return response()->json([
-        'success' => true,
-        'message' => 'Stock updated successfully.'
-    ]);
-}
 }
