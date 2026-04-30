@@ -52,15 +52,9 @@ class StockController extends Controller
                 $q->select('id', 'product_id', 'packing_value', 'packing_size')
                 ->where('status', 1);
             },
-            'packings.stock' => function ($query) use ($userId, $customerId) {
+            'packings.stock' => function ($query) use ($userId) {
                 $query->with('customer')
                     ->where('user_id', $userId);
-
-                if (!empty($customerId)) {
-                    $query->where('customer_id', $customerId);
-                } else {
-                    $query->whereNull('customer_id');
-                }
             }
         ])
         ->where('status', 1)
@@ -70,9 +64,7 @@ class StockController extends Controller
 
         // 👉 first packing mathi data levu
         $firstPacking = $product->packings->first();
-        $stock = $firstPacking && $firstPacking->stock 
-            ? $firstPacking->stock->first() 
-            : null;
+        $stock = $firstPacking ? $firstPacking->stock : null;
 
         $customer = $stock ? $stock->customer : null;
 
@@ -82,19 +74,18 @@ class StockController extends Controller
 
             // ✅ product level data
             'stock_date' => $stock ? $stock->created_at : null,
-            'contact_person_name' => $customer->contact_person_name ?? null,
-            'address' => $customer->address ?? null,
-            'phone' => $customer->phone ?? null,
+            'contact_person_name' => $customer ? $customer->contact_person_name : null,
+            'address' => $customer ? $customer->address : null,
+            'phone' => $customer ? $customer->phone : null,
 
-            // ✅ packings loop (ahi $packing valid che)
             'packings' => $product->packings->map(function ($packing) {
 
-                $stock = optional($packing->stock)->first();
+                $stock = $packing->stock;
 
                 return [
                     'packing_id' => $packing->id,
                     'packing' => $packing->packing_value . ' ' . $packing->packing_size,
-                    'stock' => $stock->quantity ?? 0,
+                    'stock' => $stock ? $stock->quantity : 0,
                     'stock_date' => $stock ? $stock->created_at->format('Y-m-d') : null,
                     
                 ];
