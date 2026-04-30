@@ -93,68 +93,68 @@ class StockController extends Controller
     // }
 
     public function getStockList(Request $request)
-{
-    $userId = Auth::id() ?? $request->user()->id ?? null;
-    $customerId = $request->input('customer_id');
+    {
+        $userId = Auth::id() ?? $request->user()->id ?? null;
+        $customerId = $request->input('customer_id');
 
-    $products = Product::with([
-        'packings' => function ($q) {
-            $q->select('id', 'product_id', 'packing_value', 'packing_size')
-              ->where('status', 1);
-        },
-        'packings.stock' => function ($query) use ($userId, $customerId) {
-            $query->with('customer')
-                  ->where('user_id', $userId);
+        $products = Product::with([
+            'packings' => function ($q) {
+                $q->select('id', 'product_id', 'packing_value', 'packing_size')
+                ->where('status', 1);
+            },
+            'packings.stock' => function ($query) use ($userId, $customerId) {
+                $query->with('customer')
+                    ->where('user_id', $userId);
 
-            if ($customerId) {
-                $query->where('customer_id', $customerId);
+                if ($customerId) {
+                    $query->where('customer_id', $customerId);
+                }
             }
-        }
-    ])
-    ->where('status', 1)
-    ->get();
+        ])
+        ->where('status', 1)
+        ->get();
 
-    $data = $products->map(function ($product) {
+        $data = $products->map(function ($product) {
 
-    // 👉 first packing mathi data levu
-    $firstPacking = $product->packings->first();
-    $stock = $firstPacking && $firstPacking->stock 
-        ? $firstPacking->stock->first() 
-        : null;
+        // 👉 first packing mathi data levu
+        $firstPacking = $product->packings->first();
+        $stock = $firstPacking && $firstPacking->stock 
+            ? $firstPacking->stock->first() 
+            : null;
 
-    $customer = $stock ? $stock->customer : null;
+        $customer = $stock ? $stock->customer : null;
 
-    return [
-        'product_id' => $product->id,
-        'product_name' => $product->product_name,
+        return [
+            'product_id' => $product->id,
+            'product_name' => $product->product_name,
 
-        // ✅ product level data
-        'stock_date' => $stock ? $stock->created_at : null,
-        'contact_person_name' => $customer->contact_person_name ?? null,
-        'address' => $customer->address ?? null,
-        'phone' => $customer->phone ?? null,
+            // ✅ product level data
+            'stock_date' => $stock ? $stock->created_at : null,
+            'contact_person_name' => $customer->contact_person_name ?? null,
+            'address' => $customer->address ?? null,
+            'phone' => $customer->phone ?? null,
 
-        // ✅ packings loop (ahi $packing valid che)
-        'packings' => $product->packings->map(function ($packing) {
+            // ✅ packings loop (ahi $packing valid che)
+            'packings' => $product->packings->map(function ($packing) {
 
-            $stock = optional($packing->stock)->first();
+                $stock = optional($packing->stock)->first();
 
-            return [
-                'packing_id' => $packing->id,
-                'packing' => $packing->packing_value . ' ' . $packing->packing_size,
-                'stock' => $stock->quantity ?? 0,
-                'stock_date' => $stock ? $stock->created_at->format('Y-m-d') : null,
-                
-            ];
-        })
-    ];
-});
+                return [
+                    'packing_id' => $packing->id,
+                    'packing' => $packing->packing_value . ' ' . $packing->packing_size,
+                    'stock' => $stock->quantity ?? 0,
+                    'stock_date' => $stock ? $stock->created_at->format('Y-m-d') : null,
+                    
+                ];
+            })
+        ];
+    });
 
-    return response()->json([
-        'success' => true,
-        'data' => $data
-    ]);
-}
+        return response()->json([
+            'success' => true,
+            'data' => $data
+        ]);
+    }
 
     public function bulkStoreStock(Request $request)
     {
@@ -199,30 +199,97 @@ class StockController extends Controller
         ]);
     }
 
+    // public function bulkUpdateStock(Request $request)
+    // {
+    //     $request->validate([
+    //         'customer_id' => 'nullable|integer',
+    //         'products' => 'required|array',
+    //         'products.*.product_id' => 'required',
+    //         'products.*.packings' => 'required|array',
+    //         'products.*.packings.*.packing_id' => 'required',
+    //         'products.*.packings.*.quantity' => 'required|integer|min:0',
+    //     ]);
+
+    //     $userId = Auth::id() ?? $request->user()->id ?? null;
+    //     $customerId = $request->input('customer_id');
+
+    //     if (!$userId) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Unauthorized user.'
+    //         ], 401);
+    //     }
+
+    //     foreach ($request->products as $product) {
+    //         foreach ($product['packings'] as $packing) {
+    //             Stock::updateOrCreate(
+    //                 [
+    //                     'user_id' => $userId,
+    //                     'customer_id' => $customerId,
+    //                     'product_id' => $product['product_id'],
+    //                     'packing_id' => $packing['packing_id'],
+    //                 ],
+    //                 [
+    //                     'quantity' => $packing['quantity'],
+    //                 ]
+    //             );
+    //         }
+    //     }
+
+    //     return response()->json([
+    //         'success' => true,
+    //         'message' => 'Stock updated successfully.'
+    //     ]);
+    // }
+
     public function bulkUpdateStock(Request $request)
-    {
-        $request->validate([
-            'customer_id' => 'nullable|integer',
-            'products' => 'required|array',
-            'products.*.product_id' => 'required',
-            'products.*.packings' => 'required|array',
-            'products.*.packings.*.packing_id' => 'required',
-            'products.*.packings.*.quantity' => 'required|integer|min:0',
+{
+    \Log::info('Bulk Stock API Hit', [
+        'request_data' => $request->all()
+    ]);
+
+    $request->validate([
+        'customer_id' => 'nullable|integer',
+        'products' => 'required|array',
+        'products.*.product_id' => 'required',
+        'products.*.packings' => 'required|array',
+        'products.*.packings.*.packing_id' => 'required',
+        'products.*.packings.*.quantity' => 'required|integer|min:0',
+    ]);
+
+    $userId = Auth::id() ?? $request->user()->id ?? null;
+    $customerId = $request->input('customer_id');
+
+    \Log::info('User & Customer Info', [
+        'user_id' => $userId,
+        'customer_id' => $customerId
+    ]);
+
+    if (!$userId) {
+        \Log::error('Unauthorized user tried to update stock');
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Unauthorized user.'
+        ], 401);
+    }
+
+    foreach ($request->products as $product) {
+
+        \Log::info('Processing Product', [
+            'product_id' => $product['product_id']
         ]);
 
-        $userId = Auth::id() ?? $request->user()->id ?? null;
-        $customerId = $request->input('customer_id');
+        foreach ($product['packings'] as $packing) {
 
-        if (!$userId) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Unauthorized user.'
-            ], 401);
-        }
+            \Log::info('Processing Packing', [
+                'product_id' => $product['product_id'],
+                'packing_id' => $packing['packing_id'],
+                'quantity' => $packing['quantity']
+            ]);
 
-        foreach ($request->products as $product) {
-            foreach ($product['packings'] as $packing) {
-                Stock::updateOrCreate(
+            try {
+                $stock = Stock::updateOrCreate(
                     [
                         'user_id' => $userId,
                         'customer_id' => $customerId,
@@ -233,12 +300,27 @@ class StockController extends Controller
                         'quantity' => $packing['quantity'],
                     ]
                 );
+
+                \Log::info('Stock Updated/Created', [
+                    'stock_id' => $stock->id,
+                    'data' => $stock
+                ]);
+
+            } catch (\Exception $e) {
+                \Log::error('Stock Update Failed', [
+                    'error' => $e->getMessage(),
+                    'product_id' => $product['product_id'],
+                    'packing_id' => $packing['packing_id']
+                ]);
             }
         }
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Stock updated successfully.'
-        ]);
     }
+
+    \Log::info('Bulk Stock Update Completed');
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Stock updated successfully.'
+    ]);
+}
 }
