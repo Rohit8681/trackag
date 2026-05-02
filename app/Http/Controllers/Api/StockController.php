@@ -47,41 +47,56 @@ class StockController extends Controller
         $userId = Auth::id() ?? $request->user()->id ?? null;
         $customerId = $request->input('customer_id');
 
-        $query = Stock::with(['product', 'packing', 'customer'])
-            ->where('user_id', $userId);
-
-        if (!empty($customerId)) {
-            $query->where('customer_id', $customerId);
+        $customer = null;
+        if ($customerId) {
+            $customer = \App\Models\Customer::find($customerId);
         }
 
-        $stocks = $query->orderByDesc('updated_at')->get();
+        $products = Product::with([
+            'packings' => function ($q) {
+                $q->select('id', 'product_id', 'packing_value', 'packing_size')
+                  ->where('status', 1);
+            },
+            'packings.stock' => function ($query) use ($userId, $customerId) {
+                $query->where('user_id', $userId)
+                      ->where('stock_date', date('Y-m-d'));
+                if ($customerId) {
+                    $query->where('customer_id', $customerId);
+                } else {
+                    $query->whereNull('customer_id');
+                }
+            }
+        ])
+        ->where('status', 1)
+        ->get();
 
-        // Group by customer and product to maintain nested structure compatibility
-        $data = $stocks->groupBy(function ($stock) {
-            return $stock->customer_id . '-' . $stock->product_id;
-        })->map(function ($group) {
-            $firstStock = $group->first();
-            $customer = $firstStock->customer;
-            $product = $firstStock->product;
+        $data = $products->map(function ($product) use ($customer) {
+            $latestStock = $product->packings->pluck('stock')->filter()->sortByDesc('updated_at')->first();
+            $productStockDate = $latestStock ? $latestStock->updated_at : null;
 
             return [
-                'product_id' => $firstStock->product_id,
-                'product_name' => $product->product_name ?? null,
-                'stock_date' => $firstStock->created_at->format('Y-m-d'),
-                'contact_person_name' => $customer->contact_person_name ?? null,
-                'address' => $customer->address ?? null,
-                'phone' => $customer->phone ?? null,
-                'packings' => $group->map(function ($stock) {
-                    $packing = $stock->packing;
+                'product_id' => $product->id,
+                'product_name' => $product->product_name,
+                'stock_date' => $productStockDate,
+                'contact_person_name' => $customer ? $customer->contact_person_name : null,
+                'address' => $customer ? $customer->address : null,
+                'phone' => $customer ? $customer->phone : null,
+                'packings' => $product->packings->map(function ($packing) use ($customer) {
+                    $stockDate = $packing->stock ? $packing->stock->stock_date : null;
                     return [
-                        'packing_id' => $stock->packing_id,
-                        'packing' => $packing ? ($packing->packing_value . ' ' . $packing->packing_size) : null,
-                        'stock' => $stock->quantity,
-                        'stock_date' => $stock->created_at->format('Y-m-d'),
+                        'packing_id' => $packing->id,
+                        'packing' => $packing->packing_value . ' ' . $packing->packing_size,
+                        'stock' => $packing->stock->quantity ?? 0,
+                        'stock_date' => $stockDate,
+                        'customer_details' => $customer ? [
+                            'contact_person_name' => $customer->contact_person_name,
+                            'address' => $customer->address,
+                            'phone' => $customer->phone,
+                        ] : null
                     ];
-                })->values()
+                })
             ];
-        })->values();
+        });
 
         return response()->json([
             'success' => true,
@@ -118,6 +133,7 @@ class StockController extends Controller
                         'customer_id' => $customerId,
                         'product_id' => $product['product_id'],
                         'packing_id' => $packing['packing_id'],
+                        'stock_date' => date('Y-m-d'),
                     ],
                     [
                         'quantity' => $packing['quantity'],
@@ -228,6 +244,7 @@ class StockController extends Controller
                             'customer_id' => $customerId,
                             'product_id' => $product['product_id'],
                             'packing_id' => $packing['packing_id'],
+                            'stock_date' => date('Y-m-d'),
                         ],
                         [
                             'quantity' => $packing['quantity'],

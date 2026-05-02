@@ -15,6 +15,7 @@ class Stock extends Model
         'customer_id',
         'product_id',
         'packing_id',
+        'stock_date',
         'quantity'
     ];
 
