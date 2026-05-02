@@ -20,6 +20,15 @@
         border-color: #ffc107;
         box-shadow: 0 0 0 0.25rem rgba(255, 193, 7, 0.25);
     }
+    /* Hide arrows from number inputs */
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+    input[type=number] {
+        -moz-appearance: textfield;
+    }
     .card-premium {
         border: none;
         box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
