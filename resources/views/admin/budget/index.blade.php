@@ -254,7 +254,7 @@
                                                     <td>
                                                         <div class="input-group">
                                                             <span class="input-group-text">₹</span>
-                                                            <input type="number" name="monthly_targets[{{ $m }}]" class="form-control target-input" data-month="{{ $m }}" step="0.01" value="0">
+                                                            <input type="number" name="monthly_targets[{{ $m }}]" class="form-control target-input" data-month="{{ $m }}" step="0.01" value="0" min="0">
                                                         </div>
                                                     </td>
                                                     <td>
@@ -272,7 +272,7 @@
                                         <h5 class="text-muted mb-3">Yearly Total Target</h5>
                                         <div class="input-group input-group-lg mb-4">
                                             <span class="input-group-text bg-warning border-warning text-dark">₹</span>
-                                            <input type="number" id="total-target-input" name="total_target" class="form-control border-warning fw-bold" placeholder="Enter Total Yearly Budget" step="0.01">
+                                            <input type="number" id="total-target-input" name="total_target" class="form-control border-warning fw-bold" placeholder="Enter Total Yearly Budget" step="0.01" min="0">
                                         </div>
                                         <p class="text-muted small mb-4">
                                             <i class="fas fa-info-circle me-1"></i> 
@@ -341,6 +341,22 @@
             updateBigDisplay(0);
             updateShares(0);
             $('#addBudgetModalLabel').html('<i class="fas fa-plus-circle me-2"></i> Set Budget Target');
+        });
+
+        // Prevent minus sign, 'e', and arrow keys
+        $('input[type="number"]').on('keydown', function(e) {
+            if (['-', 'e', 'E'].includes(e.key)) {
+                e.preventDefault();
+            }
+            // Disable Up and Down arrow keys
+            if (e.keyCode === 38 || e.keyCode === 40) {
+                e.preventDefault();
+            }
+        });
+
+        // Prevent scroll wheel from changing values
+        $('input[type="number"]').on('wheel', function(e) {
+            $(this).blur();
         });
 
         // Monthly input change
