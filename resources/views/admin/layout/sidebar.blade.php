@@ -42,6 +42,12 @@
                             </a>
                         </li>
                         @endcanany
+                        <li class="nav-item">
+                            <a href="{{ route('budget.report') }}" class="nav-link {{ request()->routeIs('budget.report') ? 'active' : '' }}">
+                                <i class="bi bi-file-earmark-bar-graph me-2"></i>
+                                <p>Budget Report</p>
+                            </a>
+                        </li>
                         @canany(['view_monthly_plan','create_monthly_plan','edit_monthly_plan','delete_monthly_plan'])
                         <li class="nav-item">
                             <a href="{{ url('admin/monthly') }}" class="nav-link {{ request()->is('admin/monthly*') ? 'active' : '' }}">

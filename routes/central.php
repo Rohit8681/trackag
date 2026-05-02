@@ -166,6 +166,7 @@ Route::middleware(['web'])->group(function () {
             Route::post('/admin/trips/{id}/complete', [TripController::class, 'completeTrip'])->name('trips.complete');
             Route::post('/trips/{trip}/toggle-status', [TripController::class, 'toggleStatus'])->name('trips.status.toggle');
 
+            Route::get('budget/report', [BudgetController::class, 'report'])->name('budget.report');
             Route::resource('budget', BudgetController::class);
             Route::resource('monthly', MonthlyController::class);
             Route::get('monthly-state-employees', [MonthlyController::class, 'getEmployeesByState'])->name('monthly.state.employees');

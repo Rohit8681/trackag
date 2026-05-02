@@ -109,4 +109,64 @@ class BudgetController extends Controller
 
         return redirect()->back()->with('success', 'Budget target set successfully.');
     }
+    public function report(Request $request)
+    {
+        $financial_year = $request->input('financial_year', date('Y') . '-' . (date('y') + 1));
+        
+        $filters = $this->getRoleBasedStateAndEmployeeFilters();
+        extract($filters);
+
+        $budgets = Budget::with(['state'])
+            ->where('financial_year', $financial_year);
+            
+        if (!empty($stateIds)) {
+            $budgets->whereIn('state_id', $stateIds);
+        }
+
+        $budgets = $budgets->get();
+        
+        $months = [
+            'april' => 4, 'may' => 5, 'june' => 6, 'july' => 7, 'august' => 8, 'september' => 9,
+            'october' => 10, 'november' => 11, 'december' => 12, 'january' => 1, 'february' => 2, 'march' => 3
+        ];
+        $monthList = array_keys($months);
+
+        $stateReport = [];
+        $years = explode('-', $financial_year);
+        $startYear = $years[0];
+        $endYear = count($years) > 1 ? '20' . $years[1] : $years[0] + 1;
+
+        foreach ($budgets as $budget) {
+            $stateId = $budget->state_id;
+            $stateName = $budget->state->name ?? 'Unknown';
+
+            if (!isset($stateReport[$stateId])) {
+                $stateReport[$stateId] = [
+                    'name' => $stateName,
+                    'total_target' => 0,
+                    'monthly_targets' => array_fill_keys($monthList, 0),
+                    'monthly_achievements' => array_fill_keys($monthList, 0),
+                ];
+            }
+
+            $stateReport[$stateId]['total_target'] += $budget->total_target;
+            foreach ($monthList as $m) {
+                $stateReport[$stateId]['monthly_targets'][$m] += $budget->$m ?? 0;
+                
+                $monthNum = $months[$m];
+                $year = ($monthNum >= 4) ? $startYear : $endYear;
+                
+                $achive = OrderItem::whereHas('order', function($q) use ($budget, $monthNum, $year) {
+                    $q->where('user_id', $budget->user_id)
+                      ->where('status', 'dispatched')
+                      ->whereMonth('created_at', $monthNum)
+                      ->whereYear('created_at', $year);
+                })->sum('grand_total');
+                
+                $stateReport[$stateId]['monthly_achievements'][$m] += $achive;
+            }
+        }
+
+        return view('admin.budget.report', compact('stateReport', 'financial_year', 'months', 'monthList', 'states'));
+    }
 }
