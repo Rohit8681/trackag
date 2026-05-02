@@ -109,6 +109,14 @@ class BudgetController extends Controller
 
         return redirect()->back()->with('success', 'Budget target set successfully.');
     }
+    public function show($id)
+    {
+        if ($id == 'report') {
+            return redirect()->route('budget.report');
+        }
+        abort(404);
+    }
+
     public function report(Request $request)
     {
         $financial_year = $request->input('financial_year', date('Y') . '-' . (date('y') + 1));
