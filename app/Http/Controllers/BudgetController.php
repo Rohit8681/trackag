@@ -59,9 +59,11 @@ class BudgetController extends Controller
             $budget->achievements = $achievements;
         }
 
+        $monthList = array_keys($months);
+
         return view('admin.budget.index', compact(
             'financial_year', 'state_id', 'employee_id',
-            'employees', 'states', 'budgets', 'months'
+            'employees', 'states', 'budgets', 'months', 'monthList'
         ));
     }
 

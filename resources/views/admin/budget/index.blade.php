@@ -247,9 +247,7 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @php
-                                                $monthList = ['april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december', 'january', 'february', 'march'];
-                                            @endphp
+
                                             @foreach($monthList as $m)
                                                 <tr>
                                                     <td class="fw-bold">{{ ucfirst($m) }}</td>
