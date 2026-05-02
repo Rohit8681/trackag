@@ -22,9 +22,12 @@
             <div class="card card-primary card-outline">
                 <div class="card-header d-flex align-items-center justify-content-between">
                     <h3 class="card-title mb-0">Farmer List</h3>
+                    @if(auth()->check() && auth()->user()->hasRole('master_admin') || auth()->check() && auth()->user()->hasRole('sub_admin'))
+
                     <button type="button" class="btn btn-info btn-sm text-white" data-bs-toggle="modal" data-bs-target="#targetModal">
                         <i class="fas fa-bullseye me-1"></i> Set Target
                     </button>
+                    @endif
                 </div>
 
                 <div class="card-body">

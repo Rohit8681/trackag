@@ -31,9 +31,12 @@
                         @can('create_customers')
                             <div class="d-flex ms-auto">
                                 <!-- Set Visit Target Button -->
+                                @if(auth()->check() && auth()->user()->hasRole('master_admin') || auth()->check() && auth()->user()->hasRole('sub_admin'))
+                                
                                 <button class="btn btn-sm btn-info me-2 text-white" data-bs-toggle="modal" data-bs-target="#targetModal">
                                     <i class="fas fa-bullseye me-1"></i> Set Target
                                 </button>
+                                @endif
 
                                 <!-- Add Customer Button -->
                                 <a href="{{ route('customers.create') }}" class="btn btn-sm btn-primary me-2">
