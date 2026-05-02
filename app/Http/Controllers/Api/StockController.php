@@ -47,53 +47,46 @@ class StockController extends Controller
     {
         $userId = Auth::id() ?? $request->user()->id ?? null;
 
-        $products = Product::whereHas('packings.stock', function ($query) use ($userId) {
-            $query->where('user_id', $userId);
-        })
-        ->with([
-            'packings' => function ($q) use ($userId) {
-                $q->select('id', 'product_id', 'packing_value', 'packing_size')
-                  ->where('status', 1)
-                  ->whereHas('stock', function ($query) use ($userId) {
-                      $query->where('user_id', $userId);
-                  });
-            },
-            'packings.stock' => function ($query) use ($userId) {
-                $query->with('customer')
-                      ->where('user_id', $userId)
-                      ->orderBy('stock_date', 'desc')
-                      ->orderBy('updated_at', 'desc');
-            }
-        ])
-        ->where('status', 1)
-        ->get();
+        $stocks = Stock::with(['product', 'packing', 'customer'])
+            ->where('user_id', $userId)
+            ->orderBy('stock_date', 'desc')
+            ->orderBy('updated_at', 'desc')
+            ->get();
 
-        $data = $products->map(function ($product) {
-            $latestStock = $product->packings->pluck('stock')->filter()->sortByDesc('stock_date')->first();
-            $productStockDate = $latestStock ? $latestStock->updated_at : null;
-            $customer = $latestStock ? $latestStock->customer : null;
+        $data = $stocks->groupBy(function ($stock) {
+            return $stock->customer_id . '_' . $stock->stock_date;
+        })->map(function ($group) {
+            $firstStock = $group->first();
+            $customer = $firstStock->customer;
+
+            $products = $group->groupBy('product_id')->map(function ($productGroup) {
+                $firstProductStock = $productGroup->first();
+                $product = $firstProductStock->product;
+
+                return [
+                    'product_id' => $product->id,
+                    'product_name' => $product->product_name,
+                    'packings' => $productGroup->map(function ($stock) {
+                        $packing = $stock->packing;
+                        return [
+                            'packing_id' => $packing->id,
+                            'packing' => ($packing->packing_value ?? '') . ' ' . ($packing->packing_size ?? ''),
+                            'stock' => $stock->quantity ?? 0,
+                            'stock_date' => $stock->stock_date
+                        ];
+                    })->values()
+                ];
+            })->values();
 
             return [
-                'product_id' => $product->id,
-                'product_name' => $product->product_name,
-                'stock_date' => $productStockDate,
-                'contact_person_name' => $customer ? $customer->contact_person_name : null,
-                'address' => $customer ? $customer->address : null,
-                'phone' => $customer ? $customer->phone : null,
-                'packings' => $product->packings->map(function ($packing) {
-                    $stockDate = $packing->stock ? $packing->stock->stock_date : null;
-                    $cust = $packing->stock ? $packing->stock->customer : null;
-                    
-                    return [
-                        'packing_id' => $packing->id,
-                        'packing' => $packing->packing_value . ' ' . $packing->packing_size,
-                        'stock' => $packing->stock->quantity ?? 0,
-                        'stock_date' => $stockDate
-                        
-                    ];
-                })
+                'customer_id' => $customer->id ?? null,
+                'contact_person_name' => $customer->contact_person_name ?? null,
+                'address' => $customer->address ?? null,
+                'phone' => $customer->phone ?? null,
+                'stock_date' => $firstStock->stock_date,
+                'products' => $products
             ];
-        });
+        })->values();
 
         return response()->json([
             'success' => true,
