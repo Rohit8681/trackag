@@ -46,33 +46,32 @@ class StockController extends Controller
     public function getStockList(Request $request)
     {
         $userId = Auth::id() ?? $request->user()->id ?? null;
-        
-        $today = date('Y-m-d');
 
-        $products = Product::whereHas('packings.stock', function ($query) use ($userId, $customerId, $today) {
+        $products = Product::whereHas('packings.stock', function ($query) use ($userId) {
             $query->where('user_id', $userId);
-                  
         })
         ->with([
-            'packings' => function ($q) use ($userId, $customerId, $today) {
+            'packings' => function ($q) use ($userId) {
                 $q->select('id', 'product_id', 'packing_value', 'packing_size')
                   ->where('status', 1)
-                  ->whereHas('stock', function ($query) use ($userId, $customerId, $today) {
+                  ->whereHas('stock', function ($query) use ($userId) {
                       $query->where('user_id', $userId);
-                            
                   });
             },
-            'packings.stock' => function ($query) use ($userId, $customerId, $today) {
-                $query->where('user_id', $userId);
-                      
+            'packings.stock' => function ($query) use ($userId) {
+                $query->with('customer')
+                      ->where('user_id', $userId)
+                      ->orderBy('stock_date', 'desc')
+                      ->orderBy('updated_at', 'desc');
             }
         ])
         ->where('status', 1)
         ->get();
 
-        $data = $products->map(function ($product) use ($customer) {
-            $latestStock = $product->packings->pluck('stock')->filter()->sortByDesc('updated_at')->first();
+        $data = $products->map(function ($product) {
+            $latestStock = $product->packings->pluck('stock')->filter()->sortByDesc('stock_date')->first();
             $productStockDate = $latestStock ? $latestStock->updated_at : null;
+            $customer = $latestStock ? $latestStock->customer : null;
 
             return [
                 'product_id' => $product->id,
@@ -81,13 +80,20 @@ class StockController extends Controller
                 'contact_person_name' => $customer ? $customer->contact_person_name : null,
                 'address' => $customer ? $customer->address : null,
                 'phone' => $customer ? $customer->phone : null,
-                'packings' => $product->packings->map(function ($packing) use ($customer) {
+                'packings' => $product->packings->map(function ($packing) {
                     $stockDate = $packing->stock ? $packing->stock->stock_date : null;
+                    $cust = $packing->stock ? $packing->stock->customer : null;
+                    
                     return [
                         'packing_id' => $packing->id,
                         'packing' => $packing->packing_value . ' ' . $packing->packing_size,
                         'stock' => $packing->stock->quantity ?? 0,
-                        'stock_date' => $stockDate
+                        'stock_date' => $stockDate,
+                        'customer_details' => $cust ? [
+                            'contact_person_name' => $cust->contact_person_name,
+                            'address' => $cust->address,
+                            'phone' => $cust->phone,
+                        ] : null
                     ];
                 })
             ];
