@@ -56,28 +56,32 @@ class StockController extends Controller
 
         $stocks = $query->orderByDesc('updated_at')->get();
 
-        $data = $stocks->map(function ($stock) {
-            $customer = $stock->customer;
-            $product = $stock->product;
-            $packing = $stock->packing;
+        // Group by customer and product to maintain nested structure compatibility
+        $data = $stocks->groupBy(function ($stock) {
+            return $stock->customer_id . '-' . $stock->product_id;
+        })->map(function ($group) {
+            $firstStock = $group->first();
+            $customer = $firstStock->customer;
+            $product = $firstStock->product;
 
             return [
-                'product_id' => $stock->product_id,
+                'product_id' => $firstStock->product_id,
                 'product_name' => $product->product_name ?? null,
-                'stock_date' => $stock->created_at->format('Y-m-d'),
+                'stock_date' => $firstStock->created_at->format('Y-m-d'),
                 'contact_person_name' => $customer->contact_person_name ?? null,
                 'address' => $customer->address ?? null,
                 'phone' => $customer->phone ?? null,
-                'packings' => [
-                    [
+                'packings' => $group->map(function ($stock) {
+                    $packing = $stock->packing;
+                    return [
                         'packing_id' => $stock->packing_id,
                         'packing' => $packing ? ($packing->packing_value . ' ' . $packing->packing_size) : null,
                         'stock' => $stock->quantity,
                         'stock_date' => $stock->created_at->format('Y-m-d'),
-                    ]
-                ]
+                    ];
+                })->values()
             ];
-        });
+        })->values();
 
         return response()->json([
             'success' => true,
