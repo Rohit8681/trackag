@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\Stock;
+use App\Models\Customer;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 
@@ -49,22 +50,26 @@ class StockController extends Controller
 
         $customer = null;
         if ($customerId) {
-            $customer = \App\Models\Customer::find($customerId);
+            $customer = Customer::find($customerId);
         }
 
-        $products = Product::with([
-            'packings' => function ($q) {
+        $products = Product::whereHas('packings.stock', function ($query) use ($userId, $customerId) {
+            $query->where('user_id', $userId);
+        })
+        ->with([
+            'packings' => function ($q) use ($userId, $customerId) {
                 $q->select('id', 'product_id', 'packing_value', 'packing_size')
-                  ->where('status', 1);
+                  ->where('status', 1)
+                  ->whereHas('stock', function ($query) use ($userId, $customerId) {
+                      $query->where('user_id', $userId)
+                            ->where('stock_date', date('Y-m-d'))
+                            ->where('customer_id', $customerId);
+                  });
             },
             'packings.stock' => function ($query) use ($userId, $customerId) {
                 $query->where('user_id', $userId)
-                      ->where('stock_date', date('Y-m-d'));
-                if ($customerId) {
-                    $query->where('customer_id', $customerId);
-                } else {
-                    $query->whereNull('customer_id');
-                }
+                      ->where('stock_date', date('Y-m-d'))
+                      ->where('customer_id', $customerId);
             }
         ])
         ->where('status', 1)
@@ -87,12 +92,7 @@ class StockController extends Controller
                         'packing_id' => $packing->id,
                         'packing' => $packing->packing_value . ' ' . $packing->packing_size,
                         'stock' => $packing->stock->quantity ?? 0,
-                        'stock_date' => $stockDate,
-                        'customer_details' => $customer ? [
-                            'contact_person_name' => $customer->contact_person_name,
-                            'address' => $customer->address,
-                            'phone' => $customer->phone,
-                        ] : null
+                        'stock_date' => $stockDate
                     ];
                 })
             ];
