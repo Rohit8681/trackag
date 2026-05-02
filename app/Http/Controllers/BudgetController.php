@@ -74,11 +74,27 @@ class BudgetController extends Controller
             'user_id' => 'required',
             'state_id' => 'required',
             'financial_year' => 'required',
-            'monthly_targets' => 'required|array',
+            'total_target' => 'nullable|numeric',
+            'monthly_targets' => 'nullable|array',
         ]);
 
-        $targets = $request->monthly_targets;
-        $totalTarget = array_sum($targets);
+        $targets = $request->monthly_targets ?? [];
+        
+        // If monthly targets are all 0 or empty, and total_target is provided
+        $sumMonthly = array_sum($targets);
+        $totalTarget = $request->total_target ?? $sumMonthly;
+
+        if (($sumMonthly == 0) && $totalTarget > 0) {
+            $monthlyValue = round($totalTarget / 12, 2);
+            $monthList = ['april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december', 'january', 'february', 'march'];
+            foreach ($monthList as $m) {
+                $targets[$m] = $monthlyValue;
+            }
+            // Adjust last month to match total exactly due to rounding
+            $targets['march'] = $totalTarget - ($monthlyValue * 11);
+        } else {
+            $totalTarget = $sumMonthly;
+        }
 
         Budget::updateOrCreate(
             [

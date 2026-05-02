@@ -1,5 +1,50 @@
 @extends('admin.layout.layout')
 
+@push('styles')
+<style>
+    .budget-table-container {
+        max-height: 70vh;
+        overflow-y: auto;
+    }
+    .budget-table thead th {
+        position: sticky;
+        top: 0;
+        background: #f8f9fa !important;
+        z-index: 2;
+        box-shadow: inset 0 -1px 0 #dee2e6;
+    }
+    .budget-table thead tr:nth-child(2) th {
+        top: 48px;
+    }
+    .target-input:focus {
+        border-color: #ffc107;
+        box-shadow: 0 0 0 0.25rem rgba(255, 193, 7, 0.25);
+    }
+    .card-premium {
+        border: none;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+        border-radius: 12px;
+    }
+    .card-premium .card-header {
+        border-radius: 12px 12px 0 0;
+    }
+    .btn-premium {
+        border-radius: 8px;
+        padding: 8px 20px;
+        font-weight: 600;
+        transition: all 0.3s;
+    }
+    .btn-premium:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .modal-content {
+        border-radius: 15px;
+        border: none;
+    }
+</style>
+@endpush
+
 @section('content')
 <main class="app-main">
     <div class="app-content-header">
@@ -68,9 +113,12 @@
             </div>
 
             <!-- Listing Page Section -->
-            <div class="card mb-4">
-                <div class="card-header bg-warning text-white">
-                    <h3 class="card-title">Listing Page</h3>
+            <div class="card card-premium mb-4">
+                <div class="card-header bg-warning text-dark d-flex justify-content-between align-items-center">
+                    <h3 class="card-title mb-0 fw-bold">Budget Achievements</h3>
+                    <button type="button" class="btn btn-dark btn-sm btn-premium" data-bs-toggle="modal" data-bs-target="#addBudgetModal">
+                        <i class="fas fa-plus-circle me-1"></i> Set Target
+                    </button>
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
@@ -121,36 +169,43 @@
                 </div>
             </div>
 
-            <!-- Set Target Section -->
-            <div class="card mb-4">
-                <div class="card-header bg-info text-white">
-                    <h3 class="card-title">Set Target</h3>
+    </div>
+
+    <!-- Set Target Modal -->
+    <div class="modal fade" id="addBudgetModal" tabindex="-1" aria-labelledby="addBudgetModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content shadow-lg">
+                <div class="modal-header bg-warning text-dark">
+                    <h5 class="modal-title fw-bold" id="addBudgetModalLabel">
+                        <i class="fas fa-bullseye me-2"></i> Set Budget Target
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="card-body">
-                    <form action="{{ route('budget.store') }}" method="POST">
-                        @csrf
+                <form action="{{ route('budget.store') }}" method="POST">
+                    @csrf
+                    <div class="modal-body">
                         <div class="row mb-4">
-                            <div class="col-md-3">
-                                <label>Select State</label>
-                                <select name="state_id" class="form-control select2" required>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">Select State</label>
+                                <select name="state_id" class="form-control select2-modal" required>
                                     <option value="">Select State</option>
                                     @foreach($states as $st)
                                         <option value="{{ $st->id }}">{{ $st->name }}</option>
                                     @endforeach
                                 </select>
                             </div>
-                            <div class="col-md-3">
-                                <label>Select Emp</label>
-                                <select name="user_id" class="form-control select2" required>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">Select Employee</label>
+                                <select name="user_id" class="form-control select2-modal" required>
                                     <option value="">Select Employee</option>
                                     @foreach($employees as $emp)
                                         <option value="{{ $emp->id }}">{{ $emp->name }}</option>
                                     @endforeach
                                 </select>
                             </div>
-                            <div class="col-md-3">
-                                <label>FY Year</label>
-                                <select name="financial_year" class="form-control select2" required>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">FY Year</label>
+                                <select name="financial_year" class="form-control select2-modal" required>
                                     @foreach($years as $fy)
                                         <option value="{{ $fy }}">{{ $fy }}</option>
                                     @endforeach
@@ -158,51 +213,66 @@
                             </div>
                         </div>
 
-                        <div class="row">
-                            <div class="col-md-6">
-                                <table class="table table-bordered">
-                                    <thead>
-                                        <tr class="bg-light">
-                                            <th>Month</th>
-                                            <th>Target Amount</th>
-                                            <th>% Share</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @php
-                                            $monthList = ['april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december', 'january', 'february', 'march'];
-                                        @endphp
-                                        @foreach($monthList as $m)
+                        <hr>
+
+                        <div class="row mt-4">
+                            <div class="col-md-7">
+                                <div class="table-responsive">
+                                    <table class="table table-bordered align-middle">
+                                        <thead class="bg-light">
                                             <tr>
-                                                <td class="align-middle">{{ ucfirst($m) }}</td>
-                                                <td>
-                                                    <input type="number" name="monthly_targets[{{ $m }}]" class="form-control target-input" data-month="{{ $m }}" step="0.01" value="0">
-                                                </td>
-                                                <td class="align-middle">
-                                                    <span class="share-percent" id="share-{{ $m }}">0%</span>
-                                                </td>
+                                                <th width="30%">Month</th>
+                                                <th width="50%">Target Amount</th>
+                                                <th width="20%">% Share</th>
                                             </tr>
-                                        @endforeach
-                                        <tr class="bg-light fw-bold">
-                                            <td>Total</td>
-                                            <td>
-                                                <input type="text" id="total-target-display" class="form-control" readonly value="0.00">
-                                            </td>
-                                            <td>100%</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                                        </thead>
+                                        <tbody>
+                                            @php
+                                                $monthList = ['april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december', 'january', 'february', 'march'];
+                                            @endphp
+                                            @foreach($monthList as $m)
+                                                <tr>
+                                                    <td class="fw-bold">{{ ucfirst($m) }}</td>
+                                                    <td>
+                                                        <div class="input-group">
+                                                            <span class="input-group-text">₹</span>
+                                                            <input type="number" name="monthly_targets[{{ $m }}]" class="form-control target-input" data-month="{{ $m }}" step="0.01" value="0">
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <span class="badge bg-secondary share-percent" id="share-{{ $m }}">0%</span>
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
-                            <div class="col-md-6 d-flex align-items-center justify-content-center">
-                                <div class="text-center">
-                                    <h4 class="mb-4">Total Budget</h4>
-                                    <h1 class="display-4 text-info mb-4" id="total-budget-big">0.00</h1>
-                                    <button type="submit" class="btn btn-success btn-lg px-5">Save Target</button>
+                            <div class="col-md-5">
+                                <div class="card bg-light border-0 h-100">
+                                    <div class="card-body d-flex flex-column justify-content-center text-center">
+                                        <h5 class="text-muted mb-3">Yearly Total Target</h5>
+                                        <div class="input-group input-group-lg mb-4">
+                                            <span class="input-group-text bg-warning border-warning text-dark">₹</span>
+                                            <input type="number" id="total-target-input" name="total_target" class="form-control border-warning fw-bold" placeholder="Enter Total Yearly Budget" step="0.01">
+                                        </div>
+                                        <p class="text-muted small mb-4">
+                                            <i class="fas fa-info-circle me-1"></i> 
+                                            Entering a total will automatically split it across all 12 months.
+                                        </p>
+                                        <div class="py-4 border-top border-bottom mb-4">
+                                            <h6 class="text-muted small text-uppercase mb-2">Calculated Total</h6>
+                                            <h1 class="display-5 fw-bold text-warning" id="total-budget-big">0.00</h1>
+                                        </div>
+                                        <button type="submit" class="btn btn-warning btn-lg btn-premium w-100">
+                                            <i class="fas fa-save me-2"></i> Save Budget Plan
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </form>
-                </div>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -212,21 +282,50 @@
 @push('scripts')
 <script>
     $(document).ready(function() {
-        $('.target-input').on('input', function() {
-            calculateTotal();
+        // Initialize select2 for modal if needed
+        $('#addBudgetModal').on('shown.bs.modal', function () {
+            $('.select2-modal').select2({
+                dropdownParent: $('#addBudgetModal')
+            });
         });
 
-        function calculateTotal() {
+        // Monthly input change
+        $('.target-input').on('input', function() {
+            calculateTotalFromMonthly();
+        });
+
+        // Total input change (Auto-distribute)
+        $('#total-target-input').on('input', function() {
+            let total = parseFloat($(this).val()) || 0;
+            let monthly = (total / 12).toFixed(2);
+            
+            $('.target-input').val(monthly);
+            
+            // Adjust last month to be precise
+            let lastMonth = (total - (monthly * 11)).toFixed(2);
+            $('.target-input[data-month="march"]').val(lastMonth);
+            
+            updateBigDisplay(total);
+            updateShares(total);
+        });
+
+        function calculateTotalFromMonthly() {
             let total = 0;
             $('.target-input').each(function() {
                 let val = parseFloat($(this).val()) || 0;
                 total += val;
             });
 
-            $('#total-target-display').val(total.toLocaleString('en-IN', {minimumFractionDigits: 2}));
-            $('#total-budget-big').text(total.toLocaleString('en-IN', {minimumFractionDigits: 2}));
+            $('#total-target-input').val(total.toFixed(2));
+            updateBigDisplay(total);
+            updateShares(total);
+        }
 
-            // Calculate percentages
+        function updateBigDisplay(total) {
+            $('#total-budget-big').text(total.toLocaleString('en-IN', {minimumFractionDigits: 2}));
+        }
+
+        function updateShares(total) {
             $('.target-input').each(function() {
                 let val = parseFloat($(this).val()) || 0;
                 let month = $(this).data('month');
