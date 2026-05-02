@@ -88,12 +88,8 @@ class StockController extends Controller
                         'packing_id' => $packing->id,
                         'packing' => $packing->packing_value . ' ' . $packing->packing_size,
                         'stock' => $packing->stock->quantity ?? 0,
-                        'stock_date' => $stockDate,
-                        'customer_details' => $cust ? [
-                            'contact_person_name' => $cust->contact_person_name,
-                            'address' => $cust->address,
-                            'phone' => $cust->phone,
-                        ] : null
+                        'stock_date' => $stockDate
+                        
                     ];
                 })
             ];
