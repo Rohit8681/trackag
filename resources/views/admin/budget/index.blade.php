@@ -124,13 +124,14 @@
                     <div class="table-responsive">
                         <table class="table table-bordered table-hover text-center mb-0">
                             <thead>
-                                <tr class="bg-light">
+                                <tr class="bg-light text-nowrap">
+                                    <th rowspan="2" class="align-middle">Action</th>
                                     <th rowspan="2" class="align-middle">Emp Name</th>
                                     @foreach($months as $monthName => $monthNum)
                                         <th colspan="3">{{ ucfirst($monthName) }}</th>
                                     @endforeach
                                 </tr>
-                                <tr class="bg-light">
+                                <tr class="bg-light text-nowrap">
                                     @foreach($months as $monthName => $monthNum)
                                         <th>Target</th>
                                         <th>Achive</th>
@@ -140,9 +141,28 @@
                             </thead>
                             <tbody>
                                 @forelse($budgets as $budget)
+                                    @php
+                                        $targetData = [];
+                                        foreach($monthList as $m) {
+                                            $targetData[$m] = $budget->$m ?? 0;
+                                        }
+                                        $targetDataJson = json_encode($targetData);
+                                    @endphp
                                     <tr>
-                                        <td class="text-start">
-                                            <strong>{{ $budget->user->name }}</strong><br>
+                                        <td class="align-middle">
+                                            <button type="button" class="btn btn-outline-warning btn-sm edit-budget-btn" 
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#addBudgetModal"
+                                                data-user-id="{{ $budget->user_id }}"
+                                                data-state-id="{{ $budget->state_id }}"
+                                                data-fy="{{ $budget->financial_year }}"
+                                                data-total="{{ $budget->total_target }}"
+                                                data-targets='{{ $targetDataJson }}'>
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                        </td>
+                                        <td class="text-start align-middle">
+                                            <div class="fw-bold">{{ $budget->user->name }}</div>
                                             <small class="text-muted">Target: {{ number_format($budget->total_target, 2) }}</small>
                                         </td>
                                         @foreach($months as $monthName => $monthNum)
@@ -151,16 +171,16 @@
                                                 $achive = $budget->achievements[$monthName] ?? 0;
                                                 $percent = $target > 0 ? ($achive / $target) * 100 : 0;
                                             @endphp
-                                            <td>{{ number_format($target, 0) }}</td>
-                                            <td>{{ number_format($achive, 0) }}</td>
-                                            <td class="{{ $percent >= 100 ? 'text-success' : 'text-danger' }} fw-bold">
+                                            <td class="align-middle">{{ number_format($target, 0) }}</td>
+                                            <td class="align-middle">{{ number_format($achive, 0) }}</td>
+                                            <td class="align-middle {{ $percent >= 100 ? 'text-success' : 'text-danger' }} fw-bold">
                                                 {{ number_format($percent, 1) }}%
                                             </td>
                                         @endforeach
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="{{ count($months) * 3 + 1 }}" class="py-4 text-muted">No budget records found for selected filters.</td>
+                                        <td colspan="{{ count($months) * 3 + 2 }}" class="py-4 text-muted">No budget records found for selected filters.</td>
                                     </tr>
                                 @endforelse
                             </tbody>
@@ -287,6 +307,42 @@
             $('.select2-modal').select2({
                 dropdownParent: $('#addBudgetModal')
             });
+        });
+
+        // Handle Edit Button Click
+        $('.edit-budget-btn').on('click', function() {
+            const btn = $(this);
+            const userId = btn.data('user-id');
+            const stateId = btn.data('state-id');
+            const fy = btn.data('fy');
+            const total = btn.data('total');
+            const targets = btn.data('targets');
+
+            // Set values
+            $('#addBudgetModal select[name="user_id"]').val(userId).trigger('change');
+            $('#addBudgetModal select[name="state_id"]').val(stateId).trigger('change');
+            $('#addBudgetModal select[name="financial_year"]').val(fy).trigger('change');
+            $('#total-target-input').val(total);
+
+            // Set monthly targets
+            Object.keys(targets).forEach(month => {
+                $(`.target-input[data-month="${month}"]`).val(targets[month]);
+            });
+
+            updateBigDisplay(total);
+            updateShares(total);
+            $('#addBudgetModalLabel').html('<i class="fas fa-edit me-2"></i> Edit Budget Target');
+        });
+
+        // Reset Modal for New Entry
+        $('[data-bs-target="#addBudgetModal"]:not(.edit-budget-btn)').on('click', function() {
+            $('#addBudgetModal form')[0].reset();
+            $('.select2-modal').val('').trigger('change');
+            $('#total-target-input').val('');
+            $('.target-input').val(0);
+            updateBigDisplay(0);
+            updateShares(0);
+            $('#addBudgetModalLabel').html('<i class="fas fa-plus-circle me-2"></i> Set Budget Target');
         });
 
         // Monthly input change
