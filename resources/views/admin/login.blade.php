@@ -134,17 +134,24 @@
 
                 <!-- NEW: APP DOWNLOAD BUTTON -->
                 <div class="download-section">
-                @if($apk)
-                    <a href="{{ asset('storage/' . $apk->file_path) }}" class="download-btn" download>
-                        <!-- <img src="https://raw.githubusercontent.com/stefano-perenzoni/google-play-badge/master/en_badge_web_generic.png" alt="Google Play Store"> -->
-                         <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" style="fill: #fff; margin-right: 5px;">
+                    <a href="{{ asset('storage/' . $apk->file_path) }}" class="download-btn" download style="padding: 6px 16px; height: auto;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" style="fill: #fff; margin-right: 10px;">
                             <path d="M3 20.5V3.5C3 2.91 3.34 2.39 3.84 2.15L13.69 12L3.84 21.85C3.34 21.61 3 21.09 3 20.5M16.81 15.12L14.4 12.71L4.54 22.57C4.69 22.62 4.84 22.65 5 22.65C5.37 22.65 5.72 22.5 6 22.25L16.81 15.12M17.41 14.72L21.39 12.06C21.77 11.81 22 11.4 22 11C22 10.6 21.77 10.19 21.39 9.94L17.41 7.28L15.1 12L17.41 14.72M16.81 8.88L6 1.75C5.72 1.5 5.37 1.35 5 1.35C4.84 1.35 4.69 1.38 4.54 1.43L14.4 11.29L16.81 8.88Z" />
                         </svg>
-                        Download App
+                        <div style="text-align: left; line-height: 1;">
+                            <div style="font-size: 8px; text-transform: uppercase; font-weight: 400; margin-bottom: 2px;">Get it on</div>
+                            <div style="font-size: 16px; font-weight: 700; letter-spacing: -0.3px;">Google Play</div>
+                        </div>
                     </a>
                 @else
-                    <a href="#" class="download-btn">
-                        Download App
+                    <a href="#" class="download-btn" style="padding: 6px 16px; height: auto;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" style="fill: #fff; margin-right: 10px;">
+                            <path d="M3 20.5V3.5C3 2.91 3.34 2.39 3.84 2.15L13.69 12L3.84 21.85C3.34 21.61 3 21.09 3 20.5M16.81 15.12L14.4 12.71L4.54 22.57C4.69 22.62 4.84 22.65 5 22.65C5.37 22.65 5.72 22.5 6 22.25L16.81 15.12M17.41 14.72L21.39 12.06C21.77 11.81 22 11.4 22 11C22 10.6 21.77 10.19 21.39 9.94L17.41 7.28L15.1 12L17.41 14.72M16.81 8.88L6 1.75C5.72 1.5 5.37 1.35 5 1.35C4.84 1.35 4.69 1.38 4.54 1.43L14.4 11.29L16.81 8.88Z" />
+                        </svg>
+                        <div style="text-align: left; line-height: 1;">
+                            <div style="font-size: 8px; text-transform: uppercase; font-weight: 400; margin-bottom: 2px;">Get it on</div>
+                            <div style="font-size: 16px; font-weight: 700; letter-spacing: -0.3px;">Google Play</div>
+                        </div>
                     </a>
                 @endif
             </div>
