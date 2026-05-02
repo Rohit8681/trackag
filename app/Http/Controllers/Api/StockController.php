@@ -53,23 +53,24 @@ class StockController extends Controller
             $customer = Customer::find($customerId);
         }
 
-        $products = Product::whereHas('packings.stock', function ($query) use ($userId, $customerId) {
+        $today = date('Y-m-d');
+
+        $products = Product::whereHas('packings.stock', function ($query) use ($userId, $customerId, $today) {
             $query->where('user_id', $userId);
+                  
         })
         ->with([
-            'packings' => function ($q) use ($userId, $customerId) {
+            'packings' => function ($q) use ($userId, $customerId, $today) {
                 $q->select('id', 'product_id', 'packing_value', 'packing_size')
                   ->where('status', 1)
-                  ->whereHas('stock', function ($query) use ($userId, $customerId) {
-                      $query->where('user_id', $userId)
-                            ->where('stock_date', date('Y-m-d'))
-                            ->where('customer_id', $customerId);
+                  ->whereHas('stock', function ($query) use ($userId, $customerId, $today) {
+                      $query->where('user_id', $userId);
+                            
                   });
             },
-            'packings.stock' => function ($query) use ($userId, $customerId) {
-                $query->where('user_id', $userId)
-                      ->where('stock_date', date('Y-m-d'))
-                      ->where('customer_id', $customerId);
+            'packings.stock' => function ($query) use ($userId, $customerId, $today) {
+                $query->where('user_id', $userId);
+                      
             }
         ])
         ->where('status', 1)
