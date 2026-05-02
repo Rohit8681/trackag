@@ -46,13 +46,7 @@ class StockController extends Controller
     public function getStockList(Request $request)
     {
         $userId = Auth::id() ?? $request->user()->id ?? null;
-        $customerId = $request->input('customer_id');
-
-        $customer = null;
-        if ($customerId) {
-            $customer = Customer::find($customerId);
-        }
-
+        
         $today = date('Y-m-d');
 
         $products = Product::whereHas('packings.stock', function ($query) use ($userId, $customerId, $today) {
