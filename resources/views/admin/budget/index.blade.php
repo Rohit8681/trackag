@@ -37,6 +37,32 @@
     .card-premium .card-header {
         border-radius: 12px 12px 0 0;
     }
+    
+    /* Horizontal Sticky Columns */
+    .sticky-col-1 {
+        position: sticky !important;
+        left: 0;
+        z-index: 11 !important;
+        background-color: #fff !important;
+        border-right: 2px solid #dee2e6 !important;
+    }
+    .sticky-col-2 {
+        position: sticky !important;
+        left: 65px; /* Width of Action column */
+        z-index: 11 !important;
+        background-color: #fff !important;
+        border-right: 2px solid #dee2e6 !important;
+    }
+    
+    /* Ensure thead sticky columns are above tbody ones */
+    thead th.sticky-col-1, thead th.sticky-col-2 {
+        z-index: 15 !important;
+        background-color: #f8f9fa !important;
+    }
+    
+    .table-responsive {
+        overflow-x: auto;
+    }
     .btn-premium {
         border-radius: 8px;
         padding: 8px 20px;
@@ -125,7 +151,7 @@
             <div class="card card-premium mb-4">
                 <div class="card-header bg-warning text-dark d-flex justify-content-between align-items-center">
                     <h3 class="card-title mb-0 fw-bold">Budget Achievements</h3>
-                    <button type="button" class="btn btn-dark btn-sm btn-premium" data-bs-toggle="modal" data-bs-target="#addBudgetModal">
+                    <button type="button" class="btn btn-dark btn-sm btn-premium ms-auto" data-bs-toggle="modal" data-bs-target="#addBudgetModal">
                         <i class="fas fa-plus-circle me-1"></i> Set Target
                     </button>
                 </div>
@@ -134,8 +160,8 @@
                         <table class="table table-bordered table-hover text-center mb-0">
                             <thead>
                                 <tr class="bg-light text-nowrap">
-                                    <th rowspan="2" class="align-middle">Action</th>
-                                    <th rowspan="2" class="align-middle">Emp Name</th>
+                                    <th rowspan="2" class="align-middle sticky-col-1">Action</th>
+                                    <th rowspan="2" class="align-middle sticky-col-2">Emp Name</th>
                                     @foreach($months as $monthName => $monthNum)
                                         <th colspan="3">{{ ucfirst($monthName) }}</th>
                                     @endforeach
@@ -158,7 +184,7 @@
                                         $targetDataJson = json_encode($targetData);
                                     @endphp
                                     <tr>
-                                        <td class="align-middle">
+                                        <td class="align-middle sticky-col-1">
                                             <button type="button" class="btn btn-outline-warning btn-sm edit-budget-btn" 
                                                 data-bs-toggle="modal" 
                                                 data-bs-target="#addBudgetModal"
@@ -170,7 +196,7 @@
                                                 <i class="fas fa-edit"></i>
                                             </button>
                                         </td>
-                                        <td class="text-start align-middle">
+                                        <td class="text-start align-middle sticky-col-2">
                                             <div class="fw-bold">{{ $budget->user->name }}</div>
                                             <small class="text-muted">Target: {{ number_format($budget->total_target, 2) }}</small>
                                         </td>
