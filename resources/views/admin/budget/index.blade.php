@@ -98,6 +98,38 @@
         </div>
     </div>
 
+    <!-- History Modal -->
+    <div class="modal fade" id="budgetLogsModal" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content shadow-lg">
+                <div class="modal-header bg-info text-white">
+                    <h5 class="modal-title fw-bold">
+                        <i class="fas fa-history me-2"></i> Budget Change History - <span id="logUserName"></span>
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th>Date & Time</th>
+                                    <th>Month</th>
+                                    <th class="text-end">Old Value</th>
+                                    <th class="text-end">New Value</th>
+                                    <th>Changed By</th>
+                                </tr>
+                            </thead>
+                            <tbody id="logsTableBody">
+                                <!-- Logs will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="app-content">
         <div class="container-fluid">
             <!-- Filter Section -->
@@ -194,6 +226,13 @@
                                                 data-total="{{ $budget->total_target }}"
                                                 data-targets='{{ $targetDataJson }}'>
                                                 <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-outline-info view-logs" 
+                                                title="View History"
+                                                data-user-id="{{ $budget->user_id }}"
+                                                data-user-name="{{ $budget->user->name }}"
+                                                data-fy="{{ $budget->financial_year }}">
+                                                <i class="fas fa-history"></i>
                                             </button>
                                         </td>
                                         <td class="text-start align-middle sticky-col-2">
@@ -438,6 +477,48 @@
                 $(`#share-${month}`).text(share + '%');
             });
         }
+
+        // View Logs
+        $('.view-logs').on('click', function() {
+            const userId = $(this).data('user-id');
+            const userName = $(this).data('user-name');
+            const fy = $(this).data('fy');
+            
+            $('#logUserName').text(userName);
+            $('#logsTableBody').html('<tr><td colspan="5" class="text-center py-3"><div class="spinner-border text-info" role="status"></div></td></tr>');
+            $('#budgetLogsModal').modal('show');
+
+            $.ajax({
+                url: "{{ route('budget.logs') }}",
+                type: 'GET',
+                data: {
+                    user_id: userId,
+                    financial_year: fy
+                },
+                success: function(response) {
+                    let html = '';
+                    if (response.logs.length > 0) {
+                        response.logs.forEach(log => {
+                            html += `
+                                <tr>
+                                    <td>${log.date}</td>
+                                    <td>${log.month}</td>
+                                    <td class="text-end">${log.old_value}</td>
+                                    <td class="text-end text-primary fw-bold">${log.new_value}</td>
+                                    <td>${log.admin_name}</td>
+                                </tr>
+                            `;
+                        });
+                    } else {
+                        html = '<tr><td colspan="5" class="text-center text-muted py-3">No change history found for this budget.</td></tr>';
+                    }
+                    $('#logsTableBody').html(html);
+                },
+                error: function() {
+                    $('#logsTableBody').html('<tr><td colspan="5" class="text-center text-danger py-3">Error loading history.</td></tr>');
+                }
+            });
+        });
     });
 </script>
 @endpush

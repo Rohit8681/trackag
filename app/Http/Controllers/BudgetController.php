@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Budget;
+use App\Models\BudgetLog;
 use App\Models\User;
 use App\Models\State;
 use App\Models\Order;
@@ -81,24 +82,29 @@ class BudgetController extends Controller
         ]);
 
         $targets = $request->monthly_targets ?? [];
-        
-        // If monthly targets are all 0 or empty, and total_target is provided
         $sumMonthly = array_sum($targets);
         $totalTarget = $request->total_target ?? $sumMonthly;
 
+        $monthList = ['april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december', 'january', 'february', 'march'];
+
         if (($sumMonthly == 0) && $totalTarget > 0) {
             $monthlyValue = round($totalTarget / 12, 2);
-            $monthList = ['april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december', 'january', 'february', 'march'];
             foreach ($monthList as $m) {
                 $targets[$m] = $monthlyValue;
             }
-            // Adjust last month to match total exactly due to rounding
             $targets['march'] = $totalTarget - ($monthlyValue * 11);
         } else {
             $totalTarget = $sumMonthly;
         }
 
-        Budget::updateOrCreate(
+        // Get existing budget to compare
+        $existingBudget = Budget::where([
+            'user_id' => $request->user_id,
+            'state_id' => $request->state_id,
+            'financial_year' => $request->financial_year,
+        ])->first();
+
+        $budget = Budget::updateOrCreate(
             [
                 'user_id' => $request->user_id,
                 'state_id' => $request->state_id,
@@ -107,7 +113,45 @@ class BudgetController extends Controller
             array_merge($targets, ['total_target' => $totalTarget])
         );
 
+        // Record Logs
+        foreach ($monthList as $month) {
+            $oldValue = $existingBudget ? ($existingBudget->$month ?? 0) : 0;
+            $newValue = isset($targets[$month]) ? $targets[$month] : 0;
+
+            if (round($oldValue, 2) != round($newValue, 2)) {
+                BudgetLog::create([
+                    'budget_id' => $budget->id,
+                    'user_id' => $request->user_id,
+                    'admin_id' => auth()->id(),
+                    'financial_year' => $request->financial_year,
+                    'month' => $month,
+                    'old_value' => $oldValue,
+                    'new_value' => $newValue,
+                ]);
+            }
+        }
+
         return redirect()->back()->with('success', 'Budget target set successfully.');
+    }
+
+    public function getLogs(Request $request)
+    {
+        $logs = BudgetLog::with(['admin'])
+            ->where('user_id', $request->user_id)
+            ->where('financial_year', $request->financial_year)
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->map(function($log) {
+                return [
+                    'admin_name' => $log->admin->name ?? 'System',
+                    'month' => ucfirst($log->month),
+                    'old_value' => number_format($log->old_value, 2),
+                    'new_value' => number_format($log->new_value, 2),
+                    'date' => $log->created_at->format('d-M-Y h:i A'),
+                ];
+            });
+
+        return response()->json(['logs' => $logs]);
     }
     public function show($id)
     {

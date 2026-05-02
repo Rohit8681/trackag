@@ -97,7 +97,9 @@ Route::prefix('admin')->group(function () {
         Route::patch('/customers/{id}/toggle', [CustomerController::class, 'toggleStatus'])->name('customers.toggle');
 
         // Business modules (tenant database)
-        // Route::resource('budget', BudgetController::class);
+        Route::get('budget/logs', [BudgetController::class, 'getLogs'])->name('budget.logs');
+        Route::get('budget-report', [BudgetController::class, 'report'])->name('budget.report');
+        Route::resource('budget', BudgetController::class);
         Route::resource('monthly', MonthlyController::class);
         Route::resource('achievement', AchievementController::class);
         Route::resource('party', PartyController::class);
