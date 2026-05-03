@@ -9,21 +9,15 @@ use Illuminate\Http\Request;
 
 class BrochureController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         $brochures = Brochure::with('state')->latest()->get();
-        // $states = State::where('status', 1)->orderBy('name')->get();
         $companyCount = Company::count();
         $company = null;
         if ($companyCount == 1) {
             $company = Company::first();
             $companyStates = array_map('intval', explode(',', $company->state));
-            $states = State::where('status', 1)
-                        ->whereIn('id', $companyStates)
-                        ->get();
+            $states = State::where('status', 1)->whereIn('id', $companyStates)->get();
         }else{
             $states = State::where('status', 1)->get();
         }
@@ -32,28 +26,21 @@ class BrochureController extends Controller
 
     public function create()
     {
-        // $states = State::where('status', 1)->orderBy('name')->get();
         $companyCount = Company::count();
         $company = null;
         if ($companyCount == 1) {
             $company = Company::first();
             $companyStates = array_map('intval', explode(',', $company->state));
-            $states = State::where('status', 1)
-                        ->whereIn('id', $companyStates)
-                        ->get();
+            $states = State::where('status', 1)->whereIn('id', $companyStates)->get();
         }else{
             $states = State::where('status', 1)->get();
         }
         return view('admin.brochure.create', compact('states'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $request->validate([
-            // 'date'     => 'required|date',
             'state_id' => 'required|exists:states,id',
             'pdf'      => 'required|mimes:pdf|max:102400',
         ]);
@@ -61,42 +48,28 @@ class BrochureController extends Controller
         $path = $request->file('pdf')->store('brochures', 'public');
 
         Brochure::create([
-            // 'date'     => $request->date,
             'state_id' => $request->state_id,
             'pdf_path' => $path,
         ]);
 
-        return redirect()->route('brochure.index')
-            ->with('success', 'Brochure uploaded successfully');
+        return redirect()->route('brochure.index')->with('success', 'Brochure uploaded successfully');
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(string $id)
     {
         //
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(string $id)
     {
         //
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, string $id)
     {
         //
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(string $id)
     {
         //

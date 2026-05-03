@@ -15,42 +15,6 @@ use Illuminate\Support\Facades\Auth;
 
 class TrackingController extends Controller
 {
-    // public function index()
-    // {
-    //     return view('admin.tracking.index');
-    // }
-
-    // public function liveData()
-    // {
-    //     $today = now()->toDateString(); // YYYY-MM-DD
-
-    //     $latestLogs = TripLog::select('trip_logs.*')
-    //         ->join('trips', 'trips.id', '=', 'trip_logs.trip_id')
-    //         ->whereDate('trip_logs.created_at', $today) // 👈 Only today
-    //         ->whereIn('trip_logs.id', function ($query) use ($today) {
-    //             $query->selectRaw('MAX(trip_logs.id)')
-    //                 ->from('trip_logs')
-    //                 ->join('trips', 'trips.id', '=', 'trip_logs.trip_id')
-    //                 ->whereDate('trip_logs.created_at', $today) // 👈 Only today
-    //                 ->groupBy('trips.user_id');
-    //         })
-    //         ->with('trip.user:id,name')
-    //         ->get();
-
-    //     $locations = $latestLogs->map(function ($log) {
-
-    //         return [
-    //             'name'          => $log->trip->user->name ?? 'Unknown',
-    //             'latitude'      => $log->latitude,
-    //             'longitude'     => $log->longitude,
-    //             'mobile_status' => $log->mobile_status,
-    //         ];
-    //     });
-
-    //     return response()->json($locations);
-    // }
-
-    
     public function index()
     {
         $user = Auth::user();
@@ -64,64 +28,65 @@ class TrackingController extends Controller
     }
 
 
-public function liveData(Request $request)
-{
-    $today = now()->toDateString();
+    public function liveData(Request $request)
+    {
+        $today = now()->toDateString();
 
-    $stateId = $request->state_id;
-    $userId  = $request->user_id;
+        $stateId = $request->state_id;
+        $userId  = $request->user_id;
 
-    $latestLogs = TripLog::select('trip_logs.*')
-        ->join('trips','trips.id','=','trip_logs.trip_id')
-        ->join('users','users.id','=','trips.user_id')
+        $latestLogs = TripLog::select('trip_logs.*')
+            ->join('trips','trips.id','=','trip_logs.trip_id')
+            ->join('users','users.id','=','trips.user_id')
 
-        ->whereDate('trip_logs.created_at',$today)
+            ->whereDate('trip_logs.created_at',$today)
 
-        ->when($stateId,function($q) use ($stateId){
-            $q->where('users.state_id',$stateId);
-        })
+            ->when($stateId,function($q) use ($stateId){
+                $q->where('users.state_id',$stateId);
+            })
 
-        ->when($userId,function($q) use ($userId){
-            $q->where('users.id',$userId);
-        })
+            ->when($userId,function($q) use ($userId){
+                $q->where('users.id',$userId);
+            })
 
-        ->whereIn('trip_logs.id', function ($query) use ($today,$stateId,$userId) {
+            ->whereIn('trip_logs.id', function ($query) use ($today,$stateId,$userId) {
 
-            $query->selectRaw('MAX(trip_logs.id)')
-                ->from('trip_logs')
-                ->join('trips','trips.id','=','trip_logs.trip_id')
-                ->join('users','users.id','=','trips.user_id')
+                $query->selectRaw('MAX(trip_logs.id)')
+                    ->from('trip_logs')
+                    ->join('trips','trips.id','=','trip_logs.trip_id')
+                    ->join('users','users.id','=','trips.user_id')
 
-                ->whereDate('trip_logs.created_at',$today)
+                    ->whereDate('trip_logs.created_at',$today)
 
-                ->when($stateId,function($q) use ($stateId){
-                    $q->where('users.state_id',$stateId);
-                })
+                    ->when($stateId,function($q) use ($stateId){
+                        $q->where('users.state_id',$stateId);
+                    })
 
-                ->when($userId,function($q) use ($userId){
-                    $q->where('users.id',$userId);
-                })
+                    ->when($userId,function($q) use ($userId){
+                        $q->where('users.id',$userId);
+                    })
 
-                ->groupBy('trips.user_id');
-        })
+                    ->groupBy('trips.user_id');
+            })
 
-        ->with('trip.user:id,name,state_id')
-        ->get();
+            ->with('trip.user:id,name,state_id')
+            ->get();
 
 
-    $locations = $latestLogs->map(function ($log) {
+        $locations = $latestLogs->map(function ($log) {
 
-        return [
-            'name'          => $log->trip->user->name ?? 'Unknown',
-            'latitude'      => $log->latitude,
-            'longitude'     => $log->longitude,
-            'mobile_status' => $log->mobile_status,
-            'time'          => $log->recorded_at ? \Carbon\Carbon::parse($log->recorded_at)->format('d M Y H:i') : ''
-        ];
-    });
+            return [
+                'name'          => $log->trip->user->name ?? 'Unknown',
+                'latitude'      => $log->latitude,
+                'longitude'     => $log->longitude,
+                'mobile_status' => $log->mobile_status,
+                'time'          => $log->recorded_at ? \Carbon\Carbon::parse($log->recorded_at)->format('d M Y H:i') : ''
+            ];
+        });
 
-    return response()->json($locations);
-}
+        return response()->json($locations);
+    }
+    
     public function create(){
     }
 

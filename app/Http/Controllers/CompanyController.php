@@ -30,6 +30,7 @@ class CompanyController extends Controller
         $this->middleware('permission:edit_companies')->only(['edit','update']);
         $this->middleware('permission:delete_companies')->only(['destroy']);
     }
+    
     public function index()
     {
         $user = Auth::user();
@@ -41,21 +42,15 @@ class CompanyController extends Controller
     {
         $authUser = auth()->user();
 
-        $roles = $authUser->user_level === 'master_admin'
-            ? Role::all()
-            : Role::where('company_id', $authUser->company_id)->get();
+        $roles = $authUser->user_level === 'master_admin' ? Role::all() : Role::where('company_id', $authUser->company_id)->get();
 
-        $companies = $authUser->user_level === 'master_admin'
-            ? Company::all()
-            : collect();
+        $companies = $authUser->user_level === 'master_admin' ? Company::all() : collect();
 
         $users = User::when($authUser->user_level !== 'master_admin', function ($query) use ($authUser) {
             $query->where('company_id', $authUser->company_id);
         })->get();
 
-        $designations = $authUser->user_level === 'master_admin'
-            ? Designation::all()
-            : Designation::where('company_id', $authUser->company_id)->get();
+        $designations = $authUser->user_level === 'master_admin' ? Designation::all() : Designation::where('company_id', $authUser->company_id)->get();
 
         $state = State::where('status', 1)->get();
 
@@ -73,10 +68,8 @@ class CompanyController extends Controller
 
     public function store(StoreCompanyRequest $request)
     {
-        // dd($request->all());
         $validated = $request->validated();
 
-        // Handle logo upload
         if ($request->hasFile('logo')) {
             $validated['logo'] = $request->file('logo')->store('logos', 'public');
         }
@@ -90,12 +83,10 @@ class CompanyController extends Controller
         $tenant = null;
 
         try {
-            // 1️⃣ Create tenant database
             DB::statement("CREATE DATABASE IF NOT EXISTS `$tenancyDbName` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
 
             DB::beginTransaction();
             try {
-                // 2️⃣ Create company in central DB
                 $company = Company::create([
                     'name' => $validated['name'],
                     'code' => $validated['code'] ?? null,
@@ -140,7 +131,6 @@ class CompanyController extends Controller
                 throw $e;
             }
 
-            // 4️⃣ Initialize tenant
             tenancy()->initialize($tenant);
 
             // 5️⃣ Setup tenant DB connection dynamically
@@ -310,7 +300,7 @@ class CompanyController extends Controller
             $validated['logo'] = $request->file('logo')->store('logos', 'public');
         }
         if (!empty($validated['state']) && is_array($validated['state'])) {
-            $validated['state'] = implode(',', $validated['state']); // [4,5,8] => "4,5,8"
+            $validated['state'] = implode(',', $validated['state']);
         }
         if (!empty($validated['user_password'])) {
             $validated['password'] = $validated['user_password'];
@@ -357,32 +347,19 @@ class CompanyController extends Controller
                 $tenantCompanyData['password'] = $validated['user_password'];
             }
 
-            DB::connection('tenant')->table('companies')
-                ->where('tenant_id', $tenant)
-                ->update($tenantCompanyData);
+            DB::connection('tenant')->table('companies')->where('tenant_id', $tenant)->update($tenantCompanyData);
 
-            // ✅ If password provided → update admin user
             if (!empty($validated['user_password'])) {
-                $adminUser = DB::connection('tenant')
-                    ->table('users')
-                    ->where('email', $company->email)
-                    ->first();
+                $adminUser = DB::connection('tenant')->table('users')->where('email', $company->email)->first();
 
                 if ($adminUser) {
-                    DB::connection('tenant')
-                        ->table('users')
-                        ->where('id', $adminUser->id)
-                        ->update([
-                            'mobile' => $validated['contact_no'],
-                            'password' => Hash::make($validated['user_password']),
-                            'updated_at' => now(),
-                        ]);
+                    DB::connection('tenant')->table('users')->where('id', $adminUser->id)
+                        ->update(['mobile' => $validated['contact_no'],'password' => Hash::make($validated['user_password']),'updated_at' => now()]);
                 }
             }
         }
 
-        return redirect()->route('companies.index')
-            ->with('success', 'Company & Tenant updated successfully.');
+        return redirect()->route('companies.index')->with('success', 'Company & Tenant updated successfully.');
     }
 
     public function destroy(Company $company)
@@ -394,38 +371,20 @@ class CompanyController extends Controller
         return redirect()->route('companies.index')->with('success', 'Company deleted successfully.');
     }
 
-
-    // public function toggle($id)
-    // {
-    //     $company = Company::findOrFail($id);
-    //     $this->authorizeCompanyAccess($company);
-
-    //     $company->is_active = !$company->is_active;
-    //     $company->status = $company->is_active ? 'Active' : 'Inactive';
-    //     $company->save();
-
-    //     return redirect()->route('companies.index')->with('success', 'Company status updated.');
-    // }
-
     public function toggle($id)
     {
         $company = Company::findOrFail($id);
         $this->authorizeCompanyAccess($company);
 
-        // Toggle status
         $company->is_active = !$company->is_active;
         $company->status = $company->is_active ? 'Active' : 'Inactive';
         $company->save();
 
-        // 🔹 Get tenant info
         $tenantId = $company->tenant_id;
         $tenant = Tenant::where('id', $tenantId)->first();
 
         if ($tenant && !empty($tenant->tenancy_db_name)) {
-
             $tenancyDbName = $tenant->tenancy_db_name;
-
-            // 🔹 Configure tenant connection
             $tenantConnection = config('database.connections.tenant');
             $tenantConnection['database'] = $tenancyDbName;
 
@@ -434,10 +393,7 @@ class CompanyController extends Controller
             DB::purge('tenant');
             DB::reconnect('tenant');
 
-            // 🔹 Update company status inside tenant DB
-            DB::connection('tenant')->table('companies')
-                ->where('tenant_id', $tenantId)
-                ->update([
+            DB::connection('tenant')->table('companies')->where('tenant_id', $tenantId)->update([
                     'is_active' => $company->is_active,
                     'status' => $company->status,
                     'updated_at' => now()
@@ -445,10 +401,8 @@ class CompanyController extends Controller
 
         }
 
-        return redirect()->route('companies.index')
-            ->with('success', 'Company status updated in central & tenant database.');
+        return redirect()->route('companies.index')->with('success', 'Company status updated in central & tenant database.');
     }
-
 
     private function authorizeMaster()
     {
@@ -457,7 +411,6 @@ class CompanyController extends Controller
             abort(403, 'Unauthorized action.');
         }
     }
-
 
     private function authorizeCompanyAccess(Company $company)
     {

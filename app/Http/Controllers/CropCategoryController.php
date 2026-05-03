@@ -48,15 +48,13 @@ class CropCategoryController extends Controller
             'name' => $request->name
         ]);
 
-        return redirect()->route('crop-categories.index')
-            ->with('success','Category updated successfully');
+        return redirect()->route('crop-categories.index')->with('success','Category updated successfully');
     }
 
     public function destroy(CropCategory $cropCategory)
     {
         $cropCategory->delete();
 
-        return redirect()->route('crop-categories.index')
-            ->with('success','Category deleted successfully');
+        return redirect()->route('crop-categories.index')->with('success','Category deleted successfully');
     }
 }

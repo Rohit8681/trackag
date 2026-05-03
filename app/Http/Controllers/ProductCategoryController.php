@@ -29,8 +29,7 @@ class ProductCategoryController extends Controller
             'status'      => $request->status ?? 1,
         ]);
 
-        return redirect()->route('product-categories.index')
-                         ->with('success', 'Product Category created successfully');
+        return redirect()->route('product-categories.index')->with('success', 'Product Category created successfully');
     }
 
     public function edit(ProductCategory $productCategory)
@@ -57,7 +56,6 @@ class ProductCategoryController extends Controller
     {
         $productCategory->delete();
 
-        return redirect()->route('product-categories.index')
-                         ->with('success', 'Product Category deleted successfully');
+        return redirect()->route('product-categories.index')->with('success', 'Product Category deleted successfully');
     }
 }

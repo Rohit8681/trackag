@@ -47,12 +47,10 @@ class AdminController extends Controller
             $tenantDb = DB::connection('tenant')->getDatabaseName();
         }
         
-        // dd('test web admin');
         $user = Auth::user();
         $onlineTimeout = now()->subMinutes(10);
         $isMasterAdmin = $user->hasRole('master_admin');
         if ($isMasterAdmin) {
-            
             $totalUsers       = User::count();
             $totalRoles       = \Spatie\Permission\Models\Role::count();
             $totalPermissions = \Spatie\Permission\Models\Permission::count();
@@ -60,9 +58,7 @@ class AdminController extends Controller
 
             $onlineUsers = User::whereHas('sessions', function ($query) {
                 $query->whereNull('logout_at')->whereIn('platform', ['web', 'mobile']);
-            })
-            ->with(['roles', 'permissions'])
-            ->get();
+            })->with(['roles', 'permissions'])->get();
 
             $sessionsQuery = UserSession::with('user')->whereDate('login_at', now());
         } else {
@@ -79,16 +75,11 @@ class AdminController extends Controller
 
             $onlineUsers = User::whereHas('sessions', function ($query) {
                 $query->whereNull('logout_at')->whereIn('platform', ['web', 'mobile']);
-            })
-            ->with(['roles', 'permissions'])
-            ->get();
+            })->with(['roles', 'permissions'])->get();
 
-            $sessionsQuery = UserSession::with('user')
-            ->whereDate('login_at', now());
+            $sessionsQuery = UserSession::with('user')->whereDate('login_at', now());
         }
-
         $sessionsGrouped = $sessionsQuery->get()->groupBy('user_id');
-    
 
         return view('admin.dashboard', compact(
             'totalUsers',
@@ -112,73 +103,10 @@ class AdminController extends Controller
         if($companyCount == 1){
             $company = Company::first();
         }
-
-         $apk = DB::connection('mysql')   // ← FORCE MAIN DATABASE
-        ->table('apk_uploads')
-        ->orderByDesc('id')
-        ->first();
-        
-                
+        $apk = DB::connection('mysql')->table('apk_uploads')->orderByDesc('id')->first();
         
         return view('admin.login',compact('company','apk'));
     }
-
-    // public function store(LoginRequest $request)
-    // {
-    //     $credentials = $request->only('mobile', 'password');
-
-    //     if (Auth::attempt($credentials)) {
-    //         $user = Auth::user();
-
-    //         if ($user->is_active == 0) {
-    //             Auth::logout();
-    //             return redirect()->back()->with('error_message', 'Your account is inactive. Please contact support.');
-    //         }
-
-    //         // if ($user->roles()->count() === 0) {
-    //         //     Auth::logout();
-    //         //     return redirect()->back()->with('error_message', 'You do not have any assigned role. Please contact the administrator.');
-    //         // }
-
-    //         if (!empty($request->remember)) {
-    //             setcookie("mobile", $credentials["mobile"], time() + 3600);
-    //             setcookie("password", $credentials["password"], time() + 3600);
-    //         } else {
-    //             setcookie("mobile", "", time() - 3600);
-    //             setcookie("password", "", time() - 3600);
-    //         }
-
-    //         $request->session()->regenerate();
-
-    //         // Log session logic...
-    //         $existingSession = \App\Models\UserSession::where('user_id', $user->id)
-    //             ->whereNull('logout_at')
-    //             ->where('platform', 'web')
-    //             ->latest()
-    //             ->first();
-
-    //         if ($existingSession) {
-    //             $existingSession->update([
-    //                 'logout_at'        => now(),
-    //                 'session_duration' => $existingSession->login_at->diffInSeconds(now()),
-    //             ]);
-    //         }
-
-    //         \App\Models\UserSession::create([
-    //             'user_id'    => $user->id,
-    //             'ip_address' => $request->ip(),
-    //             'user_agent' => $request->header('User-Agent'),
-    //             'platform'   => 'web',
-    //             'login_at'   => now(),
-    //         ]);
-
-    //         return redirect()->route('admin.dashboard');
-    //     } else {
-    //         return redirect()->back()->with('error_message', 'Invalid Email or Password.');
-    //     }
-    // }
-
-
     
     public function store(LoginRequest $request)
     {
@@ -187,14 +115,11 @@ class AdminController extends Controller
         if (Auth::attempt($credentials)) {
 
             $user = Auth::user();
-
-            // 1️⃣ User active check
             if ($user->is_active == 0) {
                 Auth::logout();
                 return redirect()->back()->with('error_message', 'Your account is inactive. Please contact support.');
             }
 
-            // 2️⃣ Company check
             $companyCount = Company::count();
             $company = Company::first();
 
@@ -206,18 +131,12 @@ class AdminController extends Controller
 
                 // 3️⃣ Validity expiry check
                 if ($company && !empty($company->validity_upto)) {
-
                     if (now()->greaterThan($company->validity_upto)) {
                         Auth::logout();
-                        return redirect()->back()->with(
-                            'error_message',
-                            'Your company subscription has expired. Please contact administrator.'
-                        );
+                        return redirect()->back()->with('error_message','Your company subscription has expired. Please contact administrator.');
                     }
                 }
             }
-            
-
             // Remember me
             if (!empty($request->remember)) {
                 setcookie("mobile", $credentials["mobile"], time() + 3600);
@@ -230,11 +149,7 @@ class AdminController extends Controller
             $request->session()->regenerate();
 
             // Session logging
-            $existingSession = \App\Models\UserSession::where('user_id', $user->id)
-                ->whereNull('logout_at')
-                ->where('platform', 'web')
-                ->latest()
-                ->first();
+            $existingSession = UserSession::where('user_id', $user->id)->whereNull('logout_at')->where('platform', 'web')->latest()->first();
 
             if ($existingSession) {
                 $existingSession->update([
@@ -243,7 +158,7 @@ class AdminController extends Controller
                 ]);
             }
 
-            \App\Models\UserSession::create([
+            UserSession::create([
                 'user_id'    => $user->id,
                 'ip_address' => $request->ip(),
                 'user_agent' => $request->header('User-Agent'),
@@ -276,11 +191,7 @@ class AdminController extends Controller
             $user->last_seen = null;
             $user->save();
 
-            $session = UserSession::where('user_id', $user->id)
-                ->whereNull('logout_at')
-                ->where('platform', 'web')
-                ->latest()
-                ->first();
+            $session = UserSession::where('user_id', $user->id)->whereNull('logout_at')->where('platform', 'web')->latest()->first();
 
             if ($session) {
                 $session->update([
@@ -294,9 +205,6 @@ class AdminController extends Controller
         return redirect()->route('admin.login');
     }
 
-    /**
-     * ✅ Fetch user session logs and total logged-in time for today (for dashboard modal popup)
-     */
     public function getUserSessionHistory(Request $request, $userId)
     {
         $loggedInUser = Auth::user();
@@ -308,31 +216,19 @@ class AdminController extends Controller
 
         $isMasterAdmin = $loggedInUser->hasRole('master_admin');
 
-        // ✅ Restrict company admins from viewing other companies' user sessions
         if (!$isMasterAdmin && $loggedInUser->company_id !== $targetUser->company_id) {
             return '<p class="text-danger">Unauthorized access. You can only view session logs of your own company\'s users.</p>';
         }
 
-        // ✅ Fetch sessions for this user
-        $sessions = UserSession::where('user_id', $userId)
-        ->whereDate('login_at', now()->toDateString())
-        ->orderByDesc('login_at')
-        ->get();
-
-
+        $sessions = UserSession::where('user_id', $userId)->whereDate('login_at', now()->toDateString())->orderByDesc('login_at')->get();
         if ($sessions->isEmpty()) {
             return '<p class="text-muted">No session records found.</p>';
         }
 
-        // ✅ Calculate today's total session duration for this user
-        $todayTotalSeconds = UserSession::where('user_id', $userId)
-            ->whereNotNull('session_duration')
-            ->whereDate('login_at', now()->toDateString())
-            ->sum('session_duration');
+        $todayTotalSeconds = UserSession::where('user_id', $userId)->whereNotNull('session_duration')->whereDate('login_at', now()->toDateString())->sum('session_duration');
 
         $html = '<p><strong>Total Active Time Today:</strong> ' . gmdate('H:i:s', $todayTotalSeconds) . '</p>';
 
-        // ✅ Add new Platform column in header
         $html .= '<table class="table table-bordered table-striped">';
         $html .= '<thead><tr>
                     <th>Platform</th>
@@ -361,53 +257,9 @@ class AdminController extends Controller
         return $html;
     }
 
-    // public function changePassword(Request $request){
-        
-        
-    //     $user = Auth::user();
-    //     $getCompany = Company::first();
-
-    //     $request->validate([
-    //         'current_password' => ['required'],
-    //         'new_password' => ['required', 'string', 'confirmed'],
-    //     ], [
-    //         'new_password.confirmed' => 'New password and confirm password do not match.',
-    //     ]);
-
-    //     if (!Hash::check($request->current_password, $user->password)) {
-    //         throw ValidationException::withMessages([
-    //             'current_password' => ['Your current password is incorrect.'],
-    //         ]);
-    //     }
-
-    //     $user->update([ 
-    //         'password' => Hash::make($request->new_password),
-    //     ]);
-
-    //     if($user->hasRole('sub_admin') && !empty($getCompany->tenant_id)){
-             
-    //         $tenantId = $getCompany->tenant_id;
-    //         $centralDb = DB::connection('central');
-    //         $centralDb->table('companies')
-    //             ->where('tenant_id', $tenantId)
-    //             ->update([
-    //                 'password' => Hash::make($request->new_password),
-    //                 'updated_at' => now(),
-    //             ]);
-    //     }
-
-        
-
-    //     return response()->json(['message' => 'Password updated successfully.']);
-    
-    // }
-
-
     public function changePassword(Request $request)
     {
         $user = Auth::user();
-
-        // 🧩 Step 1: Validate input
         $request->validate([
             'current_password' => ['required'],
             'new_password' => ['required', 'string', 'confirmed'],
@@ -415,489 +267,418 @@ class AdminController extends Controller
             'new_password.confirmed' => 'New password and confirm password do not match.',
         ]);
 
-        // ❌ Step 2: Verify current password
         if (!Hash::check($request->current_password, $user->password)) {
             throw ValidationException::withMessages([
                 'current_password' => ['Your current password is incorrect.'],
             ]);
         }
 
-        // ✅ Step 3: Update password in tenant (current DB)
-        $user->update([
-            'password' => Hash::make($request->new_password),
-        ]);
+        $user->update(['password' => Hash::make($request->new_password)]);
 
-        // 🔄 Step 4: If role is sub_admin → update password in central DB too
         if ($user->hasRole('sub_admin')) {
             $company = Company::first(); 
-            
             if ($company && !empty($company->tenant_id)) {
                 $company->update(['password'=> $request->new_password]);
                 try {
-                    DB::connection('central')
-                        ->table('companies')
-                        ->where('tenant_id', $company->tenant_id)
-                        ->update([
-                            'password' => $request->new_password,
-                            'updated_at' => now(),
-                        ]);
-
-                    \Log::info("Central password updated for tenant: {$company->tenant_id}");
+                    DB::connection('central')->table('companies')->where('tenant_id', $company->tenant_id)->update(['password' => $request->new_password,'updated_at' => now()]);
                 } catch (\Exception $e) {
                     \Log::error('Central password update failed: ' . $e->getMessage());
                 }
             }
         }
 
-        // ✅ Step 5: Return JSON response
         return response()->json(['message' => 'Password updated successfully.']);
     }
 
-    
-
     public function updateState()
-{
-    // 1️⃣ Update State
-    $state = State::findOrFail(20);
-    $state->update([
-        'name' => 'Rajasthan'
-    ]);
+    {
+        // 1️⃣ Update State
+        $state = State::findOrFail(20);
+        $state->update([
+            'name' => 'Rajasthan'
+        ]);
 
-    // 2️⃣ Rajasthan District → Tehsil Data (UNCHANGED)
-    $rajasthanData = [
-        'Ajmer' => [
-            'Ajmer','Beawar','Bhinay','Kekri','Kishangarh',
-            'Masuda','Nasirabad','Peesangan','Sarwar',
-        ],
-        'Alwar' => [
-            'Alwar','Bansur','Behror','Kathumar','Kishangarh Bas',
-            'Kotkasim','Lachhmangarh','Mandawar','Rajgarh',
-            'Ramgarh','Thanagazi','Tijara',
-        ],
-        'Banswara' => [
-            'Bagidora','Garhi','Ghatol','Kushalgarh','Banswara',
-        ],
-        'Baran' => [
-            'Antah','Atru','Baran','Chhabra',
-            'Chhipabarod','Kishanganj','Mangrol','Shahbad',
-        ],
-        'Barmer' => [
-            'Barmer','Baytoo','Chohtan','Gudha Malani',
-            'Pachpadra','Ramsar','Sheo','Siwana',
-            'Dhorimana','Sindhari',
-        ],
-        'Bharatpur' => [
-            'Bayana','Deeg','Kaman','Kumher','Nadbai',
-            'Nagar','Pahari','Rupbas','Weir','Bharatpur',
-        ],
-        'Bhilwara' => [
-            'Asind','Banera','Beejoliya','Bhilwara','Hurda',
-            'Jahazpur','Kotri','Mandal','Mandalgarh',
-            'Raipur','Sahara','Shahpura',
-        ],
-        'Bikaner' => [
-            'Bikaner','Chhatargarh','Khajuwala','Kolayat',
-            'Lunkaransar','Nokha','Poogal','Sridungargarh',
-        ],
-        'Bundi' => [
-            'Bundi','Hindoli','Indragarh',
-            'Keshoraipatan','Nainwa','Taleda',
-        ],
-        'Chittaurgarh' => [
-            'Bari Sadri','Begun','Bhadesar','Chittaurgarh',
-            'Dungla','Gangrar','Kapasan',
-            'Nimbahera','Rashmi','Rawatbhata',
-        ],
-        'Churu' => [
-            'Churu','Rajgarh','Ratangarh',
-            'Sardarshahar','Sujangarh','Taranagar',
-        ],
-        'Dausa' => [
-            'Baswa','Dausa','Lalsot','Mahwa','Sikrai',
-        ],
-        'Dhaulpur' => [
-            'Bari','Baseri','Dhaulpur','Rajakhera','Sepau',
-        ],
-        'Dungarpur' => [
-            'Aspur','Bichhiwara','Dungarpur','Sagwara','Simalwara',
-        ],
-        'Ganganagar' => [
-            'Anupgarh','Ganganagar','Gharsana','Karanpur',
-            'Padampur','Raisinghnagar','Sadulsahar',
-            'Suratgarh','Vijainagar',
-        ],
-        'Hanumangarh' => [
-            'Bhadra','Hanumangarh','Nohar',
-            'Pilibanga','Rawatsar','Sangaria','Tibbi',
-        ],
-        'Jaipur' => [
-            'Amber','Bassi','Chaksu','Chomu','Jamwa Ramgarh',
-            'Jaipur','Kotputli','Mauzamabad','Phagi',
-            'Phulera (Hq.Sambhar)','Sanganer','Shahpura','Viratnagar',
-        ],
-        'Jaisalmer' => [
-            'Fatehgarh','Jaisalmer','Pokaran',
-        ],
-        'Jalor' => [
-            'Ahore','Bagora','Bhinmal','Jalor',
-            'Raniwara','Sanchore','Sayla',
-        ],
-        'Jhalawar' => [
-            'Aklera','Gangdhar','Jhalrapatan',
-            'Khanpur','Manohar Thana','Pachpahar','Pirawa',
-        ],
-        'Jhunjhunun' => [
-            'Buhana','Chirawa','Jhunjhunun',
-            'Khetri','Nawalgarh','Udaipurwati',
-        ],
-        'Jodhpur' => [
-            'Balesar','Bap','Bhopalgarh','Bilara',
-            'Jodhpur','Luni','Osian','Phalodi','Shergarh',
-        ],
-        'Karauli' => [
-            'Hindaun','Karauli','Mandrail',
-            'Nadbai','Sapotra','Todabhim',
-        ],
-        'Kota' => [
-            'Digod','Ladpura','Pipalda',
-            'Ramganj Mandi','Sangod',
-        ],
-        'Nagaur' => [
-            'Degana','Didwana','Jayal','Kheenvsar',
-            'Ladnu','Makrana','Merta','Nagaur','Nawa','Parbatsar',
-        ],
-        'Pali' => [
-            'Bali','Desuri','Jaitaran','Marwar Junction',
-            'Pali','Raipur','Rohat','Sojat','Sumerpur',
-        ],
-        'Pratapgarh' => [
-            'Arnod','Chhoti Sadri','Dhariawad',
-            'Peepalkhoont','Pratapgarh',
-        ],
-        'Rajsamand' => [
-            'Amet','Bhim','Deogarh','Kumbhalgarh',
-            'Nathdwara','Railmagra','Rajsamand',
-        ],
-        'Sawai Madhopur' => [
-            'Bamanwas','Bonli','Chauth Ka Barwara',
-            'Gangapur','Khandar','Malarna Doongar','Sawai Madhopur',
-        ],
-        'Sikar' => [
-            'Danta Ramgarh','Fatehpur','Lachhmangarh',
-            'Neem-Ka-Thana','Sikar','Sri Madhopur',
-        ],
-        'Sirohi' => [
-            'Abu Road','Pindwara','Reodar','Sheoganj','Sirohi',
-        ],
-        'Tonk' => [
-            'Deoli','Malpura','Niwai','Peeplu',
-            'Tonk','Todaraisingh','Uniara',
-        ],
-        'Udaipur' => [
-            'Badgaon','Bhindar','Dhariawad','Girwa','Gogunda',
-            'Jhadol','Kanor','Kherwara','Kotda','Lasadiya',
-            'Mavli','Rishabhdeo','Salumbar','Sarada',
-            'Semari','Vallabhnagar',
-        ],
-    ];
-
-    // 3️⃣ Insert District & Tehsil (OPTIMIZED)
-    foreach ($rajasthanData as $districtName => $tehsils) {
-
-        $district = District::firstOrCreate(
-            [
-                'name' => $districtName,
-                'state_id' => $state->id,
+        // 2️⃣ Rajasthan District → Tehsil Data (UNCHANGED)
+        $rajasthanData = [
+            'Ajmer' => [
+                'Ajmer','Beawar','Bhinay','Kekri','Kishangarh',
+                'Masuda','Nasirabad','Peesangan','Sarwar',
             ],
-            [
-                'country_id' => 1,
-            ]
-        );
-
-        $tehsilRows = [];
-        foreach ($tehsils as $tehsilName) {
-            $tehsilRows[] = [
-                'name' => $tehsilName,
-                'district_id' => $district->id,
-                'state_id' => $state->id,
-                'country_id' => 1,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ];
-        }
-
-        // 🔥 ONE QUERY PER DISTRICT
-        Tehsil::insertOrIgnore($tehsilRows);
-    }
-
-    return response()->json([
-        'status' => true,
-        'message' => 'Rajasthan State, Districts & Tehsils inserted successfully'
-    ]);
-}
-
-public function updatePermission(){
-    $permissions = [
-            // 'view_users',
-            // 'create_users',
-            // 'edit_users',
-            // 'view_roles',
-            // 'create_roles',
-            // 'edit_roles',
-            // 'view_permissions',
-            // 'create_permissions',
-            // 'edit_permissions',
-            // 'delete_permissions',
-            // 'view_customers',
-            // 'create_customers',
-            // 'edit_customers',
-            // 'delete_customers',
-            // 'toggle_customers',
-            // 'view_products',
-            // 'create_products',
-            // 'edit_products',
-            // 'delete_products',
-            // 'toggle_users',
-            // 'view_companies',
-            // 'create_companies',
-            // 'edit_companies',
-            // 'delete_companies',
-            // 'view_budget_plan',
-            // 'create_budget_plan',
-            // 'edit_budget_plan',
-            // 'approvals_budget_plan',
-            // 'reject_budget_plan',
-            // 'verify_budget_plan',
-            // 'remove_review_budget_plan',
-            // 'view_monthly_plan',
-            // 'create_monthly_plan',
-            // 'edit_monthly_plan',
-            // 'approvals_monthly_plan',
-            // 'reject_monthly_plan',
-            // 'verify_monthly_plan',
-            // 'remove_review_monthly_plan',
-            // 'view_plan_vs_achievement',
-            // 'create_plan_vs_achievement',
-            // 'edit_plan_vs_achievement',
-            // 'approvals_plan_vs_achievement',
-            // 'reject_plan_vs_achievement',
-            // 'verify_plan_vs_achievement',
-            // 'remove_review_plan_vs_achievement',
-            // 'view_party_visit',
-            // 'view_order',
-            // 'edit_order',
-            // 'delete_order',
-            // 'approvals_order',
-            // 'reject_order',
-            // 'dispatch_order',
-            // 'view_order_report',
-            // 'view_stock',
-            // 'view_stock_ageing',
-            // 'view_emp_on_map',
-            // 'view_daily_trip',
-            // 'edit_daily_trip',
-            // 'delete_daily_trip',
-            // 'approvals_daily_trip',
-            // 'reject_daily_trip',
-            // 'view_attendance',
-            // 'create_monthly_attendance_report',
-            // 'view_monthly_attendance_report',
-            // 'approvals_monthly_attendance_report',
-            // 'create_leave_report',
-            // 'view_leave_report',
-            // 'edit_leave_report',
-            // 'view_expense',
-            // 'edit_expense',
-            // 'delete_expense',
-            // 'approvals_expense',
-            // 'reject_expense',
-            // 'create_genrate_monthly_expense',
-            // 'view_genrate_monthly_expense',
-            // 'edit_genrate_monthly_expense',
-            // 'delete_genrate_monthly_expense',
-            // 'approvals_genrate_monthly_expense',
-            // 'reject_genrate_monthly_expense',
-            // 'view_ta_da_report',
-            // 'view_daily_farm_demo',
-            // 'edit_daily_farm_demo',
-            // 'delete_daily_farm_demo',
-            // 'view_monthly_farm_demo_report',
-            // 'view_all_trip',
-            // // 'create_all_trip',
-            // 'edit_all_trip',
-            // 'delete_all_trip',
-            // 'approvals_all_trip',
-            // 'reject_all_trip',
-            // 'logs_all_trip',
-            // 'view_trip_types',
-            // 'create_trip_types',
-            // 'edit_trip_types',
-            // 'view_travel_modes',
-            // 'create_travel_modes',
-            // 'edit_travel_modes',
-            // 'view_trip_purposes',
-            // 'create_trip_purposes',
-            // 'edit_trip_purposes',
-            // 'view_designations',
-            // 'create_designations',
-            // 'edit_designations',
-            // 'delete_designations',
-            // 'view_states',
-            // 'create_states',
-            // 'edit_states',
-            // 'view_districts',
-            // 'create_districts',
-            // 'edit_districts',
-            // 'view_talukas',
-            // 'create_talukas',
-            // 'edit_talukas',
-            // 'view_vehicle_types',
-            // 'create_vehicle_types',
-            // 'edit_vehicle_types',
-            // 'delete_vehicle_types',
-            // 'view_depo_master',
-            // 'create_depo_master',
-            // 'edit_depo_master',
-            // 'delete_depo_master',
-            // 'view_party_master',
-            // 'create_party_master',
-            // 'edit_party_master',
-            // 'delete_party_master',
-            // 'view_holiday_master',
-            // 'create_holiday_master',
-            // 'edit_holiday_master',
-            // 'delete_holiday_master',
-            // 'view_leave_master',
-            // 'create_leave_master',
-            // 'edit_leave_master',
-            // 'delete_leave_master',
-            // 'view_ta_da',
-            // 'create_ta_da',
-            // 'edit_ta_da',
-            // 'delete_ta_da',
-            // 'view_ta_da_bill_master',
-            // 'create_ta_da_bill_master',
-            // 'edit_ta_da_bill_master',
-            // 'delete_ta_da_bill_master',
-            // 'view_sales_product_master',
-            // 'create_sales_product_master',
-            // 'edit_sales_product_master',
-            // 'delete_sales_product_master',
-            // 'view_technical_master',
-            // 'create_technical_master',
-            // 'edit_technical_master',
-            // 'delete_technical_master',
-            // 'view_product_category',
-            // 'create_product_category',
-            // 'edit_product_category',
-            // 'delete_product_category',
-            // 'view_product_price',
-            // 'create_product_price',
-            // 'edit_product_price',
-            // 'delete_product_price',
-            // 'view_product_collection',
-            // 'create_product_collection',
-            // 'edit_product_collection',
-            // 'delete_product_collection',
-            // 'view_price_list_master',
-            // 'create_price_list_master',
-            // 'edit_price_list_master',
-            // 'delete_price_list_master',
-            // 'view_list_of_all_price_list',
-            // 'view_upload_brochure',
-            // 'create_upload_brochure',
-            // 'edit_upload_brochure',
-            // 'delete_upload_brochure',
-            // 'view_vehicle_master',
-            // 'create_vehicle_master',
-            // 'edit_vehicle_master',
-            // 'delete_vehicle_master',
-            // 'view_new_party',
-            // 'approvals_new_party',
-            // 'reject_new_party',
-            // 'view_party_payment',
-            // 'approvals_party_payment',
-            // 'view_party_performance',
-            // 'view_party_ledger',
-            // 'view_sales_return',
-            // 'edit_sales_return',
-            // 'delete_sales_return',
-            'approvals_sales_return'
+            'Alwar' => [
+                'Alwar','Bansur','Behror','Kathumar','Kishangarh Bas',
+                'Kotkasim','Lachhmangarh','Mandawar','Rajgarh',
+                'Ramgarh','Thanagazi','Tijara',
+            ],
+            'Banswara' => [
+                'Bagidora','Garhi','Ghatol','Kushalgarh','Banswara',
+            ],
+            'Baran' => [
+                'Antah','Atru','Baran','Chhabra',
+                'Chhipabarod','Kishanganj','Mangrol','Shahbad',
+            ],
+            'Barmer' => [
+                'Barmer','Baytoo','Chohtan','Gudha Malani',
+                'Pachpadra','Ramsar','Sheo','Siwana',
+                'Dhorimana','Sindhari',
+            ],
+            'Bharatpur' => [
+                'Bayana','Deeg','Kaman','Kumher','Nadbai',
+                'Nagar','Pahari','Rupbas','Weir','Bharatpur',
+            ],
+            'Bhilwara' => [
+                'Asind','Banera','Beejoliya','Bhilwara','Hurda',
+                'Jahazpur','Kotri','Mandal','Mandalgarh',
+                'Raipur','Sahara','Shahpura',
+            ],
+            'Bikaner' => [
+                'Bikaner','Chhatargarh','Khajuwala','Kolayat',
+                'Lunkaransar','Nokha','Poogal','Sridungargarh',
+            ],
+            'Bundi' => [
+                'Bundi','Hindoli','Indragarh',
+                'Keshoraipatan','Nainwa','Taleda',
+            ],
+            'Chittaurgarh' => [
+                'Bari Sadri','Begun','Bhadesar','Chittaurgarh',
+                'Dungla','Gangrar','Kapasan',
+                'Nimbahera','Rashmi','Rawatbhata',
+            ],
+            'Churu' => [
+                'Churu','Rajgarh','Ratangarh',
+                'Sardarshahar','Sujangarh','Taranagar',
+            ],
+            'Dausa' => [
+                'Baswa','Dausa','Lalsot','Mahwa','Sikrai',
+            ],
+            'Dhaulpur' => [
+                'Bari','Baseri','Dhaulpur','Rajakhera','Sepau',
+            ],
+            'Dungarpur' => [
+                'Aspur','Bichhiwara','Dungarpur','Sagwara','Simalwara',
+            ],
+            'Ganganagar' => [
+                'Anupgarh','Ganganagar','Gharsana','Karanpur',
+                'Padampur','Raisinghnagar','Sadulsahar',
+                'Suratgarh','Vijainagar',
+            ],
+            'Hanumangarh' => [
+                'Bhadra','Hanumangarh','Nohar',
+                'Pilibanga','Rawatsar','Sangaria','Tibbi',
+            ],
+            'Jaipur' => [
+                'Amber','Bassi','Chaksu','Chomu','Jamwa Ramgarh',
+                'Jaipur','Kotputli','Mauzamabad','Phagi',
+                'Phulera (Hq.Sambhar)','Sanganer','Shahpura','Viratnagar',
+            ],
+            'Jaisalmer' => [
+                'Fatehgarh','Jaisalmer','Pokaran',
+            ],
+            'Jalor' => [
+                'Ahore','Bagora','Bhinmal','Jalor',
+                'Raniwara','Sanchore','Sayla',
+            ],
+            'Jhalawar' => [
+                'Aklera','Gangdhar','Jhalrapatan',
+                'Khanpur','Manohar Thana','Pachpahar','Pirawa',
+            ],
+            'Jhunjhunun' => [
+                'Buhana','Chirawa','Jhunjhunun',
+                'Khetri','Nawalgarh','Udaipurwati',
+            ],
+            'Jodhpur' => [
+                'Balesar','Bap','Bhopalgarh','Bilara',
+                'Jodhpur','Luni','Osian','Phalodi','Shergarh',
+            ],
+            'Karauli' => [
+                'Hindaun','Karauli','Mandrail',
+                'Nadbai','Sapotra','Todabhim',
+            ],
+            'Kota' => [
+                'Digod','Ladpura','Pipalda',
+                'Ramganj Mandi','Sangod',
+            ],
+            'Nagaur' => [
+                'Degana','Didwana','Jayal','Kheenvsar',
+                'Ladnu','Makrana','Merta','Nagaur','Nawa','Parbatsar',
+            ],
+            'Pali' => [
+                'Bali','Desuri','Jaitaran','Marwar Junction',
+                'Pali','Raipur','Rohat','Sojat','Sumerpur',
+            ],
+            'Pratapgarh' => [
+                'Arnod','Chhoti Sadri','Dhariawad',
+                'Peepalkhoont','Pratapgarh',
+            ],
+            'Rajsamand' => [
+                'Amet','Bhim','Deogarh','Kumbhalgarh',
+                'Nathdwara','Railmagra','Rajsamand',
+            ],
+            'Sawai Madhopur' => [
+                'Bamanwas','Bonli','Chauth Ka Barwara',
+                'Gangapur','Khandar','Malarna Doongar','Sawai Madhopur',
+            ],
+            'Sikar' => [
+                'Danta Ramgarh','Fatehpur','Lachhmangarh',
+                'Neem-Ka-Thana','Sikar','Sri Madhopur',
+            ],
+            'Sirohi' => [
+                'Abu Road','Pindwara','Reodar','Sheoganj','Sirohi',
+            ],
+            'Tonk' => [
+                'Deoli','Malpura','Niwai','Peeplu',
+                'Tonk','Todaraisingh','Uniara',
+            ],
+            'Udaipur' => [
+                'Badgaon','Bhindar','Dhariawad','Girwa','Gogunda',
+                'Jhadol','Kanor','Kherwara','Kotda','Lasadiya',
+                'Mavli','Rishabhdeo','Salumbar','Sarada',
+                'Semari','Vallabhnagar',
+            ],
         ];
 
-        foreach ($permissions as $permissionName) {
-            Permission::firstOrCreate(
-                ['name' => $permissionName],
-                ['guard_name' => 'web']
+        // 3️⃣ Insert District & Tehsil (OPTIMIZED)
+        foreach ($rajasthanData as $districtName => $tehsils) {
+
+            $district = District::firstOrCreate(
+                [
+                    'name' => $districtName,
+                    'state_id' => $state->id,
+                ],
+                [
+                    'country_id' => 1,
+                ]
             );
+
+            $tehsilRows = [];
+            foreach ($tehsils as $tehsilName) {
+                $tehsilRows[] = [
+                    'name' => $tehsilName,
+                    'district_id' => $district->id,
+                    'state_id' => $state->id,
+                    'country_id' => 1,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
+            }
+
+            // 🔥 ONE QUERY PER DISTRICT
+            Tehsil::insertOrIgnore($tehsilRows);
         }
-       
-        // app()[PermissionRegistrar::class]->forgetCachedPermissions();
-        // $subAdminRole = Role::firstOrCreate(['name' => 'sub_admin', 'guard_name' => 'web']);
-        // $allPermissions = Permission::all();
-        // $subAdminRole->syncPermissions($allPermissions);
-        // $user = User::find(1);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Rajasthan State, Districts & Tehsils inserted successfully'
+        ]);
+    }
+
+    public function updatePermission(){
+        $permissions = [
+                // 'view_users',
+                // 'create_users',
+                // 'edit_users',
+                // 'view_roles',
+                // 'create_roles',
+                // 'edit_roles',
+                // 'view_permissions',
+                // 'create_permissions',
+                // 'edit_permissions',
+                // 'delete_permissions',
+                // 'view_customers',
+                // 'create_customers',
+                // 'edit_customers',
+                // 'delete_customers',
+                // 'toggle_customers',
+                // 'view_products',
+                // 'create_products',
+                // 'edit_products',
+                // 'delete_products',
+                // 'toggle_users',
+                // 'view_companies',
+                // 'create_companies',
+                // 'edit_companies',
+                // 'delete_companies',
+                // 'view_budget_plan',
+                // 'create_budget_plan',
+                // 'edit_budget_plan',
+                // 'approvals_budget_plan',
+                // 'reject_budget_plan',
+                // 'verify_budget_plan',
+                // 'remove_review_budget_plan',
+                // 'view_monthly_plan',
+                // 'create_monthly_plan',
+                // 'edit_monthly_plan',
+                // 'approvals_monthly_plan',
+                // 'reject_monthly_plan',
+                // 'verify_monthly_plan',
+                // 'remove_review_monthly_plan',
+                // 'view_plan_vs_achievement',
+                // 'create_plan_vs_achievement',
+                // 'edit_plan_vs_achievement',
+                // 'approvals_plan_vs_achievement',
+                // 'reject_plan_vs_achievement',
+                // 'verify_plan_vs_achievement',
+                // 'remove_review_plan_vs_achievement',
+                // 'view_party_visit',
+                // 'view_order',
+                // 'edit_order',
+                // 'delete_order',
+                // 'approvals_order',
+                // 'reject_order',
+                // 'dispatch_order',
+                // 'view_order_report',
+                // 'view_stock',
+                // 'view_stock_ageing',
+                // 'view_emp_on_map',
+                // 'view_daily_trip',
+                // 'edit_daily_trip',
+                // 'delete_daily_trip',
+                // 'approvals_daily_trip',
+                // 'reject_daily_trip',
+                // 'view_attendance',
+                // 'create_monthly_attendance_report',
+                // 'view_monthly_attendance_report',
+                // 'approvals_monthly_attendance_report',
+                // 'create_leave_report',
+                // 'view_leave_report',
+                // 'edit_leave_report',
+                // 'view_expense',
+                // 'edit_expense',
+                // 'delete_expense',
+                // 'approvals_expense',
+                // 'reject_expense',
+                // 'create_genrate_monthly_expense',
+                // 'view_genrate_monthly_expense',
+                // 'edit_genrate_monthly_expense',
+                // 'delete_genrate_monthly_expense',
+                // 'approvals_genrate_monthly_expense',
+                // 'reject_genrate_monthly_expense',
+                // 'view_ta_da_report',
+                // 'view_daily_farm_demo',
+                // 'edit_daily_farm_demo',
+                // 'delete_daily_farm_demo',
+                // 'view_monthly_farm_demo_report',
+                // 'view_all_trip',
+                // // 'create_all_trip',
+                // 'edit_all_trip',
+                // 'delete_all_trip',
+                // 'approvals_all_trip',
+                // 'reject_all_trip',
+                // 'logs_all_trip',
+                // 'view_trip_types',
+                // 'create_trip_types',
+                // 'edit_trip_types',
+                // 'view_travel_modes',
+                // 'create_travel_modes',
+                // 'edit_travel_modes',
+                // 'view_trip_purposes',
+                // 'create_trip_purposes',
+                // 'edit_trip_purposes',
+                // 'view_designations',
+                // 'create_designations',
+                // 'edit_designations',
+                // 'delete_designations',
+                // 'view_states',
+                // 'create_states',
+                // 'edit_states',
+                // 'view_districts',
+                // 'create_districts',
+                // 'edit_districts',
+                // 'view_talukas',
+                // 'create_talukas',
+                // 'edit_talukas',
+                // 'view_vehicle_types',
+                // 'create_vehicle_types',
+                // 'edit_vehicle_types',
+                // 'delete_vehicle_types',
+                // 'view_depo_master',
+                // 'create_depo_master',
+                // 'edit_depo_master',
+                // 'delete_depo_master',
+                // 'view_party_master',
+                // 'create_party_master',
+                // 'edit_party_master',
+                // 'delete_party_master',
+                // 'view_holiday_master',
+                // 'create_holiday_master',
+                // 'edit_holiday_master',
+                // 'delete_holiday_master',
+                // 'view_leave_master',
+                // 'create_leave_master',
+                // 'edit_leave_master',
+                // 'delete_leave_master',
+                // 'view_ta_da',
+                // 'create_ta_da',
+                // 'edit_ta_da',
+                // 'delete_ta_da',
+                // 'view_ta_da_bill_master',
+                // 'create_ta_da_bill_master',
+                // 'edit_ta_da_bill_master',
+                // 'delete_ta_da_bill_master',
+                // 'view_sales_product_master',
+                // 'create_sales_product_master',
+                // 'edit_sales_product_master',
+                // 'delete_sales_product_master',
+                // 'view_technical_master',
+                // 'create_technical_master',
+                // 'edit_technical_master',
+                // 'delete_technical_master',
+                // 'view_product_category',
+                // 'create_product_category',
+                // 'edit_product_category',
+                // 'delete_product_category',
+                // 'view_product_price',
+                // 'create_product_price',
+                // 'edit_product_price',
+                // 'delete_product_price',
+                // 'view_product_collection',
+                // 'create_product_collection',
+                // 'edit_product_collection',
+                // 'delete_product_collection',
+                // 'view_price_list_master',
+                // 'create_price_list_master',
+                // 'edit_price_list_master',
+                // 'delete_price_list_master',
+                // 'view_list_of_all_price_list',
+                // 'view_upload_brochure',
+                // 'create_upload_brochure',
+                // 'edit_upload_brochure',
+                // 'delete_upload_brochure',
+                // 'view_vehicle_master',
+                // 'create_vehicle_master',
+                // 'edit_vehicle_master',
+                // 'delete_vehicle_master',
+                // 'view_new_party',
+                // 'approvals_new_party',
+                // 'reject_new_party',
+                // 'view_party_payment',
+                // 'approvals_party_payment',
+                // 'view_party_performance',
+                // 'view_party_ledger',
+                // 'view_sales_return',
+                // 'edit_sales_return',
+                // 'delete_sales_return',
+                'approvals_sales_return'
+            ];
+
+            foreach ($permissions as $permissionName) {
+                Permission::firstOrCreate(
+                    ['name' => $permissionName],
+                    ['guard_name' => 'web']
+                );
+            }
         
-        // // dd($subAdminRole->permissions->pluck('name'));
-        // $user->assignRole('sub_admin');
-        // $user->refresh();
-        
+            // app()[PermissionRegistrar::class]->forgetCachedPermissions();
+            // $subAdminRole = Role::firstOrCreate(['name' => 'sub_admin', 'guard_name' => 'web']);
+            // $allPermissions = Permission::all();
+            // $subAdminRole->syncPermissions($allPermissions);
+            // $user = User::find(1);
+            
+            // // dd($subAdminRole->permissions->pluck('name'));
+            // $user->assignRole('sub_admin');
+            // $user->refresh();
+            
 
-        // dd($user->roles->pluck('name'));
-}
-
- 
-// public function updatePermission()
-// {
-//     $tenancyDbName = 'tenant_testing'; // Target DB
-
-//     // 🔹 Dynamically set tenant connection
-//     $tenantConnection = config('database.connections.tenant');
-//     $tenantConnection['database'] = $tenancyDbName;
-//     config(['database.connections.tenant' => $tenantConnection]);
-
-//     // 🔹 Purge & reconnect
-//     DB::purge('tenant');
-//     DB::reconnect('tenant');
-
-//     // ✅ Use tenant connection safely
-//     DB::connection('tenant')->transaction(function () {
-//         // 🔹 Clear Spatie permission cache
-//         app()[PermissionRegistrar::class]->forgetCachedPermissions();
-
-//         // 🔹 Optional: truncate role_has_permissions & model_has_roles
-//         DB::connection('tenant')->table('role_has_permissions')->truncate();
-//         DB::connection('tenant')->table('model_has_roles')->truncate();
-
-//         // 🔹 Create or get sub_admin role
-//         $subAdminRole = Role::on('tenant')->firstOrCreate([
-//             'name' => 'sub_admin',
-//             'guard_name' => 'web',
-//         ]);
-
-//         // 🔹 Get all permissions
-//         $allPermissions = Permission::on('tenant')->get();
-
-//         // 🔹 Sync permissions to role
-//         $subAdminRole->syncPermissions($allPermissions);
-
-//         // 🔹 Assign role to user ID = 1
-//         $user = User::on('tenant')->find(1);
-//         if ($user) {
-//             $user->assignRole('sub_admin');
-//         }
-
-//         // 🔹 Return debug info
-//         return response()->json([
-//             'role_id' => $subAdminRole->id,
-//             'role_name' => $subAdminRole->name,
-//             'permissions_count' => $subAdminRole->permissions()->count(),
-//             'user_roles' => $user ? $user->roles->pluck('name') : null,
-//             'connected_db' => DB::connection('tenant')->getDatabaseName(),
-//         ]);
-//     });
-// }
-
-
+            // dd($user->roles->pluck('name'));
+    }
 
 }

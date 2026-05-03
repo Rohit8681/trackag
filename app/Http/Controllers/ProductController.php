@@ -42,82 +42,6 @@ class ProductController extends Controller
         return view('admin.products.create', compact('categories','states'));
     }
     
-
-    // public function store(Request $request)
-    // {
-    //     $request->validate([
-    //         'product_name' => 'required',
-    //         'technical_name' => 'required',
-    //         // 'item_code' => 'required|unique:products,item_code',
-    //         // 'product_category_id' => 'required',
-    //         'shipper_gross_weight' => 'required',
-    //         // 'master_packing' => 'required|in:Yes,No',
-    //         'gst' => 'required',
-    //         // 'product_states' => 'required|array',
-    //         'packing_value' => 'required|array',
-    //     ]);
-
-    //     DB::transaction(function () use ($request) {
-
-    //         $product = Product::create([
-    //             'product_name' => $request->product_name,
-    //             'technical_name' => $request->technical_name,
-    //             'item_code' => $request->item_code,
-    //             'product_category_id' => $request->product_category_id,
-    //             'shipper_gross_weight' => $request->shipper_gross_weight,
-    //             'master_packing' => $request->master_packing ?? 'No',
-    //             'gst' => $request->gst,
-    //             'status' => 1
-    //         ]);
-
-    //         if($request->states){
-    //             foreach ($request->states as $stateId => $stateData) {
-
-    //                 if(isset($stateData['enabled'])) {
-
-    //                     ProductState::create([
-    //                         'product_id'   => $product->id,
-    //                         'state_id'     => $stateId,
-    //                         'is_rpl'       => isset($stateData['rpl']) ? 1 : 0,
-    //                         'is_ncr'       => isset($stateData['ncr']) ? 1 : 0,
-    //                         'is_advance'   => isset($stateData['advance']) ? 1 : 0,
-    //                         'status'       => 1,
-    //                     ]);
-    //                 }
-    //             }
-    //         }
-    //         foreach ($request->packing_value as $index => $value) {
-
-    //             if (!$value) continue;
-
-    //             $packing = $product->packings()->create([
-    //                 'packing_value' => $value,
-    //                 'packing_size' => $request->packing_size[$index],
-    //                 'shipper_type' => $request->shipper_type[$index],
-    //                 'shipper_size' => $request->shipper_size[$index],
-    //                 'unit_in_shipper' => $request->unit_in_shipper[$index],
-    //                 'status' => isset($request->packing_status[$index]) ? 1 : 0,
-    //             ]);
-
-                
-    //             if(isset($request->packing_states[$index]) && is_array($request->packing_states[$index])) {
-    //                 foreach ($request->packing_states[$index] as $stateId) {
-    //                     if($stateId){
-    //                         PackingState::create([
-    //                             'packing_id' => $packing->id,
-    //                             'state_id' => $stateId,
-    //                         ]);
-    //                     }
-    //                 }
-    //             }
-    //         }
-    //     });
-
-    //     return redirect()->route('products.index')
-    //         ->with('success','Product created successfully');
-    // }
-
-    
     public function store(Request $request)
     {
         $request->validate([
@@ -194,6 +118,7 @@ class ProductController extends Controller
         return redirect()->route('products.index')
             ->with('success', 'Product created successfully');
     }
+
     public function edit(Product $product)
     {
         $product->load('packings.packingStates','productStates');
@@ -287,8 +212,7 @@ class ProductController extends Controller
             }
         });
 
-        return redirect()->route('products.index')
-            ->with('success', 'Product updated successfully');
+        return redirect()->route('products.index')->with('success', 'Product updated successfully');
     }
 
     public function destroy(Product $product)

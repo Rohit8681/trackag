@@ -33,8 +33,7 @@ class CropSubCategoryController extends Controller
             'status' => 1
         ]);
 
-        return redirect()->route('crop-sub-categories.index')
-            ->with('success','Sub Category created successfully');
+        return redirect()->route('crop-sub-categories.index')->with('success','Sub Category created successfully');
     }
 
     public function edit(CropSubCategory $cropSubCategory)
@@ -55,15 +54,13 @@ class CropSubCategoryController extends Controller
             'name' => $request->name
         ]);
 
-        return redirect()->route('crop-sub-categories.index')
-            ->with('success','Sub Category updated successfully');
+        return redirect()->route('crop-sub-categories.index')->with('success','Sub Category updated successfully');
     }
 
     public function destroy(CropSubCategory $cropSubCategory)
     {
         $cropSubCategory->delete();
 
-        return redirect()->route('crop-sub-categories.index')
-            ->with('success','Sub Category deleted successfully');
+        return redirect()->route('crop-sub-categories.index')->with('success','Sub Category deleted successfully');
     }
 }

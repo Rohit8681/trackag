@@ -39,9 +39,7 @@ class DepoController extends Controller
 
     public function create()
     {
-        // active states
         $states = State::where('status', 1)->orderBy('name')->get();
-        // $designation = Designation::where('status', 1)->orderBy('name')->get();
         $users = User::where('status','Active')->where('id', '!=', 1)->get();
         
         return view('admin.depos.create', compact('states','users'));

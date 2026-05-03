@@ -14,9 +14,6 @@ use Illuminate\Support\Facades\Auth;
 
 class BudgetController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index(Request $request)
     {
         $financial_year = $request->input('financial_year', date('Y') . '-' . (date('y') + 1));
@@ -33,12 +30,10 @@ class BudgetController extends Controller
 
         $budgets = $budgets->get();
 
-        $months = [
-            'april' => 4, 'may' => 5, 'june' => 6, 'july' => 7, 'august' => 8, 'september' => 9,
+        $months = ['april' => 4, 'may' => 5, 'june' => 6, 'july' => 7, 'august' => 8, 'september' => 9,
             'october' => 10, 'november' => 11, 'december' => 12, 'january' => 1, 'february' => 2, 'march' => 3
         ];
 
-        // If financial year is 2026-27, years are 2026 and 2027
         $years = explode('-', $financial_year);
         $startYear = $years[0];
         $endYear = count($years) > 1 ? '20' . $years[1] : $years[0] + 1;
@@ -50,7 +45,7 @@ class BudgetController extends Controller
                 
                 $achive = OrderItem::whereHas('order', function($q) use ($budget, $monthNum, $year) {
                     $q->where('user_id', $budget->user_id)
-                      ->where('status', 'dispatched') // Assuming only dispatched orders count as achievement
+                      ->where('status', 'dispatched') 
                       ->whereMonth('created_at', $monthNum)
                       ->whereYear('created_at', $year);
                 })->sum('grand_total');
@@ -68,9 +63,6 @@ class BudgetController extends Controller
         ));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $request->validate([
@@ -153,6 +145,7 @@ class BudgetController extends Controller
 
         return response()->json(['logs' => $logs]);
     }
+    
     public function show($id)
     {
         if ($id == 'report') {

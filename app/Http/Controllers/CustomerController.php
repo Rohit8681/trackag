@@ -74,7 +74,6 @@ class CustomerController extends Controller
 
         $customers = $query->latest()->get();
         
-        // $states = State::where('status', 1)->orderBy('name')->get();
         $companyCount = Company::count();
         $company = null;
 
@@ -85,15 +84,10 @@ class CustomerController extends Controller
                 $companyStates = array_map('intval', explode(',', $company->state));
 
                 if ($roleName === 'sub_admin') {
-                    $states = State::where('status', 1)
-                        ->whereIn('id', $companyStates)
-                        ->get();
+                    $states = State::where('status', 1)->whereIn('id', $companyStates)->get();
                 } else {
-                    $states = empty($stateIds)
-                        ? collect()
-                        : State::where('status', 1)
-                            ->whereIn('id', $stateIds)
-                            ->get();
+                    $states = empty($stateIds) ? collect()
+                        : State::where('status', 1)->whereIn('id', $stateIds)->get();
                 }
             } else {
                 $states = in_array($roleName, ['master_admin', 'sub_admin'])
@@ -104,10 +98,8 @@ class CustomerController extends Controller
             }
         } else {
             $states = in_array($roleName, ['master_admin', 'sub_admin'])
-                ? State::where('status', 1)->get()
-                : (empty($stateIds)
-                    ? collect()
-                    : State::where('status', 1)->whereIn('id', $stateIds)->get());
+                ? State::where('status', 1)->get() : (empty($stateIds)
+                ? collect() : State::where('status', 1)->whereIn('id', $stateIds)->get());
         }
         $financialYears = range(2025, now()->year + 1); // Example range
 
@@ -233,7 +225,6 @@ class CustomerController extends Controller
     public function destroy(string $id)
     {
         $customer = Customer::findOrFail($id);
-        // $this->authorizeCustomerAccess($customer);
         $customer->delete();
 
         return redirect()->route('customers.index')->with('success', 'Customer deleted successfully.');
@@ -244,9 +235,7 @@ class CustomerController extends Controller
         $executives = User::where('company_id', $companyId)
             ->whereDoesntHave('roles', function ($q) {
                 $q->where('name', 'master_admin');
-            })
-            ->select('id', 'name')
-            ->get();
+            })->select('id', 'name')->get();
 
         return response()->json(['executives' => $executives]);
     }
@@ -304,14 +293,10 @@ class CustomerController extends Controller
                 }
             }
 
-            return redirect()
-                ->route('customers.index')
-                ->with('success', $message);
+            return redirect()->route('customers.index')->with('success', $message);
 
         } catch (\Exception $e) {
-            return redirect()
-                ->back()
-                ->with('error', 'Import failed: '.$e->getMessage());
+            return redirect()->back()->with('error', 'Import failed: '.$e->getMessage());
         }
     }
 

@@ -48,29 +48,19 @@ class AttendanceController extends Controller
                 $companyStates = array_map('intval', explode(',', $company->state));
 
                 if ($roleName === 'sub_admin') {
-                    $states = State::where('status', 1)
-                        ->whereIn('id', $companyStates)
-                        ->get();
+                    $states = State::where('status', 1)->whereIn('id', $companyStates)->get();
                 } else {
-                    $states = empty($stateIds)
-                        ? collect()
-                        : State::where('status', 1)
-                            ->whereIn('id', $stateIds)
-                            ->get();
+                    $states = empty($stateIds) ? collect() : State::where('status', 1)->whereIn('id', $stateIds)->get();
                 }
             } else {
                 $states = in_array($roleName, ['master_admin', 'sub_admin'])
-                    ? State::where('status', 1)->get()
-                    : (empty($stateIds)
-                        ? collect()
-                        : State::where('status', 1)->whereIn('id', $stateIds)->get());
+                    ? State::where('status', 1)->get() : (empty($stateIds) ? collect()
+                    : State::where('status', 1)->whereIn('id', $stateIds)->get());
             }
         } else {
             $states = in_array($roleName, ['master_admin', 'sub_admin'])
-                ? State::where('status', 1)->get()
-                : (empty($stateIds)
-                    ? collect()
-                    : State::where('status', 1)->whereIn('id', $stateIds)->get());
+                ? State::where('status', 1)->get() : (empty($stateIds) ? collect()
+                : State::where('status', 1)->whereIn('id', $stateIds)->get());
         }
 
         $stateFilter = $request->state;
@@ -79,8 +69,7 @@ class AttendanceController extends Controller
         $usersQuery = User::where('status','Active');
 
         if (!in_array($roleName,['master_admin','sub_admin'])) {
-            $usersQuery->where('reporting_to',$loginUser->id)
-                    ->whereIn('state_id',$stateIds);
+            $usersQuery->where('reporting_to',$loginUser->id)->whereIn('state_id',$stateIds);
         }
 
         if ($stateFilter) {
@@ -98,16 +87,12 @@ class AttendanceController extends Controller
         $endDate   = Carbon::parse($month.'-01')->endOfMonth();
         $today     = now()->format('Y-m-d');
 
-        $trips = Trip::whereBetween('trip_date',[$startDate,$endDate])
-            ->get()
-            ->groupBy(fn($t)=>$t->user_id.'_'.Carbon::parse($t->trip_date)->format('Y-m-d'));
+        $trips = Trip::whereBetween('trip_date',[$startDate,$endDate])->get()->groupBy(fn($t)=>$t->user_id.'_'.Carbon::parse($t->trip_date)->format('Y-m-d'));
 
         $leaves   = Leave::where('status',1)->get();
         $holidays = Holiday::pluck('holiday_date')->toArray();
 
-        $savedAttendance = Attendance::whereBetween('attendance_date',[$startDate,$endDate])
-            ->get()
-            ->keyBy(fn($a)=>$a->user_id.'_'.$a->attendance_date->format('Y-m-d'));
+        $savedAttendance = Attendance::whereBetween('attendance_date',[$startDate,$endDate])->get()->keyBy(fn($a)=>$a->user_id.'_'.$a->attendance_date->format('Y-m-d'));
 
         $attendance = [];
 
@@ -150,30 +135,6 @@ class AttendanceController extends Controller
             'states','leaves','stateFilter','userFilter'
         ));
     }
-
-    // public function export(Request $request)
-    // {
-    //     $month = $request->input('month', now()->format('Y-m'));
-
-    //     // SAME FILTER LOGIC as index()
-    //     $usersQuery = User::where('status','Active');
-
-    //     if ($request->state) {
-    //         $usersQuery->where('state_id', $request->state);
-    //     }
-
-    //     if ($request->user_id) {
-    //         $usersQuery->where('id', $request->user_id);
-    //     }
-
-    //     $users = $usersQuery->orderBy('name')->get();
-
-    //     return Excel::download(
-    //         new AttendanceExport($month, $users),
-    //         'attendance_'.$month.'.xlsx'
-    //     );
-    // }
-
 
     public function export(Request $request)
     {
