@@ -43,10 +43,6 @@ return new class extends Migration
 
             // Address Section
             $table->text('address')->nullable();
-            // $table->string('state')->nullable();
-            // $table->string('district')->nullable();
-            // $table->string('tehsil')->nullable();
-            // $table->string('city')->nullable();
             $table->foreignId('state_id')->nullable()->constrained('states')->onDelete('set null');
             $table->foreignId('district_id')->nullable()->constrained('districts')->onDelete('set null');
             $table->foreignId('city_id')->nullable()->constrained('cities')->onDelete('set null');
@@ -58,7 +54,6 @@ return new class extends Migration
             $table->string('longitude')->nullable();
             $table->string('pincode')->nullable();
             $table->bigInteger('slab_designation_id')->nullable();
-            // $table->foreignId('pincode_id')->nullable()->constrained('pincodes')->onDelete('set null');
 
             $table->foreignId('company_id')->nullable()->constrained('companies')->onDelete('cascade');
             // $table->enum('user_level', ['master_admin', 'company_admin', 'user'])->default('user');
@@ -71,7 +66,6 @@ return new class extends Migration
 
             // Status (extra status, different from is_active)
             $table->string('status')->default('Active');
-
             $table->text('fcm_token')->nullable();
         });
 
