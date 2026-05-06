@@ -29,7 +29,7 @@ class StockController extends Controller
                         'packing_id' => $packing->id,
                         'packing_value' => $packing->packing_value,
                         'packing_size' => $packing->packing_size,
-                        'label' => $packing->packing_value . ' ' . $packing->packing_size,
+                        'packing' => $packing->packing_value . ' ' . $packing->packing_size,
                     ];
                 })
             ];
