@@ -24,6 +24,7 @@ class ApiAuthController extends BaseController
             'login_id'   => 'required|string',
             'password'   => 'required',
             'company_id' => 'nullable|string',
+            'fcm_token'  => 'nullable|string',
         ]);
         if ($validator->fails()) {
             return $this->sendError('Validation errors', $validator->errors(), 200);
@@ -81,6 +82,9 @@ class ApiAuthController extends BaseController
         $token = $user->createToken('mobile-token')->plainTextToken;
 
         $user->last_seen = now();
+        if ($request->fcm_token) {
+            $user->fcm_token = $request->fcm_token;
+        }
         $user->save();
         
         $existingMobileSession = UserSession::where('user_id', $user->id)
@@ -115,6 +119,7 @@ class ApiAuthController extends BaseController
             'company_code' => 'required|string',
             'company_mobile' => 'required|string',
             'password' => 'required|string',
+            'fcm_token' => 'nullable|string',
         ]);
 
         if ($validator->fails()) {
@@ -180,8 +185,11 @@ class ApiAuthController extends BaseController
         $user->tokens()->delete();
         $token = $user->createToken('mobile-token')->plainTextToken;
 
-        // 8️⃣ Update last_seen
+        // 8️⃣ Update last_seen and fcm_token
         $user->last_seen = now();
+        if ($request->fcm_token) {
+            $user->fcm_token = $request->fcm_token;
+        }
         $user->save();
 
         return $this->sendResponse([
@@ -197,6 +205,7 @@ class ApiAuthController extends BaseController
 
         if ($user) {
             $user->last_seen = null;
+            $user->fcm_token = null;
             $user->save();
 
             // ✅ Update last active session record
@@ -288,7 +297,7 @@ class ApiAuthController extends BaseController
 
     public function getApklist()
     {
-        $apks = ApkUpload::latest()->get(['id', 'version_code', 'version_name', 'file_path', 'created_at']);
+        $apks = ApkUpload::latest()->get(['id', 'version_code', 'version_name', 'whats_new', 'file_path', 'created_at']);
 
         $apks->transform(function ($apk) {
             $apk->file_url = asset('storage/' . $apk->file_path);

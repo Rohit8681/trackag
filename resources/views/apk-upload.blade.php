@@ -31,14 +31,20 @@
 
             <div class="mb-3">
                 <label for="versionCode" class="form-label">Version Code</label>
-                <input type="text" class="form-control" id="versionCode" name="versionCode" required>
+                <input type="text" class="form-control" id="versionCode" name="versionCode" value="{{ $apkData->version_code ?? '' }}" required>
                 @error('versionCode') <div class="text-danger">{{ $message }}</div> @enderror
             </div>
 
             <div class="mb-3">
                 <label for="versionName" class="form-label">Version Name</label>
-                <input type="text" class="form-control" id="versionName" name="versionName" required>
+                <input type="text" class="form-control" id="versionName" name="versionName" value="{{ $apkData->version_name ?? '' }}" required>
                 @error('versionName') <div class="text-danger">{{ $message }}</div> @enderror
+            </div>
+
+            <div class="mb-3">
+                <label for="whats_new" class="form-label">What's New</label>
+                <textarea class="form-control" id="whats_new" name="whats_new" rows="3">{{ $apkData->whats_new ?? '' }}</textarea>
+                @error('whats_new') <div class="text-danger">{{ $message }}</div> @enderror
             </div>
 
             <button type="submit" class="btn btn-primary">Upload</button>

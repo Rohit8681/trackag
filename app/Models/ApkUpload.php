@@ -12,6 +12,7 @@ class ApkUpload extends Model
     protected $fillable = [
         'version_code',
         'version_name',
+        'whats_new',
         'file_path',
     ];
 }

@@ -31,11 +31,12 @@ class ApkUploadController extends Controller
         $apk = ApkUpload::find($request->main_id);
 
         if ($apk) {
-            $apk->update(['version_code' => $request->versionCode,'version_name' => $request->versionName,'file_path' => $storedPath]);
+            $apk->update(['version_code' => $request->versionCode,'version_name' => $request->versionName,'whats_new' => $request->whats_new,'file_path' => $storedPath]);
         } else {
             ApkUpload::create([
                 'version_code' => $request->versionCode,
                 'version_name' => $request->versionName,
+                'whats_new' => $request->whats_new,
                 'file_path' => $storedPath,
             ]);
         }
