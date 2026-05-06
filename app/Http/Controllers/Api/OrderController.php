@@ -337,4 +337,90 @@ class OrderController extends Controller
             'message' => 'Order deleted successfully'
         ]);
     }
+
+    public function orderDetails($id)
+    {
+
+        $order = Order::with([
+            'customer',
+            'items.product',
+            'items.packing',
+            'items.dispatches.detail'
+        ])->findOrFail($id);
+
+        $data = [
+            'order_id' => $order->id,
+            'order_no' => $order->order_no,
+            'order_date' => $order->created_at->format('d-m-Y'),
+            'customer_name' => $order->customer->agro_name ?? '',
+            'status' => $order->status,
+            'remark' => $order->remark,
+            // Legacy/Single dispatch info from Order table
+            'transport_name' => $order->transport_name,
+            'lr_number' => $order->lr_number,
+            'dispatch_date' => $order->dispatch_date ? \Carbon\Carbon::parse($order->dispatch_date)->format('d-m-Y') : null,
+            'dispatch_image' => $order->dispatch_image ? asset('storage/' . $order->dispatch_image) : null,
+            
+            'items' => $order->items->map(function($item) {
+                $dispatched_qty = $item->dispatches->sum('dispatch_qty');
+                return [
+                    'product_name' => $item->product->product_name ?? '',
+                    'packing' => ($item->packing->packing_value ?? '') . ' ' . ($item->packing->packing_size ?? ''),
+                    'price' => $item->price,
+                    'qty' => $item->qty,
+                    'shipper_size' => $item->shipper_size,
+                    'gst_percent' => $item->product->gst ?? 0,
+                    'total_price' => $item->grand_total,
+                    'dispatched_qty' => $dispatched_qty,
+                    'pending_qty' => $item->shipper_size - $dispatched_qty,
+                ];
+            }),
+            
+            'dispatches' => []
+        ];
+
+        // Group dispatches by LR if any
+        $dispatches = [];
+        foreach ($order->items as $item) {
+            foreach ($item->dispatches as $dispatch) {
+                $detail = $dispatch->detail;
+                if ($detail) {
+                    $key = $detail->lr_number . '_' . $detail->dispatch_date;
+                    if (!isset($dispatches[$key])) {
+                        $dispatches[$key] = [
+                            'transport_name' => $detail->transport_name,
+                            'lr_number' => $detail->lr_number,
+                            'vehicle_no' => $detail->vehicle_no,
+                            'dispatch_date' => $detail->dispatch_date ? \Carbon\Carbon::parse($detail->dispatch_date)->format('d-m-Y') : null,
+                            'dispatch_image' => $detail->dispatch_image ? asset('storage/' . $detail->dispatch_image) : null,
+                            'items' => []
+                        ];
+                    }
+                    
+                    $unitPrice = $item->price;
+                    $dispatchQty = $dispatch->dispatch_qty;
+                    $totalPriceBeforeGst = $unitPrice * $dispatchQty;
+                    $gstPercent = $item->product->gst ?? 0;
+                    $gstAmount = ($totalPriceBeforeGst * $gstPercent) / 100;
+                    $totalPriceWithGst = $totalPriceBeforeGst + $gstAmount;
+
+                    $dispatches[$key]['items'][] = [
+                        'product_name' => $item->product->product_name ?? '',
+                        'packing' => ($item->packing->packing_value ?? '') . ' ' . ($item->packing->packing_size ?? ''),
+                        'price_per_unit' => $unitPrice,
+                        'dispatch_qty' => $dispatchQty,
+                        'gst_percent' => $gstPercent,
+                        'total_price' => round($totalPriceWithGst, 2)
+                    ];
+                }
+            }
+        }
+        $data['dispatches'] = array_values($dispatches);
+
+        return response()->json([
+            'status' => true,
+            'data' => $data
+        ]);
+    }
 }
+
