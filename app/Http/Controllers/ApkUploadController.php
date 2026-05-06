@@ -23,11 +23,11 @@ class ApkUploadController extends Controller
         ]);
 
         $file = $request->file('apkFile');
-        dd($request->all());
+        
         // 🧩 Force .apk extension rakhiye
         $fileName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
         $storedPath = $file->storeAs('apk_files', $fileName . '.apk', 'public');
-
+        dd($storedPath);
         $apk = ApkUpload::find($request->main_id);
 
         if ($apk) {
