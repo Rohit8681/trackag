@@ -183,9 +183,11 @@
             <div class="card card-premium mb-4">
                 <div class="card-header bg-warning text-dark d-flex justify-content-between align-items-center">
                     <h3 class="card-title mb-0 fw-bold">Budget Achievements</h3>
+                    @if(auth()->user()->hasRole('master_admin') || auth()->user()->hasRole('sub_admin'))
                     <button type="button" class="btn btn-dark btn-sm btn-premium ms-auto" data-bs-toggle="modal" data-bs-target="#addBudgetModal">
                         <i class="fas fa-plus-circle me-1"></i> Set Target
                     </button>
+                    @endif
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
