@@ -3,53 +3,112 @@
 @push('styles')
     <style>
         .dashboard-page {
-            background: #f4f6f9;
+            background:
+                linear-gradient(180deg, #eef3f8 0, #f7f9fc 260px, #f7f9fc 100%);
             min-height: calc(100vh - 57px);
         }
 
         .dashboard-header {
-            padding: 1.25rem 0 0;
+            padding: 1.5rem 0 0;
+        }
+
+        .dashboard-hero {
+            align-items: center;
+            background: #0f172a;
+            border: 1px solid rgba(255, 255, 255, .12);
+            border-radius: .5rem;
+            box-shadow: 0 18px 40px rgba(15, 23, 42, .14);
+            display: flex;
+            justify-content: space-between;
+            min-height: 128px;
+            overflow: hidden;
+            padding: 1.35rem 1.5rem;
+            position: relative;
+        }
+
+        .dashboard-hero::after {
+            background:
+                radial-gradient(circle at 20% 20%, rgba(59, 130, 246, .25), transparent 30%),
+                radial-gradient(circle at 75% 40%, rgba(20, 184, 166, .2), transparent 28%);
+            content: "";
+            inset: 0;
+            opacity: .9;
+            position: absolute;
+        }
+
+        .dashboard-hero > * {
+            position: relative;
+            z-index: 1;
         }
 
         .dashboard-title {
-            color: #1f2937;
-            font-weight: 700;
+            color: #fff;
+            font-size: 1.65rem;
+            font-weight: 800;
             letter-spacing: 0;
         }
 
         .dashboard-subtitle {
-            color: #6b7280;
+            color: #cbd5e1;
             font-size: .95rem;
             margin-bottom: 0;
         }
 
         .dashboard-breadcrumb {
-            background: #fff;
-            border: 1px solid #e5e7eb;
+            background: rgba(255, 255, 255, .1);
+            border: 1px solid rgba(255, 255, 255, .18);
             border-radius: .5rem;
-            box-shadow: 0 8px 20px rgba(15, 23, 42, .04);
             padding: .55rem .85rem;
+        }
+
+        .dashboard-breadcrumb,
+        .dashboard-breadcrumb .breadcrumb-item,
+        .dashboard-breadcrumb .breadcrumb-item.active {
+            color: #dbeafe;
+        }
+
+        .dashboard-breadcrumb a {
+            color: #fff;
+            text-decoration: none;
+        }
+
+        .dashboard-breadcrumb .breadcrumb-item + .breadcrumb-item::before {
+            color: #93c5fd;
+        }
+
+        .stats-row {
+            margin-top: -1.15rem;
+            position: relative;
+            z-index: 2;
         }
 
         .metric-card {
             background: #fff;
-            border: 1px solid #e5e7eb;
+            border: 1px solid rgba(148, 163, 184, .24);
             border-radius: .5rem;
-            box-shadow: 0 12px 24px rgba(15, 23, 42, .06);
+            box-shadow: 0 14px 30px rgba(15, 23, 42, .08);
             display: flex;
             flex-direction: column;
-            min-height: 148px;
+            min-height: 156px;
             overflow: hidden;
             position: relative;
+            transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+        }
+
+        .metric-card:hover {
+            border-color: rgba(59, 130, 246, .28);
+            box-shadow: 0 18px 38px rgba(15, 23, 42, .12);
+            transform: translateY(-2px);
         }
 
         .metric-card::before {
             content: "";
-            height: 4px;
+            bottom: 0;
+            height: auto;
             left: 0;
             position: absolute;
-            right: 0;
             top: 0;
+            width: 4px;
         }
 
         .metric-card.primary::before {
@@ -73,12 +132,12 @@
             display: flex;
             gap: 1rem;
             justify-content: space-between;
-            padding: 1.25rem 1.25rem 1rem;
+            padding: 1.35rem 1.35rem .9rem;
         }
 
         .metric-label {
             color: #6b7280;
-            font-size: .82rem;
+            font-size: .76rem;
             font-weight: 700;
             margin-bottom: .35rem;
             text-transform: uppercase;
@@ -86,10 +145,17 @@
 
         .metric-value {
             color: #111827;
-            font-size: 2rem;
+            font-size: 2.15rem;
             font-weight: 800;
             line-height: 1;
             margin: 0;
+        }
+
+        .metric-note {
+            color: #94a3b8;
+            font-size: .82rem;
+            font-weight: 600;
+            margin-top: .4rem;
         }
 
         .metric-icon {
@@ -125,67 +191,87 @@
 
         .metric-link {
             align-items: center;
-            border-top: 1px solid #f1f5f9;
-            color: #334155;
+            color: #475569;
             display: flex;
             font-size: .9rem;
             font-weight: 700;
             gap: .45rem;
             justify-content: space-between;
             margin-top: auto;
-            padding: .8rem 1.25rem;
+            padding: .9rem 1.35rem 1.1rem;
             text-decoration: none;
         }
 
         .metric-link:hover {
-            background: #f8fafc;
             color: #0f172a;
         }
 
         .database-pill {
             align-items: center;
-            background: #eef2ff;
-            border: 1px solid #c7d2fe;
+            background: #fff;
+            border: 1px solid rgba(148, 163, 184, .24);
             border-radius: .5rem;
-            color: #3730a3;
+            box-shadow: 0 10px 24px rgba(15, 23, 42, .06);
+            color: #334155;
             display: inline-flex;
             font-size: .85rem;
             font-weight: 700;
             gap: .5rem;
-            padding: .65rem .9rem;
+            padding: .75rem .95rem;
+        }
+
+        .database-pill i {
+            color: #4f46e5;
         }
 
         .dashboard-card {
-            border: 1px solid #e5e7eb;
+            border: 1px solid rgba(148, 163, 184, .24);
             border-radius: .5rem;
-            box-shadow: 0 12px 24px rgba(15, 23, 42, .06);
+            box-shadow: 0 14px 30px rgba(15, 23, 42, .08);
             overflow: hidden;
         }
 
         .dashboard-card .card-header {
             align-items: center;
             background: #fff;
-            border-bottom: 1px solid #e5e7eb;
+            border-bottom: 1px solid #e2e8f0;
             display: flex;
             justify-content: space-between;
-            padding: 1rem 1.25rem;
+            padding: 1.1rem 1.35rem;
         }
 
         .dashboard-card .card-title {
             color: #111827;
-            font-size: 1rem;
+            font-size: 1.05rem;
             font-weight: 800;
             margin: 0;
         }
 
+        .dashboard-card-subtitle {
+            color: #64748b;
+            font-size: .86rem;
+            margin: .2rem 0 0;
+        }
+
         .online-count {
-            background: #dcfce7;
-            border: 1px solid #bbf7d0;
+            align-items: center;
+            background: #ecfdf5;
+            border: 1px solid #a7f3d0;
             border-radius: 999px;
             color: #166534;
+            display: inline-flex;
             font-size: .8rem;
             font-weight: 700;
+            gap: .4rem;
             padding: .3rem .65rem;
+        }
+
+        .online-count::before {
+            background: #22c55e;
+            border-radius: 50%;
+            content: "";
+            height: 8px;
+            width: 8px;
         }
 
         .dashboard-table {
@@ -193,20 +279,29 @@
         }
 
         .dashboard-table thead th {
-            background: #f8fafc;
+            background: #f9fafb;
             border-bottom: 1px solid #e5e7eb;
             color: #475569;
             font-size: .78rem;
             letter-spacing: .02em;
-            padding: .9rem 1rem;
+            padding: .95rem 1.25rem;
             text-transform: uppercase;
             vertical-align: middle;
         }
 
         .dashboard-table tbody td {
+            border-color: #eef2f7;
             color: #334155;
-            padding: 1rem;
+            padding: 1rem 1.25rem;
             vertical-align: middle;
+        }
+
+        .dashboard-table tbody tr {
+            transition: background-color .16s ease;
+        }
+
+        .dashboard-table tbody tr:hover {
+            background: #f8fafc;
         }
 
         .user-cell {
@@ -218,9 +313,9 @@
 
         .user-avatar {
             align-items: center;
-            background: #e0f2fe;
+            background: linear-gradient(135deg, #dbeafe, #ccfbf1);
             border-radius: 50%;
-            color: #0369a1;
+            color: #0f172a;
             display: inline-flex;
             flex: 0 0 40px;
             font-weight: 800;
@@ -241,9 +336,16 @@
             font-size: .85rem;
         }
 
+        .mobile-value,
+        .last-seen-value {
+            color: #475569;
+            font-weight: 650;
+        }
+
         .badge-soft {
             border-radius: 999px;
             display: inline-flex;
+            font-size: .78rem;
             font-weight: 700;
             margin: .1rem;
             padding: .4rem .6rem;
@@ -261,14 +363,39 @@
 
         .empty-state {
             color: #64748b;
-            padding: 2rem 1rem;
+            padding: 2.4rem 1rem;
             text-align: center;
         }
 
+        .permission-btn {
+            align-items: center;
+            border-color: #bae6fd;
+            color: #0369a1;
+            display: inline-flex;
+            font-weight: 700;
+            gap: .35rem;
+        }
+
+        .permission-btn:hover {
+            background: #e0f2fe;
+            border-color: #7dd3fc;
+            color: #075985;
+        }
+
         @media (max-width: 575.98px) {
+            .dashboard-hero {
+                align-items: flex-start;
+                flex-direction: column;
+                gap: 1rem;
+                padding: 1.2rem;
+            }
+
             .dashboard-breadcrumb {
-                margin-top: 1rem;
                 width: 100%;
+            }
+
+            .stats-row {
+                margin-top: .75rem;
             }
 
             .metric-value {
@@ -288,7 +415,7 @@
     <main class="app-main dashboard-page">
         <div class="content-header dashboard-header">
             <div class="container-fluid">
-                <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center mb-4">
+                <div class="dashboard-hero mb-4">
                     <div>
                         <h3 class="dashboard-title mb-1">Dashboard</h3>
                         <p class="dashboard-subtitle">Overview of users, access control and active sessions.</p>
@@ -305,13 +432,14 @@
             <div class="container-fluid">
 
                 {{-- Stats Summary --}}
-                <div class="row g-3">
+                <div class="row g-3 stats-row">
                     <div class="col-xl-3 col-md-6">
                         <div class="metric-card primary">
                             <div class="metric-card-body">
                                 <div>
                                     <div class="metric-label">Total Users</div>
                                     <h3 class="metric-value">{{ $totalUsers }}</h3>
+                                    <div class="metric-note">Registered accounts</div>
                                 </div>
                                 <span class="metric-icon primary">
                                     <i class="fas fa-users"></i>
@@ -331,6 +459,7 @@
                                     <div>
                                         <div class="metric-label">Total Roles</div>
                                         <h3 class="metric-value">{{ $totalRoles }}</h3>
+                                        <div class="metric-note">Access groups</div>
                                     </div>
                                     <span class="metric-icon success">
                                         <i class="fas fa-user-tag"></i>
@@ -349,6 +478,7 @@
                                     <div>
                                         <div class="metric-label">Total Permissions</div>
                                         <h3 class="metric-value">{{ $totalPermissions }}</h3>
+                                        <div class="metric-note">Assigned capabilities</div>
                                     </div>
                                     <span class="metric-icon warning">
                                         <i class="fas fa-key"></i>
@@ -368,6 +498,7 @@
                                         <div>
                                             <div class="metric-label">Total Customers</div>
                                             <h3 class="metric-value">{{ $totalCustomers }}</h3>
+                                            <div class="metric-note">Customer records</div>
                                         </div>
                                         <span class="metric-icon danger">
                                             <i class="fas fa-user-friends"></i>
@@ -395,7 +526,10 @@
                 {{-- Online Users --}}
                 <div class="card dashboard-card mt-4">
                     <div class="card-header">
-                        <h3 class="card-title">Online Users Details</h3>
+                        <div>
+                            <h3 class="card-title">Online Users Details</h3>
+                            <p class="dashboard-card-subtitle">Currently active users with roles, permissions and last activity.</p>
+                        </div>
                         <span class="online-count">{{ $onlineUsers->count() }} Online</span>
                     </div>
                     <div class="card-body table-responsive p-0">
@@ -421,7 +555,7 @@
                                                 </div>
                                             </div>
                                         </td>
-                                        <td>{{ $user->mobile ?? 'N/A' }}</td>
+                                        <td><span class="mobile-value">{{ $user->mobile ?? 'N/A' }}</span></td>
                                         <td>
                                             @forelse ($user->getRoleNames() as $role)
                                                 <span class="badge-soft badge-soft-success">{{ $role }}</span>
@@ -430,8 +564,8 @@
                                             @endforelse
                                         </td>
                                         <td>
-                                            <button class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#permissionsModal-{{ $user->id }}">
-                                                <i class="fas fa-eye me-1"></i> View
+                                            <button class="btn btn-sm btn-outline-info permission-btn" data-bs-toggle="modal" data-bs-target="#permissionsModal-{{ $user->id }}">
+                                                <i class="fas fa-eye"></i> View
                                             </button>
 
                                             {{-- Permissions Modal --}}
@@ -455,7 +589,7 @@
                                                 </div>
                                             </div>
                                         </td>
-                                        <td>{{ $user->last_seen ? $user->last_seen->diffForHumans() : 'N/A' }}</td>
+                                        <td><span class="last-seen-value">{{ $user->last_seen ? $user->last_seen->diffForHumans() : 'N/A' }}</span></td>
                                     </tr>
                                 @empty
                                     <tr>
