@@ -123,7 +123,7 @@
 </head>
 <body>
     @php
-        $logoPath = public_path('img/TRACKAGLOGO.jpeg');
+        $logoPath = $companyLogoPath ?: public_path('img/TRACKAGLOGO.jpeg');
         $orderDate = optional($order->created_at)->format('jS F Y') ?? '-';
         $dispatchDate = !empty($dispatchInfo['dispatch_date'])
             ? \Carbon\Carbon::parse($dispatchInfo['dispatch_date'])->format('jS F Y')
@@ -180,7 +180,7 @@
                     </tr>
                     <tr>
                         <td>Price (Per Unit)</td>
-                        <td>&#8377;{{ number_format($item['price'], 2) }}</td>
+                        <td>Rs. {{ number_format($item['price'], 2) }}</td>
                     </tr>
                     <tr>
                         <td>Dispatch QTY</td>
@@ -192,14 +192,14 @@
                     </tr>
                     <tr class="total-row">
                         <td>Total Price</td>
-                        <td>&#8377;{{ number_format($item['total_price'], 2) }}</td>
+                        <td>Rs. {{ number_format($item['total_price'], 2) }}</td>
                     </tr>
                 </table>
             </div>
         @endforeach
 
         <div class="card grand-total">
-            Grand Total: &#8377;{{ number_format($grandTotal, 2) }}
+            Grand Total: Rs. {{ number_format($grandTotal, 2) }}
         </div>
     </div>
 </body>

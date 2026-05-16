@@ -12,6 +12,7 @@ use App\Models\State;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
@@ -360,8 +361,9 @@ class OrderController extends Controller
         $dispatchInfo = $this->getOrderDispatchInfo($order);
         $items = $this->getOrderPdfItems($order);
         $grandTotal = collect($items)->sum('total_price');
+        $companyLogoPath = $this->getCompanyLogoPath($request);
 
-        $pdf = Pdf::loadView('api.order.pdf', compact('order', 'dispatchInfo', 'items', 'grandTotal'))
+        $pdf = Pdf::loadView('api.order.pdf', compact('order', 'dispatchInfo', 'items', 'grandTotal', 'companyLogoPath'))
             ->setPaper('a4', 'portrait');
 
         $fileName = 'order_'.$order->id.'_'.time().'.pdf';
@@ -423,5 +425,32 @@ class OrderController extends Controller
                 'total_price' => round($totalPrice, 2),
             ];
         })->toArray();
+    }
+
+    private function getCompanyLogoPath(Request $request): ?string
+    {
+        $companyCode = $request->header('X-Company-Code');
+
+        if (!$companyCode) {
+            return null;
+        }
+
+        $centralConnection = config('tenancy.database.central_connection', 'mysql');
+        $company = DB::connection($centralConnection)
+            ->table('companies')
+            ->where('code', $companyCode)
+            ->first();
+
+        if (!$company || empty($company->logo)) {
+            return null;
+        }
+
+        $publicLogoPath = public_path('storage/' . $company->logo);
+        if (file_exists($publicLogoPath)) {
+            return $publicLogoPath;
+        }
+
+        $storageLogoPath = base_path('storage/app/public/' . $company->logo);
+        return file_exists($storageLogoPath) ? $storageLogoPath : null;
     }
 }
