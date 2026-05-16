@@ -9,9 +9,11 @@ use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\ProductPacking;
 use App\Models\State;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class OrderController extends Controller
 {
@@ -338,7 +340,7 @@ class OrderController extends Controller
         ]);
     }
 
-    public function orderDetails($id)
+    public function orderDetails(Request $request, $id)
     {
 
         $order = Order::with([
@@ -346,81 +348,80 @@ class OrderController extends Controller
             'items.product',
             'items.packing',
             'items.dispatches.detail'
-        ])->findOrFail($id);
+        ])->where('user_id', auth()->id())->find($id);
 
-        $data = [
-            'order_id' => $order->id,
-            'order_no' => $order->order_no,
-            'order_date' => $order->created_at->format('d-m-Y'),
-            'customer_name' => $order->customer->agro_name ?? '',
-            'status' => $order->status,
-            'remark' => $order->remark,
-            // Legacy/Single dispatch info from Order table
-            'transport_name' => $order->transport_name,
-            'lr_number' => $order->lr_number,
-            'dispatch_date' => $order->dispatch_date ? \Carbon\Carbon::parse($order->dispatch_date)->format('d-m-Y') : null,
-            'dispatch_image' => $order->dispatch_image ? asset('storage/' . $order->dispatch_image) : null,
-            
-            'items' => $order->items->map(function($item) {
-                $dispatched_qty = $item->dispatches->sum('dispatch_qty');
-                return [
-                    'product_name' => $item->product->product_name ?? '',
-                    'packing' => ($item->packing->packing_value ?? '') . ' ' . ($item->packing->packing_size ?? ''),
-                    'price' => $item->price,
-                    'qty' => $item->qty,
-                    'shipper_size' => $item->shipper_size,
-                    'gst_percent' => $item->product->gst ?? 0,
-                    'total_price' => $item->grand_total,
-                    'dispatched_qty' => $dispatched_qty,
-                    'pending_qty' => $item->shipper_size - $dispatched_qty,
-                ];
-            }),
-            
-            'dispatches' => []
-        ];
+        if (!$order) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Order not found',
+            ], 404);
+        }
 
-        // Group dispatches by LR if any
-        $dispatches = [];
+        $dispatchInfo = $this->getOrderDispatchInfo($order);
+        $items = $this->getOrderPdfItems($order);
+        $grandTotal = collect($items)->sum('total_price');
+
+        $pdf = Pdf::loadView('api.order.pdf', compact('order', 'dispatchInfo', 'items', 'grandTotal'))
+            ->setPaper('a4', 'portrait');
+
+        $fileName = 'order_'.$order->id.'_'.time().'.pdf';
+        $path = 'order_pdfs/'.$fileName;
+
+        Storage::disk('public')->put($path, $pdf->output());
+        $pdfUrl = $request->getSchemeAndHttpHost() . '/storage/' . $path;
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Order PDF generated successfully',
+            'data' => [
+                'order_id' => $order->id,
+                'order_no' => $order->order_no,
+                'pdf_url' => $pdfUrl,
+            ],
+        ]);
+    }
+
+    private function getOrderDispatchInfo(Order $order): array
+    {
         foreach ($order->items as $item) {
             foreach ($item->dispatches as $dispatch) {
-                $detail = $dispatch->detail;
-                if ($detail) {
-                    $key = $detail->lr_number . '_' . $detail->dispatch_date;
-                    if (!isset($dispatches[$key])) {
-                        $dispatches[$key] = [
-                            'transport_name' => $detail->transport_name,
-                            'lr_number' => $detail->lr_number,
-                            'vehicle_no' => $detail->vehicle_no,
-                            'dispatch_date' => $detail->dispatch_date ? \Carbon\Carbon::parse($detail->dispatch_date)->format('d-m-Y') : null,
-                            'dispatch_image' => $detail->dispatch_image ? asset('storage/' . $detail->dispatch_image) : null,
-                            'items' => []
-                        ];
-                    }
-                    
-                    $unitPrice = $item->price;
-                    $dispatchQty = $dispatch->dispatch_qty;
-                    $totalPriceBeforeGst = $unitPrice * $dispatchQty;
-                    $gstPercent = $item->product->gst ?? 0;
-                    $gstAmount = ($totalPriceBeforeGst * $gstPercent) / 100;
-                    $totalPriceWithGst = $totalPriceBeforeGst + $gstAmount;
-
-                    $dispatches[$key]['items'][] = [
-                        'product_name' => $item->product->product_name ?? '',
-                        'packing' => ($item->packing->packing_value ?? '') . ' ' . ($item->packing->packing_size ?? ''),
-                        'price_per_unit' => $unitPrice,
-                        'dispatch_qty' => $dispatchQty,
-                        'gst_percent' => $gstPercent,
-                        'total_price' => round($totalPriceWithGst, 2)
+                if ($dispatch->detail) {
+                    return [
+                        'transport_name' => $dispatch->detail->transport_name,
+                        'lr_number' => $dispatch->detail->lr_number,
+                        'vehicle_no' => $dispatch->detail->vehicle_no,
+                        'dispatch_date' => $dispatch->detail->dispatch_date,
                     ];
                 }
             }
         }
-        $data['dispatches'] = array_values($dispatches);
 
-        return response()->json([
-            'status' => true,
-            'data' => $data
-        ]);
+        return [
+            'transport_name' => $order->transport_name,
+            'lr_number' => $order->lr_number,
+            'vehicle_no' => null,
+            'dispatch_date' => $order->dispatch_date,
+        ];
+    }
+
+    private function getOrderPdfItems(Order $order): array
+    {
+        return $order->items->map(function ($item) {
+            $dispatchQty = $item->dispatches->sum('dispatch_qty');
+            $qty = $dispatchQty > 0 ? $dispatchQty : ($item->qty ?? 0);
+            $gstPercent = $item->product->gst ?? $item->gst ?? 0;
+            $price = (float) ($item->price ?? 0);
+            $totalBeforeGst = $price * $qty;
+            $totalPrice = $totalBeforeGst + (($totalBeforeGst * $gstPercent) / 100);
+
+            return [
+                'product_name' => $item->product->product_name ?? '-',
+                'packing' => trim(($item->packing->packing_value ?? '') . ' ' . ($item->packing->packing_size ?? '')) ?: '-',
+                'price' => $price,
+                'dispatch_qty' => $qty,
+                'gst_percent' => $gstPercent,
+                'total_price' => round($totalPrice, 2),
+            ];
+        })->toArray();
     }
 }
-

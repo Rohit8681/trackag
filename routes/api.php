@@ -1,6 +1,7 @@
 <?php
 use App\Http\Controllers\Api\ApiAuthController;
 use App\Http\Controllers\Api\ApiTripController;
+use App\Http\Controllers\Api\BudgetApiController;
 use App\Http\Controllers\Api\CommanController;
 use App\Http\Controllers\Api\ExpenseController;
 use App\Http\Controllers\Api\FailedJobController;
@@ -96,5 +97,7 @@ Route::middleware([TenantAuthenticate::class])->group(function () {
     Route::get('/monthly-plan/packing-list', [MonthlyPlanApiController::class, 'getProductPackingList']);
     Route::get('/monthly-plan/list', [MonthlyPlanApiController::class, 'getPlanList']);
     Route::post('/monthly-plan/bulk-store', [MonthlyPlanApiController::class, 'bulkStorePlan']);
+
+    Route::get('/budget/annual', [BudgetApiController::class, 'annualBudget']);
     Route::post('/update-fcm-token', [ApiAuthController::class, 'updateToken']);
 });

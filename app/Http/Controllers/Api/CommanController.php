@@ -141,6 +141,10 @@ class CommanController extends Controller
             'P'  => 0,
             'A'  => 0,
             'H'  => 0,
+            'PL' => 0,
+            'CL' => 0,
+            'WO' => 0,
+            'NA' => 0,
         ];
         
         $leaves = Leave::where('status', 1)->get();
@@ -198,9 +202,41 @@ class CommanController extends Controller
         return response()->json([
             'status'     => true,
             'month_year' => $startDate->format('F Y'),
-            'summary'    => $summary,
+            'summary'    => $this->formatAttendanceSummary($summary),
             'calendar'   => $calendar
         ]);
+    }
+
+    private function formatAttendanceSummary(array $summary): array
+    {
+        $order = ['P', 'A', 'H', 'PL', 'CL', 'WO', 'NA'];
+        $colors = [
+            'P'  => '#28a745',
+            'A'  => '#dc3545',
+            'H'  => '#17a2b8',
+            'PL' => '#ffc107',
+            'CL' => '#6f42c1',
+            'WO' => '#6c757d',
+            'NA' => '#000000',
+        ];
+
+        $orderedSummary = [];
+        foreach ($order as $code) {
+            $orderedSummary[$code] = $summary[$code] ?? 0;
+        }
+
+        foreach ($summary as $code => $count) {
+            if (!array_key_exists($code, $orderedSummary)) {
+                $orderedSummary[$code] = $count;
+            }
+        }
+
+        return collect($orderedSummary)->map(function ($count, $code) use ($colors) {
+            return [
+                $code => $count,
+                'color_code' => $colors[$code] ?? '#000000',
+            ];
+        })->values()->toArray();
     }
 
 }
