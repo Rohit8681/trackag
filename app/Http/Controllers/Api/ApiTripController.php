@@ -11,6 +11,9 @@ use App\Models\TravelMode;
 use App\Models\Trip;
 use App\Models\User;
 use App\Models\TripLog;
+use App\Models\Farmer;
+use App\Models\FarmVisit;
+use App\Models\PartyVisit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -524,5 +527,242 @@ class ApiTripController extends BaseController
             });
 
         return $this->sendResponse($trips, "Trips fetched successfully");
+    }
+
+    public function viewLog($tripId)
+    {
+        $trip = Trip::with('user')->find($tripId);
+        if (!$trip) {
+            return $this->sendError('Trip not found', [], 404);
+        }
+
+        $logs = TripLog::where('trip_id', $trip->id)
+            ->orderBy('recorded_at')
+            ->get()
+            ->map(function ($log) {
+                return [
+                    'latitude'     => $log->latitude,
+                    'longitude'    => $log->longitude,
+                    'battery'      => $log->battery_percentage !== null
+                                        ? $log->battery_percentage . '%'
+                                        : 'N/A',
+                    'gps_status'   => $log->gps_status,
+                    'mobile_status' => $log->mobile_status,
+                    'recorded_at'  => Carbon::parse($log->recorded_at)->format('d-m-Y H:i:s a'),
+                    'created_at'   => optional($log->created_at)->format('d-m-Y H:i:s a'),
+                    'updated_at'   => optional($log->updated_at)->format('d-m-Y H:i:s a'),
+                ];
+            });
+
+        $tripData = [
+            'id'            => $trip->id,
+            'trip_date'     => Carbon::parse($trip->trip_date)->format('d-m-Y'),
+            'employee_name' => optional($trip->user)->name ?? 'N/A',
+            'start_time'    => $trip->start_time,
+            'end_time'      => $trip->end_time,
+            'status'        => $trip->status,
+        ];
+
+        return $this->sendResponse([
+            'trip' => $tripData,
+            'logs' => $logs
+        ], "Trip log fetched successfully");
+    }
+
+    public function viewMap($tripId)
+    {
+        $trip = Trip::with('user')->find($tripId);
+        if (!$trip) {
+            return $this->sendError('Trip not found', [], 404);
+        }
+
+        $tripLogs = TripLog::where('trip_id', $trip->id)
+            ->where('latitude', '!=', 0)
+            ->where('longitude', '!=', 0)
+            ->orderBy('recorded_at')
+            ->get(['latitude', 'longitude', 'recorded_at'])
+            ->map(function ($log) {
+                return [
+                    'latitude'    => $log->latitude,
+                    'longitude'   => $log->longitude,
+                    'recorded_at' => Carbon::parse($log->recorded_at)->format('d-m-Y H:i:s a'),
+                ];
+            });
+
+        $partyVisits = PartyVisit::with('customer')
+            ->whereDate('visited_date', $trip->trip_date)
+            ->where('user_id', $trip->user_id)
+            ->whereNotNull('latitude')
+            ->whereNotNull('longitude')
+            ->get()
+            ->map(function ($visit) {
+                return [
+                    'latitude'      => $visit->latitude,
+                    'longitude'     => $visit->longitude,
+                    'check_in_time' => $visit->check_in_time
+                        ? Carbon::parse($visit->check_in_time)
+                            ->timezone('Asia/Kolkata')
+                            ->format('d-m-Y h:i A')
+                        : null,
+                    'customer'      => [
+                        'agro_name' => optional($visit->customer)->agro_name ?? 'Customer'
+                    ],
+                ];
+            });
+
+        $farmers = Farmer::where('user_id', $trip->user_id)
+            ->whereDate('created_at', $trip->trip_date)
+            ->whereNotNull('latitude')
+            ->whereNotNull('longitude')
+            ->get()
+            ->map(function ($farmer) {
+                return [
+                    'latitude'    => $farmer->latitude,
+                    'longitude'   => $farmer->longitude,
+                    'created_at'  => Carbon::parse($farmer->created_at)->format('d-m-Y H:i:s a'),
+                    'farmer_name' => $farmer->farmer_name ?? 'Farmer',
+                ];
+            });
+
+        $farmVisits = FarmVisit::with('farmer')
+            ->where('user_id', $trip->user_id)
+            ->whereDate('created_at', $trip->trip_date)
+            ->whereNotNull('latitude')
+            ->whereNotNull('longitude')
+            ->get()
+            ->map(function ($visit) {
+                return [
+                    'latitude'    => $visit->latitude,
+                    'longitude'   => $visit->longitude,
+                    'created_at'  => Carbon::parse($visit->created_at)->format('d-m-Y H:i:s a'),
+                    'farmer_name' => optional($visit->farmer)->farmer_name ?? 'Farmer',
+                ];
+            });
+
+        $customers = Customer::where('user_id', $trip->user_id)
+            ->whereDate('created_at', $trip->trip_date)
+            ->whereNotNull('latitude')
+            ->whereNotNull('longitude')
+            ->get()
+            ->map(function ($customer) {
+                return [
+                    'latitude'   => $customer->latitude,
+                    'longitude'  => $customer->longitude,
+                    'created_at' => Carbon::parse($customer->created_at)->format('d-m-Y H:i:s a'),
+                    'agro_name'  => $customer->agro_name ?? 'Customer',
+                ];
+            });
+
+        $tripData = [
+            'id'            => $trip->id,
+            'trip_date'     => Carbon::parse($trip->trip_date)->format('d-m-Y'),
+            'employee_name' => optional($trip->user)->name ?? 'N/A',
+            'start_time'    => $trip->start_time,
+            'end_time'      => $trip->end_time,
+            'status'        => $trip->status,
+        ];
+
+        return $this->sendResponse([
+            'trip'        => $tripData,
+            'tripLogs'    => $tripLogs,
+            'partyVisits' => $partyVisits,
+            'farmers'     => $farmers,
+            'farmVisits'  => $farmVisits,
+            'customers'   => $customers,
+        ], "Trip map details fetched successfully");
+    }
+
+    public function viewMapWebview($tripId)
+    {
+        $trip = Trip::with('user')->find($tripId);
+        if (!$trip) {
+            abort(404, 'Trip not found');
+        }
+
+        $tripLogs = TripLog::where('trip_id', $trip->id)
+            ->where('latitude', '!=', 0)
+            ->where('longitude', '!=', 0)
+            ->orderBy('recorded_at')
+            ->get(['latitude', 'longitude', 'recorded_at'])
+            ->map(function ($log) {
+                return [
+                    'latitude'    => $log->latitude,
+                    'longitude'   => $log->longitude,
+                    'recorded_at' => Carbon::parse($log->recorded_at)->format('d-m-Y H:i:s a'),
+                ];
+            });
+
+        $partyVisits = PartyVisit::with('customer')
+            ->whereDate('visited_date', $trip->trip_date)
+            ->where('user_id', $trip->user_id)
+            ->whereNotNull('latitude')
+            ->whereNotNull('longitude')
+            ->get()
+            ->map(function ($visit) {
+                return [
+                    'latitude'      => $visit->latitude,
+                    'longitude'     => $visit->longitude,
+                    'check_in_time' => $visit->check_in_time
+                        ? Carbon::parse($visit->check_in_time)
+                            ->timezone('Asia/Kolkata')
+                            ->format('d-m-Y h:i A')
+                        : null,
+                    'customer'      => [
+                        'agro_name' => optional($visit->customer)->agro_name ?? 'Customer'
+                    ],
+                ];
+            });
+
+        $farmers = Farmer::where('user_id', $trip->user_id)
+            ->whereDate('created_at', $trip->trip_date)
+            ->whereNotNull('latitude')
+            ->whereNotNull('longitude')
+            ->get()
+            ->map(function ($farmer) {
+                return [
+                    'latitude'    => $farmer->latitude,
+                    'longitude'   => $farmer->longitude,
+                    'created_at'  => Carbon::parse($farmer->created_at)->format('d-m-Y H:i:s a'),
+                    'farmer_name' => $farmer->farmer_name ?? 'Farmer',
+                ];
+            });
+
+        $farmVisits = FarmVisit::with('farmer')
+            ->where('user_id', $trip->user_id)
+            ->whereDate('created_at', $trip->trip_date)
+            ->whereNotNull('latitude')
+            ->whereNotNull('longitude')
+            ->get()
+            ->map(function ($visit) {
+                return [
+                    'latitude'    => $visit->latitude,
+                    'longitude'   => $visit->longitude,
+                    'created_at'  => Carbon::parse($visit->created_at)->format('d-m-Y H:i:s a'),
+                    'farmer_name' => optional($visit->farmer)->farmer_name ?? 'Farmer',
+                ];
+            });
+
+        $customers = Customer::where('user_id', $trip->user_id)
+            ->whereDate('created_at', $trip->trip_date)
+            ->whereNotNull('latitude')
+            ->whereNotNull('longitude')
+            ->get()
+            ->map(function ($customer) {
+                return [
+                    'latitude'   => $customer->latitude,
+                    'longitude'  => $customer->longitude,
+                    'created_at' => Carbon::parse($customer->created_at)->format('d-m-Y H:i:s a'),
+                    'agro_name'  => $customer->agro_name ?? 'Customer',
+                ];
+            });
+
+        return view('admin.trips.map_webview', compact(
+            'trip',
+            'tripLogs',
+            'partyVisits',
+            'farmers',
+            'farmVisits',
+            'customers'
+        ));
     }
 }
