@@ -122,12 +122,6 @@ class FarmVisitController extends Controller
 
         $videoPaths = [];
 
-        // if ($request->hasFile('videos')) {
-        //     foreach ($request->file('videos') as $video) {
-        //         $path = $video->store('farm_visits/videos', 'public');
-        //         $videoPaths[] = $path;
-        //     }
-        // }
         if ($request->hasFile('videos')) {
             foreach ($request->file('videos') as $video) {
 
@@ -222,15 +216,6 @@ class FarmVisitController extends Controller
 
         $videoPaths = $visit->videos ?? [];
 
-        // if ($request->hasFile('videos')) {
-
-        //     foreach ($request->file('videos') as $video) {
-
-        //         $path = $video->store('farm_visits/videos', 'public');
-
-        //         $videoPaths[] = $path;
-        //     }
-        // }
         if ($request->hasFile('videos')) {
             foreach ($request->file('videos') as $video) {
 

@@ -23,10 +23,6 @@ class MonthlyPlanApiController extends Controller
 
         $search = $request->input('search');
         
-        // Determine the target month and year (default to current or next month context)
-        // If today is April, we might be planning for May. 
-        // Based on image context (Mar, Apr, May), if today is April, May is the target.
-        // We'll allow passing month/year, else default to "next month" context.
         $targetMonth = $request->input('month', date('n') == 12 ? 1 : date('n') + 1);
         $targetYear = $request->input('year', date('n') == 12 ? date('Y') + 1 : date('Y'));
 

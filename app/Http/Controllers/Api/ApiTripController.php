@@ -37,18 +37,6 @@ class ApiTripController extends BaseController
         // Return the response
         return $this->sendResponse($success, 'Tour details fetch successfully');
     }
-    // public function fetchCustomer()
-    // {
-
-    //     $user = Auth::user(); 
-
-    //     $customers = Customer::where('is_active', 1)
-    //         ->where('user_id', $user->id)
-    //         ->latest()
-    //         ->get();
-
-    //     return $this->sendResponse($customers, "Customers fetched successfully");
-    // }
 
     public function fetchCustomer()
     {
@@ -472,11 +460,6 @@ class ApiTripController extends BaseController
             'trip_id' => $request->trip_id
         ]);
 
-        // return response()->json([
-        //     "status" => true,
-        //     "message" => "GPS Log Saved Successfully",
-        //     "data" => $log
-        // ], 200);
         return $this->sendResponse($log, "GPS Log Saved Successfully");
     }
 

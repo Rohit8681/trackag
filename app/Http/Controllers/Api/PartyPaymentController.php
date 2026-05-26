@@ -57,11 +57,6 @@ class PartyPaymentController extends BaseController
             'image'        => $imagePath,
         ]);
 
-        // return response()->json([
-        //     'status' => true,
-        //     'message' => 'Party payment stored successfully',
-        //     'data' => $payment
-        // ], 201);
         return $this->sendResponse($payment, "Party payment stored successfully");
     }
 }

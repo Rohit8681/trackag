@@ -48,10 +48,6 @@ class CommanController extends Controller
     {
         $query = Brochure::with('state:id,name');
 
-        // if ($request->filled('state_id')) {
-        //     $query->where('state_id', $request->state_id);
-        // }
-
         $brochures = $query->latest()->get()->map(function ($item) {
             return [
                 'id'        => $item->id,
