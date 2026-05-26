@@ -192,14 +192,9 @@ class ApiAuthController extends BaseController
         }
         $user->save();
 
-        // 9️⃣ Get user role and attach it to the user object
-        $role = $user->getRoleNames()->first();
-        $user->role = $role;
-
         return $this->sendResponse([
             'token' => $token,
             'user' => $user,
-            'role' => $role,
             'company' => $company
         ], 'User logged in successfully.');
     }
