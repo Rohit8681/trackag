@@ -49,7 +49,7 @@
                                     <th>Product Name</th>
                                     <th>Category</th>
                                     <th>Item Code</th>
-                                    <th>Gross Weight (kg)</th>
+                                    <th>Packing</th>
                                     <th>Master Packing</th>
                                     <th>Status</th>
                                     <th style="width:90px;">Action</th>
@@ -78,7 +78,15 @@
                                         </td>
 
                                         <td>
-                                            {{ $product->shipper_gross_weight ?? '-' }}
+                                            @if($product->packings->isNotEmpty())
+                                                @foreach($product->packings as $packing)
+                                                    <span class="badge bg-light text-dark border">
+                                                        {{ $packing->packing_value }} {{ $packing->packing_size }}
+                                                    </span>
+                                                @endforeach
+                                            @else
+                                                -
+                                            @endif
                                         </td>
 
                                         <td>

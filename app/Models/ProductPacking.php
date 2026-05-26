@@ -20,6 +20,12 @@ class ProductPacking extends Model
         'status'
     ];
 
+    protected $casts = [
+        'packing_value' => 'float',
+        'shipper_size' => 'float',
+        'unit_in_shipper' => 'float',
+    ];
+
     public function product()
     {
         return $this->belongsTo(Product::class);

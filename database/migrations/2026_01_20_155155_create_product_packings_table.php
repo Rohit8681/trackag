@@ -14,11 +14,11 @@ return new class extends Migration
         Schema::create('product_packings', function (Blueprint $table) {
             $table->id();
             $table->foreignId('product_id')->constrained()->cascadeOnDelete();
-            $table->integer('packing_value');
+            $table->decimal('packing_value', 10, 2);
             $table->enum('packing_size', ['GM','KG','ML','LTR','UNIT']);
             $table->enum('shipper_type', ['Bag','Box','Bucket','Drum']);
             $table->decimal('shipper_size', 10, 2);
-            $table->integer('unit_in_shipper');
+            $table->decimal('unit_in_shipper', 10, 2);
             $table->boolean('status')->default(1);
             $table->timestamps();
         });

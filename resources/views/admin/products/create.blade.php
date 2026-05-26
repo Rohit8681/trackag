@@ -180,6 +180,7 @@
                                 <label class="form-label">GST<span class="text-danger">*</span></label>
                                 <select name="gst" class="form-select" required>
                                     <option value="0">0%</option>
+                                    <option value="5">5%</option>
                                     <option value="12">12%</option>
                                     <option value="18">18%</option>
                                     <option value="24">24%</option>
@@ -256,8 +257,8 @@
                             <tbody>
                                 <tr>
                                     <td>
-                                        <input type="number" step="0.01" min="0" step="0.01"
-                                            oninput="this.value = this.value < 0 ? 0 : this.value" name="packing_value[]"
+                                        <input type="number" step="0.01" min="0"
+                                            oninput="if(this.value < 0) this.value = 0;" name="packing_value[]"
                                             class="form-control form-control-sm packing_value">
                                         <span class="text-danger error-text packing_value_error"></span>
                                     </td>
@@ -283,14 +284,14 @@
                                         <span class="text-danger error-text shipper_type_error"></span>
                                     </td>
                                     <td>
-                                        <input type="number" step="0.01" min="0" step="0.01"
-                                            oninput="this.value = this.value < 0 ? 0 : this.value" name="shipper_size[]"
+                                        <input type="number" step="0.01" min="0"
+                                            oninput="if(this.value < 0) this.value = 0;" name="shipper_size[]"
                                             class="form-control form-control-sm shipper_size">
                                         <span class="text-danger error-text shipper_size_error"></span>
                                     </td>
                                     <td>
-                                        <input type="number" step="0.01" min="0" step="0.01"
-                                            oninput="this.value = this.value < 0 ? 0 : this.value" name="unit_in_shipper[]"
+                                        <input type="number" step="0.01" min="0"
+                                            oninput="if(this.value < 0) this.value = 0;" name="unit_in_shipper[]"
                                             class="form-control form-control-sm unit_in_shipper" readonly>
                                     </td>
                                     <td>
@@ -317,8 +318,8 @@
                             <tbody>
                                 <tr id="packingRowTemplate">
                                     <td>
-                                        <input type="number" step="0.01" min="0" step="0.01"
-                                            oninput="this.value = this.value < 0 ? 0 : this.value" name="packing_value[]"
+                                        <input type="number" step="0.01" min="0"
+                                            oninput="if(this.value < 0) this.value = 0;" name="packing_value[]"
                                             class="form-control form-control-sm packing_value">
                                     </td>
                                     <td>
@@ -341,13 +342,13 @@
                                         </select>
                                     </td>
                                     <td>
-                                        <input type="number" step="0.01" min="0" step="0.01"
-                                            oninput="this.value = this.value < 0 ? 0 : this.value" name="shipper_size[]"
+                                        <input type="number" step="0.01" min="0"
+                                            oninput="if(this.value < 0) this.value = 0;" name="shipper_size[]"
                                             class="form-control form-control-sm shipper_size">
                                     </td>
                                     <td>
-                                        <input type="number" step="0.01" min="0" step="0.01"
-                                            oninput="this.value = this.value < 0 ? 0 : this.value" name="unit_in_shipper[]"
+                                        <input type="number" step="0.01" min="0"
+                                            oninput="if(this.value < 0) this.value = 0;" name="unit_in_shipper[]"
                                             class="form-control form-control-sm unit_in_shipper" readonly>
                                     </td>
                                     <td>
@@ -453,7 +454,7 @@
                         units = (shipperSize * 1000) / packingValue;
                     }
 
-                    row.find('.unit_in_shipper').val(Math.floor(units));
+                    row.find('.unit_in_shipper').val(units % 1 === 0 ? units : Math.round(units * 100) / 100);
                 } else {
                     row.find('.unit_in_shipper').val('');
                 }
