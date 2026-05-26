@@ -238,24 +238,6 @@ class ApiAuthController extends BaseController
         return $this->sendResponse($success, 'User detail fetch successfully');
     }
 
-    // public function profile(Request $request)
-    // {
-    //     try {
-    //         $this->switchToTenantDB($request);
-
-    //         $userModel = new \App\Models\User();
-    //         if ($request->header('X-Company-Code')) {
-    //             $userModel->setConnection('tenant'); // tenant DB
-    //         }
-
-    //         $user = $userModel->find($request->user()->id);
-
-    //         return $this->sendResponse(['user' => $user], 'User detail fetched successfully');
-    //     } catch (\Exception $e) {
-    //         return $this->sendError('Error fetching profile', $e->getMessage(), 500);
-    //     }
-    // }
-
     protected function switchToTenantDB(Request $request)
     {
         $companyCode = $request->header('X-Company-Code'); // tenant company code from header
@@ -278,22 +260,6 @@ class ApiAuthController extends BaseController
 
         return $tenant;
     }
-
-    // public function getApklist(){
-    //     $apks = ApkUpload::latest()->get(['id', 'version_code', 'version_name', 'file_path', 'created_at']);
-
-    //     // Convert file path to public URL
-    //     $apks->transform(function ($apk) {
-    //         $apk->file_url = asset('storage/' . $apk->file_path);
-    //         return $apk;
-    //     });
-
-    //     return response()->json([
-    //         'status' => true,
-    //         'message' => 'APK list fetched successfully.',
-    //         'data' => $apks
-    //     ]);
-    // }
 
     public function getApklist()
     {
