@@ -80,7 +80,7 @@ class ApiTripController extends BaseController
         if ($user->hasRole('master_admin')) {
             // Master admin sees all trips
         } elseif ($user->hasRole('sub_admin')) {
-            $query->where('company_id', $user->company_id);
+            // $query->where('company_id', $user->company_id);
         } else {
             $query->where(function ($q) use ($user) {
                 $q->where('user_id', $user->id);
