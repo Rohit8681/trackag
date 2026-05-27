@@ -467,18 +467,28 @@ class ApiTripController extends BaseController
     {
         $user = Auth::user();
 
-        $trips = Trip::with([
+        $query = Trip::with([
                 'tourType',
                 'travelMode',
                 'purpose',
-                'purposeData'
-            ])
-            ->where('user_id', $user->id)
+                'purposeData',
+                'user'
+            ]);
+
+        if (!$user->hasRole('master_admin') && !$user->hasRole('sub_admin')) {
+            $userIds = User::where('reporting_to', $user->id)->pluck('id');
+            $userIds->push($user->id);
+
+            $query->whereIn('user_id', $userIds);
+        }
+
+        $trips = $query
             ->latest()
             ->get()
             ->map(function ($data) {
                 return [
                     'id' => $data->id,
+                    'employee_name' => optional($data->user)->name,
                     'trip_date' => $data->trip_date,
                     'tour_type' => optional($data->tourType)->name,
                     'travel_mode' => optional($data->travelMode)->name,
