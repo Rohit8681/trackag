@@ -280,6 +280,7 @@
                                             <option>Box</option>
                                             <option>Bucket</option>
                                             <option>Drum</option>
+                                            <option>Unit</option>
                                         </select>
                                         <span class="text-danger error-text shipper_type_error"></span>
                                     </td>
@@ -339,6 +340,7 @@
                                             <option>Box</option>
                                             <option>Bucket</option>
                                             <option>Drum</option>
+                                            <option>Unit</option>
                                         </select>
                                     </td>
                                     <td>
@@ -399,8 +401,58 @@
         }
 
         $(document).ready(function () {
-            initSelect2($('#packingTable tbody tr:first'));
+            let firstRow = $('#packingTable tbody tr:first');
+            initSelect2(firstRow);
+            applyShipperTypeBehavior(firstRow);
             filterPackingStates(); // initial filter
+        });
+
+        /* -----------------------------
+           SHIPPER TYPE BEHAVIOR
+        --------------------------------*/
+        function applyShipperTypeBehavior(row) {
+            let shipperType = row.find('select[name="shipper_type[]"]').val();
+            let shipperSizeField = row.find('.shipper_size');
+            let unitField = row.find('.unit_in_shipper');
+
+            if (shipperType === 'Unit') {
+                shipperSizeField.val(1).prop('readonly', true);
+                unitField.val(1).prop('readonly', true);
+            } else {
+                shipperSizeField.prop('readonly', false);
+                unitField.prop('readonly', true);
+                calculateUnits(row);
+            }
+        }
+
+        function calculateUnits(row) {
+            let shipperType = row.find('select[name="shipper_type[]"]').val();
+            let packingValue = parseFloat(row.find('.packing_value').val()) || 0;
+            let shipperSize = parseFloat(row.find('.shipper_size').val()) || 0;
+            let packingSize = row.find('select[name="packing_size[]"]') .val();
+
+            if (shipperType === 'Unit') {
+                row.find('.shipper_size').val(1);
+                row.find('.unit_in_shipper').val(1);
+                return;
+            }
+
+            if (packingValue > 0 && shipperSize > 0) {
+                let units = '';
+                if (packingSize === 'KG' || packingSize === 'LTR') {
+                    units = shipperSize / packingValue;
+                } else {
+                    units = (shipperSize * 1000) / packingValue;
+                }
+                row.find('.unit_in_shipper').val(units % 1 === 0 ? units : Math.round(units * 100) / 100);
+            } else {
+                row.find('.unit_in_shipper').val('');
+            }
+        }
+
+        $(document).on('change', 'select[name="shipper_type[]"]', function () {
+            let row = $(this).closest('tr');
+            applyShipperTypeBehavior(row);
         });
 
         /* -----------------------------
@@ -410,6 +462,11 @@
 
             let row = $('#packingRowTemplate').clone().removeAttr('id');
 
+            row.find('input').val('');
+            row.find('select').val(null);
+            row.find('.shipper_size').prop('readonly', false);
+            row.find('.unit_in_shipper').prop('readonly', true);
+
             row.find('.packing-states')
                 .attr('name', `packing_states[${packingIndex}][]`)
                 .addClass('packing-state-dropdown');
@@ -417,6 +474,7 @@
             $('#packingTable tbody').append(row);
 
             initSelect2(row);
+            applyShipperTypeBehavior(row);
             filterPackingStates(); // apply filter on new row
 
             packingIndex++;

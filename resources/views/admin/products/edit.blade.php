@@ -251,7 +251,7 @@
                                     </td>
                                     <td>
                                         <select name="shipper_type[]" class="form-select form-select-sm">
-                                            @foreach(['Bag','Box','Bucket','Drum'] as $type)
+                                            @foreach(['Bag','Box','Bucket','Drum','Unit'] as $type)
                                                 <option value="{{ $type }}"
                                                     {{ $pack->shipper_type == $type ? 'selected' : '' }}>
                                                     {{ $type }}
@@ -319,6 +319,7 @@
                                             <option>Box</option>
                                             <option>Bucket</option>
                                             <option>Drum</option>
+                                            <option>Unit</option>
                                         </select>
                                     </td>
                                     <td>
@@ -383,9 +384,58 @@ $(document).ready(function(){
     // Init select2 for all existing rows
     $('#packingTable tbody tr').each(function(){
         initSelect2($(this));
+        applyShipperTypeBehavior($(this));
     });
 
     filterPackingStates(); // 🔥 apply filter on page load
+});
+
+/* -----------------------------
+   SHIPPER TYPE BEHAVIOR
+--------------------------------*/
+function applyShipperTypeBehavior(row){
+    let shipperType = row.find('select[name="shipper_type[]"]').val();
+    let shipperSizeField = row.find('.shipper_size');
+    let unitField = row.find('.unit_in_shipper');
+
+    if(shipperType === 'Unit'){
+        shipperSizeField.val(1).prop('readonly', true);
+        unitField.val(1).prop('readonly', true);
+    } else {
+        shipperSizeField.prop('readonly', false);
+        unitField.prop('readonly', true);
+        calculateUnits(row);
+    }
+}
+
+function calculateUnits(row){
+    let shipperType = row.find('select[name="shipper_type[]"]').val();
+    let packingValue = parseFloat(row.find('.packing_value').val()) || 0;
+    let shipperSize = parseFloat(row.find('.shipper_size').val()) || 0;
+    let packingSize = row.find('select[name="packing_size[]"]') .val();
+
+    if(shipperType === 'Unit'){
+        row.find('.shipper_size').val(1);
+        row.find('.unit_in_shipper').val(1);
+        return;
+    }
+
+    if(packingValue > 0 && shipperSize > 0){
+        let units = '';
+        if(packingSize === 'KG' || packingSize === 'LTR'){
+            units = shipperSize / packingValue;
+        } else {
+            units = (shipperSize * 1000) / packingValue;
+        }
+        row.find('.unit_in_shipper').val(units % 1 === 0 ? units : Math.round(units * 100) / 100);
+    } else {
+        row.find('.unit_in_shipper').val('');
+    }
+}
+
+$(document).on('change', 'select[name="shipper_type[]"]', function(){
+    let row = $(this).closest('tr');
+    applyShipperTypeBehavior(row);
 });
 
 /* -----------------------------
@@ -397,6 +447,8 @@ $('#addRow').click(function(){
 
     row.find('input').val('');
     row.find('select').val(null);
+    row.find('.shipper_size').prop('readonly', false);
+    row.find('.unit_in_shipper').prop('readonly', true);
 
     // Replace index in name
     row.find('.packing-states')
@@ -407,6 +459,7 @@ $('#addRow').click(function(){
     $('#packingTable tbody').append(row);
 
     initSelect2(row);
+    applyShipperTypeBehavior(row);
     filterPackingStates(); // 🔥 apply filter to new row
 
     packingIndex++;
@@ -430,25 +483,7 @@ $(document).on(
 function () {
 
     let row = $(this).closest('tr');
-
-    let packingValue = parseFloat(row.find('.packing_value').val()) || 0;
-    let shipperSize  = parseFloat(row.find('.shipper_size').val()) || 0;
-    let packingSize  = row.find('select[name="packing_size[]"]').val();
-
-    let units = '';
-
-    if (packingValue > 0 && shipperSize > 0) {
-
-        if (packingSize === 'KG' || packingSize === 'LTR') {
-            units = shipperSize / packingValue;
-        } else {
-            units = (shipperSize * 1000) / packingValue;
-        }
-
-        row.find('.unit_in_shipper').val(units % 1 === 0 ? units : Math.round(units * 100) / 100);
-    } else {
-        row.find('.unit_in_shipper').val('');
-    }
+    calculateUnits(row);
 });
 
 /* --------------------------------------------------
