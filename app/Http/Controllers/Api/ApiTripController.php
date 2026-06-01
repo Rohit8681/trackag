@@ -524,68 +524,74 @@ class ApiTripController extends BaseController
 
 
     public function getMyTrips(Request $request)
-{
-    $user = Auth::user();
+    {
+        $user = Auth::user();
 
-    $query = Trip::with([
-        'tourType',
-        'travelMode',
-        'purpose',
-        'purposeData',
-        'user'
-    ]);
+        $query = Trip::with([
+            'tourType',
+            'travelMode',
+            'purpose',
+            'purposeData',
+            'user'
+        ]);
 
-    if (!$user->hasRole('master_admin') && !$user->hasRole('sub_admin')) {
-        $userIds = User::where('reporting_to', $user->id)->pluck('id');
-        $userIds->push($user->id);
+        if ($request->filled('view_map_log')) {
 
-        $query->whereIn('user_id', $userIds);
-    }
+            if (!$user->hasRole('master_admin') && !$user->hasRole('sub_admin')) {
+                $userIds = User::where('reporting_to', $user->id)->pluck('id');
+                $userIds->push($user->id);
 
-    // Default today's data
-    if (!$request->filled('from_date') && !$request->filled('to_date')) {
-        // $query->whereDate('trip_date', today());
-    } else {
-        // Filter data
-        if ($request->filled('from_date')) {
-            $query->whereDate('trip_date', '>=', $request->from_date);
+                $query->whereIn('user_id', $userIds);
+            }
+
+            // Default today's data
+            if (!$request->filled('from_date') && !$request->filled('to_date')) {
+                $query->whereDate('trip_date', today());
+            } else {
+                // Filter data
+                if ($request->filled('from_date')) {
+                    $query->whereDate('trip_date', '>=', $request->from_date);
+                }
+
+                if ($request->filled('to_date')) {
+                    $query->whereDate('trip_date', '<=', $request->to_date);
+                }
+            }
+
+        }else{
+            $query->where('user_id', $user->id);
         }
 
-        if ($request->filled('to_date')) {
-            $query->whereDate('trip_date', '<=', $request->to_date);
-        }
+        $trips = $query->latest()->get()->map(function ($data) {
+            return [
+                'id' => $data->id,
+                'employee_name' => optional($data->user)->name,
+                'trip_date' => $data->trip_date,
+                'tour_type' => optional($data->tourType)->name,
+                'travel_mode' => optional($data->travelMode)->name,
+                'tour_purpose' => optional($data->purposeData)->name,
+                'start_time' => $data->start_time,
+                'end_time' => $data->end_time,
+                'visit_place' => $data->place_to_visit,
+                'starting_km' => $data->starting_km,
+                'end_km' => $data->end_km,
+                'travel_km' => ($data->end_km && $data->starting_km)
+                    ? ((float)$data->end_km - (float)$data->starting_km)
+                    : 0,
+                'gps_km' => $data->total_distance_km ?? 0,
+                'km_diff' => ($data->end_km && $data->starting_km)
+                    ? ((float)$data->end_km - (float)$data->starting_km)
+                    : 0,
+                'approval_status' => $data->approval_status,
+                'ta_exp' => "",
+                'da_exp' => "",
+                'other_exp' => "",
+                'total' => "",
+            ];
+        });
+
+        return $this->sendResponse($trips, "Trips fetched successfully");
     }
-
-    $trips = $query->latest()->get()->map(function ($data) {
-        return [
-            'id' => $data->id,
-            'employee_name' => optional($data->user)->name,
-            'trip_date' => $data->trip_date,
-            'tour_type' => optional($data->tourType)->name,
-            'travel_mode' => optional($data->travelMode)->name,
-            'tour_purpose' => optional($data->purposeData)->name,
-            'start_time' => $data->start_time,
-            'end_time' => $data->end_time,
-            'visit_place' => $data->place_to_visit,
-            'starting_km' => $data->starting_km,
-            'end_km' => $data->end_km,
-            'travel_km' => ($data->end_km && $data->starting_km)
-                ? ((float)$data->end_km - (float)$data->starting_km)
-                : 0,
-            'gps_km' => $data->total_distance_km ?? 0,
-            'km_diff' => ($data->end_km && $data->starting_km)
-                ? ((float)$data->end_km - (float)$data->starting_km)
-                : 0,
-            'approval_status' => $data->approval_status,
-            'ta_exp' => "",
-            'da_exp' => "",
-            'other_exp' => "",
-            'total' => "",
-        ];
-    });
-
-    return $this->sendResponse($trips, "Trips fetched successfully");
-}
 
     public function viewLog($tripId)
     {
