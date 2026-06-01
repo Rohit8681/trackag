@@ -544,7 +544,7 @@ class ApiTripController extends BaseController
 
     // Default today's data
     if (!$request->filled('from_date') && !$request->filled('to_date')) {
-        $query->whereDate('trip_date', today());
+        // $query->whereDate('trip_date', today());
     } else {
         // Filter data
         if ($request->filled('from_date')) {
