@@ -120,7 +120,7 @@ class OrderController extends Controller
                 'packing_value' => $packing->packing_value,
                 'packing_size' => $packing->packing_size,
                 'shipper_type' => $packing->shipper_type,
-                'shipper_size' => $packing->shipper_size,
+                'shipper_size' => (string) $packing->shipper_size,
                 'unit_in_shipper' => $packing->unit_in_shipper,
                 'qty' => $qty,
                 'gst_percent' => $gstPercent,
