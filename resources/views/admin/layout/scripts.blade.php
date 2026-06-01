@@ -36,7 +36,7 @@
 {{-- <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB_-uOyQimLqBkDW_Vr8d88GX6Qk0lyksI&libraries=places"> --}}
 {{-- <script src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_MAPS_API_KEY') }}&libraries=places" ></script> --}}
 <script
-    src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_MAPS_API_KEY') }}&libraries=places,marker&callback=initMap"
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD9aLsgkoreyI0W-T7sh-DNjTxVLf_uK6k&libraries=places,marker&callback=initMap"
     async defer>
 </script>
 
