@@ -525,6 +525,7 @@ class ApiTripController extends BaseController
 
     public function getMyTrips(Request $request)
     {
+        Log::info('getMyTrips Request Params', $request->all());
         $user = Auth::user();
 
         $query = Trip::with([
