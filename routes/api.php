@@ -13,6 +13,9 @@ use App\Http\Controllers\Api\FarmVisitController;
 use App\Http\Controllers\Api\MonthlyPlanApiController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\StockController;
+use App\Http\Controllers\Api\TallyAuthController;
+use App\Http\Controllers\Api\TallyController;
+use App\Http\Middleware\EnsureTallyAccessToken;
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\TenantAuthenticate;
 
@@ -22,6 +25,19 @@ Route::post('/login_new', [ApiAuthController::class, 'login_new']);
 Route::get('locations', [LocationApiController::class, 'index']);
 Route::post('/failedJobs', [FailedJobController::class, 'store']);
 Route::get('/apk-list', [ApiAuthController::class, 'getApklist']);
+
+Route::prefix('tally')->group(function () {
+    Route::post('/login', [TallyAuthController::class, 'login']);
+
+    Route::middleware(EnsureTallyAccessToken::class)->group(function () {
+        Route::get('/party-sync', [TallyController::class, 'partySync']);
+        Route::post('/party-sync', [TallyController::class, 'partySync']);
+        Route::get('/sales-bill', [TallyController::class, 'salesBill']);
+        Route::post('/sales-bill', [TallyController::class, 'salesBill']);
+        Route::get('/opening-closing', [TallyController::class, 'openingClosing']);
+        Route::post('/opening-closing', [TallyController::class, 'openingClosing']);
+    });
+});
 
 Route::middleware([TenantAuthenticate::class])->group(function () {
     Route::post('/logout', [ApiAuthController::class, 'logout']);
