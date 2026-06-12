@@ -3,19 +3,19 @@
 @section('title', 'Trip Route Map | Trackag')
 
 @section('content')
-<main class="app-main">
+<main class="app-main trip-map-page">
     <div class="app-content py-4">
         <div class="container-fluid">
 
             <!-- Page Header -->
             <!-- Page Header Row: Title & Subtitle + Back Button -->
-            <div class="d-flex justify-content-between align-items-center flex-wrap mb-3">
+            <div class="trip-map-hero d-flex justify-content-between align-items-center flex-wrap mb-3">
                 <!-- LEFT INFO -->
                 <div>
-                    <h3 class="fw-bold text-dark mb-1 d-flex align-items-center">
-                        <i class="fas fa-map-marked-alt text-primary me-2"></i> Trip Route Map
+                    <h3 class="fw-bold mb-1 d-flex align-items-center">
+                        <i class="fas fa-map-marked-alt me-2"></i> Trip Route Map
                     </h3>
-                    <div class="text-muted d-flex flex-wrap align-items-center gap-3 mt-1" style="font-size: 14px;">
+                    <div class="trip-map-meta d-flex flex-wrap align-items-center gap-3 mt-1" style="font-size: 14px;">
                         <div><strong>Agent:</strong> {{ $trip->user->name ?? 'N/A' }}</div>
                         <div><strong>Place to Visit:</strong> {{ $trip->place_to_visit ?? 'N/A' }}</div>
                         <div><strong>Date:</strong> {{ \Carbon\Carbon::parse($trip->trip_date)->format('d-m-Y') }}</div>
@@ -87,7 +87,7 @@
             </div>
 
             <!-- Map Card -->
-            <div class="card shadow border-0 rounded-3 overflow-hidden">
+            <div class="card map-shell shadow border-0 rounded-3 overflow-hidden">
                 <div class="card-body p-0">
                     <div id="map" class="w-100" style="height: 700px;"></div>
                 </div>
@@ -110,6 +110,33 @@
     <style>
         body {
             background-color: #f5f6fa;
+        }
+
+        .trip-map-page {
+            background: #f4f7fb;
+            min-height: calc(100vh - 57px);
+        }
+
+        .trip-map-hero {
+            background: linear-gradient(135deg, #123c69 0%, #1d6fa5 54%, #1b8a5a 100%);
+            border-radius: 8px;
+            color: #fff;
+            padding: 22px 24px;
+            box-shadow: 0 14px 34px rgba(18, 60, 105, 0.22);
+        }
+
+        .trip-map-hero .btn-outline-secondary {
+            background: rgba(255,255,255,0.95);
+            border-color: rgba(255,255,255,0.95);
+        }
+
+        .trip-map-meta {
+            color: rgba(255,255,255,0.84);
+        }
+
+        .map-shell {
+            border: 1px solid #dce8f5 !important;
+            box-shadow: 0 16px 38px rgba(15, 23, 42, 0.12) !important;
         }
 
         .card {
@@ -294,7 +321,7 @@
         /* ---------- LEGEND ---------- */
         .route-legend {
     background: #ffffff;
-    border-radius: 12px;
+    border-radius: 8px;
     padding: 14px 16px;
     box-shadow: 0 6px 18px rgba(0,0,0,0.08);
     border: 1px solid #e5e7eb;
@@ -336,6 +363,7 @@
     display: flex;
     align-items: center;
     gap: 20px;
+    flex-wrap: wrap;
     white-space: nowrap;
 }
 

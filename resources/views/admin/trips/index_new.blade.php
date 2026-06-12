@@ -51,21 +51,136 @@
 .trip-type-btn:hover {
     background: #f1f1f1;
 }
+
+.trips-page {
+    background: #f4f7fb;
+    min-height: calc(100vh - 57px);
+}
+
+.trips-hero {
+    background: linear-gradient(135deg, #123c69 0%, #1d6fa5 50%, #1b8a5a 100%);
+    border-radius: 8px;
+    color: #fff;
+    padding: 22px 24px;
+    box-shadow: 0 14px 34px rgba(18, 60, 105, 0.22);
+}
+
+.trips-hero .breadcrumb a,
+.trips-hero .breadcrumb-item,
+.trips-hero .breadcrumb-item.active {
+    color: rgba(255, 255, 255, 0.86);
+}
+
+.trips-hero .breadcrumb-item + .breadcrumb-item::before {
+    color: rgba(255, 255, 255, 0.62);
+}
+
+.trip-panel {
+    border: 1px solid #e5edf5;
+    border-radius: 8px;
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+}
+
+.filter-panel {
+    background: #fff;
+    border: 1px solid #e6edf5;
+    border-radius: 8px;
+    padding: 16px;
+}
+
+.filter-panel .form-label {
+    color: #40556c;
+    font-size: 12px;
+    margin-bottom: 6px;
+}
+
+.filter-panel .form-control,
+.filter-panel .form-select {
+    border-color: #d8e2ec;
+    border-radius: 7px;
+}
+
+.trip-table {
+    border-color: #e7edf4;
+    color: #26384c;
+}
+
+.trip-table thead th {
+    background: #eef6ff;
+    color: #17395c;
+    border-color: #dce8f5;
+    font-size: 12px;
+    letter-spacing: 0;
+    text-transform: uppercase;
+    vertical-align: middle;
+}
+
+.trip-table tbody td {
+    border-color: #edf2f7;
+    vertical-align: middle;
+}
+
+.trip-table tbody tr:hover {
+    background: #f8fbff;
+}
+
+.agent-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #15283d;
+    font-weight: 700;
+}
+
+.agent-pill::before {
+    content: "";
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: #e7f1ff;
+    border: 1px solid #c9ddf4;
+}
+
+.trip-soft-badge {
+    background: #edf7ff;
+    border: 1px solid #cfe8fb;
+    color: #15567d;
+    border-radius: 999px;
+    display: inline-flex;
+    font-weight: 700;
+    padding: 6px 10px;
+}
+
+.action-stack {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    min-width: 112px;
+}
+
+.empty-trips {
+    background: #f8fafc;
+    border-radius: 8px;
+}
 </style>
 @section('content')
-<main class="app-main">
+<main class="app-main trips-page">
     <div class="app-content-header">
         <div class="container-fluid">
-            <div class="row">
+            <div class="trips-hero">
+            <div class="row align-items-center">
                 <div class="col-sm-6">
-                    <h3 class="mb-0">Trips</h3>
+                    <h3 class="mb-1 fw-bold"><i class="fas fa-route me-2"></i>Trips</h3>
+                    <div class="small opacity-75">Trip approvals, route logs, odometer readings and map tracking</div>
                 </div>
                 <div class="col-sm-6">
-                    <ol class="breadcrumb float-sm-end">
+                    <ol class="breadcrumb float-sm-end mb-0">
                         <li class="breadcrumb-item"><a href="#" class="text-decoration-none">Trip Management</a></li>
                         <li class="breadcrumb-item active">All Trips</li>
                     </ol>
                 </div>
+            </div>
             </div>
         </div>
     </div>
@@ -73,10 +188,10 @@
     {{-- Main Content --}}
     <div class="app-content">
         <div class="container-fluid">
-            <div class="card shadow-sm border-0">
+            <div class="card trip-panel">
                 <div class="card-body">
                     {{-- 🔹 Filter Section --}}
-                    <form method="GET" action="{{ route('trips.index') }}" class="mb-4">
+                    <form method="GET" action="{{ route('trips.index') }}" class="filter-panel mb-4">
                         <div class="row g-3 align-items-end">
                             <div class="col-md-2">
                                 <label class="form-label fw-semibold">From Date</label>
@@ -124,12 +239,12 @@
 
                             
                             <div class="col-md-1">
-                                <button type="submit" class="btn btn-primary w-100">
+                                <button type="submit" class="btn btn-primary w-100 shadow-sm" title="Search">
                                     <i class="fas fa-search me-1"></i>
                                 </button>
                             </div>
                             <div class="col-md-1">
-                                <a href="{{ route('trips.index') }}" class="btn btn-secondary w-100">
+                                <a href="{{ route('trips.index') }}" class="btn btn-light border w-100 shadow-sm" title="Reset">
                                     <i class="fas fa-undo me-1"></i>
                                 </a>
                             </div>
@@ -140,8 +255,8 @@
                     @can('view_all_trip')
                     
                         <div class="table-responsive">
-                            <table id="trips-table" class="table table-hover align-middle table-bordered text-nowrap">
-                                <thead class="table-primary text-center">
+                            <table id="trips-table" class="table table-hover align-middle table-bordered text-nowrap trip-table">
+                                <thead class="text-center">
                                     <tr>
                                         <th>#</th>
                                         <th>Agent</th>
@@ -161,7 +276,7 @@
                                             <td class="text-center fw-semibold text-secondary">{{ $loop->iteration }}</td>
 
                                             <td>
-                                                <span class="fw-semibold text-dark">{{ $trip->user->name ?? 'N/A' }}</span><br>
+                                                <span class="agent-pill">{{ $trip->user->name ?? 'N/A' }}</span><br>
                                             </td>
                                             <td>
                                                  <div>
@@ -187,10 +302,10 @@
                                             </td>
 
                                             <td>
-                                                <span class="badge bg-info text-dark px-3 py-2">
+                                                <span class="trip-soft-badge">
                                                     {{ $trip->travelMode->name ?? '-' }}
                                                 </span><br><br>
-                                                <span class="badge bg-info text-dark px-3 py-2">
+                                                <span class="trip-soft-badge">
                                                     {{ $trip->tourType->name ?? "-" }}
                                                 </span>
                                             </td>
@@ -234,13 +349,13 @@
                                             </td>
 
                                             <td class="text-center">
-                                                <div class="d-inline-flex flex-column align-items-center gap-1">
+                                                <div class="action-stack">
 
                                                     {{-- View Map --}}
                                                     <a href="{{ route('trips.show', $trip) }}"
                                                     target="_blank"
-                                                    class="text-primary small fw-semibold">
-                                                        View Map
+                                                    class="btn btn-outline-primary btn-sm">
+                                                        <i class="fas fa-map-marked-alt me-1"></i> Map
                                                     </a>
 
                                                     {{-- Logs count --}}
@@ -258,7 +373,7 @@
                                                         data-url="{{ route('trips.logs', $trip->id) }}"
                                                         data-bs-toggle="modal"
                                                         data-bs-target="#logsModal">
-                                                         View Logs
+                                                         <i class="fas fa-list me-1"></i> Logs
                                                     </button>
 
                                                 </div>
@@ -322,7 +437,12 @@
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="10" class="text-center text-muted py-4">No trips found.</td>
+                                            <td colspan="10" class="text-center text-muted py-5">
+                                                <div class="empty-trips p-4">
+                                                    <i class="fas fa-route fa-2x mb-2 text-secondary"></i>
+                                                    <div class="fw-semibold">No trips found.</div>
+                                                </div>
+                                            </td>
                                         </tr>
                                     @endforelse
                                 </tbody>

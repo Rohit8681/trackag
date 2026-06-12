@@ -1,12 +1,75 @@
 @extends('admin.layout.layout')
 
+<style>
+    .trip-form-page {
+        background: #f4f7fb;
+        min-height: calc(100vh - 57px);
+    }
+
+    .trip-form-hero {
+        background: linear-gradient(135deg, #123c69 0%, #1d6fa5 52%, #1b8a5a 100%);
+        border-radius: 8px;
+        color: #fff;
+        padding: 22px 24px;
+        box-shadow: 0 14px 34px rgba(18, 60, 105, 0.22);
+    }
+
+    .trip-form-hero .breadcrumb a,
+    .trip-form-hero .breadcrumb-item,
+    .trip-form-hero .breadcrumb-item.active {
+        color: rgba(255,255,255,0.86);
+    }
+
+    .trip-form-card {
+        border: 1px solid #e5edf5;
+        border-radius: 8px;
+        box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+    }
+
+    .trip-section {
+        background: #fff;
+        border: 1px solid #e6edf5;
+        border-radius: 8px;
+        padding: 18px;
+        margin-bottom: 18px;
+    }
+
+    .trip-section h5 {
+        color: #17395c;
+        font-weight: 700;
+        margin-bottom: 16px;
+    }
+
+    .trip-section .form-label {
+        color: #40556c;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .trip-section .form-control,
+    .trip-section .form-select {
+        border-color: #d8e2ec;
+        border-radius: 7px;
+    }
+
+    .trip-action-bar {
+        background: #f8fafc;
+        border: 1px solid #e6edf5;
+        border-radius: 8px;
+        padding: 14px;
+    }
+</style>
+
 @section('content')
-<main class="app-main">
+<main class="app-main trip-form-page">
     <!-- Page Header -->
     <div class="app-content-header">
         <div class="container-fluid">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h3 class="mb-0">Trip Management</h3>
+            <div class="trip-form-hero d-flex justify-content-between align-items-center mb-3">
+                <div>
+                    <h3 class="mb-1 fw-bold"><i class="fas fa-route me-2"></i>Trip Management</h3>
+                    <div class="small opacity-75">Add trip details, odometer readings and customer visits</div>
+                </div>
                 <ol class="breadcrumb mb-0">
                     <li class="breadcrumb-item"><a href="{{ route('trips.index') }}">Trips</a></li>
                     <li class="breadcrumb-item active">Add Trip</li>
@@ -18,13 +81,13 @@
     <!-- Page Content -->
     <div class="app-content">
         <div class="container-fluid">
-            <div class="card card-primary card-outline">
-                <div class="card-header">
+            <div class="card trip-form-card">
+                <div class="card-header bg-white border-0 pt-4 px-4">
                     <h5 class="card-title">Add New Trip</h5>
                 </div>
 
                 <!-- Flash & Validation Messages -->
-                <div class="card-body">
+                <div class="card-body px-4 pb-4">
                     @if (session('success'))
                         <div class="alert alert-success alert-dismissible fade show" role="alert">
                             <strong>Success:</strong> {{ session('success') }}
@@ -51,7 +114,7 @@
                         @csrf
 
                         <!-- Basic Trip Info -->
-                        <div class="mb-4 border-bottom pb-2">
+                        <div class="trip-section">
                             <h5 class="mb-3">Trip Details</h5>
                             <div class="row g-3">
                                 <div class="col-md-4">
@@ -70,7 +133,7 @@
                         </div>
 
                         <!-- Travel Mode & Purpose -->
-                        <div class="mb-4 border-bottom pb-2">
+                        <div class="trip-section">
                             <h5 class="mb-3">Travel & Purpose</h5>
                             <div class="row g-3">
                                 <div class="col-md-4">
@@ -104,7 +167,7 @@
                         </div>
 
                         <!-- Locations -->
-                        <div class="mb-4 border-bottom pb-2">
+                        <div class="trip-section">
                             <h5 class="mb-3">Locations & Distances</h5>
                             <div class="row g-3">
                                 <div class="col-md-6">
@@ -135,7 +198,7 @@
                         </div>
 
                         <!-- KM Logs -->
-                        <div class="mb-4 border-bottom pb-2">
+                        <div class="trip-section">
                             <h5 class="mb-3">Odometer Readings</h5>
                             <div class="row g-3">
                                 <div class="col-md-3">
@@ -158,7 +221,7 @@
                         </div>
 
                         <!-- Customers -->
-                        <div class="mb-4 border-bottom pb-2">
+                        <div class="trip-section">
                             <h5 class="mb-3">Customers</h5>
                             <label for="customer_ids" class="form-label">Select Customers</label>
                             <select name="customer_ids[]" class="form-select" multiple required>
@@ -170,14 +233,14 @@
                         </div>
 
                         <!-- Map -->
-                        <div class="mb-4">
+                        <div class="trip-section">
                             <h5 class="mb-3">Map Preview</h5>
-                            <div id="map" style="height: 400px; border: 1px solid #ccc;"></div>
+                            <div id="map" style="height: 400px; border: 1px solid #d8e2ec; border-radius: 8px;"></div>
                         </div>
 
                         <!-- Submit -->
-                        <div class="text-end">
-                            <button type="submit" class="btn btn-success">Save Trip</button>
+                        <div class="trip-action-bar text-end">
+                            <button type="submit" class="btn btn-success px-4"><i class="fas fa-save me-1"></i> Save Trip</button>
                         </div>
 
                     </form>
