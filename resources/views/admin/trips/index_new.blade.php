@@ -125,14 +125,14 @@
 }
 
 .trip-place-column {
-    width: 340px;
-    max-width: 340px;
+    width: 220px;
+    max-width: 220px;
 }
 
 .trip-place-text {
     display: block;
-    width: 340px;
-    max-width: 340px;
+    width: 220px;
+    max-width: 220px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
