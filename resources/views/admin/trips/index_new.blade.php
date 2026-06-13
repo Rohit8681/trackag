@@ -124,6 +124,21 @@
     background: #f8fbff;
 }
 
+.trip-place-column {
+    width: 340px;
+    max-width: 340px;
+}
+
+.trip-place-text {
+    display: block;
+    width: 340px;
+    max-width: 340px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    cursor: help;
+}
+
 .agent-pill {
     display: inline-flex;
     align-items: center;
@@ -262,7 +277,7 @@
                                         <th>Agent</th>
                                         <th>Day Start / End</th>
                                         <th>Vehicle & Type</th>
-                                        <th>Places</th>
+                                        <th class="trip-place-column">Places</th>
                                         <th>Customers</th>
                                         <th>KM Images</th>
                                         <th>KM Info</th>
@@ -310,7 +325,11 @@
                                                 </span>
                                             </td>
 
-                                            <td>{{ $trip->place_to_visit ?? '-' }}</td>
+                                            <td class="trip-place-column">
+                                                <span class="trip-place-text" title="{{ $trip->place_to_visit ?? '-' }}">
+                                                    {{ $trip->place_to_visit ?? '-' }}
+                                                </span>
+                                            </td>
 
                                             <td>
                                                 @forelse ($trip->customers as $customer)
