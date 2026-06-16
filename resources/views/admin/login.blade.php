@@ -18,61 +18,95 @@
     <style>
         :root {
             --trackag-primary: #0f4c81;
+            --trackag-primary-dark: #08345d;
             --trackag-accent: #20b486;
-            --trackag-ink: #142333;
+            --trackag-ink: #172033;
             --trackag-muted: #64748b;
-            --trackag-border: #d3dde9;
-            --trackag-surface: #f8fafc;
-        }
-
-        * {
-            box-sizing: border-box;
+            --trackag-border: #dbe5ef;
         }
 
         body.login-page {
             min-height: 100vh;
-            background: radial-gradient(circle at top right, rgba(32, 180, 134, 0.18), transparent 28%),
-                radial-gradient(circle at bottom left, rgba(15, 76, 129, 0.14), transparent 24%),
-                linear-gradient(180deg, #eef4fb 0%, #e2ebf6 100%);
+            background:
+                linear-gradient(120deg, rgba(15, 76, 129, 0.94), rgba(8, 52, 93, 0.86)),
+                url("{{ asset('img/TRACKAGLOGO.jpeg') }}");
+            background-position: center;
+            background-size: cover;
             color: var(--trackag-ink);
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 24px;
-            font-family: "Source Sans 3", Inter, system-ui, sans-serif;
+            overflow-x: hidden;
+        }
+
+        body.login-page::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            background-image:
+                linear-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+            background-size: 44px 44px;
+            mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.45), transparent 78%);
         }
 
         .login-box {
-            width: min(520px, 100%);
+            width: min(940px, 100%);
             position: relative;
             z-index: 1;
         }
 
         .login-shell {
-            border-radius: 28px;
+            display: grid;
+            grid-template-columns: minmax(0, 0.95fr) minmax(380px, 1fr);
+            min-height: 560px;
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            border-radius: 22px;
             overflow: hidden;
-            background: #ffffff;
-            box-shadow: 0 35px 80px rgba(15, 76, 129, 0.15);
+            background: rgba(255, 255, 255, 0.94);
+            box-shadow: 0 28px 80px rgba(8, 28, 50, 0.32);
+            backdrop-filter: blur(18px);
         }
 
         .login-brand-panel {
-            padding: 32px 28px;
-            background: linear-gradient(140deg, rgba(15, 76, 129, 1), rgba(32, 180, 134, 0.92));
-            color: #ffffff;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 42px;
+            color: #fff;
+            background:
+                linear-gradient(145deg, rgba(12, 74, 122, 0.96), rgba(19, 108, 91, 0.88)),
+                url("{{ asset('img/TRACKAGLOGO.jpeg') }}");
+            background-position: center;
+            background-size: cover;
         }
 
-        .brand-content {
-            max-width: 100%;
+        .login-brand-panel::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, transparent, rgba(4, 22, 38, 0.38));
+        }
+
+        .brand-content,
+        .brand-footer {
+            position: relative;
+            z-index: 1;
         }
 
         .brand-kicker {
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            margin-bottom: 20px;
-            padding: 10px 14px;
+            width: fit-content;
+            margin-bottom: 22px;
+            padding: 8px 12px;
+            border: 1px solid rgba(255, 255, 255, 0.22);
             border-radius: 999px;
-            background: rgba(255, 255, 255, 0.14);
+            background: rgba(255, 255, 255, 0.12);
             font-size: 12px;
             font-weight: 700;
             letter-spacing: 0.08em;
@@ -81,40 +115,89 @@
 
         .brand-title {
             margin: 0;
-            font-size: clamp(28px, 4vw, 38px);
+            font-size: 34px;
             font-weight: 800;
-            line-height: 1.08;
+            line-height: 1.15;
         }
 
         .brand-copy {
-            margin: 18px 0 0;
-            color: rgba(255, 255, 255, 0.86);
+            max-width: 340px;
+            margin: 16px 0 0;
+            color: rgba(255, 255, 255, 0.82);
             font-size: 15px;
             line-height: 1.7;
         }
 
+        .brand-footer {
+            display: grid;
+            gap: 12px;
+        }
+
+        .brand-metric {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 13px 14px;
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.11);
+        }
+
+        .brand-metric .bi {
+            width: 38px;
+            height: 38px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.16);
+            font-size: 18px;
+        }
+
+        .brand-metric strong {
+            display: block;
+            font-size: 14px;
+            line-height: 1.2;
+        }
+
+        .brand-metric span {
+            display: block;
+            margin-top: 3px;
+            color: rgba(255, 255, 255, 0.72);
+            font-size: 12px;
+        }
+
         .login-form-panel {
-            padding: 36px 32px 28px;
-            background: var(--trackag-surface);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 44px;
+            background:
+                radial-gradient(circle at top right, rgba(32, 180, 134, 0.12), transparent 34%),
+                #f8fafc;
         }
 
         .login-card-body {
             width: 100%;
+            max-width: 400px;
+            padding: 0;
+            background: transparent;
+            color: var(--trackag-ink);
         }
 
         .login-logo {
             display: flex;
             justify-content: center;
-            margin-bottom: 24px;
+            margin-bottom: 22px;
         }
 
         .login-logo img {
-            max-width: 170px;
-            max-height: 100px;
+            max-width: 190px;
+            max-height: 120px;
             width: auto;
             height: auto;
             object-fit: contain;
-            filter: drop-shadow(0 16px 30px rgba(15, 76, 129, 0.14));
+            filter: drop-shadow(0 12px 22px rgba(15, 76, 129, 0.12));
         }
 
         .fallback-logo {
@@ -123,8 +206,9 @@
             gap: 10px;
             justify-content: center;
             color: var(--trackag-primary);
-            font-size: 30px;
+            font-size: 28px;
             font-weight: 800;
+            letter-spacing: 0;
         }
 
         .fallback-logo .bi {
@@ -141,11 +225,11 @@
             color: var(--trackag-ink);
             font-size: 26px;
             font-weight: 800;
-            line-height: 1.15;
+            line-height: 1.2;
         }
 
         .login-heading p {
-            margin: 10px 0 0;
+            margin: 8px 0 0;
             color: var(--trackag-muted);
             font-size: 14px;
         }
@@ -153,15 +237,16 @@
         .login-form .input-group {
             margin-bottom: 14px !important;
             border: 1px solid var(--trackag-border);
-            border-radius: 16px;
+            border-radius: 14px;
             overflow: hidden;
-            background: #ffffff;
+            background: #fff;
+            box-shadow: 0 10px 24px rgba(15, 76, 129, 0.06);
             transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
         }
 
         .login-form .input-group:focus-within {
-            border-color: rgba(32, 180, 134, 0.85);
-            box-shadow: 0 12px 24px rgba(32, 180, 134, 0.11);
+            border-color: rgba(32, 180, 134, 0.8);
+            box-shadow: 0 14px 30px rgba(32, 180, 134, 0.12);
             transform: translateY(-1px);
         }
 
@@ -171,7 +256,6 @@
             color: var(--trackag-ink);
             font-size: 15px;
             box-shadow: none;
-            background: transparent;
         }
 
         .login-form .form-floating > label {
@@ -183,14 +267,14 @@
             justify-content: center;
             border: 0;
             border-left: 1px solid var(--trackag-border);
-            background: #ffffff;
+            background: #fff;
             color: var(--trackag-primary);
             font-size: 19px;
         }
 
         .login-options {
             align-items: center;
-            margin-top: 10px;
+            margin-top: 2px;
             row-gap: 14px;
         }
 
@@ -214,23 +298,23 @@
         }
 
         .sign-in-btn {
-            min-height: 52px;
+            min-height: 50px;
             border: 0;
-            border-radius: 14px;
+            border-radius: 12px;
             background: linear-gradient(135deg, var(--trackag-primary), var(--trackag-accent));
             font-weight: 700;
-            box-shadow: 0 16px 30px rgba(15, 76, 129, 0.18);
+            box-shadow: 0 14px 26px rgba(15, 76, 129, 0.24);
             transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
 
         .sign-in-btn:hover,
         .sign-in-btn:focus {
             transform: translateY(-1px);
-            box-shadow: 0 20px 38px rgba(15, 76, 129, 0.22);
+            box-shadow: 0 18px 34px rgba(15, 76, 129, 0.3);
         }
 
         .download-section {
-            margin-top: 26px;
+            margin-top: 24px;
             text-align: center;
         }
 
@@ -238,73 +322,94 @@
             display: inline-flex;
             align-items: center;
             gap: 12px;
-            min-height: 56px;
-            padding: 12px 18px;
+            min-height: 58px;
+            padding: 8px 18px;
             background: #101828;
             color: #fff;
-            border: 0;
-            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            border-radius: 14px;
             text-decoration: none;
-            font-weight: 700;
-            box-shadow: 0 12px 26px rgba(16, 24, 40, 0.22);
+            font-weight: 600;
+            box-shadow: 0 12px 28px rgba(16, 24, 40, 0.22);
             transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
         }
 
         .download-btn:hover {
-            background: #0f172a;
+            background: #0b1220;
+            color: #fff;
             transform: translateY(-1px);
-            box-shadow: 0 18px 34px rgba(16, 24, 40, 0.28);
+            box-shadow: 0 16px 34px rgba(16, 24, 40, 0.28);
+        }
+
+        .download-btn svg {
+            flex: 0 0 auto;
+            fill: #fff;
+        }
+
+        .download-label {
+            text-align: left;
+            line-height: 1;
         }
 
         .download-label small {
             display: block;
-            margin-bottom: 4px;
-            color: rgba(255, 255, 255, 0.75);
-            font-size: 9px;
-            letter-spacing: 0.1em;
+            margin-bottom: 3px;
+            color: rgba(255, 255, 255, 0.78);
+            font-size: 8px;
+            font-weight: 500;
+            letter-spacing: 0.08em;
             text-transform: uppercase;
         }
 
         .download-label strong {
             display: block;
             color: #fff;
-            font-size: 16px;
+            font-size: 17px;
             font-weight: 800;
             letter-spacing: 0;
         }
 
         .alert {
             border: 0;
-            border-radius: 16px;
-            box-shadow: 0 12px 24px rgba(220, 53, 69, 0.12);
+            border-radius: 14px;
+            box-shadow: 0 12px 26px rgba(220, 53, 69, 0.12);
         }
 
-        @media (max-width: 520px) {
+        @media (max-width: 860px) {
             body.login-page {
-                padding: 16px;
+                padding: 18px;
+            }
+
+            .login-shell {
+                grid-template-columns: 1fr;
+                min-height: auto;
+            }
+
+            .login-brand-panel {
+                display: none;
             }
 
             .login-form-panel {
-                padding: 28px 20px 22px;
+                padding: 34px 24px;
+            }
+        }
+
+        @media (max-width: 430px) {
+            body.login-page {
+                padding: 12px;
+            }
+
+            .login-form-panel {
+                padding: 28px 18px;
             }
 
             .login-heading h1 {
-                font-size: 24px;
+                font-size: 23px;
             }
 
             .login-options .col-8,
             .login-options .col-4 {
                 width: 100%;
-                display: block;
-            }
-
-            .login-options .col-4 {
-                margin-top: 12px;
-            }
-
-            .download-btn {
-                width: 100%;
-                justify-content: center;
             }
         }
     </style>
@@ -378,7 +483,7 @@
                                 class="form-control @error('mobile') is-invalid @enderror mobile_no"
                                 placeholder="Mobile"
                                 @if(isset($_COOKIE["mobile"])) value="{{ $_COOKIE['mobile'] }}" @endif />
-                            <label for="mobile">Mobile</label>
+                            <label for="mobile">User Name</label>
                             @error('mobile')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
