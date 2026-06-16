@@ -49,7 +49,10 @@ class TallyController extends Controller
     {
         return response()->json([
             'status' => true,
+            'success' => true,
+            'count' => 0,
             'message' => 'Data received successfully',
+            'data' => [],
         ]);
     }
 
