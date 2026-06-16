@@ -6,9 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Tally\OpeningClosingRequest;
 use App\Http\Requests\Tally\PartySyncRequest;
 use App\Http\Requests\Tally\SalesBillRequest;
-use App\Models\TallyOpeningClosing;
-use App\Models\TallyPartySync;
-use App\Models\TallySalesBill;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
 use Throwable;
@@ -18,9 +15,9 @@ class TallyController extends Controller
     public function partySync(PartySyncRequest $request): JsonResponse
     {
         try {
-            $partySync = TallyPartySync::create($this->payloadWithRawPayload($request->validated(), $request->all()));
+            $request->validated();
 
-            return $this->successResponse($partySync->id);
+            return $this->successResponse();
         } catch (Throwable $exception) {
             return $this->errorResponse($exception, 'party-sync');
         }
@@ -29,9 +26,9 @@ class TallyController extends Controller
     public function salesBill(SalesBillRequest $request): JsonResponse
     {
         try {
-            $salesBill = TallySalesBill::create($this->payloadWithRawPayload($request->validated(), $request->all()));
+            $request->validated();
 
-            return $this->successResponse($salesBill->id);
+            return $this->successResponse();
         } catch (Throwable $exception) {
             return $this->errorResponse($exception, 'sales-bill');
         }
@@ -40,27 +37,19 @@ class TallyController extends Controller
     public function openingClosing(OpeningClosingRequest $request): JsonResponse
     {
         try {
-            $openingClosing = TallyOpeningClosing::create($this->payloadWithRawPayload($request->validated(), $request->all()));
+            $request->validated();
 
-            return $this->successResponse($openingClosing->id);
+            return $this->successResponse();
         } catch (Throwable $exception) {
             return $this->errorResponse($exception, 'opening-closing');
         }
     }
 
-    private function payloadWithRawPayload(array $validated, array $payload): array
-    {
-        return array_merge($validated, [
-            'raw_payload' => $payload,
-        ]);
-    }
-
-    private function successResponse(int $id): JsonResponse
+    private function successResponse(): JsonResponse
     {
         return response()->json([
             'status' => true,
             'message' => 'Data received successfully',
-            'id' => $id,
         ]);
     }
 
