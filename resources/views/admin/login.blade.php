@@ -18,11 +18,14 @@
     <style>
         :root {
             --trackag-primary: #0f4c81;
-            --trackag-primary-dark: #08345d;
             --trackag-accent: #20b486;
             --trackag-ink: #172033;
             --trackag-muted: #64748b;
             --trackag-border: #dbe5ef;
+        }
+
+        * {
+            box-sizing: border-box;
         }
 
         body.login-page {
@@ -32,244 +35,185 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 24px;
-            overflow-x: hidden;
+            padding: 20px;
+            font-family: "Source Sans 3", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
         }
 
         .login-box {
-            width: min(940px, 100%);
+            width: 100%;
+            max-width: 900px;
             position: relative;
             z-index: 1;
         }
 
         .login-shell {
             display: grid;
-            grid-template-columns: minmax(0, 0.95fr) minmax(380px, 1fr);
-            min-height: 560px;
-            border: 1px solid rgba(255, 255, 255, 0.35);
-            border-radius: 22px;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+            border-radius: 24px;
             overflow: hidden;
-            background: rgba(255, 255, 255, 0.94);
-            box-shadow: 0 28px 80px rgba(8, 28, 50, 0.32);
-            backdrop-filter: blur(18px);
+            background: #ffffff;
+            box-shadow: 0 32px 80px rgba(15, 76, 129, 0.16);
         }
 
+        /* LEFT PANEL - BRAND */
         .login-brand-panel {
-            position: relative;
+            background: linear-gradient(135deg, #0f4c81 0%, #20b486 100%);
+            padding: 60px 40px;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 42px;
-            color: #fff;
-            background: linear-gradient(140deg, rgba(15, 76, 129, 1), rgba(32, 180, 134, 0.92));
+            min-height: 500px;
+            color: #ffffff;
         }
 
         .login-brand-panel img {
-            max-width: 100%;
-            max-height: 100%;
-            width: auto;
+            max-width: 280px;
+            width: 100%;
             height: auto;
-            object-fit: contain;
+            margin-bottom: 40px;
         }
 
-        .login-brand-panel::after {
-            display: none;
-        }
-
+        /* Hide brand text content */
         .brand-content,
-        .brand-footer {
-            position: relative;
-            z-index: 1;
-            display: none;
-        }
-
-        .brand-kicker {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            width: fit-content;
-            margin-bottom: 22px;
-            padding: 8px 12px;
-            border: 1px solid rgba(255, 255, 255, 0.22);
-            border-radius: 999px;
-            background: rgba(255, 255, 255, 0.12);
-            font-size: 12px;
-            font-weight: 700;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-        }
-
-        .brand-title {
-            margin: 0;
-            font-size: 34px;
-            font-weight: 800;
-            line-height: 1.15;
-        }
-
-        .brand-copy {
-            max-width: 340px;
-            margin: 16px 0 0;
-            color: rgba(255, 255, 255, 0.82);
-            font-size: 15px;
-            line-height: 1.7;
-        }
-
-        .brand-footer {
-            display: grid;
-            gap: 12px;
-        }
-
+        .brand-footer,
+        .brand-kicker,
+        .brand-title,
+        .brand-copy,
         .brand-metric {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 13px 14px;
-            border: 1px solid rgba(255, 255, 255, 0.16);
-            border-radius: 14px;
-            background: rgba(255, 255, 255, 0.11);
+            display: none !important;
         }
 
-        .brand-metric .bi {
-            width: 38px;
-            height: 38px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 12px;
-            background: rgba(255, 255, 255, 0.16);
-            font-size: 18px;
-        }
-
-        .brand-metric strong {
-            display: block;
-            font-size: 14px;
-            line-height: 1.2;
-        }
-
-        .brand-metric span {
-            display: block;
-            margin-top: 3px;
-            color: rgba(255, 255, 255, 0.72);
-            font-size: 12px;
-        }
-
+        /* RIGHT PANEL - FORM */
         .login-form-panel {
+            padding: 50px 45px;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 44px;
-            background:
-                radial-gradient(circle at top right, rgba(32, 180, 134, 0.12), transparent 34%),
-                #f8fafc;
+            background: #ffffff;
         }
 
         .login-card-body {
             width: 100%;
-            max-width: 400px;
-            padding: 0;
-            background: transparent;
-            color: var(--trackag-ink);
+            max-width: 380px;
         }
 
+        /* LOGO SECTION */
         .login-logo {
             display: flex;
             justify-content: center;
-            margin-bottom: 22px;
+            margin-bottom: 28px;
         }
 
         .login-logo img {
-            max-width: 190px;
-            max-height: 120px;
+            max-width: 160px;
+            max-height: 100px;
             width: auto;
             height: auto;
             object-fit: contain;
-            filter: drop-shadow(0 12px 22px rgba(15, 76, 129, 0.12));
         }
 
         .fallback-logo {
             display: inline-flex;
             align-items: center;
             gap: 10px;
-            justify-content: center;
             color: var(--trackag-primary);
-            font-size: 28px;
+            font-size: 30px;
             font-weight: 800;
-            letter-spacing: 0;
         }
 
         .fallback-logo .bi {
             color: var(--trackag-accent);
         }
 
+        /* HEADING */
         .login-heading {
-            margin-bottom: 28px;
             text-align: center;
+            margin-bottom: 32px;
         }
 
         .login-heading h1 {
             margin: 0;
-            color: var(--trackag-ink);
-            font-size: 26px;
+            font-size: 28px;
             font-weight: 800;
+            color: var(--trackag-ink);
             line-height: 1.2;
         }
 
         .login-heading p {
-            margin: 8px 0 0;
+            margin: 12px 0 0;
             color: var(--trackag-muted);
             font-size: 14px;
+            line-height: 1.6;
         }
 
+        /* FORM INPUTS */
         .login-form .input-group {
-            margin-bottom: 14px !important;
-            border: 1px solid var(--trackag-border);
-            border-radius: 14px;
+            margin-bottom: 16px !important;
+            border: 1.5px solid var(--trackag-border);
+            border-radius: 12px;
             overflow: hidden;
-            background: #fff;
-            box-shadow: 0 10px 24px rgba(15, 76, 129, 0.06);
-            transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+            background: #ffffff;
+            transition: all 0.2s ease;
         }
 
         .login-form .input-group:focus-within {
-            border-color: rgba(32, 180, 134, 0.8);
-            box-shadow: 0 14px 30px rgba(32, 180, 134, 0.12);
-            transform: translateY(-1px);
+            border-color: var(--trackag-accent);
+            box-shadow: 0 8px 20px rgba(32, 180, 134, 0.14);
         }
 
         .login-form .form-control {
-            min-height: 58px;
-            border: 0;
+            min-height: 56px;
+            border: 0 !important;
             color: var(--trackag-ink);
-            font-size: 15px;
-            box-shadow: none;
+            font-size: 14px;
+            background: transparent;
+            padding: 0 16px;
+        }
+
+        .login-form .form-control::placeholder {
+            color: var(--trackag-muted);
         }
 
         .login-form .form-floating > label {
             color: var(--trackag-muted);
+            font-size: 13px;
+            padding-left: 16px;
         }
 
         .login-form .input-group-text {
-            min-width: 58px;
-            justify-content: center;
+            min-width: 56px;
             border: 0;
-            border-left: 1px solid var(--trackag-border);
-            background: #fff;
+            border-left: 1.5px solid var(--trackag-border);
+            background: transparent;
             color: var(--trackag-primary);
-            font-size: 19px;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
+        /* OPTIONS - REMEMBER & BUTTON */
         .login-options {
+            display: flex;
             align-items: center;
-            margin-top: 2px;
-            row-gap: 14px;
+            justify-content: space-between;
+            margin-top: 20px;
+            gap: 12px;
+        }
+
+        .form-check {
+            margin: 0;
         }
 
         .form-check-input {
-            width: 20px;
-            height: 20px;
-            margin-top: 0.08rem;
-            border-color: #cbd5e1;
+            width: 18px;
+            height: 18px;
+            margin-top: 2px;
+            border: 1.5px solid #cbd5e1;
             cursor: pointer;
+            border-radius: 4px;
         }
 
         .form-check-input:checked {
@@ -278,29 +222,35 @@
         }
 
         .form-check-label {
-            color: #475569;
-            font-size: 15px;
+            margin-left: 8px;
+            color: var(--trackag-muted);
+            font-size: 14px;
             cursor: pointer;
+            font-weight: 500;
         }
 
         .sign-in-btn {
-            min-height: 50px;
+            min-height: 52px;
             border: 0;
-            border-radius: 12px;
+            border-radius: 10px;
             background: linear-gradient(135deg, var(--trackag-primary), var(--trackag-accent));
+            color: #ffffff;
             font-weight: 700;
-            box-shadow: 0 14px 26px rgba(15, 76, 129, 0.24);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            font-size: 15px;
+            box-shadow: 0 12px 28px rgba(15, 76, 129, 0.2);
+            cursor: pointer;
+            transition: all 0.2s ease;
         }
 
         .sign-in-btn:hover,
         .sign-in-btn:focus {
-            transform: translateY(-1px);
-            box-shadow: 0 18px 34px rgba(15, 76, 129, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 16px 36px rgba(15, 76, 129, 0.28);
         }
 
+        /* DOWNLOAD SECTION */
         .download-section {
-            margin-top: 24px;
+            margin-top: 28px;
             text-align: center;
         }
 
@@ -308,67 +258,51 @@
             display: inline-flex;
             align-items: center;
             gap: 12px;
-            min-height: 58px;
-            padding: 8px 18px;
-            background: #101828;
-            color: #fff;
-            border: 1px solid rgba(255, 255, 255, 0.14);
-            border-radius: 14px;
+            min-height: 54px;
+            padding: 10px 20px;
+            background: #1a1f36;
+            color: #ffffff;
+            border: 0;
+            border-radius: 11px;
             text-decoration: none;
-            font-weight: 600;
-            box-shadow: 0 12px 28px rgba(16, 24, 40, 0.22);
-            transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+            font-weight: 700;
+            font-size: 14px;
+            box-shadow: 0 10px 24px rgba(26, 31, 54, 0.18);
+            transition: all 0.2s ease;
         }
 
         .download-btn:hover {
-            background: #0b1220;
-            color: #fff;
-            transform: translateY(-1px);
-            box-shadow: 0 16px 34px rgba(16, 24, 40, 0.28);
-        }
-
-        .download-btn svg {
-            flex: 0 0 auto;
-            fill: #fff;
-        }
-
-        .download-label {
-            text-align: left;
-            line-height: 1;
+            background: #0f1423;
+            transform: translateY(-2px);
+            box-shadow: 0 14px 32px rgba(26, 31, 54, 0.24);
         }
 
         .download-label small {
             display: block;
-            margin-bottom: 3px;
-            color: rgba(255, 255, 255, 0.78);
-            font-size: 8px;
-            font-weight: 500;
-            letter-spacing: 0.08em;
+            font-size: 10px;
+            opacity: 0.8;
+            letter-spacing: 0.05em;
             text-transform: uppercase;
         }
 
         .download-label strong {
             display: block;
-            color: #fff;
-            font-size: 17px;
+            font-size: 15px;
             font-weight: 800;
-            letter-spacing: 0;
         }
 
+        /* ALERT */
         .alert {
             border: 0;
-            border-radius: 14px;
-            box-shadow: 0 12px 26px rgba(220, 53, 69, 0.12);
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 16px rgba(220, 53, 69, 0.14);
         }
 
-        @media (max-width: 860px) {
-            body.login-page {
-                padding: 18px;
-            }
-
+        /* RESPONSIVE */
+        @media (max-width: 800px) {
             .login-shell {
                 grid-template-columns: 1fr;
-                min-height: auto;
             }
 
             .login-brand-panel {
@@ -376,25 +310,50 @@
             }
 
             .login-form-panel {
-                padding: 34px 24px;
-            }
-        }
-
-        @media (max-width: 430px) {
-            body.login-page {
-                padding: 12px;
+                padding: 40px 28px;
+                min-height: auto;
             }
 
-            .login-form-panel {
-                padding: 28px 18px;
+            .login-card-body {
+                max-width: 100%;
             }
 
             .login-heading h1 {
-                font-size: 23px;
+                font-size: 24px;
             }
 
-            .login-options .col-8,
-            .login-options .col-4 {
+            .login-options {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body.login-page {
+                padding: 16px;
+            }
+
+            .login-form-panel {
+                padding: 32px 20px;
+            }
+
+            .login-heading h1 {
+                font-size: 22px;
+            }
+
+            .login-heading p {
+                font-size: 13px;
+            }
+
+            .login-form .input-group {
+                margin-bottom: 14px !important;
+            }
+
+            .login-options {
+                width: 100%;
+            }
+
+            .sign-in-btn {
                 width: 100%;
             }
         }
@@ -492,18 +451,16 @@
                         <div class="input-group-text"><span class="bi bi-lock-fill"></span></div>
                     </div>
 
-                    <div class="row login-options">
-                        <div class="col-8 d-inline-flex align-items-center">
+                    <div class="login-options">
+                        <div>
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" id="remember" name="remember"
                                     @if(isset($_COOKIE['email'])) checked @endif />
-                                <label class="form-check-label" for="remember"> Remember Me </label>
+                                <label class="form-check-label" for="remember">Remember Me</label>
                             </div>
                         </div>
-                        <div class="col-4">
-                            <div class="d-grid gap-2">
-                                <button type="submit" class="btn btn-primary sign-in-btn">Sign In</button>
-                            </div>
+                        <div>
+                            <button type="submit" class="btn btn-primary sign-in-btn">Sign In</button>
                         </div>
                     </div>
                 </form>
