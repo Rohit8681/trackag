@@ -27,29 +27,13 @@
 
         body.login-page {
             min-height: 100vh;
-            background:
-                linear-gradient(120deg, rgba(15, 76, 129, 0.94), rgba(8, 52, 93, 0.86)),
-                url("{{ asset('img/TRACKAGLOGO.jpeg') }}");
-            background-position: center;
-            background-size: cover;
+            background: #f8fafc;
             color: var(--trackag-ink);
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 24px;
             overflow-x: hidden;
-        }
-
-        body.login-page::before {
-            content: "";
-            position: fixed;
-            inset: 0;
-            pointer-events: none;
-            background-image:
-                linear-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px);
-            background-size: 44px 44px;
-            mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.45), transparent 78%);
         }
 
         .login-box {
@@ -73,28 +57,30 @@
         .login-brand-panel {
             position: relative;
             display: flex;
-            flex-direction: column;
-            justify-content: space-between;
+            align-items: center;
+            justify-content: center;
             padding: 42px;
             color: #fff;
-            background:
-                linear-gradient(145deg, rgba(12, 74, 122, 0.96), rgba(19, 108, 91, 0.88)),
-                url("{{ asset('img/TRACKAGLOGO.jpeg') }}");
-            background-position: center;
-            background-size: cover;
+            background: linear-gradient(140deg, rgba(15, 76, 129, 1), rgba(32, 180, 134, 0.92));
+        }
+
+        .login-brand-panel img {
+            max-width: 100%;
+            max-height: 100%;
+            width: auto;
+            height: auto;
+            object-fit: contain;
         }
 
         .login-brand-panel::after {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(180deg, transparent, rgba(4, 22, 38, 0.38));
+            display: none;
         }
 
         .brand-content,
         .brand-footer {
             position: relative;
             z-index: 1;
+            display: none;
         }
 
         .brand-kicker {
@@ -419,6 +405,7 @@
     <div class="login-box">
         <div class="login-shell">
             <div class="login-brand-panel">
+                <img src="{{ asset('img/trackag-logo.png') }}" alt="Trackag Logo">
                 <div class="brand-content">
                     <div class="brand-kicker">
                         <span class="bi bi-shield-check"></span>
