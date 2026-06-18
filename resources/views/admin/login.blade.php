@@ -62,17 +62,17 @@
             padding: 40px 30px;
             display: flex;
             flex-direction: column;
-            align-items: flex-start;
-            justify-content: space-between;
+            align-items: center;
+            justify-content: flex-start;
             min-height: 500px;
             color: #ffffff;
         }
 
         .login-brand-panel img {
-            max-width: 200px;
+            max-width: 280px;
             width: 100%;
             height: auto;
-            margin-bottom: 30px;
+            margin-bottom: 40px;
         }
 
         /* Hide brand text content */
