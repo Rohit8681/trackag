@@ -176,13 +176,13 @@
                         </li>
 
                         {{-- Order Report --}}
-                        <li class="nav-item">
+                        {{-- <li class="nav-item">
                             <a href="{{ url('admin/order-report') }}"
                             class="nav-link {{ request()->is('admin/order-report*') ? 'active' : '' }}">
                                 <i class="bi bi-bar-chart-line-fill me-2"></i>
                                 <p>Order Report</p>
                             </a>
-                        </li>
+                        </li> --}}
 
                     </ul>
                 </li>
@@ -216,13 +216,13 @@
                         </li>
 
                         {{-- Stock Ageing --}}
-                        <li class="nav-item">
+                        <!-- <li class="nav-item">
                             <a href="{{ url('admin/stock-ageing') }}"
                             class="nav-link {{ request()->is('admin/stock-ageing*') ? 'active' : '' }}">
                                 <i class="bi bi-hourglass-split me-2"></i>
                                 <p>Stock Ageing</p>
                             </a>
-                        </li>
+                        </li> -->
 
                     </ul>
                 </li>
@@ -259,13 +259,13 @@
                         </li>
 
                         {{-- Daily Trip --}}
-                        <li class="nav-item">
+                        <!-- <li class="nav-item">
                             <a href="{{ url('admin/daily-trip') }}"
                             class="nav-link {{ request()->is('admin/daily-trip*') ? 'active' : '' }}">
                                 <i class="bi bi-truck-front-fill me-2"></i>
                                 <p>Daily Trip</p>
                             </a>
-                        </li>
+                        </li> -->
 
                     </ul>
                 </li>
