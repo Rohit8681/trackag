@@ -74,7 +74,7 @@
 
 <div class="container">
 
-    <img src="{{ asset('img/TRACKAGLOGO.jpeg') }}" alt="Trackag Logo" class="logo">
+    <img src="{{ asset('img/trackag-new-logo.png') }}" alt="Trackag Logo" class="logo">
 
     <h1>Coming Soon 🚀</h1>
 

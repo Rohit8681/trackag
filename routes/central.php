@@ -71,6 +71,12 @@ Route::middleware(['web'])->group(function () {
     Route::get('/',function(){
         return view('frontend.home');
     });
+    Route::get('/privacy-policy', function () {
+        return view('frontend.privacy-policy');
+    })->name('privacy-policy');
+    Route::get('/contact-us', function () {
+        return view('frontend.contact-us');
+    })->name('contact-us');
     Route::get('/login', function () {
         return redirect()->route('admin.login');
     });
