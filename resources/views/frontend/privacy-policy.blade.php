@@ -79,6 +79,49 @@
         .back-link:hover {
             color: #1c9e85;
         }
+        @media (max-width: 768px) {
+            .content-wrapper {
+                margin: 20px 16px;
+                padding: 24px 16px;
+            }
+            .content-wrapper h1 {
+                font-size: 1.8rem;
+                margin-bottom: 16px;
+            }
+            .content-wrapper h2 {
+                font-size: 1.2rem;
+                margin-top: 24px;
+                margin-bottom: 12px;
+            }
+            .navbar-brand {
+                font-size: 1.2rem;
+            }
+        }
+        @media (max-width: 480px) {
+            body {
+                font-size: 0.95rem;
+            }
+            .content-wrapper {
+                margin: 16px 12px;
+                padding: 16px 12px;
+                border-radius: 8px;
+            }
+            .content-wrapper h1 {
+                font-size: 1.5rem;
+                margin-bottom: 12px;
+            }
+            .content-wrapper h2 {
+                font-size: 1.1rem;
+            }
+            .content-wrapper p {
+                font-size: 0.95rem;
+                margin-bottom: 12px;
+            }
+            .footer {
+                padding: 16px 12px;
+                font-size: 0.85rem;
+            }
+        }
     </style>
 </head>
 <body>

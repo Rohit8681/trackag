@@ -145,6 +145,86 @@
         .back-link:hover {
             color: #1c9e85;
         }
+        @media (max-width: 768px) {
+            .content-wrapper {
+                margin: 20px 16px;
+                padding: 24px 16px;
+            }
+            .content-wrapper h1 {
+                font-size: 1.8rem;
+                margin-bottom: 24px;
+            }
+            .contact-card {
+                padding: 24px 16px;
+            }
+            .contact-item {
+                margin-bottom: 20px;
+            }
+            .form-section {
+                padding: 24px 16px;
+            }
+            .form-section h2 {
+                font-size: 1.2rem;
+                margin-bottom: 16px;
+            }
+            .navbar-brand {
+                font-size: 1.2rem;
+            }
+        }
+        @media (max-width: 480px) {
+            body {
+                font-size: 0.95rem;
+            }
+            .content-wrapper {
+                margin: 16px 12px;
+                padding: 16px 12px;
+                border-radius: 8px;
+            }
+            .content-wrapper h1 {
+                font-size: 1.5rem;
+                margin-bottom: 16px;
+            }
+            .contact-card {
+                padding: 16px 12px;
+                margin-bottom: 24px;
+            }
+            .contact-item {
+                gap: 12px;
+                margin-bottom: 16px;
+            }
+            .contact-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 20px;
+            }
+            .contact-info h3 {
+                font-size: 0.95rem;
+            }
+            .contact-info p {
+                font-size: 0.9rem;
+            }
+            .form-section {
+                padding: 16px 12px;
+                border-left: 3px solid #1c9e85;
+            }
+            .form-section h2 {
+                font-size: 1.1rem;
+                margin-bottom: 12px;
+            }
+            .form-control {
+                padding: 10px 12px;
+                font-size: 0.95rem;
+            }
+            .btn-submit {
+                width: 100%;
+                padding: 12px 16px;
+                font-size: 0.95rem;
+            }
+            .footer {
+                padding: 16px 12px;
+                font-size: 0.8rem;
+            }
+        }
     </style>
 </head>
 <body>
