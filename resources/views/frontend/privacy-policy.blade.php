@@ -149,10 +149,26 @@
             <p>Your information is used to facilitate the operation, maintenance, and improvement of our TrackAg application, which includes delivering customer support and some features.</p>
 
             <h2>Analytics and Communication:</h2>
-            <p>We might use your contact details to deliver administrative messages, updates, and communications associated with our services, Analytics tools are used to analyze usage patterns, monitor performance, and gather insights to improve our services.</p>
+            <p>We might use your contact details to deliver administrative messages, updates, and communications associated with our services. Analytics tools are used to analyze usage patterns, monitor performance, and gather insights to improve our services.</p>
+
+            <h2>Location Information</h2>
+            <p>Our application collects and processes location data, including precise latitude and longitude coordinates, to support employee attendance, field staff monitoring, route tracking, and work activity verification.</p>
+            <p>Location tracking is only activated when an employee manually starts their work session by using the Punch In feature and remains active during working hours. Location tracking stops when the employee uses the Punch Out feature.</p>
+            <p>The collected location data is used solely for:</p>
+            <ul>
+                <li>Employee attendance verification</li>
+                <li>Field workforce tracking and monitoring</li>
+                <li>Client visit and activity verification</li>
+                <li>Route and travel history reporting</li>
+                <li>Operational and workforce management purposes</li>
+            </ul>
+            <p>Location information is securely stored and accessed only by authorized personnel within the organization. We do not sell, rent, or share location data with third parties for advertising or marketing purposes.</p>
+            <p>By using the application and granting location permissions, users consent to the collection and processing of their location data as described in this Privacy Policy.</p>
+
+            <p>Background location is collected only while an employee is actively working after Punch In and is used exclusively for attendance, workforce tracking, and field activity verification. Location tracking stops when the employee Punches Out.</p>
 
             <h2>Data Safety</h2>
-            <p>We adopt necessary technical and organizational measures to ensure the protection of your information from unauthorized access, Alteration, revelation.</p>
+            <p>We adopt necessary technical and organizational measures to ensure the protection of your information from unauthorized access, alteration, disclosure, and loss.</p>
 
             <hr style="margin: 40px 0; border: 1px solid #dbe5ef;">
 
