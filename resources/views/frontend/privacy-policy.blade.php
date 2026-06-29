@@ -140,23 +140,23 @@
             <p><strong>TrackAg</strong> is committed to ensuring the privacy of our users. This Privacy Policy explains how we collect, use, disclose, and protect your information when you utilize our <strong>TrackAg</strong> application.</p>
 
             <h2>Personal Information</h2>
-            <p>We may collect personal information such as your name, email address, and contact number when you register for an account or use our services.</p>
+            <p>We may collect personal information, such as your name, email address, location and contact number, when you register for an account or make use of our services.</p>
 
-            <h2>Usage Information</h2>
-            <p>We automatically gather certain information about your device and your interaction with our application, including device type and browser information.</p>
+            <h2>Details regarding usage</h2>
+            <p>We auto gather certain information about your device and your engagement with our application, including your device type, browser information.</p>
 
             <h2>How We Handle Your Information</h2>
-            <p>Your information is used to facilitate the operation, maintenance, and improvement of our TrackAg application, including providing customer support and key features.</p>
+            <p>Your information is used to facilitate the operation, maintenance, and improvement of our TrackAg application, which includes delivering customer support and some features.</p>
 
-            <h2>Analytics and Communication</h2>
-            <p>We may use your contact details to deliver administrative messages, updates, and service-related communications. Analytics tools are used to analyze usage patterns, monitor performance, and gather insights to improve our services.</p>
+            <h2>Analytics and Communication:</h2>
+            <p>We might use your contact details to deliver administrative messages, updates, and communications associated with our services, Analytics tools are used to analyze usage patterns, monitor performance, and gather insights to improve our services.</p>
 
             <h2>Data Safety</h2>
-            <p>We adopt necessary technical and organizational measures to protect your information from unauthorized access, alteration, disclosure, and loss.</p>
+            <p>We adopt necessary technical and organizational measures to ensure the protection of your information from unauthorized access, Alteration, revelation.</p>
 
             <hr style="margin: 40px 0; border: 1px solid #dbe5ef;">
 
-            <p>This Privacy Policy may be revised periodically. Any modifications will be communicated to you by publishing the updated Privacy Policy on this page.</p>
+            <p>This Privacy Policy may be revised periodically. Any modifications will be communicated to you by publishing the updated Privacy Policy on this page</p>
 
             <p><strong>Contact us for privacy policy concerns at:</strong> <a href="mailto:sales@trackag.in" style="color: #0f4c81; font-weight: 600;">sales@trackag.in</a></p>
         </div>
