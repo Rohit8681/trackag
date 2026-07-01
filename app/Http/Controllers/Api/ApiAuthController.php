@@ -195,6 +195,7 @@ class ApiAuthController extends BaseController
         return $this->sendResponse([
             'token' => $token,
             'user' => $user,
+            'role' => $user->getRoleNames()->first(),
             'company' => $company
         ], 'User logged in successfully.');
     }
