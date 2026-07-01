@@ -202,6 +202,7 @@ Route::middleware(['web'])->group(function () {
             Route::post('order/update-items-qty', [OrderController::class, 'updateOrderItemsQty'])->name('order.items.update_qty');
             Route::get('order/{order}/dispatch-data', [OrderController::class, 'getDispatchData'])->name('order.dispatch.data');
             Route::post('order/dispatch/store', [OrderController::class, 'storeDispatch'])->name('order.dispatch.store');
+            Route::get('order-report', [OrderController::class, 'report'])->name('order.report');
             Route::resource('order', OrderController::class);
             Route::view('sales-bill-register', 'admin.order.sales_bill_register')->name('sales.bill.register');
             Route::resource('stock', StockController::class);

@@ -16,6 +16,48 @@ use Illuminate\Support\Facades\Auth;
 
 class OrderController extends Controller
 {
+    public function report(Request $request)
+    {
+        $filters = $this->getRoleBasedStateAndEmployeeFilters();
+        $roleName = $filters['roleName'];
+
+        $query = Order::with(['user.state', 'customer', 'items'])->latest();
+
+        if (!in_array($roleName, ['master_admin', 'sub_admin'])) {
+            $employeeIds = $filters['employees']->pluck('id')->push($filters['user']->id)->unique();
+            $query->whereIn('user_id', $employeeIds);
+        }
+
+        if ($request->filled('from_date')) {
+            $query->whereDate('created_at', '>=', $request->from_date);
+        }
+
+        if ($request->filled('to_date')) {
+            $query->whereDate('created_at', '<=', $request->to_date);
+        }
+
+        if ($request->filled('state_id')) {
+            $query->whereHas('user', fn ($q) => $q->where('state_id', $request->state_id));
+        }
+
+        foreach (['user_id', 'party_id', 'order_type', 'status'] as $field) {
+            if ($request->filled($field)) {
+                $query->where($field, $request->input($field));
+            }
+        }
+
+        if ($request->filled('order_no')) {
+            $query->where('order_no', 'like', '%' . $request->order_no . '%');
+        }
+
+        return view('admin.order.report', [
+            'orders' => $query->get(),
+            'states' => $filters['states'],
+            'users' => $filters['employees'],
+            'customers' => Customer::where('is_active', true)->orderBy('agro_name')->get(),
+        ]);
+    }
+
     public function index(Request $request)
     {
         $user = Auth::user();

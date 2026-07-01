@@ -103,6 +103,7 @@ Route::prefix('admin')->group(function () {
         Route::resource('monthly', MonthlyController::class);
         Route::resource('achievement', AchievementController::class);
         Route::resource('party', PartyController::class);
+        Route::get('order-report', [OrderController::class, 'report'])->name('order.report');
         Route::resource('order', OrderController::class);
         Route::resource('stock', StockController::class);
         // Route::resource('tracking', TrackingController::class);

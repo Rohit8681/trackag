@@ -176,13 +176,13 @@
                         </li>
 
                         {{-- Order Report --}}
-                        {{-- <li class="nav-item">
+                        <li class="nav-item">
                             <a href="{{ url('admin/order-report') }}"
                             class="nav-link {{ request()->is('admin/order-report*') ? 'active' : '' }}">
                                 <i class="bi bi-bar-chart-line-fill me-2"></i>
                                 <p>Order Report</p>
                             </a>
-                        </li> --}}
+                        </li>
 
                     </ul>
                 </li>
