@@ -45,10 +45,10 @@ class BudgetController extends Controller
                 
                 $achive = OrderItem::whereHas('order', function($q) use ($budget, $monthNum, $year) {
                     $q->where('user_id', $budget->user_id)
-                      ->where('status', 'dispatched') 
+                      ->where('status', 'approved')
                       ->whereMonth('created_at', $monthNum)
                       ->whereYear('created_at', $year);
-                })->sum('grand_total');
+                })->sum('total_price');
 
                 $achievements[$monthName] = $achive;
             }
@@ -203,10 +203,10 @@ class BudgetController extends Controller
                 
                 $achive = OrderItem::whereHas('order', function($q) use ($budget, $monthNum, $year) {
                     $q->where('user_id', $budget->user_id)
-                      ->where('status', 'dispatched')
+                      ->where('status', 'approved')
                       ->whereMonth('created_at', $monthNum)
                       ->whereYear('created_at', $year);
-                })->sum('grand_total');
+                })->sum('total_price');
                 
                 $stateReport[$stateId]['monthly_achievements'][$m] += $achive;
             }
