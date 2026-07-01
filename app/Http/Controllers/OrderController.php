@@ -21,7 +21,9 @@ class OrderController extends Controller
         $filters = $this->getRoleBasedStateAndEmployeeFilters();
         $roleName = $filters['roleName'];
 
-        $query = Order::with(['user.state', 'customer', 'items'])->latest();
+        $query = Order::with(['user.state', 'customer', 'items'])
+            ->where('status', 'approved')
+            ->latest();
 
         if (!in_array($roleName, ['master_admin', 'sub_admin'])) {
             $employeeIds = $filters['employees']->pluck('id')->push($filters['user']->id)->unique();
@@ -40,7 +42,7 @@ class OrderController extends Controller
             $query->whereHas('user', fn ($q) => $q->where('state_id', $request->state_id));
         }
 
-        foreach (['user_id', 'party_id', 'order_type', 'status'] as $field) {
+        foreach (['user_id', 'party_id', 'order_type'] as $field) {
             if ($request->filled($field)) {
                 $query->where($field, $request->input($field));
             }

@@ -71,15 +71,6 @@
                                 <label class="form-label">Order No</label>
                                 <input type="text" name="order_no" class="form-control" value="{{ request('order_no') }}">
                             </div>
-                            <div class="col-md-2">
-                                <label class="form-label">Status</label>
-                                <select name="status" class="form-select">
-                                    <option value="">All</option>
-                                    @foreach(['pending', 'hold', 'approved', 'rejected', 'part_dispatched', 'dispatched'] as $status)
-                                        <option value="{{ $status }}" @selected(request('status') === $status)>{{ ucwords(str_replace('_', ' ', $status)) }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
                             <div class="col-md-2 d-flex align-items-end">
                                 <button type="submit" class="btn btn-primary w-100"><i class="bi bi-funnel-fill me-1"></i>Filter</button>
                             </div>
