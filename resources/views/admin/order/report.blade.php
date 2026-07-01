@@ -113,7 +113,7 @@
                                     <td>{{ $order->order_no }}</td>
                                     <td>{{ $order->customer->agro_name ?? '-' }}</td>
                                     <td>{{ $order->user->name ?? '-' }}</td>
-                                    <td class="text-end">{{ number_format($order->items->sum('grand_total'), 2) }}</td>
+                                    <td class="text-end">{{ number_format($order->items->sum('total_price'), 2) }}</td>
                                     <td>{{ ucwords(str_replace('_', ' ', $order->status)) }}</td>
                                 </tr>
                             @empty
