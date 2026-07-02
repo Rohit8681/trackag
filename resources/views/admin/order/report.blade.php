@@ -96,7 +96,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @forelse($orders as $order)
+                            @foreach($orders as $order)
                                 <tr>
                                     <td data-order="{{ $order->created_at->timestamp }}">{{ $order->created_at->format('d-m-Y') }}</td>
                                     <td>{{ $order->user->state->name ?? '-' }}</td>
@@ -107,9 +107,7 @@
                                     <td class="text-end">{{ number_format($order->items->sum('total_price'), 2) }}</td>
                                     <td>{{ ucwords(str_replace('_', ' ', $order->status)) }}</td>
                                 </tr>
-                            @empty
-                                <tr><td colspan="8" class="text-center text-muted">No orders found.</td></tr>
-                            @endforelse
+                            @endforeach
                         </tbody>
                     </table>
                 </div>
@@ -125,7 +123,10 @@
         $('#order-report-table').DataTable({
             responsive: true,
             pageLength: 25,
-            order: [[0, 'desc']]
+            order: [[0, 'desc']],
+            language: {
+                emptyTable: 'No approved orders found.'
+            }
         });
     });
 </script>
