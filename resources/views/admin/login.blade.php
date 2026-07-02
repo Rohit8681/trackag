@@ -30,6 +30,7 @@
 
         body.login-page {
             min-height: 100vh;
+            min-height: 100dvh;
             background: #f8fafc;
             color: var(--trackag-ink);
             display: flex;
@@ -247,12 +248,18 @@
         }
 
         .login-form .form-control {
+            height: 56px;
             min-height: 56px;
             border: 0 !important;
             color: var(--trackag-ink);
             font-size: 14px;
             background: transparent;
-            padding: 0 16px;
+            padding: 1.625rem 16px 0.625rem;
+        }
+
+        .login-form .form-floating {
+            flex: 1 1 auto;
+            min-width: 0;
         }
 
         .login-form .form-control::placeholder {
@@ -262,7 +269,7 @@
         .login-form .form-floating > label {
             color: var(--trackag-muted);
             font-size: 13px;
-            padding-left: 16px;
+            padding: 1rem 16px;
         }
 
         .login-form .input-group-text {
@@ -384,8 +391,14 @@
 
         /* RESPONSIVE */
         @media (max-width: 800px) {
+            body.login-page {
+                align-items: flex-start;
+                overflow-y: auto;
+            }
+
             .login-shell {
                 grid-template-columns: 1fr;
+                border-radius: 18px;
             }
 
             .login-brand-panel {
@@ -406,18 +419,29 @@
             }
 
             .login-options {
-                flex-direction: column;
-                align-items: flex-start;
+                width: 100%;
             }
         }
 
         @media (max-width: 480px) {
             body.login-page {
-                padding: 16px;
+                padding: 12px;
             }
 
             .login-form-panel {
-                padding: 32px 20px;
+                padding: 28px 20px;
+            }
+
+            .login-logo {
+                margin-bottom: 20px;
+            }
+
+            .login-logo img {
+                max-height: 76px;
+            }
+
+            .login-heading {
+                margin-bottom: 24px;
             }
 
             .login-heading h1 {
@@ -437,7 +461,38 @@
             }
 
             .sign-in-btn {
-                width: 100%;
+                min-width: 96px;
+            }
+
+            .download-section {
+                margin-top: 22px;
+            }
+        }
+
+        @media (max-height: 700px) and (max-width: 800px) {
+            .login-form-panel {
+                padding-top: 20px;
+                padding-bottom: 20px;
+            }
+
+            .login-logo {
+                margin-bottom: 14px;
+            }
+
+            .login-logo img {
+                max-height: 64px;
+            }
+
+            .login-heading {
+                margin-bottom: 18px;
+            }
+
+            .login-heading p {
+                margin-top: 6px;
+            }
+
+            .download-section {
+                margin-top: 16px;
             }
         }
     </style>
@@ -508,7 +563,7 @@
 
                     <div class="input-group mb-1">
                         <div class="form-floating">
-                            <input name="mobile" id="mobile" type="number"
+                            <input name="mobile" id="mobile" type="tel" inputmode="numeric" maxlength="10"
                                 class="form-control @error('mobile') is-invalid @enderror mobile_no"
                                 placeholder="Mobile"
                                 @if(isset($_COOKIE["mobile"])) value="{{ $_COOKIE['mobile'] }}" @endif />
