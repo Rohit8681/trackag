@@ -27,11 +27,48 @@
     .user-settings {
         display: grid;
         gap: 6px;
-        min-width: 110px;
+        min-width: 128px;
+        padding: 8px;
+        border: 1px solid #e2e8f0;
+        border-radius: 6px;
+        background: #f8fafc;
     }
     .user-settings .btn {
         width: 100%;
+        min-height: 34px;
+        border: 0;
+        border-radius: 5px;
         white-space: nowrap;
+        color: #fff;
+        font-weight: 600;
+        transition: background-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .user-settings .btn-tada {
+        background: #174b7a;
+    }
+    .user-settings .btn-tada:hover,
+    .user-settings .btn-tada:focus {
+        background: #10395e;
+        color: #fff;
+        box-shadow: 0 0 0 3px rgba(23, 75, 122, 0.18);
+    }
+    .user-settings .btn-state-access {
+        background: #0f766e;
+    }
+    .user-settings .btn-state-access:hover,
+    .user-settings .btn-state-access:focus {
+        background: #0b5f59;
+        color: #fff;
+        box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.18);
+    }
+    .user-settings .btn-reset-password {
+        background: #b45309;
+    }
+    .user-settings .btn-reset-password:hover,
+    .user-settings .btn-reset-password:focus {
+        background: #92400e;
+        color: #fff;
+        box-shadow: 0 0 0 3px rgba(180, 83, 9, 0.18);
     }
 </style>
 <main class="app-main">
@@ -218,16 +255,16 @@
                                                 <td>
                                                     <div class="user-settings">
                                                         @if($user->id != 1)
-                                                            <button type="button" class="btn btn-sm btn-outline-primary"
+                                                            <button type="button" class="btn btn-sm btn-tada"
                                                                 onclick="openSlabModal('{{ $user->id }}')">
                                                                 TA/DA
                                                             </button>
-                                                            <button type="button" class="btn btn-sm btn-outline-info state_access"
+                                                            <button type="button" class="btn btn-sm btn-state-access state_access"
                                                                 data-user-id="{{ $user->id }}">
                                                                 State Access
                                                             </button>
                                                         @endif
-                                                        <button type="button" class="btn btn-sm btn-outline-secondary reset-password"
+                                                        <button type="button" class="btn btn-sm btn-reset-password reset-password"
                                                             data-user-id="{{ $user->id }}">
                                                             Reset Password
                                                         </button>
