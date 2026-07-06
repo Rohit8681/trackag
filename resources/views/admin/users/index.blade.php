@@ -24,6 +24,15 @@
     .table td {
         vertical-align: middle;
     }
+    .user-settings {
+        display: grid;
+        gap: 6px;
+        min-width: 110px;
+    }
+    .user-settings .btn {
+        width: 100%;
+        white-space: nowrap;
+    }
 </style>
 <main class="app-main">
     <div class="app-content-header">
@@ -149,12 +158,12 @@
                                         <tr class="text-center">
                                             <th>No</th>
                                             <th>Employee Name</th>
+                                            <th>Designation</th>
+                                            <th>Reporting To</th>
                                             <th>Address</th>
                                             <th>Other Info</th>
-                                            <th>TA/DA Info</th>
-                                            <th>State Access</th>
+                                            <th>Settings</th>
                                             <th>Status</th>
-                                            <th>Reset Password</th>
                                             <th>Actions</th>
                                         </tr>
                                     </thead>
@@ -176,15 +185,14 @@
                                                         <div style="line-height: 1.3;">
                                                             <strong>{{ $user->name }}</strong><br>
                                                             <small><strong>Mobile:</strong> {{ $user->mobile ?? '-' }}</small><br>
-                                                            <small><strong>Designation:</strong> {{ $user->designation->name ?? '-' }}</small>
                                                             @if ($user->id === $loggedInUserId)
                                                                 <span class="badge bg-success ms-1">You</span>
                                                             @endif
-                                                            <br>
-                                                            <small><strong>Reporting To:</strong> {{ $user->reportingManager->name ?? '-' }}</small>
                                                         </div>
                                                     </div>
                                                 </td>
+                                                <td>{{ $user->designation->name ?? '-' }}</td>
+                                                <td>{{ $user->reportingManager->name ?? '-' }}</td>
                                                 <td style="line-height: 1.3;">
                                                     <small><strong>State:</strong> {{ $user->state->name ?? '-' }}</small><br>
                                                     <small><strong>District:</strong> {{ $user->district->name ?? '-' }}</small><br>
@@ -205,17 +213,25 @@
                                                             <span class="text-muted">No Role</span>
                                                         @endif
                                                     </small><br>
-                                                    <small><strong>Depo:</strong> {{ $user->depos?->depo_name ?? '-' }}</small>
+                                                    <!-- <small><strong>Depo:</strong> {{ $user->depos?->depo_name ?? '-' }}</small> -->
                                                 </td>
-                                                <td class="text-center">
-                                                    @if($user->id != 1)
-                                                    <i class="fas fa-cog text-muted" style="cursor:pointer;" onclick="openSlabModal('{{ $user->id }}')"></i>
-                                                    @endif
-                                                </td>
-                                                <td class="text-center">
-                                                    @if($user->id != 1)
-                                                    <i class="fas fa-cog text-muted state_access" style="cursor:pointer;" data-user-id="{{ $user->id }}"></i>
-                                                    @endif
+                                                <td>
+                                                    <div class="user-settings">
+                                                        @if($user->id != 1)
+                                                            <button type="button" class="btn btn-sm btn-outline-primary"
+                                                                onclick="openSlabModal('{{ $user->id }}')">
+                                                                TA/DA
+                                                            </button>
+                                                            <button type="button" class="btn btn-sm btn-outline-info state_access"
+                                                                data-user-id="{{ $user->id }}">
+                                                                State Access
+                                                            </button>
+                                                        @endif
+                                                        <button type="button" class="btn btn-sm btn-outline-secondary reset-password"
+                                                            data-user-id="{{ $user->id }}">
+                                                            Reset Password
+                                                        </button>
+                                                    </div>
                                                 </td>
 
                                                 
@@ -230,10 +246,6 @@
                                                         </span>
                                                     @endif
                                                 </td>
-                                                <td class="text-center">
-                                                    <i class="fas fa-cog text-primary reset-password" style="cursor:pointer;" data-user-id="{{ $user->id }}"></i>
-                                                </td>   
-                                                
                                                 <td class="text-center">
                                                 @php
                                                     $authUser = auth()->user();
