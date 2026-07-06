@@ -173,7 +173,7 @@
                                                 value="{{ old('village') }}">
                                         </div>
 
-                                        <div class="col-md-3">
+                                        <!-- <div class="col-md-3">
                                             <label class="form-label">Pincode</label>
                                             {{-- <select name="pincode_id" id="pincode" class="form-select">
                                                 <option value="">Select Pincode</option>
@@ -196,7 +196,7 @@
                                             <label class="form-label">Longitude</label>
                                             <input type="text" name="longitude" class="form-control"
                                                 value="{{ old('longitude') }}">
-                                        </div>
+                                        </div> -->
                                     </div>
 
                                     {{-- Employment Information --}}
