@@ -355,14 +355,14 @@
 
 
                     {{-- TA-DA Report --}}
-                    <ul class="nav nav-treeview">
+                    <!-- <ul class="nav nav-treeview">
                         <li class="nav-item">
                             <a href="{{ route('coming-soon') }}" class="nav-link">
                                 <i class="bi bi-file-earmark-text me-2"></i>
                                 <p>TA-DA Report</p>
                             </a>
                         </li>
-                    </ul>
+                    </ul> -->
 
                 </li>
                 @endcanany
