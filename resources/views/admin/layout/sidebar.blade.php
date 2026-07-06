@@ -758,11 +758,11 @@
 
                         {{-- Depo Master --}}
                         @canany(['view_depo_master','create_depo_master','edit_depo_master','delete_depo_master'])
-                        <li class="nav-item">
+                        <!-- <li class="nav-item">
                             <a href="{{ url('admin/depos') }}" class="nav-link {{ request()->is('admin/depos*') ? 'active' : '' }}">
                                 <i class="bi bi-person-lines-fill me-2"></i><p>Depo Master</p>
                             </a>
-                        </li>
+                        </li> -->
                         @endcanany
 
                         {{-- Companies --}}
