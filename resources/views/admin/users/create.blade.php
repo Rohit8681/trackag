@@ -347,7 +347,7 @@
                                     </div>
 
                                     {{-- Other Info --}}
-                                    <h5 class="mb-3">Other Info</h5>
+                                    <!-- <h5 class="mb-3">Other Info</h5>
                                     <div class="row g-3 mb-4">
                                         <div class="col-md-3">
                                             <label class="form-label">A/C No. </label>
@@ -404,7 +404,7 @@
                                             <label class="form-label">Profile Image</label>
                                             <input type="file" name="image" class="form-control" accept="image/*">
                                         </div>
-                                    </div>
+                                    </div> -->
 
                                     {{-- Authentication --}}
                                     <h5 class="mb-3">Authentication</h5>

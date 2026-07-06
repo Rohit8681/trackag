@@ -323,7 +323,7 @@
                                 </div>
 
                                 {{-- Other Info --}}
-                                <h5 class="mb-3">Other Info</h5>
+                                <!-- <h5 class="mb-3">Other Info</h5>
                                 <div class="row g-3 mb-4">
                                     <div class="col-md-3">
                                         <label class="form-label">A/C No. </label>
@@ -383,7 +383,7 @@
                                     </div>
                                     
 
-                                </div>
+                                </div> -->
 
                                 {{-- Authentication --}}
                                 <h5 class="mb-3">Authentication</h5>
