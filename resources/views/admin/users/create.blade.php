@@ -283,7 +283,7 @@
                                             @enderror
                                         </div>
                                         <div class="col-md-3">
-                                            <label class="form-label">Is Self Sale<span class="text-danger">*</span></label>
+                                            <label class="form-label">Order<span class="text-danger">*</span></label>
                                             <select name="is_self_sale" class="form-select @error('is_self_sale') is-invalid @enderror">
                                                 <option value="0" {{ old('is_self_sale') == '0' ? 'selected' : '' }}>
                                                     No</option>
@@ -295,7 +295,7 @@
                                             @enderror
                                         </div>
                                         <div class="col-md-3">
-                                            <label class="form-label">Multi-Day Start/End Allowed<span class="text-danger">*</span></label>
+                                            <label class="form-label">Multi Punch In/Out Allowed<span class="text-danger">*</span></label>
                                             <select name="is_multi_day_start_end_allowed" class="form-select @error('is_multi_day_start_end_allowed') is-invalid @enderror">
                                                 <option value="0"
                                                     {{ old('is_multi_day_start_end_allowed') == '0' ? 'selected' : '' }}>No
@@ -319,7 +319,7 @@
                                         </div>
 
                                         <div class="col-md-3">
-                                            <label class="form-label">Depo Assign</label>
+                                            <label class="form-label">Party</label>
                                             <select name="depo_id" class="form-select">
                                                 <option value="">Select Depo</option>
                                                 @foreach ($depos as $depo)
@@ -332,7 +332,7 @@
                                         </div>
 
                                         <div class="col-md-3">
-                                            <label class="form-label">Is Web Login Access<span class="text-danger">*</span></label>
+                                            <label class="form-label">Web Login<span class="text-danger">*</span></label>
                                             <select name="is_web_login_access" class="form-select @error('is_web_login_access') is-invalid @enderror">
                                                 <option value="1"
                                                     {{ old('is_web_login_access') == '1' ? 'selected' : '' }}>Yes</option>
