@@ -798,7 +798,7 @@
                                 {{-- SALES PRODUCT MASTER --}}
                                 <li class="nav-item">
                                     <a href="{{ url('admin/products') }}" class="nav-link {{ request()->is('admin/products*') ? 'active' : '' }}">
-                                        <i class="bi bi-circle me-2"></i><p>Sales Product Master</p>
+                                        <i class="bi bi-circle me-2"></i><p>Product Master</p>
                                     </a>
                                 </li>
 
