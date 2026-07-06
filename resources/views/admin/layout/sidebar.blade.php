@@ -853,11 +853,11 @@
 
                             <ul class="nav nav-treeview">
                                 {{-- PRICE MASTER --}}
-                                <li class="nav-item">
+                                <!-- <li class="nav-item">
                                     <a href="{{ url('admin/price') }}" class="nav-link {{ request()->is('admin/price*') ? 'active' : '' }}">
                                         <i class="bi bi-circle me-2"></i><p>Price Master</p>
                                     </a>
-                                </li>
+                                </li> -->
 
                                 {{-- PRICE LIST --}}
                                 <li class="nav-item">
