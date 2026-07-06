@@ -56,7 +56,7 @@
 
                                 {{-- Party Code --}}
                                 <div class="mb-3 col-md-4">
-                                    <label for="party_code" class="form-label">Party Code <span class="text-danger">*</span></label>
+                                    <label for="party_code" class="form-label">Party Code </label>
                                     <input type="text" name="party_code" id="party_code"
                                            class="form-control @error('party_code') is-invalid @enderror"
                                            value="{{ old('party_code', $customer->party_code) }}">
@@ -158,7 +158,7 @@
                                 </div>
 
                                 {{-- Depo --}}
-                                <div class="mb-3 col-md-4">
+                                <!-- <div class="mb-3 col-md-4">
                                     <label for="depo_id" class="form-label">Depo<span class="text-danger">*</span></label>
                                     <select name="depo_id" id="depo_id"
                                             class="form-select @error('depo_id') is-invalid @enderror">
@@ -170,7 +170,7 @@
                                         @endforeach
                                     </select>
                                     @error('depo_id') <small class="text-danger">{{ $message }}</small> @enderror
-                                </div>
+                                </div> -->
 
                                 {{-- Party Active Since --}}
                                 <div class="mb-3 col-md-4">
