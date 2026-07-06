@@ -130,7 +130,7 @@
                                 <th>Bill Type</th>
                                 <th>Bill Title</th>
                                 <th>Bill Details</th>
-                                <th>Travel Mode</th>
+                                <th>Other</th>
                                 <th>Amount</th>
                                 <th>Image</th>
                                 <th>Status</th>
