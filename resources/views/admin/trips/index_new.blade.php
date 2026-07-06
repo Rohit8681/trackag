@@ -179,6 +179,66 @@
     border-radius: 8px;
 }
 </style>
+@push('styles')
+<style>
+    .trips-page { min-height: calc(100vh - 57px); background: #f5f7fa; color: #243447; }
+    .trips-hero {
+        display: flex; align-items: center; justify-content: space-between; gap: 16px;
+        padding: 6px 0; border-radius: 0; background: transparent; color: #172b3f; box-shadow: none;
+    }
+    .trips-hero h3 { font-size: 24px; }
+    .trips-hero .breadcrumb a,
+    .trips-hero .breadcrumb-item,
+    .trips-hero .breadcrumb-item.active { color: #66788a; }
+    .trips-hero .breadcrumb-item + .breadcrumb-item::before { color: #9aa7b4; }
+    .trip-summary-bar {
+        display: grid; grid-template-columns: repeat(4, minmax(130px, 1fr));
+        margin-bottom: 16px; overflow: hidden; border: 1px solid #dfe5ec;
+        border-radius: 7px; background: #fff;
+    }
+    .trip-summary-item { padding: 13px 16px; border-right: 1px solid #e7ebf0; }
+    .trip-summary-item:last-child { border-right: 0; }
+    .trip-summary-label { display: block; margin-bottom: 2px; color: #6b7785; font-size: 12px; font-weight: 600; }
+    .trip-summary-value { color: #172b3f; font-size: 21px; font-weight: 700; line-height: 1.2; }
+    .trip-panel { overflow: hidden; border: 1px solid #dfe5ec; border-radius: 7px; box-shadow: 0 4px 14px rgba(31, 45, 61, 0.06); }
+    .filter-panel {
+        margin: -16px -16px 16px; padding: 16px; border: 0; border-bottom: 1px solid #e5e9ef;
+        border-radius: 0; background: #f9fafb;
+    }
+    .filter-panel .form-label { margin-bottom: 5px; color: #44546a; font-size: 12px; font-weight: 600; }
+    .filter-panel .form-control, .filter-panel .form-select { min-height: 36px; border-color: #ced6df; border-radius: 5px; background-color: #fff; }
+    .trip-table { min-width: 1350px; margin-bottom: 0; border-color: #e2e7ed; color: #2f3d4d; font-size: 13px; }
+    .trip-table thead th {
+        position: sticky; top: 0; z-index: 2; padding: 11px 9px; border-color: #dce2e8;
+        background: #eaf0f5; color: #263b50; font-size: 11px; font-weight: 700; vertical-align: middle;
+    }
+    .trip-table tbody td { padding: 11px 9px; border-color: #e8ecf1; background: #fff; vertical-align: middle; }
+    .trip-table tbody tr:nth-child(even) td { background: #fbfcfd; }
+    .trip-table tbody tr:hover td { background: #f2f7fb; }
+    .agent-pill { gap: 9px; min-width: 145px; }
+    .agent-pill::before { display: none; }
+    .agent-avatar {
+        display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px;
+        flex: 0 0 34px; border-radius: 50%; background: #dbeafe; color: #1e4f82;
+        font-size: 12px; font-weight: 700;
+    }
+    .trip-place-column { width: 210px; max-width: 210px; }
+    .trip-place-text { width: 210px; max-width: 210px; }
+    .trip-soft-badge { margin-bottom: 5px; padding: 4px 7px; border-color: #d6e0e8; border-radius: 5px; background: #f3f6f8; color: #36536d; font-weight: 600; }
+    .trip-data-line { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 4px; }
+    .trip-data-line strong { color: #647385; font-weight: 600; }
+    .action-stack { display: grid; gap: 6px; min-width: 104px; }
+    .action-stack .btn { border-radius: 5px; }
+    .trip-type-btn { border-radius: 6px; }
+    @media (max-width: 767.98px) {
+        .trips-hero { align-items: flex-start; flex-direction: column; }
+        .trips-hero .breadcrumb { margin: 0; }
+        .trip-summary-bar { grid-template-columns: repeat(2, 1fr); }
+        .trip-summary-item:nth-child(2) { border-right: 0; }
+        .trip-summary-item:nth-child(-n+2) { border-bottom: 1px solid #e7ebf0; }
+    }
+</style>
+@endpush
 @section('content')
 <main class="app-main trips-page">
     <div class="app-content-header">
@@ -186,8 +246,7 @@
             <div class="trips-hero">
             <div class="row align-items-center">
                 <div class="col-sm-6">
-                    <h3 class="mb-1 fw-bold"><i class="fas fa-route me-2"></i>Trips</h3>
-                    <div class="small opacity-75">Trip approvals, route logs, odometer readings and map tracking</div>
+                    <h3 class="mb-0 fw-bold"><i class="fas fa-route me-2 text-primary"></i>Trips</h3>
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-end mb-0">
@@ -203,6 +262,30 @@
     {{-- Main Content --}}
     <div class="app-content">
         <div class="container-fluid">
+            @php
+                $totalTrips = $trips->count();
+                $runningTrips = $trips->where('status', '!=', 'completed')->count();
+                $pendingTrips = $trips->where('approval_status', 'pending')->count();
+                $approvedTrips = $trips->where('approval_status', 'approved')->count();
+            @endphp
+            <div class="trip-summary-bar" aria-label="Trip summary">
+                <div class="trip-summary-item">
+                    <span class="trip-summary-label">Total Trips</span>
+                    <span class="trip-summary-value">{{ $totalTrips }}</span>
+                </div>
+                <div class="trip-summary-item">
+                    <span class="trip-summary-label">Running</span>
+                    <span class="trip-summary-value text-primary">{{ $runningTrips }}</span>
+                </div>
+                <div class="trip-summary-item">
+                    <span class="trip-summary-label">Pending Approval</span>
+                    <span class="trip-summary-value text-warning">{{ $pendingTrips }}</span>
+                </div>
+                <div class="trip-summary-item">
+                    <span class="trip-summary-label">Approved</span>
+                    <span class="trip-summary-value text-success">{{ $approvedTrips }}</span>
+                </div>
+            </div>
             <div class="card trip-panel">
                 <div class="card-body">
                     {{-- 🔹 Filter Section --}}
@@ -291,10 +374,21 @@
                                             <td class="text-center fw-semibold text-secondary">{{ $loop->iteration }}</td>
 
                                             <td>
-                                                <span class="agent-pill">{{ $trip->user->name ?? 'N/A' }}</span><br>
+                                                @php
+                                                    $agentName = $trip->user->name ?? 'N/A';
+                                                    $agentInitials = collect(explode(' ', trim($agentName)))
+                                                        ->filter()
+                                                        ->take(2)
+                                                        ->map(fn ($part) => strtoupper(substr($part, 0, 1)))
+                                                        ->implode('');
+                                                @endphp
+                                                <span class="agent-pill">
+                                                    <span class="agent-avatar">{{ $agentInitials ?: 'NA' }}</span>
+                                                    {{ $agentName }}
+                                                </span>
                                             </td>
                                             <td>
-                                                 <div>
+                                                 <div class="trip-data-line">
                                                     <strong>Start:</strong>
                                                     @php $startTime = $trip->start_time; @endphp
                                                     <span class="text-success">
@@ -302,7 +396,7 @@
                                                         {{ $startTime ? \Carbon\Carbon::parse($startTime)->format('H:i a') : '-' }}
                                                     </span>
                                                 </div>
-                                                <div>
+                                                <div class="trip-data-line">
                                                     <strong>End:</strong>
                                                     @if ($trip->status === 'completed')
                                                         @php $endTime = $trip->end_time; @endphp
@@ -353,9 +447,9 @@
                                             </td>
 
                                             <td>
-                                                <div><strong>Start:</strong> {{ $trip->starting_km ?? '-' }}</div>
-                                                <div><strong>End:</strong> {{ $trip->end_km ?? '-' }}</div>
-                                                <div><strong>Diff:</strong>
+                                                <div class="trip-data-line"><strong>Start:</strong><span>{{ $trip->starting_km ?? '-' }}</span></div>
+                                                <div class="trip-data-line"><strong>End:</strong><span>{{ $trip->end_km ?? '-' }}</span></div>
+                                                <div class="trip-data-line"><strong>Diff:</strong><span>
                                                     @if (!is_null($trip->starting_km) && !is_null($trip->end_km))
                                                         <span class="fw-semibold text-primary">
                                                             {{ (float) $trip->end_km - (float) $trip->starting_km }}
@@ -363,8 +457,8 @@
                                                     @else
                                                         -
                                                     @endif
-                                                </div>
-                                                <div><strong>GPS (km):</strong> {{ $trip->total_distance_km }}</div>
+                                                </span></div>
+                                                <div class="trip-data-line"><strong>GPS:</strong><span>{{ $trip->total_distance_km }} km</span></div>
                                             </td>
 
                                             <td class="text-center">
@@ -380,7 +474,7 @@
                                                     {{-- Logs count --}}
                                                     <span class="badge bg-info text-dark px-2 py-1"
                                                         style="font-size: 11px;">
-                                                        {{ $trip->tripLogs->count() ?? 0 }} logs
+                                                        {{ $trip->trip_logs_count }} logs
                                                     </span>
 
                                                     {{-- View Logs --}}

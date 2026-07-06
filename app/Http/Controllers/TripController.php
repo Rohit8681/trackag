@@ -37,7 +37,8 @@ class TripController extends Controller
         $filters = $this->getRoleBasedStateAndEmployeeFilters();
         extract($filters);
 
-        $query = Trip::with(['user', 'company', 'approvedByUser', 'tripLogs', 'customers', 'travelMode', 'tourType']);
+        $query = Trip::with(['user', 'company', 'approvedByUser', 'customers', 'travelMode', 'tourType'])
+            ->withCount('tripLogs');
 
         if (!in_array($roleName, ['master_admin', 'sub_admin'])) {
             if (empty($stateIds)) {
