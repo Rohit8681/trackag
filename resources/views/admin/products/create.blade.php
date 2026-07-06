@@ -134,7 +134,7 @@
                                 <span class="text-danger error-text technical_name_error"></span>
                             </div>
 
-                            <div class="col-md-3">
+                            <!-- <div class="col-md-3">
                                 <label class="form-label">Product Category </label>
                                 <select name="product_category_id" class="form-select">
                                     <option value="">-- Select Category --</option>
@@ -143,31 +143,24 @@
                                     @endforeach
                                 </select>
                                 <span class="text-danger error-text product_category_id_error"></span>
-                            </div>
+                            </div> -->
 
-                            <div class="col-md-3">
+                            <!-- <div class="col-md-3">
                                 <label class="form-label">Item Code </label>
                                 <input type="text" name="item_code" class="form-control">
                                 <span class="text-danger error-text item_code_error"></span>
-                            </div>
+                            </div> -->
 
-                            <div class="col-md-3">
+                            <!-- <div class="col-md-3">
                                 <label class="form-label">Shipper Gross Weight (KG) <span
                                         class="text-danger">*</span></label>
                                 <input type="number" step="0.01" name="shipper_gross_weight" class="form-control" required>
                                 <span class="text-danger error-text shipper_gross_weight_error"></span>
-                            </div>
+                            </div> -->
 
-                            {{-- <div class="col-md-3">
-                                <label class="form-label">Product States <span class="text-danger">*</span></label>
-                                <select name="product_states[]" class="form-select select2" multiple required>
-                                    @foreach($states as $state)
-                                    <option value="{{ $state->id }}">{{ $state->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div> --}}
+                            
 
-                            <div class="col-md-3">
+                            <!-- <div class="col-md-3">
                                 <label class="form-label">Master Packing </label>
                                 <select name="master_packing" class="form-select">
                                     <option value="">-- Select --</option>
@@ -175,7 +168,7 @@
                                     <option value="No">No</option>
                                 </select>
                                 <span class="text-danger error-text master_packing_error"></span>
-                            </div>
+                            </div> -->
                             <div class="col-md-3">
                                 <label class="form-label">GST<span class="text-danger">*</span></label>
                                 <select name="gst" class="form-select" required>

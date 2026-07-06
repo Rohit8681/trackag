@@ -47,7 +47,7 @@ class ProductController extends Controller
         $request->validate([
             'product_name'        => 'required',
             'technical_name'      => 'required',
-            'shipper_gross_weight'=> 'required',
+            // 'shipper_gross_weight'=> 'required',
             'gst'                 => 'required',
             'packing_value'       => 'required|array',
         ]);
@@ -146,7 +146,7 @@ class ProductController extends Controller
         $request->validate([
             'product_name' => 'required',
             'technical_name' => 'required',
-            'shipper_gross_weight' => 'required',
+            // 'shipper_gross_weight' => 'required',
             'gst' => 'required',
             'packing_value' => 'required|array',
         ]);
