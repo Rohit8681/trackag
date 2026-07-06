@@ -47,10 +47,7 @@
                                 <tr>
                                     <th style="width:40px;">No</th>
                                     <th>Product Name</th>
-                                    <th>Category</th>
-                                    <th>Item Code</th>
                                     <th>Packing</th>
-                                    <th>Master Packing</th>
                                     <th>Status</th>
                                     <th style="width:90px;">Action</th>
                                 </tr>
@@ -70,14 +67,6 @@
                                         </td>
 
                                         <td>
-                                            {{ $product->category->name ?? '-' }}
-                                        </td>
-
-                                        <td>
-                                            {{ $product->item_code ?? '-' }}
-                                        </td>
-
-                                        <td>
                                             @if($product->packings->isNotEmpty())
                                                 @foreach($product->packings as $packing)
                                                     <span class="badge bg-light text-dark border">
@@ -86,14 +75,6 @@
                                                 @endforeach
                                             @else
                                                 -
-                                            @endif
-                                        </td>
-
-                                        <td>
-                                            @if($product->master_packing == "Yes")
-                                                <span class="badge bg-success">Yes</span>
-                                            @else
-                                                <span class="badge bg-secondary">No</span>
                                             @endif
                                         </td>
 
@@ -114,7 +95,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="8" class="text-center text-muted">
+                                        <td colspan="5" class="text-center text-muted">
                                             No products found.
                                         </td>
                                     </tr>
