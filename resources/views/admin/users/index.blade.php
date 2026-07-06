@@ -151,10 +151,7 @@
                                             <th>Employee Name</th>
                                             <th>Address</th>
                                             <th>Other Info</th>
-                                            <th>It Self Sale</th>
-                                            <th>Salary</th>
                                             <th>TA/DA Info</th>
-                                            <th>Depo Access</th>
                                             <th>State Access</th>
                                             <th>Status</th>
                                             <th>Reset Password</th>
@@ -211,24 +208,8 @@
                                                     <small><strong>Depo:</strong> {{ $user->depos?->depo_name ?? '-' }}</small>
                                                 </td>
                                                 <td class="text-center">
-                                                    <span class="badge {{ $user->is_self_sale ? 'bg-success' : 'bg-danger' }}">
-                                                        {{ $user->is_self_sale ? 'Yes' : 'No' }}
-                                                    </span>
-                                                </td>
-                                                <td class="text-center">
-                                                    @if($user->id != 1)
-                                                        <i class="fas fa-cog text-muted"></i>
-                                                    @endif
-                                                    
-                                                </td>
-                                                <td class="text-center">
                                                     @if($user->id != 1)
                                                     <i class="fas fa-cog text-muted" style="cursor:pointer;" onclick="openSlabModal('{{ $user->id }}')"></i>
-                                                    @endif
-                                                </td>
-                                                <td class="text-center">
-                                                    @if($user->id != 1)
-                                                    <i class="fas fa-cog text-muted depo_access" style="cursor:pointer;" data-user-id="{{ $user->id }}"></i>
                                                     @endif
                                                 </td>
                                                 <td class="text-center">
@@ -332,7 +313,7 @@
                                             </tr>
                                         @empty
                                             <tr>
-                                                <td colspan="12" class="text-center text-muted">No users found.</td>
+                                                <td colspan="9" class="text-center text-muted">No users found.</td>
                                             </tr>
                                         @endforelse
                                     </tbody>
@@ -960,4 +941,3 @@ $(document).ready(function() {
 
 </script>
 @endpush
-

@@ -276,7 +276,7 @@
                                         </div>
                                         <div class="col-md-3">
                                             <label class="form-label">Emergency Contact<span class="text-danger">*</span></label>
-                                            <input type="text" name="emergency_contact_no" class="form-control @error('emergency_contact_no') is-invalid @enderror"
+                                            <input type="text" name="emergency_contact_no" class="form-control emergency_contact_no @error('emergency_contact_no') is-invalid @enderror"
                                                 value="{{ old('emergency_contact_no') }}">
                                                 @error('emergency_contact_no')
                                             <div class="invalid-feedback">{{ $message }}</div>
@@ -531,7 +531,7 @@ $(document).ready(function () {
     };
 
     
-    $('.mobile_no').on('input', function () {
+    $('.mobile_no, .emergency_contact_no').on('input', function () {
         this.value = this.value.replace(/\D/g, '').slice(0, 10);
     });
 
