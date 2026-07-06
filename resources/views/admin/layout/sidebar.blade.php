@@ -722,7 +722,7 @@
                                     <a href="{{ url('admin/users') }}"
                                     class="nav-link {{ request()->is('admin/users*') ? 'active' : '' }}">
                                         <i class="bi bi-person-fill me-2"></i>
-                                        <p>Manage Users</p>
+                                        <p>Add Users</p>
                                     </a>
                                 </li>
                                 @endcanany
