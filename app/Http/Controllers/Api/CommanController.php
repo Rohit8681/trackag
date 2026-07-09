@@ -21,26 +21,28 @@ class CommanController extends Controller
     public function priceList(Request $request)
     {
         $user = Auth::user();
-        $query = PriceList::with('state:id,name');
 
-        if ($user->state_id) {
-            $query->where('state_id', $user->state_id);
-        }
-
-        $prices = $query->latest()->get()->map(function ($item) {
-            return [
-                'id'        => $item->id,
-                'date'      => $item->created_at
-                                    ->timezone('Asia/Kolkata')
-                                    ->format('d-m-Y'),
-                'state'     => $item->state->name ?? '',
-                'pdf_url'   => asset('storage/'.$item->pdf_path),
-            ];
-        });
+        $prices = PriceList::with('state:id,name')
+            ->when($user->state_id, function ($query) use ($user) {
+                $query->where('state_id', $user->state_id);
+            })
+            ->latest()
+            ->limit(1)
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'id'      => $item->id,
+                    'date'    => $item->created_at
+                        ->timezone('Asia/Kolkata')
+                        ->format('d-m-Y'),
+                    'state'   => $item->state->name ?? '',
+                    'pdf_url' => asset('storage/' . $item->pdf_path),
+                ];
+            });
 
         return response()->json([
             'status' => true,
-            'data'   => $prices
+            'data'   => $prices,
         ]);
     }
 
