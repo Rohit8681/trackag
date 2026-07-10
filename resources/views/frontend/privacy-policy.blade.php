@@ -170,6 +170,20 @@
             <h2>Data Safety</h2>
             <p>We adopt necessary technical and organizational measures to ensure the protection of your information from unauthorized access, alteration, disclosure, and loss.</p>
 
+            <h2>Background Location Disclosure</h2>
+            <p>TrackAg collects precise location data, including in the background, to support employee attendance tracking, field activity verification, route monitoring, travel distance calculation, and workforce management.</p>
+            <p>Location data is collected only after an employee manually initiates a work session by selecting Punch In and granting the required location permissions. Location tracking remains active during the work session, including when the application is closed, minimized, or not actively in use.</p>
+            <p>Location tracking automatically stops when the employee selects Punch Out or ends the work session.</p>
+            <p>Background location data is used exclusively for:</p>
+            <ul>
+                <li>Employee attendance verification</li>
+                <li>Real-time field staff tracking</li>
+                <li>Client and site visit verification</li>
+                <li>Travel distance and route calculation</li>
+                <li>Work activity reporting and workforce management</li>
+            </ul>
+            <p>TrackAg does not use location data for advertising purposes and does not sell location information to third parties. Location data is accessible only to authorized personnel for business and operational purposes.</p>
+
             <hr style="margin: 40px 0; border: 1px solid #dbe5ef;">
 
             <p>This Privacy Policy may be revised periodically. Any modifications will be communicated to you by publishing the updated Privacy Policy on this page</p>
