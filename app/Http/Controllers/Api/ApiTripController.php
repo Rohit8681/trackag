@@ -18,7 +18,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 
 class ApiTripController extends BaseController
 {
@@ -116,7 +115,6 @@ class ApiTripController extends BaseController
     
     public function logPoint(Request $request)
     {
-        Log::info('Full Request Data:', $request->all());
         $validated = $request->validate([
             'location' => 'required|array|min:1',
             'location.*.tripId' => 'required',
@@ -195,7 +193,6 @@ class ApiTripController extends BaseController
     // Create a new trip via API
     public function storeTrip(Request $request)
     {
-        Log::info('STORE TRIP RAW REQUEST', $request->all());
         $validated = $request->validate([
             'trip_date'      => 'nullable|date',
             'start_time'     => 'nullable',
@@ -210,21 +207,13 @@ class ApiTripController extends BaseController
             'customer_ids'   => 'nullable|array',
             'battery_percentage' => 'nullable',
         ]);
-         Log::info('VALIDATED TRIP DATA', $validated);
 
         $user = Auth::user();
-         Log::info('AUTH USER', ['user_id' => $user->id]);
         $startKmPhoto = null;
         if ($request->hasFile('start_km_photo')) {
             try {
-                Log::error('Received file:', [
-                    'exists' => $request->hasFile('start_km_photo'),
-                    'valid' => $request->file('start_km_photo')->isValid(),
-                    'size' => $request->file('start_km_photo')->getSize(),
-                ]);
                 $startKmPhoto = $request->file('start_km_photo')->store('trip_photos', 'public');
             } catch (\Exception $e) {
-                Log::error('File upload failed: ' . $e->getMessage());
                 // Handle the error appropriately
             }
         }
@@ -233,7 +222,6 @@ class ApiTripController extends BaseController
             try {
                 $endKmPhoto = $request->file('end_km_photo')->store('trip_photos', 'public');
             } catch (\Exception $e) {
-                Log::error('File upload failed: ' . $e->getMessage());
                 // Handle the error appropriately
             }
         }
@@ -248,7 +236,6 @@ class ApiTripController extends BaseController
                 $validated['end_lat'],
                 $validated['end_lng']
             );
-            Log::info('DISTANCE CALCULATED', ['km' => $distance]);
         }
 
         $trip = Trip::create([
@@ -284,14 +271,10 @@ class ApiTripController extends BaseController
                 'recorded_at' => now(),
             ]);
         }
-        Log::info('TRIP CREATED SUCCESSFULLY', ['trip_id' => $trip->id,'user_id' => $user->id,]);
 
         // Attach customers if provided
         if (!empty($validated['customer_ids'])) {
             $trip->customers()->attach($validated['customer_ids']);
-            Log::info('CUSTOMERS ATTACHED', ['customer_ids' => $validated['customer_ids']]);
-        }else{
-            Log::info('NO CUSTOMER IDS PROVIDED');
         }
         return $this->sendResponse($trip->load(["purpose", "tourType", "travelMode", "company", "approvedByUser", "user"]), "Day logs created successfully");
     }
@@ -301,7 +284,6 @@ class ApiTripController extends BaseController
         $logs = TripLog::where('trip_id', $tripId)->orderBy('recorded_at')->get();
 
         if ($logs->count() < 2) {
-            Log::warning('Not enough trip logs to calculate distance', ['trip_id' => $tripId]);
             return 0;
         }
 
@@ -316,12 +298,6 @@ class ApiTripController extends BaseController
 
             if (is_numeric($km) && !is_nan($km) && !is_infinite($km)) {
                 $distance += $km;
-            } else {
-                Log::warning('Skipped invalid segment in distance calculation', [
-                    'trip_id' => $tripId,
-                    'index' => $i,
-                    'value' => $km
-                ]);
             }
         }
 
@@ -377,10 +353,6 @@ class ApiTripController extends BaseController
 
             $user = Auth::user();
             if ($trip->user_id !== $user->id) {
-                Log::warning('Unauthorized trip access attempt', [
-                    'user_id' => $user->id,
-                    'trip_user_id' => $trip->user_id
-                ]);
                 return $this->sendError('Trip is not assigned you', [], 403);
             }
 
@@ -420,20 +392,9 @@ class ApiTripController extends BaseController
             return $this->sendResponse($trip, "Trip has been closed");
 
         } catch (\Illuminate\Validation\ValidationException $e) {
-            Log::error('Validation error in trip close API', [
-                'errors' => $e->errors(),
-                'request_data' => $request->all()
-            ]);
             return $this->sendError('Validation failed', $e->errors(), 422);
 
         } catch (\Exception $e) {
-            Log::error('Unexpected error in trip close API', [
-                'message' => $e->getMessage(),
-                'file' => $e->getFile(),
-                'line' => $e->getLine(),
-                'trace' => $e->getTraceAsString(),
-                'request_data' => $request->all(),
-            ]);
             return $this->sendError('Something went wrong while closing trip.', [], 500);
         }
     }
@@ -463,69 +424,8 @@ class ApiTripController extends BaseController
         return $this->sendResponse($log, "GPS Log Saved Successfully");
     }
 
-//    public function getMyTrips(Request $request)
-//     {
-//         $user = Auth::user();
-
-//         $query = Trip::with([
-//                 'tourType',
-//                 'travelMode',
-//                 'purpose',
-//                 'purposeData',
-//                 'user'
-//             ]);
-
-//         if (!$user->hasRole('master_admin') && !$user->hasRole('sub_admin')) {
-//             $userIds = User::where('reporting_to', $user->id)->pluck('id');
-//             $userIds->push($user->id);
-
-//             $query->whereIn('user_id', $userIds);
-//         }
-
-//         $trips = $query
-//             ->latest()
-//             ->get()
-//             ->map(function ($data) {
-//                 return [
-//                     'id' => $data->id,
-//                     'employee_name' => optional($data->user)->name,
-//                     'trip_date' => $data->trip_date,
-//                     'tour_type' => optional($data->tourType)->name,
-//                     'travel_mode' => optional($data->travelMode)->name,
-//                     'tour_purpose' => optional($data->purposeData)->name,
-//                     'start_time' => $data->start_time,
-//                     'end_time' => $data->end_time,
-//                     'visit_place' => $data->place_to_visit,
-
-//                     'starting_km' => $data->starting_km,
-//                     'end_km' => $data->end_km,
-
-//                     'travel_km' => ($data->end_km && $data->starting_km)
-//     ? ((float)$data->end_km - (float)$data->starting_km)
-//     : 0,
-
-//                     'gps_km' => $data->total_distance_km ?? 0,
-
-//                     // km difference same as travel_km
-//                     'km_diff' => ($data->end_km && $data->starting_km)
-//     ? ((float)$data->end_km - (float)$data->starting_km)
-//     : 0,
-//                     'approval_status' => $data->approval_status,
-
-//                     'ta_exp' => "",
-//                     'da_exp' => "",
-//                     'other_exp' => "",
-//                     'total' => "",
-//                 ];
-//             });
-
-//         return $this->sendResponse($trips, "Trips fetched successfully");
-//     }
-
-
     public function getMyTrips(Request $request)
     {
-        Log::info('getMyTrips Request Params', $request->all());
         $user = Auth::user();
 
         $query = Trip::with([
