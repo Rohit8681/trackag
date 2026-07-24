@@ -191,8 +191,6 @@ class OrderController extends Controller
         
     public function store(Request $request)
     {
-        Log::info('Order Store API Called', ['request' => $request->all()]);
-
         $request->validate([
             'party_id' => 'required',
             'order_type' => 'required|in:cash,debit',
@@ -200,20 +198,17 @@ class OrderController extends Controller
         ]);
 
         $user = Auth::user();
-        Log::info('Authenticated User', ['user_id' => $user->id]);
 
         // 🔹 Get State Code
         $state = State::find($user->state_id); 
         $stateCode = $state ? $state->state_code : 'ORD';
 
-        Log::info('State Code', ['state_code' => $stateCode]);
 
         // 🔹 Get Last Order
         $lastOrder = Order::where('order_no', 'like', $stateCode . '-%')
             ->latest()
             ->first();
 
-        Log::info('Last Order', ['last_order' => $lastOrder]);
 
         $nextNumber = 1;
 
@@ -225,7 +220,6 @@ class OrderController extends Controller
         // 🔹 Generate Order Number
         $orderNo = $stateCode . '-ORD-' . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
 
-        Log::info('Generated Order No', ['order_no' => $orderNo]);
 
         // 🔹 Create Order
         $order = Order::create([
@@ -240,12 +234,10 @@ class OrderController extends Controller
             'status' => 'pending'
         ]);
 
-        Log::info('Order Created', ['order_id' => $order->id]);
 
         // 🔹 Store Products
         foreach ($request->products as $item) {
 
-            Log::info('Processing Product', ['item' => $item]);
 
             OrderItem::create([
                 'order_id' => $order->id,
@@ -260,8 +252,6 @@ class OrderController extends Controller
                 'qty' => $item['qty'] ?? 1
             ]);
         }
-
-        Log::info('All Products Stored Successfully');
 
         return response()->json([
             'status' => true,

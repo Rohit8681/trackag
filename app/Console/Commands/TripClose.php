@@ -19,8 +19,6 @@ class TripClose extends Command
         $today = Carbon::today('Asia/Kolkata');
         $currentTime = Carbon::now('Asia/Kolkata');
 
-        Log::info("🚀 Trip Close started at {$currentTime->toDateTimeString()} for all tenants");
-
         $tenants = Tenant::all();
 
         if ($tenants->isEmpty()) {

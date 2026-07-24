@@ -611,7 +611,7 @@ class ExpenseController extends Controller
 
         Storage::disk('public')->put($path, $pdf->output());
 
-        ExpensePdf::create([
+        $expensePdf = ExpensePdf::create([
             'user_id' => $selected_user_id,
             'pdf_path'=> $path,
             'month'   => $month,
@@ -621,8 +621,38 @@ class ExpenseController extends Controller
             'pdf_status' => 1
         ]);
 
+        $this->sendExpenseReportApprovalNotification($expensePdf, $trips->count(), $total_total);
+
         return back()->with('success', 'Expense PDF generated successfully.');
     }
+
+    private function sendExpenseReportApprovalNotification(ExpensePdf $expensePdf, int $tripCount, $totalAmount): void
+    {
+        try {
+            $user = User::find($expensePdf->user_id);
+
+            if (!$user || empty($user->fcm_token)) {
+                return;
+            }
+
+            $firebaseService = app(\App\Services\FirebaseService::class);
+            $monthLabel = Carbon::parse($expensePdf->month . '-01')->format('F Y');
+            $title = 'Expense Report Approved';
+            $message = "Your expense report for {$monthLabel} has been approved.";
+
+            $firebaseService->sendNotification($user->fcm_token, $title, $message, [
+                'type' => 'expense_report_approved',
+                'expense_pdf_id' => (string) $expensePdf->id,
+                'month' => $expensePdf->month,
+                'trip_count' => (string) $tripCount,
+                'total_amount' => (string) $totalAmount,
+                'pdf_url' => asset('storage/' . $expensePdf->pdf_path),
+            ]);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Failed to send expense report approval notification: ' . $e->getMessage());
+        }
+    }
+
     public function expensePdfList(){
         $pdfs = ExpensePdf::with('user')
         ->latest()

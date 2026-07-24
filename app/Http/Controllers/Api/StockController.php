@@ -140,10 +140,6 @@ class StockController extends Controller
 
     public function bulkUpdateStock(Request $request)
     {
-        \Log::info('Bulk Stock API Hit', [
-            'request_data' => $request->all()
-        ]);
-
         $request->validate([
             'customer_id' => 'nullable|integer',
             'products' => 'required|array',
@@ -156,13 +152,7 @@ class StockController extends Controller
         $userId = Auth::id() ?? $request->user()->id ?? null;
         $customerId = $request->input('customer_id');
 
-        \Log::info('User & Customer Info', [
-            'user_id' => $userId,
-            'customer_id' => $customerId
-        ]);
-
         if (!$userId) {
-            \Log::error('Unauthorized user tried to update stock');
 
             return response()->json([
                 'success' => false,
@@ -171,19 +161,7 @@ class StockController extends Controller
         }
 
         foreach ($request->products as $product) {
-
-            \Log::info('Processing Product', [
-                'product_id' => $product['product_id']
-            ]);
-
             foreach ($product['packings'] as $packing) {
-
-                \Log::info('Processing Packing', [
-                    'product_id' => $product['product_id'],
-                    'packing_id' => $packing['packing_id'],
-                    'quantity' => $packing['quantity']
-                ]);
-
                 try {
                     $stock = Stock::updateOrCreate(
                         [
@@ -198,23 +176,12 @@ class StockController extends Controller
                         ]
                     );
 
-                    \Log::info('Stock Updated/Created', [
-                        'stock_id' => $stock->id,
-                        'data' => $stock
-                    ]);
 
                 } catch (\Exception $e) {
-                    \Log::error('Stock Update Failed', [
-                        'error' => $e->getMessage(),
-                        'product_id' => $product['product_id'],
-                        'packing_id' => $packing['packing_id']
-                    ]);
+                    
                 }
             }
         }
-
-        \Log::info('Bulk Stock Update Completed');
-
         return response()->json([
             'success' => true,
             'message' => 'Stock updated successfully.'

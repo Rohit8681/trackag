@@ -117,13 +117,42 @@ class PartyPaymentController extends Controller
             'clear_return_date' => 'required|date',
         ]);
 
-        $payment = PartyPayment::findOrFail($request->id);
+        $payment = PartyPayment::with(['user', 'customer'])->findOrFail($request->id);
 
         $payment->update([
             'clear_return_date' => $request->clear_return_date,
             'status' => 'payment received',
         ]);
 
+        $this->sendPaymentReceivedNotification($payment);
+
         return redirect()->back()->with('success', 'Payment marked as received successfully.');
+    }
+
+    private function sendPaymentReceivedNotification(PartyPayment $payment): void
+    {
+        try {
+            $payment->loadMissing(['user', 'customer']);
+
+            if (!$payment->user || empty($payment->user->fcm_token)) {
+                return;
+            }
+
+            $firebaseService = app(\App\Services\FirebaseService::class);
+            $partyName = $payment->customer->agro_name ?? 'Party payment';
+            $title = 'Payment Received';
+            $message = "Payment for {$partyName} has been marked as received.";
+
+            $firebaseService->sendNotification($payment->user->fcm_token, $title, $message, [
+                'type' => 'party_payment_status',
+                'party_payment_id' => (string) $payment->id,
+                'customer_id' => (string) $payment->customer_id,
+                'status' => $payment->status,
+                'amount' => (string) $payment->amount,
+                'clear_return_date' => (string) ($payment->clear_return_date ?? ''),
+            ]);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Failed to send party payment notification: ' . $e->getMessage());
+        }
     }
 }
