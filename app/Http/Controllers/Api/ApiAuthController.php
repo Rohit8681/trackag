@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use ZipArchive;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
 
 class ApiAuthController extends BaseController
@@ -129,6 +130,12 @@ class ApiAuthController extends BaseController
         $companyCode = $request->company_code;
         $mobile = $request->company_mobile;
         $password = $request->password;
+        Log::info('login_new fcm_token received', [
+            'company_code' => $companyCode,
+            'mobile' => $mobile,
+            'has_fcm_token' => $request->filled('fcm_token'),
+            'fcm_token_length' => $request->filled('fcm_token') ? strlen($request->fcm_token) : 0,
+        ]);
 
         // 1️⃣ Find company in central DB
         $company = Company::where('code', $companyCode)->first();
@@ -191,6 +198,12 @@ class ApiAuthController extends BaseController
             $user->fcm_token = $request->fcm_token;
         }
         $user->save();
+        Log::info('login_new fcm_token saved', [
+            'tenant_db' => $tenant->tenancy_db_name,
+            'user_id' => $user->id,
+            'has_saved_fcm_token' => !empty($user->fcm_token),
+            'saved_fcm_token_length' => !empty($user->fcm_token) ? strlen($user->fcm_token) : 0,
+        ]);
 
         return $this->sendResponse([
             'token' => $token,
