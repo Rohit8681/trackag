@@ -267,9 +267,11 @@ class ExpenseController extends Controller
 
     public function approve($id)
     {
-        $expense = Expense::findOrFail($id);
+        $expense = Expense::with('user')->findOrFail($id);
         $expense->approval_status = 'Approved';
         $expense->save();
+
+        $this->sendExpenseStatusNotification($expense);
 
         return redirect()->back()->with('success', 'Expense approved successfully.');
     }
@@ -279,12 +281,40 @@ class ExpenseController extends Controller
             'reject_reason' => 'required|string'
         ]);
 
-        $expense = Expense::findOrFail($id);
+        $expense = Expense::with('user')->findOrFail($id);
         $expense->approval_status = 'Rejected';
         $expense->reject_reason = $request->reject_reason;
         $expense->save();
 
+        $this->sendExpenseStatusNotification($expense);
+
         return redirect()->back()->with('error', 'Expense rejected.');
+    }
+
+    private function sendExpenseStatusNotification(Expense $expense): void
+    {
+        try {
+            $expense->loadMissing('user');
+
+            if (!$expense->user || empty($expense->user->fcm_token)) {
+                return;
+            }
+
+            $firebaseService = app(\App\Services\FirebaseService::class);
+            $title = "Expense #{$expense->id} {$expense->approval_status}";
+            $message = $expense->approval_status === 'Approved'
+                ? 'Your expense has been approved.'
+                : 'Your expense has been rejected.';
+
+            $firebaseService->sendNotification($expense->user->fcm_token, $title, $message, [
+                'type' => 'expense_status',
+                'expense_id' => (string) $expense->id,
+                'status' => $expense->approval_status,
+                'reject_reason' => $expense->reject_reason ?? '',
+            ]);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Failed to send expense status notification: ' . $e->getMessage());
+        }
     }
 
     public function expenseReport(Request $request)

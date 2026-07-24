@@ -402,13 +402,49 @@ class PartyController extends Controller
             'remark' => $request->status == 'approved' ? 'nullable|string' : 'required|string',
         ]);
 
-        $customer = Customer::findOrFail($request->customer_id);
+        $customer = Customer::with('user')->findOrFail($request->customer_id);
 
         $customer->status = $request->status;
         $customer->remarks = $request->remark;
         $customer->save();
 
+        $this->sendNewPartyStatusNotification($customer);
+
         return back()->with('success', 'Status updated successfully!');
+    }
+
+    private function sendNewPartyStatusNotification(Customer $customer): void
+    {
+        try {
+            $customer->loadMissing('user');
+
+            if (!$customer->user || empty($customer->user->fcm_token)) {
+                return;
+            }
+
+            $firebaseService = app(\App\Services\FirebaseService::class);
+            $partyName = $customer->agro_name ?? 'Your party';
+            $statusText = ucfirst($customer->status);
+            $title = "{$partyName} {$statusText}";
+
+            $message = "Your new party status has been updated to {$customer->status}.";
+            if ($customer->status === 'approved') {
+                $message = "{$partyName} has been approved.";
+            } elseif ($customer->status === 'rejected') {
+                $message = "{$partyName} has been rejected.";
+            } elseif ($customer->status === 'hold') {
+                $message = "{$partyName} has been placed on hold.";
+            }
+
+            $firebaseService->sendNotification($customer->user->fcm_token, $title, $message, [
+                'type' => 'new_party_status',
+                'party_id' => (string) $customer->id,
+                'status' => $customer->status,
+                'remark' => $customer->remarks ?? '',
+            ]);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Failed to send new party status notification: ' . $e->getMessage());
+        }
     }
 
     public function partyVisitReport()

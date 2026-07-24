@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Foundation\Application;
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 
@@ -20,6 +21,9 @@ return Application::configure(basePath: dirname(__DIR__))
             'last_seen' => \App\Http\Middleware\UpdateLastSeen::class,
             'company.access' => \App\Http\Middleware\CheckCompanyAccess::class,
         ]); 
+    })
+    ->withSchedule(function (Schedule $schedule) {
+        $schedule->command('trip:close-reminder')->dailyAt('21:00')->timezone('Asia/Kolkata');
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

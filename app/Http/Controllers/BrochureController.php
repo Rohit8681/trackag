@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Brochure;
 use App\Models\Company;
 use App\Models\State;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class BrochureController extends Controller
@@ -47,12 +48,47 @@ class BrochureController extends Controller
 
         $path = $request->file('pdf')->store('brochures', 'public');
 
-        Brochure::create([
+        $brochure = Brochure::create([
             'state_id' => $request->state_id,
             'pdf_path' => $path,
         ]);
 
+        $this->sendBrochureNotification($brochure);
+
         return redirect()->route('brochure.index')->with('success', 'Brochure uploaded successfully');
+    }
+
+    private function sendBrochureNotification(Brochure $brochure): void
+    {
+        try {
+            $brochure->loadMissing('state');
+
+            $users = User::where('state_id', $brochure->state_id)
+                ->where('status', 'Active')
+                ->whereNotNull('fcm_token')
+                ->where('fcm_token', '!=', '')
+                ->get();
+
+            if ($users->isEmpty()) {
+                return;
+            }
+
+            $firebaseService = app(\App\Services\FirebaseService::class);
+            $stateName = $brochure->state->name ?? 'your state';
+            $title = 'New Brochure Uploaded';
+            $message = "New brochure has been uploaded for {$stateName}.";
+
+            foreach ($users as $user) {
+                $firebaseService->sendNotification($user->fcm_token, $title, $message, [
+                    'type' => 'brochure',
+                    'brochure_id' => (string) $brochure->id,
+                    'state_id' => (string) $brochure->state_id,
+                    'pdf_url' => asset('storage/' . $brochure->pdf_path),
+                ]);
+            }
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Failed to send brochure notification: ' . $e->getMessage());
+        }
     }
 
     public function show(string $id)

@@ -51,6 +51,9 @@ class FirebaseService
 
         try {
             $notification = Notification::create($title, $body);
+            $data = collect($data)->mapWithKeys(function ($value, $key) {
+                return [(string) $key => is_scalar($value) || is_null($value) ? (string) $value : json_encode($value)];
+            })->all();
             
             $message = CloudMessage::withTarget('token', $fcmToken)
                 ->withNotification($notification)

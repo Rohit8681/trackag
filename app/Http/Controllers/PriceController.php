@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Company;
 use App\Models\PriceList;
 use App\Models\State;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class PriceController extends Controller
@@ -49,12 +50,47 @@ class PriceController extends Controller
 
         $path = $request->file('pdf')->store('price_lists', 'public');
 
-        PriceList::create([
+        $priceList = PriceList::create([
             'state_id' => $request->state_id,
             'pdf_path' => $path,
         ]);
 
+        $this->sendPriceListNotification($priceList);
+
         return redirect()->route('price.index')->with('success', 'Price list uploaded successfully');
+    }
+
+    private function sendPriceListNotification(PriceList $priceList): void
+    {
+        try {
+            $priceList->loadMissing('state');
+
+            $users = User::where('state_id', $priceList->state_id)
+                ->where('status', 'Active')
+                ->whereNotNull('fcm_token')
+                ->where('fcm_token', '!=', '')
+                ->get();
+
+            if ($users->isEmpty()) {
+                return;
+            }
+
+            $firebaseService = app(\App\Services\FirebaseService::class);
+            $stateName = $priceList->state->name ?? 'your state';
+            $title = 'New Price List Uploaded';
+            $message = "New price list has been uploaded for {$stateName}.";
+
+            foreach ($users as $user) {
+                $firebaseService->sendNotification($user->fcm_token, $title, $message, [
+                    'type' => 'price_list',
+                    'price_list_id' => (string) $priceList->id,
+                    'state_id' => (string) $priceList->state_id,
+                    'pdf_url' => asset('storage/' . $priceList->pdf_path),
+                ]);
+            }
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Failed to send price list notification: ' . $e->getMessage());
+        }
     }
 
     public function show(PriceList $price)

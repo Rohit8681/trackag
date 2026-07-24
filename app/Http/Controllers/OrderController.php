@@ -250,6 +250,7 @@ class OrderController extends Controller
                 }
 
                 $firebaseService->sendNotification($order->user->fcm_token, $title, $statusMessage, [
+                    'type' => 'order_status',
                     'order_id' => (string) $order->id,
                     'status' => $order->status
                 ]);
@@ -464,6 +465,7 @@ class OrderController extends Controller
                         : "Your order is partially dispatched.";
 
                     $firebaseService->sendNotification($order->user->fcm_token, $title, $statusMessage, [
+                        'type' => 'order_dispatch',
                         'order_id' => (string) $order->id,
                         'status' => $order->status
                     ]);

@@ -367,7 +367,7 @@ class TripController extends Controller
 
     public function approve(Request $request, $id)
     {
-        $trip = Trip::findOrFail($id);
+        $trip = Trip::with('user')->findOrFail($id);
         $status = $request->input('status', 'approved');
         $reason = $request->input('reason');
         $tripType = $request->input('trip_type'); // full or half
@@ -404,7 +404,37 @@ class TripController extends Controller
             'trip_limit_override' => $status === 'approved' ? ($overrideValue ?? 0) : 0,
         ]);
 
+        $this->sendTripApprovalNotification($trip);
+
         return redirect()->back()->with('success', 'Trip approval status updated successfully.');
+    }
+
+    private function sendTripApprovalNotification(Trip $trip): void
+    {
+        try {
+            $trip->loadMissing('user');
+
+            if (!$trip->user || empty($trip->user->fcm_token)) {
+                return;
+            }
+
+            $firebaseService = app(\App\Services\FirebaseService::class);
+            $statusText = $trip->approval_status === 'approved' ? 'Approved' : 'Rejected';
+            $title = "Trip #{$trip->id} {$statusText}";
+            $message = $trip->approval_status === 'approved'
+                ? 'Your trip has been approved.'
+                : 'Your trip has been rejected.';
+
+            $firebaseService->sendNotification($trip->user->fcm_token, $title, $message, [
+                'type' => 'trip_status',
+                'trip_id' => (string) $trip->id,
+                'status' => $trip->approval_status,
+                'approval_reason' => $trip->approval_reason ?? '',
+                'trip_date' => (string) ($trip->trip_date ?? ''),
+            ]);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Failed to send trip approval notification: ' . $e->getMessage());
+        }
     }
 
 
