@@ -23,7 +23,7 @@ return Application::configure(basePath: dirname(__DIR__))
         ]); 
     })
     ->withSchedule(function (Schedule $schedule) {
-        $schedule->command('trip:close-reminder')->dailyAt('21:00')->timezone('Asia/Kolkata');
+        $schedule->command('trip:close-reminder')->hourly()->between('21:00', '23:59')->timezone('Asia/Kolkata');
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
