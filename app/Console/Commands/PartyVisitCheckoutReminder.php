@@ -24,20 +24,20 @@ class PartyVisitCheckoutReminder extends Command
         $totalSent = 0;
         $totalFailed = 0;
 
-        Log::info('Party visit checkout reminder command started.', [
+        $this->cronLog('info', 'Party visit checkout reminder command started.', [
             'now' => $now->toDateTimeString(),
             'today' => $today,
             'tenant_count' => $tenants->count(),
         ]);
 
         if ($tenants->isEmpty()) {
-            Log::warning('No tenants found for party visit checkout reminder.');
+            $this->cronLog('warning', 'No tenants found for party visit checkout reminder.');
             return self::SUCCESS;
         }
 
         foreach ($tenants as $tenant) {
             if (empty($tenant->tenancy_db_name)) {
-                Log::warning('Party visit checkout reminder tenant skipped because database name is empty.', [
+                $this->cronLog('warning', 'Party visit checkout reminder tenant skipped because database name is empty.', [
                     'tenant_id' => $tenant->id ?? null,
                 ]);
                 continue;
@@ -46,7 +46,7 @@ class PartyVisitCheckoutReminder extends Command
             try {
                 $this->useTenantDatabase($tenant->tenancy_db_name);
 
-                Log::info('Party visit checkout reminder tenant processing started.', [
+                $this->cronLog('info', 'Party visit checkout reminder tenant processing started.', [
                     'tenant_db' => $tenant->tenancy_db_name,
                     'tenant_id' => $tenant->id ?? null,
                 ]);
@@ -82,7 +82,7 @@ class PartyVisitCheckoutReminder extends Command
 
                 $totalOpenVisits += $openVisits->count();
 
-                Log::info('Party visit checkout reminder open visits checked.', [
+                $this->cronLog('info', 'Party visit checkout reminder open visits checked.', [
                     'tenant_db' => $tenant->tenancy_db_name,
                     'open_visit_rows' => $openVisitRows,
                     'eligible_users_with_fcm_token' => $openVisits->count(),
@@ -114,7 +114,7 @@ class PartyVisitCheckoutReminder extends Command
 
                     $logLevel = $sent ? 'info' : 'warning';
 
-                    Log::$logLevel('Party visit checkout reminder notification processed.', [
+                    $this->cronLog($logLevel, 'Party visit checkout reminder notification processed.', [
                         'tenant_db' => $tenant->tenancy_db_name,
                         'party_visit_id' => $visit->party_visit_id,
                         'user_id' => $visit->user_id,
@@ -123,7 +123,7 @@ class PartyVisitCheckoutReminder extends Command
                 }
 
             } catch (\Exception $e) {
-                Log::error('Failed to send party visit checkout reminders.', [
+                $this->cronLog('error', 'Failed to send party visit checkout reminders.', [
                     'tenant_db' => $tenant->tenancy_db_name,
                     'message' => $e->getMessage(),
                     'file' => $e->getFile(),
@@ -132,7 +132,7 @@ class PartyVisitCheckoutReminder extends Command
             }
         }
 
-        Log::info('Party visit checkout reminder command finished.', [
+        $this->cronLog('info', 'Party visit checkout reminder command finished.', [
             'now' => Carbon::now('Asia/Kolkata')->toDateTimeString(),
             'tenant_count' => $tenants->count(),
             'total_eligible_users' => $totalOpenVisits,
@@ -160,5 +160,20 @@ class PartyVisitCheckoutReminder extends Command
 
         DB::purge('tenant');
         DB::reconnect('tenant');
+    }
+
+    private function cronLog(string $level, string $message, array $context = []): void
+    {
+        Log::$level($message, $context);
+
+        $logDirectory = storage_path('logs');
+        if (!is_dir($logDirectory)) {
+            @mkdir($logDirectory, 0775, true);
+        }
+
+        $contextJson = $context ? ' '.json_encode($context, JSON_UNESCAPED_SLASHES) : '';
+        $line = '['.Carbon::now('Asia/Kolkata')->toDateTimeString().'] local.'.strtoupper($level).': '.$message.$contextJson.PHP_EOL;
+
+        @file_put_contents($logDirectory.'/laravel.log', $line, FILE_APPEND | LOCK_EX);
     }
 }

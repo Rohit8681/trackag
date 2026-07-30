@@ -24,20 +24,20 @@ class TripCloseReminder extends Command
         $totalSent = 0;
         $totalFailed = 0;
 
-        Log::info('Trip close reminder command started.', [
+        $this->cronLog('info', 'Trip close reminder command started.', [
             'now' => $now->toDateTimeString(),
             'today' => $today,
             'tenant_count' => $tenants->count(),
         ]);
 
         if ($tenants->isEmpty()) {
-            Log::warning('No tenants found for trip close reminder.');
+            $this->cronLog('warning', 'No tenants found for trip close reminder.');
             return self::SUCCESS;
         }
 
         foreach ($tenants as $tenant) {
             if (empty($tenant->tenancy_db_name)) {
-                Log::warning('Trip close reminder tenant skipped because database name is empty.', [
+                $this->cronLog('warning', 'Trip close reminder tenant skipped because database name is empty.', [
                     'tenant_id' => $tenant->id ?? null,
                 ]);
                 continue;
@@ -46,7 +46,7 @@ class TripCloseReminder extends Command
             try {
                 $this->useTenantDatabase($tenant->tenancy_db_name);
 
-                Log::info('Trip close reminder tenant processing started.', [
+                $this->cronLog('info', 'Trip close reminder tenant processing started.', [
                     'tenant_db' => $tenant->tenancy_db_name,
                     'tenant_id' => $tenant->id ?? null,
                 ]);
@@ -83,7 +83,7 @@ class TripCloseReminder extends Command
 
                 $totalOpenTrips += $openTrips->count();
 
-                Log::info('Trip close reminder open trips checked.', [
+                $this->cronLog('info', 'Trip close reminder open trips checked.', [
                     'tenant_db' => $tenant->tenancy_db_name,
                     'open_trip_rows' => $openTripRows,
                     'eligible_users_with_fcm_token' => $openTrips->count(),
@@ -111,7 +111,7 @@ class TripCloseReminder extends Command
 
                     $logLevel = $sent ? 'info' : 'warning';
 
-                    Log::$logLevel('Trip close reminder notification processed.', [
+                    $this->cronLog($logLevel, 'Trip close reminder notification processed.', [
                         'tenant_db' => $tenant->tenancy_db_name,
                         'trip_id' => $trip->trip_id,
                         'user_id' => $trip->user_id,
@@ -120,7 +120,7 @@ class TripCloseReminder extends Command
                 }
 
             } catch (\Exception $e) {
-                Log::error('Failed to send trip close reminders.', [
+                $this->cronLog('error', 'Failed to send trip close reminders.', [
                     'tenant_db' => $tenant->tenancy_db_name,
                     'message' => $e->getMessage(),
                     'file' => $e->getFile(),
@@ -129,7 +129,7 @@ class TripCloseReminder extends Command
             }
         }
 
-        Log::info('Trip close reminder command finished.', [
+        $this->cronLog('info', 'Trip close reminder command finished.', [
             'now' => Carbon::now('Asia/Kolkata')->toDateTimeString(),
             'tenant_count' => $tenants->count(),
             'total_eligible_users' => $totalOpenTrips,
@@ -157,5 +157,20 @@ class TripCloseReminder extends Command
 
         DB::purge('tenant');
         DB::reconnect('tenant');
+    }
+
+    private function cronLog(string $level, string $message, array $context = []): void
+    {
+        Log::$level($message, $context);
+
+        $logDirectory = storage_path('logs');
+        if (!is_dir($logDirectory)) {
+            @mkdir($logDirectory, 0775, true);
+        }
+
+        $contextJson = $context ? ' '.json_encode($context, JSON_UNESCAPED_SLASHES) : '';
+        $line = '['.Carbon::now('Asia/Kolkata')->toDateTimeString().'] local.'.strtoupper($level).': '.$message.$contextJson.PHP_EOL;
+
+        @file_put_contents($logDirectory.'/laravel.log', $line, FILE_APPEND | LOCK_EX);
     }
 }
