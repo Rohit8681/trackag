@@ -150,7 +150,7 @@ class PartyPaymentController extends Controller
                 'status' => $payment->status,
                 'amount' => (string) $payment->amount,
                 'clear_return_date' => (string) ($payment->clear_return_date ?? ''),
-            ]);
+            ], $payment->user->id);
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('Failed to send party payment notification: ' . $e->getMessage());
         }

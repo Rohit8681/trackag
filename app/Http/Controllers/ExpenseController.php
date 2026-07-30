@@ -311,7 +311,7 @@ class ExpenseController extends Controller
                 'expense_id' => (string) $expense->id,
                 'status' => $expense->approval_status,
                 'reject_reason' => $expense->reject_reason ?? '',
-            ]);
+            ], $expense->user->id);
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('Failed to send expense status notification: ' . $e->getMessage());
         }
@@ -647,7 +647,7 @@ class ExpenseController extends Controller
                 'trip_count' => (string) $tripCount,
                 'total_amount' => (string) $totalAmount,
                 'pdf_url' => asset('storage/' . $expensePdf->pdf_path),
-            ]);
+            ], $user->id);
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('Failed to send expense report approval notification: ' . $e->getMessage());
         }

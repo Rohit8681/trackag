@@ -441,7 +441,7 @@ class PartyController extends Controller
                 'party_id' => (string) $customer->id,
                 'status' => $customer->status,
                 'remark' => $customer->remarks ?? '',
-            ]);
+            ], $customer->user->id);
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('Failed to send new party status notification: ' . $e->getMessage());
         }

@@ -253,7 +253,7 @@ class OrderController extends Controller
                     'type' => 'order_status',
                     'order_id' => (string) $order->id,
                     'status' => $order->status
-                ]);
+                ], $order->user->id);
             }
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('Failed to send push notification: ' . $e->getMessage());
@@ -468,7 +468,7 @@ class OrderController extends Controller
                         'type' => 'order_dispatch',
                         'order_id' => (string) $order->id,
                         'status' => $order->status
-                    ]);
+                    ], $order->user->id);
                 }
             } catch (\Exception $e) {
                 \Illuminate\Support\Facades\Log::error('Failed to send push notification on dispatch: ' . $e->getMessage());

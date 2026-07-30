@@ -69,7 +69,8 @@ class PartyVisitCheckoutReminder extends Command
                             'user_id' => (string) $visit->user_id,
                             'visited_date' => (string) $visit->visited_date,
                             'check_in_time' => (string) $visit->check_in_time,
-                        ]
+                        ],
+                        $visit->user_id
                     );
                 }
 

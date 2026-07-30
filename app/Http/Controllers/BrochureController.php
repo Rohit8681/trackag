@@ -84,7 +84,7 @@ class BrochureController extends Controller
                     'brochure_id' => (string) $brochure->id,
                     'state_id' => (string) $brochure->state_id,
                     'pdf_url' => asset('storage/' . $brochure->pdf_path),
-                ]);
+                ], $user->id);
             }
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('Failed to send brochure notification: ' . $e->getMessage());

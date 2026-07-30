@@ -64,7 +64,8 @@ class TripCloseReminder extends Command
                             'trip_id' => (string) $trip->trip_id,
                             'user_id' => (string) $trip->user_id,
                             'trip_date' => (string) $trip->trip_date,
-                        ]
+                        ],
+                        $trip->user_id
                     );
                 }
 

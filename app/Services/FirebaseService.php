@@ -5,7 +5,9 @@ namespace App\Services;
 use Kreait\Firebase\Factory;
 use Kreait\Firebase\Messaging\CloudMessage;
 use Kreait\Firebase\Messaging\Notification;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 use Exception;
 
 class FirebaseService
@@ -35,35 +37,43 @@ class FirebaseService
      * @param string $title
      * @param string $body
      * @param array $data
+     * @param int|null $userId
      * @return bool
      */
-    public function sendNotification($fcmToken, $title, $body, $data = [])
+    public function sendNotification($fcmToken, $title, $body, $data = [], $userId = null)
     {
+        $data = collect($data)->mapWithKeys(function ($value, $key) {
+            return [(string) $key => is_scalar($value) || is_null($value) ? (string) $value : json_encode($value)];
+        })->all();
+
+        $notificationLogId = $this->storeNotificationLog($fcmToken, $title, $body, $data, $userId);
+
         if (!$this->messaging) {
             Log::error('Firebase messaging is not initialized.');
+            $this->markNotificationFailed($notificationLogId, 'Firebase messaging is not initialized.');
             return false;
         }
 
         if (empty($fcmToken)) {
             Log::warning('Cannot send notification, FCM token is empty.');
+            $this->markNotificationFailed($notificationLogId, 'FCM token is empty.');
             return false;
         }
 
         try {
             $notification = Notification::create($title, $body);
-            $data = collect($data)->mapWithKeys(function ($value, $key) {
-                return [(string) $key => is_scalar($value) || is_null($value) ? (string) $value : json_encode($value)];
-            })->all();
             
             $message = CloudMessage::withTarget('token', $fcmToken)
                 ->withNotification($notification)
                 ->withData($data);
 
             $this->messaging->send($message);
+            $this->markNotificationSent($notificationLogId);
             
             Log::info("Push notification sent successfully to token: {$fcmToken}");
             return true;
         } catch (Exception $e) {
+            $this->markNotificationFailed($notificationLogId, $e->getMessage());
             Log::error('Firebase send notification error: ' . $e->getMessage(), [
                 'token' => $fcmToken,
                 'title' => $title,
@@ -71,5 +81,76 @@ class FirebaseService
             ]);
             return false;
         }
+    }
+
+    private function storeNotificationLog($fcmToken, string $title, string $body, array $data, $userId = null): ?int
+    {
+        try {
+            $connection = $this->notificationLogConnection();
+
+            if (!Schema::connection($connection)->hasTable('notification_logs')) {
+                return null;
+            }
+
+            $resolvedUserId = $userId ?? ($data['user_id'] ?? null);
+
+            return DB::connection($connection)->table('notification_logs')->insertGetId([
+                'user_id' => is_numeric($resolvedUserId) ? (int) $resolvedUserId : null,
+                'type' => $data['type'] ?? null,
+                'title' => $title,
+                'body' => $body,
+                'data' => json_encode($data),
+                'fcm_token' => $fcmToken,
+                'status' => 'pending',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        } catch (Exception $e) {
+            Log::error('Failed to store notification log: ' . $e->getMessage());
+            return null;
+        }
+    }
+
+    private function markNotificationSent(?int $notificationLogId): void
+    {
+        $this->updateNotificationLog($notificationLogId, [
+            'status' => 'sent',
+            'sent_at' => now(),
+            'updated_at' => now(),
+        ]);
+    }
+
+    private function markNotificationFailed(?int $notificationLogId, string $errorMessage): void
+    {
+        $this->updateNotificationLog($notificationLogId, [
+            'status' => 'failed',
+            'error_message' => $errorMessage,
+            'updated_at' => now(),
+        ]);
+    }
+
+    private function updateNotificationLog(?int $notificationLogId, array $values): void
+    {
+        if (!$notificationLogId) {
+            return;
+        }
+
+        try {
+            DB::connection($this->notificationLogConnection())
+                ->table('notification_logs')
+                ->where('id', $notificationLogId)
+                ->update($values);
+        } catch (Exception $e) {
+            Log::error('Failed to update notification log: ' . $e->getMessage());
+        }
+    }
+
+    private function notificationLogConnection(): string
+    {
+        if (tenancy()->tenant || !empty(config('database.connections.tenant.database'))) {
+            return 'tenant';
+        }
+
+        return config('database.default');
     }
 }

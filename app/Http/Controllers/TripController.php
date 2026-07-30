@@ -431,7 +431,7 @@ class TripController extends Controller
                 'status' => $trip->approval_status,
                 'approval_reason' => $trip->approval_reason ?? '',
                 'trip_date' => (string) ($trip->trip_date ?? ''),
-            ]);
+            ], $trip->user->id);
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('Failed to send trip approval notification: ' . $e->getMessage());
         }

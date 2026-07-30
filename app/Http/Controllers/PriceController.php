@@ -86,7 +86,7 @@ class PriceController extends Controller
                     'price_list_id' => (string) $priceList->id,
                     'state_id' => (string) $priceList->state_id,
                     'pdf_url' => asset('storage/' . $priceList->pdf_path),
-                ]);
+                ], $user->id);
             }
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('Failed to send price list notification: ' . $e->getMessage());
