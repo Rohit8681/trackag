@@ -54,8 +54,13 @@ class TripCloseReminder extends Command
                     ->get()
                     ->unique('user_id');
 
+                Log::info('Trip close reminder open trips found.', [
+                    'tenant_db' => $tenant->tenancy_db_name,
+                    'count' => $openTrips->count(),
+                ]);
+
                 foreach ($openTrips as $trip) {
-                    $firebaseService->sendNotification(
+                    $sent = $firebaseService->sendNotification(
                         $trip->fcm_token,
                         'Punch Out Reminder',
                         'Your day trip is still active. Please punch out once your day trip is finished.',
@@ -67,12 +72,15 @@ class TripCloseReminder extends Command
                         ],
                         $trip->user_id
                     );
+
+                    Log::info('Trip close reminder notification processed.', [
+                        'tenant_db' => $tenant->tenancy_db_name,
+                        'trip_id' => $trip->trip_id,
+                        'user_id' => $trip->user_id,
+                        'sent' => $sent,
+                    ]);
                 }
 
-                Log::info('Trip close reminders sent.', [
-                    'tenant_db' => $tenant->tenancy_db_name,
-                    'count' => $openTrips->count(),
-                ]);
             } catch (\Exception $e) {
                 Log::error('Failed to send trip close reminders.', [
                     'tenant_db' => $tenant->tenancy_db_name,

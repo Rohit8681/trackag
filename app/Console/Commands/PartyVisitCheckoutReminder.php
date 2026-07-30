@@ -55,10 +55,15 @@ class PartyVisitCheckoutReminder extends Command
                     ->get()
                     ->unique('user_id');
 
+                Log::info('Party visit checkout reminder open visits found.', [
+                    'tenant_db' => $tenant->tenancy_db_name,
+                    'count' => $openVisits->count(),
+                ]);
+
                 foreach ($openVisits as $visit) {
                     $partyName = $visit->agro_name ?? 'your party visit';
 
-                    $firebaseService->sendNotification(
+                    $sent = $firebaseService->sendNotification(
                         $visit->fcm_token,
                         'Party Visit Checkout Reminder',
                         "Your visit for {$partyName} is still active. Please check out once the visit is finished.",
@@ -72,12 +77,15 @@ class PartyVisitCheckoutReminder extends Command
                         ],
                         $visit->user_id
                     );
+
+                    Log::info('Party visit checkout reminder notification processed.', [
+                        'tenant_db' => $tenant->tenancy_db_name,
+                        'party_visit_id' => $visit->party_visit_id,
+                        'user_id' => $visit->user_id,
+                        'sent' => $sent,
+                    ]);
                 }
 
-                Log::info('Party visit checkout reminders sent.', [
-                    'tenant_db' => $tenant->tenancy_db_name,
-                    'count' => $openVisits->count(),
-                ]);
             } catch (\Exception $e) {
                 Log::error('Failed to send party visit checkout reminders.', [
                     'tenant_db' => $tenant->tenancy_db_name,

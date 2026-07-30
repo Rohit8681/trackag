@@ -313,7 +313,6 @@ class ExpenseController extends Controller
                 'reject_reason' => $expense->reject_reason ?? '',
             ], $expense->user->id);
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error('Failed to send expense status notification: ' . $e->getMessage());
         }
     }
 
@@ -649,7 +648,6 @@ class ExpenseController extends Controller
                 'pdf_url' => asset('storage/' . $expensePdf->pdf_path),
             ], $user->id);
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error('Failed to send expense report approval notification: ' . $e->getMessage());
         }
     }
 

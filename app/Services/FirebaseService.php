@@ -6,7 +6,6 @@ use Kreait\Firebase\Factory;
 use Kreait\Firebase\Messaging\CloudMessage;
 use Kreait\Firebase\Messaging\Notification;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
 use Exception;
 
@@ -22,11 +21,8 @@ class FirebaseService
             if (file_exists($credentialsPath)) {
                 $factory = (new Factory)->withServiceAccount($credentialsPath);
                 $this->messaging = $factory->createMessaging();
-            } else {
-                Log::warning('Firebase credentials file not found at: ' . $credentialsPath);
             }
         } catch (Exception $e) {
-            Log::error('Firebase initialization error: ' . $e->getMessage());
         }
     }
 
@@ -49,13 +45,11 @@ class FirebaseService
         $notificationLogId = $this->storeNotificationLog($fcmToken, $title, $body, $data, $userId);
 
         if (!$this->messaging) {
-            Log::error('Firebase messaging is not initialized.');
             $this->markNotificationFailed($notificationLogId, 'Firebase messaging is not initialized.');
             return false;
         }
 
         if (empty($fcmToken)) {
-            Log::warning('Cannot send notification, FCM token is empty.');
             $this->markNotificationFailed($notificationLogId, 'FCM token is empty.');
             return false;
         }
@@ -70,15 +64,9 @@ class FirebaseService
             $this->messaging->send($message);
             $this->markNotificationSent($notificationLogId);
             
-            Log::info("Push notification sent successfully to token: {$fcmToken}");
             return true;
         } catch (Exception $e) {
             $this->markNotificationFailed($notificationLogId, $e->getMessage());
-            Log::error('Firebase send notification error: ' . $e->getMessage(), [
-                'token' => $fcmToken,
-                'title' => $title,
-                'body'  => $body,
-            ]);
             return false;
         }
     }
@@ -106,7 +94,6 @@ class FirebaseService
                 'updated_at' => now(),
             ]);
         } catch (Exception $e) {
-            Log::error('Failed to store notification log: ' . $e->getMessage());
             return null;
         }
     }
@@ -141,7 +128,6 @@ class FirebaseService
                 ->where('id', $notificationLogId)
                 ->update($values);
         } catch (Exception $e) {
-            Log::error('Failed to update notification log: ' . $e->getMessage());
         }
     }
 

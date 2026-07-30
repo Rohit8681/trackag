@@ -89,7 +89,6 @@ class PriceController extends Controller
                 ], $user->id);
             }
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error('Failed to send price list notification: ' . $e->getMessage());
         }
     }
 

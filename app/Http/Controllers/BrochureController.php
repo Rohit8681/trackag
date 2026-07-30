@@ -87,7 +87,6 @@ class BrochureController extends Controller
                 ], $user->id);
             }
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error('Failed to send brochure notification: ' . $e->getMessage());
         }
     }
 

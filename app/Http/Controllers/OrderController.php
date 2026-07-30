@@ -256,7 +256,6 @@ class OrderController extends Controller
                 ], $order->user->id);
             }
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error('Failed to send push notification: ' . $e->getMessage());
         }
 
         return response()->json([
@@ -471,7 +470,6 @@ class OrderController extends Controller
                     ], $order->user->id);
                 }
             } catch (\Exception $e) {
-                \Illuminate\Support\Facades\Log::error('Failed to send push notification on dispatch: ' . $e->getMessage());
             }
         }
 

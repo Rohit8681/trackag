@@ -443,7 +443,6 @@ class PartyController extends Controller
                 'remark' => $customer->remarks ?? '',
             ], $customer->user->id);
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error('Failed to send new party status notification: ' . $e->getMessage());
         }
     }
 
