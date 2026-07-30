@@ -17,8 +17,18 @@ class PartyVisitCheckoutReminder extends Command
 
     public function handle(FirebaseService $firebaseService)
     {
-        $today = Carbon::today('Asia/Kolkata')->toDateString();
+        $now = Carbon::now('Asia/Kolkata');
+        $today = $now->toDateString();
         $tenants = Tenant::all();
+        $totalOpenVisits = 0;
+        $totalSent = 0;
+        $totalFailed = 0;
+
+        Log::info('Party visit checkout reminder command started.', [
+            'now' => $now->toDateTimeString(),
+            'today' => $today,
+            'tenant_count' => $tenants->count(),
+        ]);
 
         if ($tenants->isEmpty()) {
             Log::warning('No tenants found for party visit checkout reminder.');
@@ -27,11 +37,26 @@ class PartyVisitCheckoutReminder extends Command
 
         foreach ($tenants as $tenant) {
             if (empty($tenant->tenancy_db_name)) {
+                Log::warning('Party visit checkout reminder tenant skipped because database name is empty.', [
+                    'tenant_id' => $tenant->id ?? null,
+                ]);
                 continue;
             }
 
             try {
                 $this->useTenantDatabase($tenant->tenancy_db_name);
+
+                Log::info('Party visit checkout reminder tenant processing started.', [
+                    'tenant_db' => $tenant->tenancy_db_name,
+                    'tenant_id' => $tenant->id ?? null,
+                ]);
+
+                $openVisitRows = DB::connection('tenant')
+                    ->table('party_visits')
+                    ->whereDate('visited_date', $today)
+                    ->whereNotNull('check_in_time')
+                    ->whereNull('check_out_time')
+                    ->count();
 
                 $openVisits = DB::connection('tenant')
                     ->table('party_visits')
@@ -55,9 +80,12 @@ class PartyVisitCheckoutReminder extends Command
                     ->get()
                     ->unique('user_id');
 
-                Log::info('Party visit checkout reminder open visits found.', [
+                $totalOpenVisits += $openVisits->count();
+
+                Log::info('Party visit checkout reminder open visits checked.', [
                     'tenant_db' => $tenant->tenancy_db_name,
-                    'count' => $openVisits->count(),
+                    'open_visit_rows' => $openVisitRows,
+                    'eligible_users_with_fcm_token' => $openVisits->count(),
                 ]);
 
                 foreach ($openVisits as $visit) {
@@ -78,7 +106,15 @@ class PartyVisitCheckoutReminder extends Command
                         $visit->user_id
                     );
 
-                    Log::info('Party visit checkout reminder notification processed.', [
+                    if ($sent) {
+                        $totalSent++;
+                    } else {
+                        $totalFailed++;
+                    }
+
+                    $logLevel = $sent ? 'info' : 'warning';
+
+                    Log::$logLevel('Party visit checkout reminder notification processed.', [
                         'tenant_db' => $tenant->tenancy_db_name,
                         'party_visit_id' => $visit->party_visit_id,
                         'user_id' => $visit->user_id,
@@ -90,9 +126,19 @@ class PartyVisitCheckoutReminder extends Command
                 Log::error('Failed to send party visit checkout reminders.', [
                     'tenant_db' => $tenant->tenancy_db_name,
                     'message' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
                 ]);
             }
         }
+
+        Log::info('Party visit checkout reminder command finished.', [
+            'now' => Carbon::now('Asia/Kolkata')->toDateTimeString(),
+            'tenant_count' => $tenants->count(),
+            'total_eligible_users' => $totalOpenVisits,
+            'total_sent' => $totalSent,
+            'total_failed' => $totalFailed,
+        ]);
 
         return self::SUCCESS;
     }

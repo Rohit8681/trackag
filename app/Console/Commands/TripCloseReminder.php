@@ -17,8 +17,18 @@ class TripCloseReminder extends Command
 
     public function handle(FirebaseService $firebaseService)
     {
-        $today = Carbon::today('Asia/Kolkata')->toDateString();
+        $now = Carbon::now('Asia/Kolkata');
+        $today = $now->toDateString();
         $tenants = Tenant::all();
+        $totalOpenTrips = 0;
+        $totalSent = 0;
+        $totalFailed = 0;
+
+        Log::info('Trip close reminder command started.', [
+            'now' => $now->toDateTimeString(),
+            'today' => $today,
+            'tenant_count' => $tenants->count(),
+        ]);
 
         if ($tenants->isEmpty()) {
             Log::warning('No tenants found for trip close reminder.');
@@ -27,11 +37,28 @@ class TripCloseReminder extends Command
 
         foreach ($tenants as $tenant) {
             if (empty($tenant->tenancy_db_name)) {
+                Log::warning('Trip close reminder tenant skipped because database name is empty.', [
+                    'tenant_id' => $tenant->id ?? null,
+                ]);
                 continue;
             }
 
             try {
                 $this->useTenantDatabase($tenant->tenancy_db_name);
+
+                Log::info('Trip close reminder tenant processing started.', [
+                    'tenant_db' => $tenant->tenancy_db_name,
+                    'tenant_id' => $tenant->id ?? null,
+                ]);
+
+                $openTripRows = DB::connection('tenant')
+                    ->table('trips')
+                    ->whereDate('trip_date', $today)
+                    ->where(function ($query) {
+                        $query->whereNull('end_time')
+                            ->orWhere('status', '!=', 'completed');
+                    })
+                    ->count();
 
                 $openTrips = DB::connection('tenant')
                     ->table('trips')
@@ -54,9 +81,12 @@ class TripCloseReminder extends Command
                     ->get()
                     ->unique('user_id');
 
-                Log::info('Trip close reminder open trips found.', [
+                $totalOpenTrips += $openTrips->count();
+
+                Log::info('Trip close reminder open trips checked.', [
                     'tenant_db' => $tenant->tenancy_db_name,
-                    'count' => $openTrips->count(),
+                    'open_trip_rows' => $openTripRows,
+                    'eligible_users_with_fcm_token' => $openTrips->count(),
                 ]);
 
                 foreach ($openTrips as $trip) {
@@ -73,7 +103,15 @@ class TripCloseReminder extends Command
                         $trip->user_id
                     );
 
-                    Log::info('Trip close reminder notification processed.', [
+                    if ($sent) {
+                        $totalSent++;
+                    } else {
+                        $totalFailed++;
+                    }
+
+                    $logLevel = $sent ? 'info' : 'warning';
+
+                    Log::$logLevel('Trip close reminder notification processed.', [
                         'tenant_db' => $tenant->tenancy_db_name,
                         'trip_id' => $trip->trip_id,
                         'user_id' => $trip->user_id,
@@ -85,9 +123,19 @@ class TripCloseReminder extends Command
                 Log::error('Failed to send trip close reminders.', [
                     'tenant_db' => $tenant->tenancy_db_name,
                     'message' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
                 ]);
             }
         }
+
+        Log::info('Trip close reminder command finished.', [
+            'now' => Carbon::now('Asia/Kolkata')->toDateTimeString(),
+            'tenant_count' => $tenants->count(),
+            'total_eligible_users' => $totalOpenTrips,
+            'total_sent' => $totalSent,
+            'total_failed' => $totalFailed,
+        ]);
 
         return self::SUCCESS;
     }
