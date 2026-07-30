@@ -15,10 +15,10 @@ class Kernel extends ConsoleKernel
         $schedule->command('trip:close')->everyMinute();
 
         // Original live schedule:
-        // $schedule->command('trip:close-reminder')->hourly()->between('21:00', '23:59')->timezone('Asia/Kolkata');
-        // $schedule->command('party-visit:checkout-reminder')->hourly()->timezone('Asia/Kolkata');
-        $schedule->command('trip:close-reminder')->everyMinute()->timezone('Asia/Kolkata');
-        $schedule->command('party-visit:checkout-reminder')->everyMinute()->timezone('Asia/Kolkata');
+        $schedule->command('trip:close-reminder')->hourly()->between('21:00', '23:59')->timezone('Asia/Kolkata');
+        $schedule->command('party-visit:checkout-reminder')->hourly()->timezone('Asia/Kolkata');
+        // $schedule->command('trip:close-reminder')->everyMinute()->timezone('Asia/Kolkata');
+        // $schedule->command('party-visit:checkout-reminder')->everyMinute()->timezone('Asia/Kolkata');
     }
 
     /**
